@@ -54,16 +54,17 @@ If you have the same idea, you are welcome to join the project by adding code pa
 
 ## Goals of the project
 
-### Work for any client
+### Supports any client
 
 The blocks and items can be used by anyone.
 * Players with a corresponding client mod receive the custom blocks and items directly.
-* Players with a resource pack can see the custom blocks and items through a collection of replaced block and item and entity models.
+* Players with a resource pack can see the custom blocks and items through a collection of replaced block states and item and entity models.
 * Anyone without the resource pack sees the closest vanilla equivalent, with the custom item's name as display name.
 
 ### Can be seamlessly updated
 
-Mods adding custom blocks frequently have the problem that they stop being updated, or need to be updated for every version, which makes it hard for servers to use them. The custom blocks added to a Fiddle server are updated automatically, and remain saved in the world and placeable/breakable as before.
+Mods adding custom blocks frequently have the problem that they stop being updated, or need to be updated for every version, which makes it hard for servers to use them.
+The custom blocks added to a Fiddle server are updated automatically, and remain saved in the world and placeable/breakable as before.
 
 ### Works with plugins
 
