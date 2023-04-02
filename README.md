@@ -69,3 +69,58 @@ The custom blocks added to a Fiddle server are updated automatically, and remain
 ### Works with plugins
 
 Custom blocks and items work fully with almost all plugins out of the box.
+## Design considerations
+
+### Namespaced keys
+
+Minecraft introduced namespaced keys as a way of differentiating what source resources belong to.
+The `minecraft:` namespace is for vanilla resources, and other namespaces (for example `quark:`) can be used by mods.
+
+However, neither Bukkit, nor most Bukkit plugins, work with this.
+There are many plugins that assume that Bukkit's `Material` can be turned directly into a `minecraft:` namespaced key (so `Material.OAK_PLANKS` corresponds to `minecraft:oak_planks`).
+It is not possible to add a fitting value to `Material` for other namespaces, like `quark:birch_bookshelf`.
+
+There are many plugins that make the hard-coded assumption that `Material` corresponds to the namespaced keys, including common plugins like WorldEdit and CoreProtect.
+Such plugins simply do not work with different namespaces.
+If all custom resources use the `minecraft:` namespace, nearly all of these plugins fully work.
+
+Therefore, against the purpose of namespaced keys, Fiddle uses the `minecraft:` namespace, with a prefix in the key, for example `minecraft:quark_birch_bookshelf`.
+
+Furthermore, most plugins assume that `Material` names contain uppercase letters, digits and underscores, and that namespaced keys are identical but lowercase.
+Therefore, all namespaced keys in Fiddle can only contain lowercase letters, digits and underscores.
+
+### Block entities
+
+Duplicate visual block states (such as note block properties, leaves distance, infested stone bricks) can be overridden in a resource pack with the look of a custom block.
+However, some properties of these overridden block states are hard-coded in the client, and limit what they can be used for.
+
+Most importantly, the collision box of a block state is hard-coded in the client.
+This means that to be able to add custom stairs, the client must always receive a block state with the collision box as the custom block state, or else it won't be possible to walk on it properly.
+There are only 4 duplicate visual stairs (waxed copper stairs) that could be used.
+This allows the addition of only 4 types of custom stairs.
+
+An alternative method is sending some regular stairs as a block, and drawing the desired block as an entity around it.
+Many such entities will cause the client FPS to drop.
+
+To allow the potential use of any collision box, using the entity method is supported.
+
+### Breaking speed
+
+Block breaking speed is initially managed client-side.
+When breaking a block, the client determines how much the damage that has been done to a block, and when to send a packet to the server indicating it has finished.
+The server then only checks whether the breaking time was reasonable, and approves or denies the breaking.
+
+There is no clean way to make breaking the block go slower.
+Because of the short time needed to break most blocks, packets sent to influence the breaking will often take too much time to arrive, leading to visual glitches, including invisible blocks.
+
+The client determines the block breaking speed only from the block type (not the specific block state) and whether an appropriate tool is being used.
+The breaking speed per block is hard-coded and cannot be modified.
+This means that for example, if a note block state is sent to a client with a resource pack, then the client will assume the block takes as long to break as a regular note block.
+If the resource pack overrides the block state's texture to be calcite bricks, then the block breaking speed is unnaturally fast.
+
+However, no good solution for this appears to be possible.
+Denying the block break from the client does not slow down block breaking, but forces the client to begin again.
+Therefore, it is chosen that, if a server block X (for example, calcite bricks) is sent to the client as block Y (for example, a note block), then we will accept any block breaks sent by the client using a calculation for block Y.
+
+Similarly, because the appropriate tools to break a block can be determined by the server, but only for a block type as a whole (not individual block states), if a note block state is overridden to look like calcite bricks, and calcite bricks must be breakable quickly by using a pickaxe, then all note block states will be breakable quickly by using a pickaxe.
+It may be possible to modify the appropriate tools to break a block at the last second when a player looks at it, by sending an [Update Tags](https://wiki.vg/Protocol#Update_Tags) packet.
