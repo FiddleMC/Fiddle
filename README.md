@@ -44,6 +44,13 @@
   </i>
 </div>
 
+## Introduction
+
+To add custom blocks to Minecraft, but stay within the Paper ecosystem, and allow vanilla players to join, a fork of Paper that does exactly this was originally written for a small community server.
+You can join *sucraft.org* and do `/warp Demo` to see it in action yourself.
+The goal of this project is to re-write it in a generic way, so that everyone can use it, and add their own custom blocks just as easily, smoothly and reliably.
+
+If you have the same idea, you are welcome to join the project by adding code parts, testing, sharing knowledge or giving suggestions.
 
 ## Goals of the project
 
