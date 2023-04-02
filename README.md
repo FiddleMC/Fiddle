@@ -124,3 +124,13 @@ Therefore, it is chosen that, if a server block X (for example, calcite bricks) 
 
 Similarly, because the appropriate tools to break a block can be determined by the server, but only for a block type as a whole (not individual block states), if a note block state is overridden to look like calcite bricks, and calcite bricks must be breakable quickly by using a pickaxe, then all note block states will be breakable quickly by using a pickaxe.
 It may be possible to modify the appropriate tools to break a block at the last second when a player looks at it, by sending an [Update Tags](https://wiki.vg/Protocol#Update_Tags) packet.
+
+## Issues
+
+### Plugin data
+
+Many plugins store data, usually referring to blocks and items by their namespaced key (or using the `Material` names, which is worse).
+This means that deleting namespaced keys from the server (which also happens in vanilla Minecraft, such as with the renaming of `grass_path` to `dirt_path`) may affect the plugin.
+
+Therefore, it is generally best to assume that added blocks or items must always keep the same namespaced key from that moment on.
+Even if the world data can be updated, there is no guarantee that plugins can handle such a change.
