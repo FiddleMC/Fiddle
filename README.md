@@ -52,10 +52,6 @@ The goal of this project is to re-write it in a generic way, so that everyone ca
 
 If you have the same idea, you are welcome to join the project by adding code parts, testing, sharing knowledge or giving suggestions.
 
-## Architecture
-
-<img src="design/architecture.svg" width="100%">
-
 ## Goals of the project
 
 ### Supports any client
@@ -73,6 +69,11 @@ The custom blocks added to a Fiddle server are updated automatically, and remain
 ### Works with plugins
 
 Custom blocks and items work fully with almost all plugins out of the box.
+
+## Architecture
+
+<img src="design/architecture.svg" width="100%">
+
 ## Design considerations
 
 ### Namespaced keys
