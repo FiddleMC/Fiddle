@@ -52,6 +52,10 @@ The goal of this project is to re-write it in a generic way, so that everyone ca
 
 If you have the same idea, you are welcome to join the project by adding code parts, testing, sharing knowledge or giving suggestions.
 
+## Architecture
+
+<img src="design/architecture.svg" width="100%">
+
 ## Goals of the project
 
 ### Supports any client
