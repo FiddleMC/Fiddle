@@ -290,7 +290,7 @@ index 31243f5f1b2c54624cc110038618c53b788d4375..25709f1c36fc9ec09c1d96e743b79983
      // CraftBukkit end
  
 diff --git a/src/main/java/net/minecraft/server/Services.java b/src/main/java/net/minecraft/server/Services.java
-index ef6ff78af2ae747e939895b82ee9d11c75012dcd..ec45ac596e0695785416ca56ba8d02455dabcaa0 100644
+index ef6ff78af2ae747e939895b82ee9d11c75012dcd..8745ce427810ae9b3922fddae3afde2ada041ca1 100644
 --- a/src/main/java/net/minecraft/server/Services.java
 +++ b/src/main/java/net/minecraft/server/Services.java
 @@ -6,12 +6,13 @@ import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
@@ -301,7 +301,7 @@ index ef6ff78af2ae747e939895b82ee9d11c75012dcd..ec45ac596e0695785416ca56ba8d0245
  
  // Paper start
 -public record Services(MinecraftSessionService sessionService, SignatureValidator serviceSignatureValidator, GameProfileRepository profileRepository, GameProfileCache profileCache, @javax.annotation.Nullable io.papermc.paper.configuration.PaperConfigurations paperConfigurations) {
-+public record Services(MinecraftSessionService sessionService, SignatureValidator serviceSignatureValidator, GameProfileRepository profileRepository, GameProfileCache profileCache, @javax.annotation.Nullable io.papermc.paper.configuration.PaperConfigurations paperConfigurations, @javax.annotation.Nullable FiddleConfigurations FiddleConfigurations) { // Fiddle - Fiddle configuration
++public record Services(MinecraftSessionService sessionService, SignatureValidator serviceSignatureValidator, GameProfileRepository profileRepository, GameProfileCache profileCache, @javax.annotation.Nullable io.papermc.paper.configuration.PaperConfigurations paperConfigurations, @javax.annotation.Nullable FiddleConfigurations fiddleConfigurations) { // Fiddle - Fiddle configuration
  
      public Services(MinecraftSessionService sessionService, SignatureValidator signatureValidator, GameProfileRepository profileRepository, GameProfileCache profileCache) {
 -        this(sessionService, signatureValidator, profileRepository, profileCache, null);
@@ -315,7 +315,7 @@ index ef6ff78af2ae747e939895b82ee9d11c75012dcd..ec45ac596e0695785416ca56ba8d0245
      // Paper end
 +    // Fiddle start - Fiddle configuration
 +    public FiddleConfigurations FiddleConfigurations() {
-+        return java.util.Objects.requireNonNull(this.FiddleConfigurations);
++        return java.util.Objects.requireNonNull(this.fiddleConfigurations);
 +    }
 +    // Fiddle end - Fiddle configuration
      public static final String USERID_CACHE_FILE = "usercache.json"; // Paper - private -> public
@@ -327,8 +327,8 @@ index ef6ff78af2ae747e939895b82ee9d11c75012dcd..ec45ac596e0695785416ca56ba8d0245
          io.papermc.paper.configuration.PaperConfigurations paperConfigurations = io.papermc.paper.configuration.PaperConfigurations.setup(legacyConfigPath, configDirPath, rootDirectory.toPath(), (File) optionSet.valueOf("spigot-settings"));
 -        return new Services(minecraftSessionService, signatureValidator, gameProfileRepository, gameProfileCache, paperConfigurations);
 +        // Fiddle start - Fiddle configuration
-+        FiddleConfigurations FiddleConfigurations = FiddleConfigurations.setup(configDirPath);
-+        return new Services(minecraftSessionService, signatureValidator, gameProfileRepository, gameProfileCache, paperConfigurations, FiddleConfigurations);
++        FiddleConfigurations fiddleConfigurations = FiddleConfigurations.setup(configDirPath);
++        return new Services(minecraftSessionService, signatureValidator, gameProfileRepository, gameProfileCache, paperConfigurations, fiddleConfigurations);
 +        // Fiddle end - Fiddle configuration
          // Paper end
      }
