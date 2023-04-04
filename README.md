@@ -74,6 +74,10 @@ Custom blocks and items work fully with almost all plugins out of the box.
 
 <img src="design/architecture.svg" width="100%">
 
+## Current state
+
+### 
+
 ## Design considerations
 
 ### Namespaced keys
