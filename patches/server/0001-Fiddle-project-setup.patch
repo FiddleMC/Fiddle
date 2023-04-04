@@ -1,0 +1,29 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Thu, 24 Nov 2022 21:26:57 +0100
+Subject: [PATCH] Fiddle project setup
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/build.gradle.kts b/build.gradle.kts
+index 9cf389defdaeb887e9cad4f0fed3f3b95667b238..c6fdd597783bdc3ba633d866d43f182fc2237365 100644
+--- a/build.gradle.kts
++++ b/build.gradle.kts
+@@ -7,8 +7,14 @@ plugins {
+ }
+ 
+ dependencies {
+-    implementation(project(":paper-api"))
+-    implementation(project(":paper-mojangapi"))
++    // Fiddle start - project setup
++    // Depend on own API
++    implementation(project(":fiddle-api"))
++    // Depend on Paper MojangAPI
++    implementation("io.papermc.paper:paper-mojangapi:1.19.3-R0.1-SNAPSHOT") {
++        exclude("io.papermc.paper", "paper-api")
++    }
++    // Fiddle end - project setup
+     // Paper start
+     implementation("org.jline:jline-terminal-jansi:3.21.0")
+     implementation("net.minecrell:terminalconsoleappender:1.3.0")

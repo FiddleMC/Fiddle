@@ -76,7 +76,7 @@ Custom blocks and items work fully with almost all plugins out of the box.
 
 ## Current state
 
-### 
+There are global and per-world configuration files containing a single, unused placeholder option.
 
 ## Design considerations
 
