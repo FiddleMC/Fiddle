@@ -62,10 +62,10 @@ After running Fiddle once, you must open `fiddle.txt`, read the warning carefull
 <div align="center">
   <table>
     <tr>
-      <td>
-        <h2>🔨</h2>
+      <td valign="center">
+        <h1>🔨</h1>
       </td>
-      <td>
+      <td valign="center">
         Note: Fiddle is in active development.
         <br>
         Some of the information below may be outdated or incorrect.
