@@ -50,7 +50,32 @@ To add custom blocks to Minecraft, but stay within the Paper ecosystem, and allo
 You can join *sucraft.org* and do `/warp Demo` to see it in action yourself.
 The goal of this project is to re-write it in a generic way, so that everyone can use it, and add their own custom blocks just as easily, smoothly and reliably.
 
-If you have the same idea, you are welcome to join the project by adding code parts, testing, sharing knowledge or giving suggestions.
+You are very welcome to join the project by adding code parts, testing, sharing knowledge or giving suggestions.
+
+## Installation
+
+You can download the latest stable JAR from [releases](https://github.com/FiddleMC/Fiddle/releases) and the latest development JAR from [actions](https://github.com/FiddleMC/Fiddle/actions).
+
+After running Fiddle once, you must open `fiddle.txt`, read the warning carefully, and set `enable=true`.\
+(Alternatively, you can skip the above step by using the `-Dfiddle.ignore.permanence=true` runtime flag.)
+
+<div align="center">
+  <table>
+    <tr>
+      <td>
+        <h2>🔨</h2>
+      </td>
+      <td>
+        Note: Fiddle is in active development.
+        <br>
+        Some of the information below may be outdated or incorrect.
+        <br>
+        Do <b>NOT</b> run Fiddle on a production server!
+      </td>
+    </tr>
+  </table>
+</div>
+
 
 ## Goals of the project
 
