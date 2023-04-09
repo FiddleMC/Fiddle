@@ -79,8 +79,10 @@ After running Fiddle once, you must open `fiddle.txt`, read the warning carefull
 ## Adding blocks/items
 
 You can easily add custom blocks or items with [packs](https://github.com/FiddleMC/Fiddle/wiki/Packs).
-Packs are placed into the `fiddle_packs` folder in the server root.
-A Fiddle pack is an archive file (`.rar` or `.zip`), for example: `fiddle_packs/willows.rar`.
+
+Packs can be stand-alone, or included in a [plugin](https://github.com/FiddleMC/Fiddle/wiki/Making-packs#in-a-plugin).
+Stand-alone packs are an archive file (`.rar` or `.zip`), and can be placed into the `fiddle_packs` folder in the server root.
+For example: `fiddle_packs/Willows.rar`.
 
 ## Goals of the project
 
