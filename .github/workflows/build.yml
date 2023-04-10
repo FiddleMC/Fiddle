@@ -1,10 +1,10 @@
 name: Build Fiddle
-on: [ push, pull_request ]
+on: [ push ]
 jobs:
   build:
     runs-on: ubuntu-latest
-    # Always run on PRs if the source branch is on someone else's repo, and otherwise, only run if the last commit does not start with [ci-skip]
-    if: ${{ (github.event_name != 'pull_request' && !contains(github.event.commits[0].message, '[ci-skip]')) || github.repository != github.event.pull_request.head.repo.full_name }}
+    # Only run if the last commit does not start with [ci-skip]
+    if: ${{ !contains(github.event.commits[0].message, '[ci-skip]') }}
     steps:
       - name: Checkout Git repository
         uses: actions/checkout@v3
