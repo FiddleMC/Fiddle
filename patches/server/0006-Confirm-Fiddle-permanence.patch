@@ -1,0 +1,129 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Fri, 14 Apr 2023 17:27:27 +0200
+Subject: [PATCH] Confirm Fiddle permanence
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
+index 6b168999bc8fa2660cc808e482442f3ce7f8fab8..edd4620c9378f459bbc4244be002e749f33f6e85 100644
+--- a/src/main/java/net/minecraft/server/Main.java
++++ b/src/main/java/net/minecraft/server/Main.java
+@@ -64,6 +64,7 @@ import net.minecraft.world.level.storage.LevelSummary;
+ import net.minecraft.world.level.storage.PrimaryLevelData;
+ import net.minecraft.world.level.storage.WorldData;
+ import org.fiddlemc.fiddle.configuration.FiddleConfigurations;
++import org.fiddlemc.fiddle.configuration.PermanenceConfirmation;
+ import org.slf4j.Logger;
+ 
+ // CraftBukkit start
+@@ -134,6 +135,13 @@ public class Main {
+             fiddleConfigurations.initializeGlobalConfiguration();
+             // Fiddle end - Fiddle configuration - load Fiddle global configuration before bootstrap
+ 
++            // Fiddle start - confirm Fiddle permanence
++            if (!PermanenceConfirmation.get().hasConfirmedPermanence()) {
++                Main.LOGGER.info("You must confirm that you wish to run Fiddle in this folder. Go to fiddle.txt for more info.");
++                return;
++            }
++            // Fiddle end - confirm Fiddle permanence
++
+             io.papermc.paper.plugin.PluginInitializerManager.load(optionset); // Paper
+             Bootstrap.bootStrap();
+             Bootstrap.validate();
+diff --git a/src/main/java/org/fiddlemc/fiddle/configuration/PermanenceConfirmation.java b/src/main/java/org/fiddlemc/fiddle/configuration/PermanenceConfirmation.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..25b6f83e5839e1cd85dd6151d8eca0934da4c79d
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/configuration/PermanenceConfirmation.java
+@@ -0,0 +1,89 @@
++// Fiddle - confirm Fiddle permanence
++
++package org.fiddlemc.fiddle.configuration;
++
++import com.mojang.logging.LogUtils;
++import net.minecraft.SharedConstants;
++import org.slf4j.Logger;
++
++import java.io.InputStream;
++import java.io.OutputStream;
++import java.nio.file.Files;
++import java.nio.file.Path;
++import java.nio.file.Paths;
++import java.util.Properties;
++
++/**
++ * A class that forces the server owner to confirm that running Fiddle is permanent.
++ */
++public class PermanenceConfirmation {
++
++    public static final Path file = Paths.get("fiddle.txt");
++
++    public static final String confirmedKey = "modded";
++    public static final String confirmedDefaultValue = "false";
++    public static final String compatibilityModeKey = "backwards_plugin_compatibility_mode";
++    public static final String compatibilityModeDefaultValue = "false";
++
++    private static final Logger LOGGER = LogUtils.getLogger();
++    private boolean confirmed;
++    private boolean compatibilityMode;
++
++    private PermanenceConfirmation() {
++        this.confirmed = SharedConstants.IS_RUNNING_IN_IDE;
++        this.readFile();
++    }
++
++    private void readFile() {
++        try (InputStream inputStream = Files.newInputStream(file)) {
++            Properties properties = new Properties();
++            properties.load(inputStream);
++            this.confirmed |= Boolean.parseBoolean(properties.getProperty(confirmedKey, confirmedDefaultValue));
++            this.compatibilityMode = Boolean.parseBoolean(properties.getProperty(compatibilityModeKey, compatibilityModeDefaultValue));
++        } catch (Exception var6) {
++            LOGGER.warn("Failed to load {}", file);
++            this.saveDefaults();
++        }
++    }
++
++    public boolean hasConfirmedPermanence() {
++        return this.confirmed;
++    }
++
++    public boolean hasEnabledCompatibilityMode() {
++        return this.compatibilityMode;
++    }
++
++    private void saveDefaults() {
++        if (!SharedConstants.IS_RUNNING_IN_IDE) {
++            try (OutputStream outputStream = Files.newOutputStream(file)) {
++                Properties properties = new Properties();
++                properties.setProperty(confirmedKey, confirmedDefaultValue);
++                properties.setProperty(compatibilityModeKey, compatibilityModeDefaultValue);
++                properties.store(outputStream, " Fiddle allows you to add new blocks and items." +
++                    "\n These are saved into your world and plugin data, meaning the world and plugin data is affected in the same way as on a modded server." +
++                    "\n Loading a world in Fiddle is therefore PERMANENT." +
++                    "\n DO NOT RUN FIDDLE ON A SERVER IF YOU DO NOT WANT THE WORLD AND PLUGIN DATA TO BE PERMANENTLY AFFECTED." +
++                    "\n At the time this message is written, Fiddle is still in development, in which case DO NOT RUN FIDDLE ON A PRODUCTION SERVER." +
++                    "\n By changing the '" + confirmedKey + "' setting below to 'true' you are indicating that you understand that the server will become a modded server PERMANENTLY." +
++                    "\n" +
++                    "\n Additionally, a backwards compatibility mode exists for legacy plugins that use Bukkit enum names instead of namespaced keys." +
++                    "\n Please see https://github.com/FiddleMC/Fiddle/wiki/Plugin-compatibility to understand the details of this mode." +
++                    "\n Enabling/disabling this mode is PERMANENT and you can NOT change the value of this setting after setting '" + confirmedKey + "' to true." +
++                    "\n You must set the value of '" + compatibilityModeKey + "' NOW.");
++            } catch (Exception var6) {
++                LOGGER.warn("Failed to save {}", file, var6);
++            }
++
++        }
++    }
++
++    private static PermanenceConfirmation INSTANCE;
++    public static PermanenceConfirmation get() {
++        if (INSTANCE == null) {
++            INSTANCE = new PermanenceConfirmation();
++        }
++        return INSTANCE;
++    }
++
++}
