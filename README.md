@@ -62,8 +62,7 @@ Fiddle is a drop-in replacement for Paper.
 
 You can download the latest stable JAR from [releases](https://github.com/FiddleMC/Fiddle/releases) and the latest development JAR from [actions](https://github.com/FiddleMC/Fiddle/actions).
 
-After running Fiddle once, you must open `fiddle.txt`, read the warning carefully, and set `modded=true`.\
-(Alternatively, you can skip the above step by using the `-Dfiddle.ignore.permanence=true` runtime flag.)
+After running Fiddle once, you must open `fiddle.txt`, read the warning carefully, and set `modded=true`.
 
 <div align="center">
   <table>
