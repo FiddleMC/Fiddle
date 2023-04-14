@@ -6,7 +6,9 @@
     Fiddle
   </h1>
   <h3>
-    A Paper server fork that lets you<br>add server-side custom blocks and items
+    A Paper server fork that lets you
+    <br>
+    add server-side custom blocks and items
   </h3>
 
   [![Discord](https://img.shields.io/discord/1091830813240348732?color=5865F2&label=discord&style=for-the-badge)](https://discord.gg/EduvcVmKS7)
@@ -46,17 +48,21 @@
 
 ## Introduction
 
-To add custom blocks to Minecraft, but stay within the Paper ecosystem, and allow vanilla players to join, a fork of Paper that does exactly this was originally written for a small community server.
-You can join *sucraft.org* and do `/warp Demo` to see it in action yourself.
-The goal of this project is to re-write it in a generic way, so that everyone can use it, and add their own custom blocks just as easily, smoothly and reliably.
+Fiddle is a Paper server fork that lets you add new blocks and items into Minecraft.
 
-You are very welcome to join the project by adding code parts, testing, sharing knowledge or giving suggestions.
+Unlike modded platforms, Fiddle:
+* works with Bukkit plugins
+* works with the vanilla client
+* doesn't require custom content to be updated for new Minecraft versions
+* has the speed and optimizations from Paper
 
 ## Installation
 
+Fiddle is a drop-in replacement for Paper.
+
 You can download the latest stable JAR from [releases](https://github.com/FiddleMC/Fiddle/releases) and the latest development JAR from [actions](https://github.com/FiddleMC/Fiddle/actions).
 
-After running Fiddle once, you must open `fiddle.txt`, read the warning carefully, and set `enable=true`.\
+After running Fiddle once, you must open `fiddle.txt`, read the warning carefully, and set `modded=true`.\
 (Alternatively, you can skip the above step by using the `-Dfiddle.ignore.permanence=true` runtime flag.)
 
 <div align="center">
@@ -78,11 +84,22 @@ After running Fiddle once, you must open `fiddle.txt`, read the warning carefull
 
 ## Adding blocks/items
 
-You can easily add custom blocks or items with [packs](https://github.com/FiddleMC/Fiddle/wiki/Packs).
+You can easily add custom blocks or items by [installing packs and plugins](https://github.com/FiddleMC/Fiddle/wiki/Installing-packs).
 
-Packs can be stand-alone, or included in a [plugin](https://github.com/FiddleMC/Fiddle/wiki/Making-packs#in-a-plugin).
-Stand-alone packs are an archive file (`.rar` or `.zip`), and can be placed into the `fiddle_packs` folder in the server root.
-For example: `fiddle_packs/Willows.rar`.
+* A pack is a `.zip` or `.rar` file, and can be placed into the `fiddle_packs` folder in the server root.\
+  *For example:* `fiddle_packs/WillowTrees.zip`
+
+* Regular Bukkit plugins can also add their own custom blocks and items when added on a Fiddle server!\
+  *For example:* `plugins/WarpObelisks.jar`
+
+## Background
+
+To add custom blocks to Minecraft, but stay within the Paper ecosystem, and allow vanilla players to join, a fork of Paper that does exactly this was originally written for a small community server.
+You can join *sucraft.org* and do `/warp Demo` to see it in action yourself.
+
+The goal of this project is to re-write it in a generic way, so that everyone can use it, and add their own custom blocks just as easily, smoothly and reliably.
+
+You are very welcome to join the project by adding code parts, testing, sharing knowledge or giving suggestions.
 
 ## Goals of the project
 
@@ -175,3 +192,38 @@ This means that deleting namespaced keys from the server (which also happens in 
 
 Therefore, it is generally best to assume that added blocks or items must always keep the same namespaced key from that moment on.
 Even if the world data can be updated, there is no guarantee that plugins can handle such a change.
+
+## Acknowledgements
+
+This project has been made possible by:
+* the generous donations from
+  <table>
+    <tr>
+      <td align="center"><a href="https://github.com/EnzoMortelli"><img src="https://avatars.githubusercontent.com/u/10728176" width="54"><br>EnzoMortelli</a></td>
+      <td align="center">Rammus</td>
+      <td align="center">Heedi93</td>
+      <td align="center"><a href="https://github.com/SielStudent"><img src="https://avatars.githubusercontent.com/u/124888543" width="54"><br>SielStudent</a></td>
+      <td align="center">Avidan2</td>
+      <td align="center">BangboomJoe</td>
+      <td align="center">Saigai</td>
+    </tr>
+    <tr>
+      <td align="center"><a href="https://github.com/WarturtleChips99"><img src="https://avatars.githubusercontent.com/u/110665347" width="54"><br>Thomas</a></td>
+      <td align="center">Chi168</td>
+      <td align="center"><a href="https://github.com/pontaoski"><img src="https://avatars.githubusercontent.com/u/20326855" width="54"><br>Janet Blackquill</a></td>
+      <td align="center">__Dragonfly__</td>
+      <td align="center">TrunkS</td>
+      <td align="center">Bingus1</td>
+      <td align="center"><a href="https://github.com/RoelHospel"><img src="https://avatars.githubusercontent.com/u/10463997" width="54"><br>Roel Hospel</a></td>
+    </tr>
+    <tr>
+      <td align="center">SpiderLock</td>
+      <td align="center">hkwhipitup</td>
+      <td align="center">LukePage111</td>
+      <td align="center"><a href="https://github.com/thunderm"><img src="https://avatars.githubusercontent.com/u/4498583" width="54"><br>Michael</a></td>
+      <td align="center"><a href="https://github.com/y0giOP"><img src="https://avatars.githubusercontent.com/u/105310539" width="54"><br>y0giOP</a></td>
+    </tr>
+  </table>
+
+* the authors and maintainers of the Bukkit, [Spigot](https://www.spigotmc.org/) and [Paper](https://github.com/PaperMC/Paper) projects
+* everyone on GitHub and the [Discord](https://discord.gg/EduvcVmKS7) server who helped test Fiddle and provided feedback and suggestions
