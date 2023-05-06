@@ -1,0 +1,173 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sat, 6 May 2023 11:46:15 +0200
+Subject: [PATCH] Read packs - Read pack file bytes functionality
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/reader/ArchivePackBeingRead.java b/src/main/java/org/fiddlemc/fiddle/pack/reader/ArchivePackBeingRead.java
+index 75477e53897e137d2f1b2865e20c8419d3f0022e..20551169d613ff0a8e91ffc9d0e4476cc56d79d0 100644
+--- a/src/main/java/org/fiddlemc/fiddle/pack/reader/ArchivePackBeingRead.java
++++ b/src/main/java/org/fiddlemc/fiddle/pack/reader/ArchivePackBeingRead.java
+@@ -2,10 +2,14 @@
+ 
+ package org.fiddlemc.fiddle.pack.reader;
+ 
++import it.unimi.dsi.fastutil.bytes.ByteArrayList;
++import it.unimi.dsi.fastutil.bytes.ByteList;
++import net.sf.sevenzipjbinding.ExtractOperationResult;
+ import net.sf.sevenzipjbinding.SevenZip;
+ import net.sf.sevenzipjbinding.SevenZipException;
+ import net.sf.sevenzipjbinding.impl.RandomAccessFileInStream;
+ import net.sf.sevenzipjbinding.simple.ISimpleInArchiveItem;
++import org.jetbrains.annotations.Nullable;
+ 
+ import java.io.*;
+ import java.util.Arrays;
+@@ -55,6 +59,48 @@ final class ArchivePackBeingRead extends PackBeingRead {
+             this.item = item;
+         }
+ 
++        @Override
++        protected byte[] readBytes() throws PackParseException {
++            Long size;
++            try {
++                size = this.item.getSize();
++            } catch (SevenZipException e) {
++                throw new PackParseException("An exception occurred while getting the size of a file ('" + this.pathInArchive + "') in a pack archive ('" + ArchivePackBeingRead.this.packFile.getPath() + "'): " + e.getMessage(), e);
++            }
++            final byte @Nullable [] bytes;
++            final int[] bytesIndex = {0};
++            final @Nullable ByteList byteList;
++            if (size != null && size >= 0) {
++                if (size > Integer.MAX_VALUE - 8) {
++                    throw new PackParseException("A file ('" + this.pathInArchive + "') in a pack archive ('" + ArchivePackBeingRead.this.packFile.getPath() + "' is too large: " + size + " bytes");
++                }
++                bytes = new byte[size.intValue()];
++                byteList = null;
++            } else {
++                bytes = null;
++                byteList = new ByteArrayList(2048);
++            }
++            try {
++                var result = this.item.extractSlow(data -> {
++                    if (bytes != null) {
++                        System.arraycopy(data, 0, bytes, bytesIndex[0], data.length);
++                        bytesIndex[0] += data.length;
++                    } else {
++                        for (byte value : data) {
++                            byteList.add(value);
++                        }
++                    }
++                    return data.length;
++                });
++                if (result != ExtractOperationResult.OK) {
++                    throw new PackParseException("Reading bytes from a file ('" + this.pathInArchive + "') in a pack archive ('" + ArchivePackBeingRead.this.packFile.getPath() + "' failed: " + result);
++                }
++            } catch (SevenZipException e) {
++                throw new PackParseException("An exception occurred while reading bytes from a file ('" + this.pathInArchive + "') in a pack archive ('" + ArchivePackBeingRead.this.packFile.getPath() + "': " + e.getMessage(), e);
++            }
++            return bytes != null ? bytes : byteList.toArray(new byte[0]);
++        }
++
+     }
+ 
+ }
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/reader/DirectoryPackBeingRead.java b/src/main/java/org/fiddlemc/fiddle/pack/reader/DirectoryPackBeingRead.java
+index aa8e59c2fed1ecc517c356608f2a68a84173b582..f2dd0eef5ca1636464f3f08f30f547a15ed06877 100644
+--- a/src/main/java/org/fiddlemc/fiddle/pack/reader/DirectoryPackBeingRead.java
++++ b/src/main/java/org/fiddlemc/fiddle/pack/reader/DirectoryPackBeingRead.java
+@@ -48,6 +48,15 @@ final class DirectoryPackBeingRead extends PackBeingRead {
+             this.file = file;
+         }
+ 
++        @Override
++        protected byte[] readBytes() throws PackParseException {
++            try {
++                return Files.readAllBytes(this.file.toPath());
++            } catch (IOException e) {
++                throw new PackParseException("An exception of type " + e.getClass().getSimpleName() + " occurred while reading a file ('" + this.pathInArchive + "') in a pack folder ('" + DirectoryPackBeingRead.this.packFile.getPath() + "'): " + e.getMessage(), e);
++            }
++        }
++
+     }
+ 
+ }
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/reader/PackBeingRead.java b/src/main/java/org/fiddlemc/fiddle/pack/reader/PackBeingRead.java
+index 39bd1ac237124c6861d3edd5c4412af9d43b72c3..1d72e572456a11921b1ac0a018556e11fe5414a5 100644
+--- a/src/main/java/org/fiddlemc/fiddle/pack/reader/PackBeingRead.java
++++ b/src/main/java/org/fiddlemc/fiddle/pack/reader/PackBeingRead.java
+@@ -2,6 +2,7 @@
+ 
+ package org.fiddlemc.fiddle.pack.reader;
+ 
++import com.google.common.base.Charsets;
+ import org.jetbrains.annotations.Nullable;
+ 
+ import java.io.File;
+@@ -59,11 +60,46 @@ sealed abstract class PackBeingRead permits ArchivePackBeingRead, DirectoryPackB
+         final String pathInArchive;
+         final boolean isDirectory;
+ 
++        /**
++         * The byte content of this file, or null if not currently cached.
++         */
++        private byte @Nullable [] cachedBytes;
++
+         protected FileInPack(String pathInArchive, boolean isDirectory) {
+             this.pathInArchive = pathInArchive;
+             this.isDirectory = isDirectory;
+         }
+ 
++        protected abstract byte[] readBytes() throws PackParseException;
++
++        /**
++         * @param cache Whether to cache the result (must be cleared with {@link #clearCachedBytes()} later).
++         * @return The bytes in this file.
++         */
++        byte[] getBytes(boolean cache) throws PackParseException {
++            if (this.cachedBytes != null) {
++                return this.cachedBytes;
++            }
++            var bytes = this.readBytes();
++            if (cache) {
++                this.cachedBytes = bytes;
++            }
++            return bytes;
++        }
++
++        /**
++         * @return The content of this file as a string.
++         *
++         * @see #getBytes(boolean)
++         */
++        String getString(boolean cache) throws PackParseException {
++            return new String(this.getBytes(cache), Charsets.UTF_8);
++        }
++
++        void clearCachedBytes() {
++            this.cachedBytes = null;
++        }
++
+     }
+ 
+ }
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/reader/PackReader.java b/src/main/java/org/fiddlemc/fiddle/pack/reader/PackReader.java
+index 6cf04403e2668f5354f3fa14dacba57db7095637..3f6be27889c36f9ce9ead0fc003b02fd1652855c 100644
+--- a/src/main/java/org/fiddlemc/fiddle/pack/reader/PackReader.java
++++ b/src/main/java/org/fiddlemc/fiddle/pack/reader/PackReader.java
+@@ -45,6 +45,13 @@ public final class PackReader {
+             }
+         });
+ 
++        // Clear any file contents stored in memory
++        packs.forEach(pack -> {
++            for (var file : pack.getFiles()) {
++                file.clearCachedBytes();
++            }
++        });
++
+         // Deallocate the opened packs
+         packs.clear();
+ 

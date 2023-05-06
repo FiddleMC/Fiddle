@@ -1,0 +1,32 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sat, 6 May 2023 11:54:59 +0200
+Subject: [PATCH] Read packs - Scan for meta file in packs
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/reader/PackReader.java b/src/main/java/org/fiddlemc/fiddle/pack/reader/PackReader.java
+index 07514ab582d973234ed8f4d1f8896762475d4b1c..6cf04403e2668f5354f3fa14dacba57db7095637 100644
+--- a/src/main/java/org/fiddlemc/fiddle/pack/reader/PackReader.java
++++ b/src/main/java/org/fiddlemc/fiddle/pack/reader/PackReader.java
+@@ -16,6 +16,7 @@ import java.util.*;
+ public final class PackReader {
+ 
+     public static final String fiddlePacksFolderName = "fiddle_packs";
++    public static final String packMetaFilename = "pack.mcmeta";
+ 
+     public static final Logger LOGGER = LogUtils.getClassLogger();
+ 
+@@ -83,7 +84,10 @@ public final class PackReader {
+             } else {
+                 pack = new ArchivePackBeingRead(packFile);
+             }
+-            // TODO Scan the meta file
++            var packMetaFile = pack.getFileByPath(packMetaFilename);
++            if (packMetaFile != null && !packMetaFile.isDirectory) {
++                // TODO Parse the meta file
++            }
+         } catch (Exception e) {
+             LOGGER.warn("An exception occurred while checking if a file or folder '" + packFile.getPath() + "' is a Fiddle pack. The file or folder will not be loaded.", e);
+         }

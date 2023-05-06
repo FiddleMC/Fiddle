@@ -1,0 +1,79 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sat, 6 May 2023 11:46:38 +0200
+Subject: [PATCH] Read packs - Read meta
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/reader/PackBeingRead.java b/src/main/java/org/fiddlemc/fiddle/pack/reader/PackBeingRead.java
+index 1d72e572456a11921b1ac0a018556e11fe5414a5..f46a363045a93d54fdfb69544783fb3e599f9049 100644
+--- a/src/main/java/org/fiddlemc/fiddle/pack/reader/PackBeingRead.java
++++ b/src/main/java/org/fiddlemc/fiddle/pack/reader/PackBeingRead.java
+@@ -3,6 +3,7 @@
+ package org.fiddlemc.fiddle.pack.reader;
+ 
+ import com.google.common.base.Charsets;
++import org.fiddlemc.fiddle.pack.FiddlePackMeta;
+ import org.jetbrains.annotations.Nullable;
+ 
+ import java.io.File;
+@@ -25,6 +26,11 @@ sealed abstract class PackBeingRead permits ArchivePackBeingRead, DirectoryPackB
+      */
+     private @Nullable Map<String, FileInPack> fileByPath;
+ 
++    /**
++     * Null while not set yet.
++     */
++    public @Nullable FiddlePackMeta meta;
++
+     protected PackBeingRead(File packFile) {
+         this.packFile = packFile;
+     }
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/reader/PackReader.java b/src/main/java/org/fiddlemc/fiddle/pack/reader/PackReader.java
+index 3f6be27889c36f9ce9ead0fc003b02fd1652855c..4c583710e95decec419dad737975c27ca578cd0d 100644
+--- a/src/main/java/org/fiddlemc/fiddle/pack/reader/PackReader.java
++++ b/src/main/java/org/fiddlemc/fiddle/pack/reader/PackReader.java
+@@ -2,8 +2,11 @@
+ 
+ package org.fiddlemc.fiddle.pack.reader;
+ 
++import com.google.gson.JsonElement;
++import com.google.gson.JsonParser;
+ import com.mojang.logging.LogUtils;
+ import joptsimple.OptionSet;
++import org.fiddlemc.fiddle.pack.FiddlePackMeta;
+ import org.slf4j.Logger;
+ 
+ import java.io.File;
+@@ -93,7 +96,29 @@ public final class PackReader {
+             }
+             var packMetaFile = pack.getFileByPath(packMetaFilename);
+             if (packMetaFile != null && !packMetaFile.isDirectory) {
+-                // TODO Parse the meta file
++                String packMetaFileContent;
++                try {
++                    packMetaFileContent = packMetaFile.getString(false);
++                } catch (Exception e) {
++                    LOGGER.warn("An exception occurred while opening '" + packMetaFilename + "' in '" + packFile.getPath() + "'. The pack will not be loaded.", e);
++                    return;
++                }
++                JsonElement json;
++                try {
++                    json = JsonParser.parseString(packMetaFileContent);
++                } catch (Exception e) {LOGGER.warn("An exception occurred while parsing '" + packMetaFilename + "' in '" + packFile.getPath() + "' as JSON. The pack will not be loaded.", e);
++                    LOGGER.warn("'" + packMetaFilename + "' in '" + packFile.getPath() + "' is not valid JSON. The pack will not be loaded.", e);
++                    return;
++                }
++                try {
++                    pack.meta = FiddlePackMeta.fromJson(json);
++                    LOGGER.info(packFile.getPath() + " may be a Fiddle pack because it has a valid " + packMetaFilename);
++                    packs.add(pack);
++                } catch (PackParseException e) {
++                    LOGGER.warn("A problem occurred while parsing '" + packMetaFilename + "' in '" + packFile.getPath() + "': " + e.getMessage() + (e.getMessage().endsWith(".") || e.getMessage().endsWith("!") || e.getMessage().endsWith("?") ? "" : ".") + " The pack will not be loaded.", e);
++                } catch (Exception e) {
++                    LOGGER.warn("An exception occurred while reading '" + packMetaFilename + "' in '" + packFile.getPath() + "'. The pack will not be loaded.", e);
++                }
+             }
+         } catch (Exception e) {
+             LOGGER.warn("An exception occurred while checking if a file or folder '" + packFile.getPath() + "' is a Fiddle pack. The file or folder will not be loaded.", e);

@@ -1,0 +1,32 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sat, 6 May 2023 11:39:16 +0200
+Subject: [PATCH] Read packs - Exception class
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/reader/PackParseException.java b/src/main/java/org/fiddlemc/fiddle/pack/reader/PackParseException.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..743c1016da421028ec512644d5fe4d9f45ebea0e
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/reader/PackParseException.java
+@@ -0,0 +1,18 @@
++// Fiddle - read packs
++
++package org.fiddlemc.fiddle.pack.reader;
++
++/**
++ * A checked exception that occurred while parsing part of a pack.
++ */
++public class PackParseException extends Exception {
++
++    public PackParseException(String message) {
++        super(message);
++    }
++
++    public PackParseException(String message, Throwable cause) {
++        super(message, cause);
++    }
++
++}

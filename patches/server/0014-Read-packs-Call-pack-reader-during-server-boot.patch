@@ -1,0 +1,29 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sat, 6 May 2023 11:52:47 +0200
+Subject: [PATCH] Read packs - Call pack reader during server boot
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
+index edd4620c9378f459bbc4244be002e749f33f6e85..ee5e0717922e54607996b1d4be8f06c140df3c13 100644
+--- a/src/main/java/net/minecraft/server/Main.java
++++ b/src/main/java/net/minecraft/server/Main.java
+@@ -65,6 +65,7 @@ import net.minecraft.world.level.storage.PrimaryLevelData;
+ import net.minecraft.world.level.storage.WorldData;
+ import org.fiddlemc.fiddle.configuration.FiddleConfigurations;
+ import org.fiddlemc.fiddle.configuration.PermanenceConfirmation;
++import org.fiddlemc.fiddle.pack.reader.PackReader;
+ import org.slf4j.Logger;
+ 
+ // CraftBukkit start
+@@ -142,6 +143,8 @@ public class Main {
+             }
+             // Fiddle end - confirm Fiddle permanence
+ 
++            PackReader.readPacks(optionset); // Fiddle - read packs
++
+             io.papermc.paper.plugin.PluginInitializerManager.load(optionset); // Paper
+             Bootstrap.bootStrap();
+             Bootstrap.validate();

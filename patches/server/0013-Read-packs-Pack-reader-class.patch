@@ -1,0 +1,41 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sat, 6 May 2023 11:52:07 +0200
+Subject: [PATCH] Read packs - Pack reader class
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/reader/PackReader.java b/src/main/java/org/fiddlemc/fiddle/pack/reader/PackReader.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..c50ad86b7a533f788d59c18973ae0d81b3b12189
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/reader/PackReader.java
+@@ -0,0 +1,27 @@
++// Fiddle - read packs
++
++package org.fiddlemc.fiddle.pack.reader;
++
++import com.mojang.logging.LogUtils;
++import joptsimple.OptionSet;
++import org.slf4j.Logger;
++
++/**
++ * A singleton providing the {@link #readPacks} method.
++ */
++public final class PackReader {
++
++    public static final Logger LOGGER = LogUtils.getClassLogger();
++
++    private PackReader() {
++        throw new RuntimeException();
++    }
++
++    /**
++     * Scans for packs in the appropriate places, and performs preparatory reading of their contents,
++     * including making sure that they are valid in every way that is possible to tell at this stage,
++     * so that their contents may be used at the right moment later, such as during block registry.
++     */
++    public static void readPacks(OptionSet optionSet) {}
++
++}

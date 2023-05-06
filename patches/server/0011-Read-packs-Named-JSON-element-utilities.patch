@@ -1,0 +1,925 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sat, 6 May 2023 11:39:42 +0200
+Subject: [PATCH] Read packs - Named JSON element utilities
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/reader/json/named/NamedJsonArray.java b/src/main/java/org/fiddlemc/fiddle/pack/reader/json/named/NamedJsonArray.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..8d9fda956b3aa5d8295f500d68831cf12337455c
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/reader/json/named/NamedJsonArray.java
+@@ -0,0 +1,171 @@
++// Fiddle - read packs - JSON utils - named elements
++
++package org.fiddlemc.fiddle.pack.reader.json.named;
++
++import com.google.gson.JsonArray;
++import com.google.gson.JsonElement;
++import org.fiddlemc.fiddle.pack.reader.PackParseException;
++import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
++
++import java.util.ArrayList;
++import java.util.Iterator;
++import java.util.List;
++import java.util.Objects;
++import java.util.stream.Collectors;
++import java.util.stream.StreamSupport;
++
++/**
++ * A potentially named {@link JsonArray}.
++ */
++@SuppressWarnings("unused")
++public record NamedJsonArray(@Nullable String name, JsonArray unnamed) implements NamedJsonElement<JsonArray>, Iterable<NamedJsonElement<?>> {
++
++    public NamedJsonArray(@Nullable String name) {
++        this(name, new JsonArray());
++    }
++
++    public NamedJsonArray(@Nullable String name, int capacity) {
++        this(name, new JsonArray(capacity));
++    }
++
++    public NamedJsonArray() {
++        this(null);
++    }
++
++    public NamedJsonArray(int capacity) {
++        this(null, capacity);
++    }
++
++    @Override
++    public NamedJsonArray deepCopy() {
++        return (NamedJsonArray) NamedJsonElement.super.deepCopy();
++    }
++
++    public void add(Boolean bool) {
++        this.unnamed.add(bool);
++    }
++
++    public void add(Character character) {
++        this.unnamed.add(character);
++    }
++
++    public void add(Number number) {
++        this.unnamed.add(number);
++    }
++
++    public void add(String string) {
++        this.unnamed.add(string);
++    }
++
++    public void add(JsonElement element) {
++        this.unnamed.add(element);
++    }
++
++    public void addAll(JsonArray array) {
++        this.unnamed.addAll(array);
++    }
++
++    public JsonElement set(int index, JsonElement element) {
++        return this.unnamed.set(index, element);
++    }
++
++    public boolean remove(JsonElement element) {
++        return this.unnamed.remove(element);
++    }
++
++    public JsonElement remove(int index) {
++        return this.unnamed.remove(index);
++    }
++
++    public boolean contains(JsonElement element) {
++        return this.unnamed.contains(element);
++    }
++
++    public int size() {
++        return this.unnamed.size();
++    }
++
++    public boolean isEmpty() {
++        return this.unnamed.isEmpty();
++    }
++
++    @Override
++    public @NotNull Iterator<NamedJsonElement<?>> iterator() {
++        return new Iterator<>() {
++
++            private int i = 0;
++
++            @Override
++            public boolean hasNext() {
++                return this.i < NamedJsonArray.this.size();
++            }
++
++            @Override
++            public NamedJsonElement<?> next() {
++                this.i++;
++                try {
++                    return NamedJsonArray.this.get(this.i - 1);
++                } catch (PackParseException e) {
++                    throw new RuntimeException(e);
++                }
++            }
++
++        };
++    }
++
++    public @Nullable NamedJsonElement<?> getOrNull(int i) {
++        var unnamedChild = this.unnamed.get(i);
++        if (unnamedChild == null) {
++            return null;
++        }
++        return NamedJsonElement.get(concatenateParentAndChild(this, i), unnamedChild);
++    }
++
++    public NamedJsonElement<?> get(int i) throws PackParseException {
++        var unnamedChild = this.unnamed.get(i);
++        if (unnamedChild == null) {
++            throw new PackParseException((this.name == null ? "Missing JSON" : "JSON at '" + this.name + "' is missing") + " item at index " + i);
++        }
++        return NamedJsonElement.get(concatenateParentAndChild(this, i), unnamedChild);
++    }
++
++    public List<NamedJsonElement<?>> asList() {
++        return StreamSupport
++            .stream(this.spliterator(), false)
++            .collect(Collectors.toList());
++    }
++
++    @FunctionalInterface
++    public interface NamedJsonArrayMapping<V> {
++
++        V apply(NamedJsonElement<?> element) throws PackParseException;
++
++    }
++
++    public <V> List<V> map(NamedJsonArrayMapping<V> mapping) throws PackParseException {
++        List<V> result = new ArrayList<>(this.size());
++        for (int i = 0; i < this.size(); i++) {
++            result.add(mapping.apply(this.get(i)));
++        }
++        return result;
++    }
++
++    public <V> List<V> mapNotNull(NamedJsonArrayMapping<V> mapping) throws PackParseException {
++        return map(mapping).stream().filter(Objects::nonNull).toList();
++    }
++
++    @Override
++    public String toString() {
++        return this.toNameAndUnnamedString();
++    }
++
++    public static String concatenateParentAndChild(@Nullable String parentName, int index) {
++        return (parentName == null ? "" : parentName) + "[" + index + "]";
++    }
++
++    public static String concatenateParentAndChild(NamedJsonArray parent, int index) {
++        return concatenateParentAndChild(parent.name(), index);
++    }
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/reader/json/named/NamedJsonElement.java b/src/main/java/org/fiddlemc/fiddle/pack/reader/json/named/NamedJsonElement.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..0d5d6d810fa693f087d3afc0675d55d8b33cafcd
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/reader/json/named/NamedJsonElement.java
+@@ -0,0 +1,177 @@
++// Fiddle - read packs - JSON utils - named elements
++
++package org.fiddlemc.fiddle.pack.reader.json.named;
++
++import com.google.gson.*;
++import org.fiddlemc.fiddle.pack.reader.PackParseException;
++import org.jetbrains.annotations.Nullable;
++
++import java.math.BigDecimal;
++import java.math.BigInteger;
++import java.util.List;
++import java.util.UUID;
++
++/**
++ * A potentially named {@link JsonElement}.
++ */
++@SuppressWarnings("unused")
++public sealed interface NamedJsonElement<T extends JsonElement> permits NamedJsonArray, NamedJsonNull, NamedJsonObject, NamedJsonPrimitive {
++
++    @Nullable String name();
++
++    T unnamed();
++
++    default boolean hasName() {
++        return name() != null;
++    }
++
++    default NamedJsonElement<T> deepCopy() {
++        //noinspection unchecked
++        return (NamedJsonElement<T>) get(name(), unnamed().deepCopy());
++    }
++
++    default boolean isJsonArray() {
++        return this instanceof NamedJsonArray;
++    }
++
++    default boolean isJsonObject() {
++        return this instanceof NamedJsonObject;
++    }
++
++    default boolean isJsonPrimitive() {
++        return this instanceof NamedJsonPrimitive;
++    }
++
++    default boolean isJsonNull() {
++        return this instanceof NamedJsonNull;
++    }
++
++    default NamedJsonArray getAsJsonArray() throws PackParseException {
++        if (this.isJsonArray()) {
++            return (NamedJsonArray) this;
++        }
++        throw invalidTypeException(this, JsonArray.class);
++    }
++
++    default <V> List<V> getAsMappedJsonArray(NamedJsonArray.NamedJsonArrayMapping<V> mapping) throws PackParseException {
++        return this.getAsJsonArray().map(mapping);
++    }
++
++    default <V> List<V> getAsNotNullMappedJsonArray(NamedJsonArray.NamedJsonArrayMapping<V> mapping) throws PackParseException {
++        return this.getAsJsonArray().mapNotNull(mapping);
++    }
++
++    default NamedJsonObject getAsJsonObject() throws PackParseException {
++        if (this.isJsonObject()) {
++            return (NamedJsonObject) this;
++        }
++        throw invalidTypeException(this, JsonObject.class);
++    }
++
++    default NamedJsonPrimitive getAsJsonPrimitive() throws PackParseException {
++        if (this.isJsonPrimitive()) {
++            return (NamedJsonPrimitive) this;
++        }
++        throw invalidTypeException(this, JsonPrimitive.class);
++    }
++
++    default boolean getAsBoolean() throws PackParseException {
++        throw NamedJsonPrimitive.invalidTypeException(this, Boolean.TYPE);
++    }
++
++    default Number getAsNumber() throws PackParseException {
++        throw NamedJsonPrimitive.invalidTypeException(this, Number.class);
++    }
++
++    enum BlankStringParseResult {
++        RETURN_STRING,
++        RETURN_NULL,
++        THROW_EXCEPTION
++    }
++
++    default String getAsString() throws PackParseException {
++        throw NamedJsonPrimitive.invalidTypeException(this, String.class);
++    }
++
++    default @Nullable String getAsString(boolean trim, BlankStringParseResult blankResult, @Nullable Integer maxLength) throws PackParseException {
++        throw NamedJsonPrimitive.invalidTypeException(this, String.class);
++    }
++
++    default double getAsDouble() throws PackParseException {
++        throw NamedJsonPrimitive.invalidTypeException(this, Double.TYPE);
++    }
++
++    default BigDecimal getAsBigDecimal() throws PackParseException {
++        throw NamedJsonPrimitive.invalidTypeException(this, BigDecimal.class);
++    }
++
++    default BigInteger getAsBigInteger() throws PackParseException {
++        throw NamedJsonPrimitive.invalidTypeException(this, BigInteger.class);
++    }
++
++    default float getAsFloat() throws PackParseException {
++        throw NamedJsonPrimitive.invalidTypeException(this, Float.TYPE);
++    }
++
++    default long getAsLong() throws PackParseException {
++        throw NamedJsonPrimitive.invalidTypeException(this, "long (64-bit integer)");
++    }
++
++    default short getAsShort() throws PackParseException {
++        throw NamedJsonPrimitive.invalidTypeException(this, "short (16-bit integer)");
++    }
++
++    default int getAsInt() throws PackParseException {
++        throw NamedJsonPrimitive.invalidTypeException(this, "int (32-bit integer)");
++    }
++
++    default byte getAsByte() throws PackParseException {
++        throw NamedJsonPrimitive.invalidTypeException(this, "byte (8-bit integer)");
++    }
++
++    default UUID getAsUUID() throws PackParseException {
++        throw NamedJsonPrimitive.invalidTypeException(this, "UUID string");
++    }
++
++    default NamedJsonNull getAsJsonNull() throws PackParseException {
++        if (this.isJsonNull()) {
++            return (NamedJsonNull) this;
++        }
++        throw invalidTypeException(this, JsonNull.class);
++    }
++
++    default String toNameAndUnnamedString() {
++        return this.name() == null ? this.unnamed().toString() : this.name() + ": " + this.unnamed().toString();
++    }
++
++    private static PackParseException invalidTypeException(NamedJsonElement<?> json, Class<? extends JsonElement> desiredType) {
++        return new PackParseException("The value " + (json.name() == null ? "" : "for '" + json.name() + "' ") + "is a " + json.unnamed().getClass().getSimpleName() + ", but it must be a " + desiredType.getSimpleName());
++    }
++
++    @SuppressWarnings("unchecked")
++    static <T extends JsonElement> NamedJsonElement<T> get(@Nullable String name, T json) {
++        if (json.isJsonArray()) {
++            return (NamedJsonElement<T>) new NamedJsonArray(name, json.getAsJsonArray());
++        } else if (json.isJsonObject()) {
++            return (NamedJsonElement<T>) new NamedJsonObject(name, json.getAsJsonObject());
++        } else if (json.isJsonPrimitive()) {
++            return (NamedJsonElement<T>) new NamedJsonPrimitive(name, json.getAsJsonPrimitive());
++        } else if (json.isJsonNull()) {
++            return (NamedJsonElement<T>) (name == null ? NamedJsonNull.UNNAMED_INSTANCE : new NamedJsonNull(name, json.getAsJsonNull()));
++        }
++        // Cannot happen
++        throw new IllegalArgumentException("Unknown type of JSON instance: " + json.getClass().getName());
++    }
++
++    static <T extends JsonElement> NamedJsonElement<T> get(T json) {
++        return get(null, json);
++    }
++
++    static void enforceMaxByteLength(String string, @Nullable String name, int maxLength) throws PackParseException {
++        var length = string.getBytes().length;
++        if (length > maxLength) {
++            throw new PackParseException((name == null ? "A JSON string value" : name) + " is too long: " + length + " bytes (maximum is " + maxLength + " bytes)");
++        }
++    }
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/reader/json/named/NamedJsonNull.java b/src/main/java/org/fiddlemc/fiddle/pack/reader/json/named/NamedJsonNull.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..57676a1aed869c217028368c97e9946047aa61cc
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/reader/json/named/NamedJsonNull.java
+@@ -0,0 +1,32 @@
++// Fiddle - read packs - JSON utils - named elements
++
++package org.fiddlemc.fiddle.pack.reader.json.named;
++
++import com.google.gson.JsonNull;
++import org.jetbrains.annotations.Nullable;
++
++import java.util.Objects;
++
++/**
++ * A potentially named {@link JsonNull}.
++ */
++@SuppressWarnings("unused")
++public record NamedJsonNull(@Nullable String name, JsonNull unnamed) implements NamedJsonElement<JsonNull> {
++
++    public static final NamedJsonNull UNNAMED_INSTANCE = new NamedJsonNull(null, JsonNull.INSTANCE);
++
++    public NamedJsonNull(String name) {
++        this(Objects.requireNonNull(name), JsonNull.INSTANCE);
++    }
++
++    @Override
++    public NamedJsonNull deepCopy() {
++        return this == UNNAMED_INSTANCE ? UNNAMED_INSTANCE : (NamedJsonNull) NamedJsonElement.super.deepCopy();
++    }
++
++    @Override
++    public String toString() {
++        return this.toNameAndUnnamedString();
++    }
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/reader/json/named/NamedJsonObject.java b/src/main/java/org/fiddlemc/fiddle/pack/reader/json/named/NamedJsonObject.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..5c20e6c1e6b41825b7ebab24fcbe294322c9cf62
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/reader/json/named/NamedJsonObject.java
+@@ -0,0 +1,335 @@
++// Fiddle - read packs - JSON utils - named elements
++
++package org.fiddlemc.fiddle.pack.reader.json.named;
++
++import com.google.gson.*;
++import org.fiddlemc.fiddle.pack.reader.PackParseException;
++import org.jetbrains.annotations.Nullable;
++
++import java.math.BigDecimal;
++import java.math.BigInteger;
++import java.util.List;
++import java.util.Map;
++import java.util.Set;
++import java.util.UUID;
++import java.util.stream.Collectors;
++
++/**
++ * A potentially named {@link JsonObject}.
++ */
++@SuppressWarnings("unused")
++public record NamedJsonObject(@Nullable String name, JsonObject unnamed) implements NamedJsonElement<JsonObject> {
++
++    public NamedJsonObject(@Nullable String name) {
++        this(name, new JsonObject());
++    }
++
++    @Override
++    public NamedJsonObject deepCopy() {
++        return (NamedJsonObject) NamedJsonElement.super.deepCopy();
++    }
++
++    public void add(String property, JsonElement value) {
++        this.unnamed.add(property, value);
++    }
++
++    public JsonElement remove(String property) {
++        return this.unnamed.remove(property);
++    }
++
++    public void addProperty(String property, String value) {
++        this.unnamed.addProperty(property, value);
++    }
++
++    public void addProperty(String property, Number value) {
++        this.unnamed.addProperty(property, value);
++    }
++
++    public void addProperty(String property, Boolean value) {
++        this.unnamed.addProperty(property, value);
++    }
++
++    public void addProperty(String property, Character value) {
++        this.unnamed.addProperty(property, value);
++    }
++
++    public Set<Map.Entry<String, NamedJsonElement<JsonElement>>> entrySet() {
++        return this.unnamed.entrySet().stream()
++            .map(entry -> Map.entry(entry.getKey(), NamedJsonElement.get(concatenateParentAndChild(this, entry.getKey()), entry.getValue())))
++            .collect(Collectors.toSet());
++    }
++
++    public Set<String> keySet() {
++        return this.unnamed.keySet();
++    }
++
++    public int size() {
++        return this.unnamed.size();
++    }
++
++    public boolean has(String memberName) {
++        return this.unnamed.has(memberName);
++    }
++
++    public @Nullable NamedJsonElement<?> getOrNull(String memberName) {
++        var unnamedChild = this.unnamed.get(memberName);
++        if (unnamedChild == null) {
++            return null;
++        }
++        return NamedJsonElement.get(concatenateParentAndChild(this, memberName), unnamedChild);
++    }
++
++    public NamedJsonElement<?> get(String memberName) throws PackParseException {
++        var child = this.getOrNull(memberName);
++        if (child == null) {
++            throw new PackParseException((this.name == null ? "Missing JSON" : "JSON at '" + this.name + "' is missing") + " key '" + memberName + "'");
++        }
++        return child;
++    }
++
++    public NamedJsonArray getAsJsonArray(String memberName) throws PackParseException {
++        return get(memberName).getAsJsonArray();
++    }
++
++    public @Nullable NamedJsonArray getAsJsonArrayIfPresent(String memberName) throws PackParseException {
++        var child = getOrNull(memberName);
++        if (child == null) {
++            return null;
++        }
++        return child.getAsJsonArray();
++    }
++
++    public <V> List<V> getAsMappedJsonArray(String memberName, NamedJsonArray.NamedJsonArrayMapping<V> mapping) throws PackParseException {
++        return get(memberName).getAsMappedJsonArray(mapping);
++    }
++
++    public <V> @Nullable List<V> getAsMappedJsonArrayIfPresent(String memberName, NamedJsonArray.NamedJsonArrayMapping<V> mapping) throws PackParseException {
++        var child = getOrNull(memberName);
++        if (child == null) {
++            return null;
++        }
++        return child.getAsMappedJsonArray(mapping);
++    }
++
++    public <V> List<V> getAsNotNullMappedJsonArray(String memberName, NamedJsonArray.NamedJsonArrayMapping<V> mapping) throws PackParseException {
++        return get(memberName).getAsNotNullMappedJsonArray(mapping);
++    }
++
++    public <V> @Nullable List<V> getAsNotNullMappedJsonArrayIfPresent(String memberName, NamedJsonArray.NamedJsonArrayMapping<V> mapping) throws PackParseException {
++        var child = getOrNull(memberName);
++        if (child == null) {
++            return null;
++        }
++        return child.getAsNotNullMappedJsonArray(mapping);
++    }
++
++    public NamedJsonObject getAsJsonObject(String memberName) throws PackParseException {
++        return get(memberName).getAsJsonObject();
++    }
++
++    public @Nullable NamedJsonObject getAsJsonObjectIfPresent(String memberName) throws PackParseException {
++        var child = getOrNull(memberName);
++        if (child == null) {
++            return null;
++        }
++        return child.getAsJsonObject();
++    }
++
++    public NamedJsonPrimitive getAsJsonPrimitive(String memberName) throws PackParseException {
++        return get(memberName).getAsJsonPrimitive();
++    }
++
++    public @Nullable NamedJsonPrimitive getAsJsonPrimitiveIfPresent(String memberName) throws PackParseException {
++        var child = getOrNull(memberName);
++        if (child == null) {
++            return null;
++        }
++        return child.getAsJsonPrimitive();
++    }
++
++    public boolean getAsBoolean(String memberName) throws PackParseException {
++        return get(memberName).getAsBoolean();
++    }
++
++    public @Nullable Boolean getAsBooleanIfPresent(String memberName) throws PackParseException {
++        var child = getOrNull(memberName);
++        if (child == null) {
++            return null;
++        }
++        return child.getAsBoolean();
++    }
++
++    public Number getAsNumber(String memberName) throws PackParseException {
++        return get(memberName).getAsNumber();
++    }
++
++    public @Nullable Number getAsNumberIfPresent(String memberName) throws PackParseException {
++        var child = getOrNull(memberName);
++        if (child == null) {
++            return null;
++        }
++        return child.getAsNumber();
++    }
++
++    public String getAsString(String memberName) throws PackParseException {
++        return get(memberName).getAsString();
++    }
++
++    public @Nullable String getAsStringIfPresent(String memberName) throws PackParseException {
++        var child = getOrNull(memberName);
++        if (child == null) {
++            return null;
++        }
++        return child.getAsString();
++    }
++
++    public @Nullable String getAsString(String memberName, boolean trim, BlankStringParseResult blankResult, @Nullable Integer maxLength) throws PackParseException {
++        return get(memberName).getAsString(trim, blankResult, maxLength);
++    }
++
++    public @Nullable String getAsStringIfPresent(String memberName, boolean trim, BlankStringParseResult blankResult, @Nullable Integer maxLength) throws PackParseException {
++        var child = getOrNull(memberName);
++        if (child == null) {
++            return null;
++        }
++        return child.getAsString(trim, blankResult, maxLength);
++    }
++
++    public Double getAsDouble(String memberName) throws PackParseException {
++        return get(memberName).getAsDouble();
++    }
++
++    public @Nullable Double getAsDoubleIfPresent(String memberName) throws PackParseException {
++        var child = getOrNull(memberName);
++        if (child == null) {
++            return null;
++        }
++        return child.getAsDouble();
++    }
++
++    public BigDecimal getAsBigDecimal(String memberName) throws PackParseException {
++        return get(memberName).getAsBigDecimal();
++    }
++
++    public @Nullable BigDecimal getAsBigDecimalIfPresent(String memberName) throws PackParseException {
++        var child = getOrNull(memberName);
++        if (child == null) {
++            return null;
++        }
++        return child.getAsBigDecimal();
++    }
++
++    public BigInteger getAsBigInteger(String memberName) throws PackParseException {
++        return get(memberName).getAsBigInteger();
++    }
++
++    public @Nullable BigInteger getAsBigIntegerIfPresent(String memberName) throws PackParseException {
++        var child = getOrNull(memberName);
++        if (child == null) {
++            return null;
++        }
++        return child.getAsBigInteger();
++    }
++
++    public float getAsFloat(String memberName) throws PackParseException {
++        return get(memberName).getAsFloat();
++    }
++
++    public @Nullable Float getAsFloatIfPresent(String memberName) throws PackParseException {
++        var child = getOrNull(memberName);
++        if (child == null) {
++            return null;
++        }
++        return child.getAsFloat();
++    }
++
++    public long getAsLong(String memberName) throws PackParseException {
++        return get(memberName).getAsLong();
++    }
++
++    public @Nullable Long getAsLongIfPresent(String memberName) throws PackParseException {
++        var child = getOrNull(memberName);
++        if (child == null) {
++            return null;
++        }
++        return child.getAsLong();
++    }
++
++    public short getAsShort(String memberName) throws PackParseException {
++        return get(memberName).getAsShort();
++    }
++
++    public @Nullable Short getAsShortIfPresent(String memberName) throws PackParseException {
++        var child = getOrNull(memberName);
++        if (child == null) {
++            return null;
++        }
++        return child.getAsShort();
++    }
++
++    public int getAsInt(String memberName) throws PackParseException {
++        return get(memberName).getAsInt();
++    }
++
++    public @Nullable Integer getAsIntIfPresent(String memberName) throws PackParseException {
++        var child = getOrNull(memberName);
++        if (child == null) {
++            return null;
++        }
++        return child.getAsInt();
++    }
++
++    public byte getAsByte(String memberName) throws PackParseException {
++        return get(memberName).getAsByte();
++    }
++
++    public @Nullable Byte getAsByteIfPresent(String memberName) throws PackParseException {
++        var child = getOrNull(memberName);
++        if (child == null) {
++            return null;
++        }
++        return child.getAsByte();
++    }
++
++    public UUID getAsUUID(String memberName) throws PackParseException {
++        return get(memberName).getAsUUID();
++    }
++
++    public @Nullable UUID getAsUUIDIfPresent(String memberName) throws PackParseException {
++        var child = getOrNull(memberName);
++        if (child == null) {
++            return null;
++        }
++        return child.getAsUUID();
++    }
++
++    public NamedJsonNull getAsJsonNull(String memberName) throws PackParseException {
++        return get(memberName).getAsJsonNull();
++    }
++
++    public @Nullable NamedJsonNull getAsJsonNullIfPresent(String memberName) throws PackParseException {
++        var child = getOrNull(memberName);
++        if (child == null) {
++            return null;
++        }
++        return child.getAsJsonNull();
++    }
++
++    public Map<String, JsonElement> asMap() {
++        return this.unnamed.asMap();
++    }
++
++    @Override
++    public String toString() {
++        return this.toNameAndUnnamedString();
++    }
++
++    public static String concatenateParentAndChild(@Nullable String parentName, String key) {
++        return parentName == null ? key : parentName + "." + key;
++    }
++
++    public static String concatenateParentAndChild(NamedJsonObject parent, String key) {
++        return concatenateParentAndChild(parent.name(), key);
++    }
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/reader/json/named/NamedJsonPrimitive.java b/src/main/java/org/fiddlemc/fiddle/pack/reader/json/named/NamedJsonPrimitive.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..162abdabbadf86d1af88fbcebeb5ec38e770f47e
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/reader/json/named/NamedJsonPrimitive.java
+@@ -0,0 +1,172 @@
++// Fiddle - read packs - JSON utils - named elements
++
++package org.fiddlemc.fiddle.pack.reader.json.named;
++
++import com.google.gson.JsonPrimitive;
++import org.fiddlemc.fiddle.pack.reader.PackParseException;
++import org.jetbrains.annotations.Nullable;
++
++import java.math.BigDecimal;
++import java.math.BigInteger;
++import java.util.UUID;
++
++/**
++ * A potentially named {@link JsonPrimitive}.
++ */
++@SuppressWarnings("unused")
++public record NamedJsonPrimitive(@Nullable String name, JsonPrimitive unnamed) implements NamedJsonElement<JsonPrimitive> {
++
++    @Override
++    public NamedJsonPrimitive deepCopy() {
++        return this;
++    }
++
++    public boolean isBoolean() {
++        return this.unnamed.isBoolean();
++    }
++
++    @Override
++    public boolean getAsBoolean() throws PackParseException {
++        if (!this.isBoolean()) {
++            throw invalidTypeException(this, Boolean.TYPE);
++        }
++        return this.unnamed.getAsBoolean();
++    }
++
++    public boolean isNumber() {
++        return this.unnamed.isNumber();
++    }
++
++    @Override
++    public Number getAsNumber() throws PackParseException {
++        if (!this.isNumber()) {
++            throw invalidTypeException(this, Number.class);
++        }
++        return this.unnamed.getAsNumber();
++    }
++
++    public boolean isString() {
++        return this.unnamed.isString();
++    }
++
++    @Override
++    public String getAsString() throws PackParseException {
++        if (!this.isString()) {
++            return NamedJsonElement.super.getAsString();
++        }
++        return this.unnamed.getAsString();
++    }
++
++    @Override
++    public @Nullable String getAsString(boolean trim, BlankStringParseResult blankResult, @Nullable Integer maxLength) throws PackParseException {
++        var value = this.getAsString();
++        if (trim) {
++            value = value.trim();
++        }
++        if (blankResult != BlankStringParseResult.RETURN_STRING) {
++            if (value.isBlank()) {
++                if (blankResult == BlankStringParseResult.RETURN_NULL) {
++                    return null;
++                } else if (blankResult == BlankStringParseResult.THROW_EXCEPTION) {
++                    throw new PackParseException(this.name == null ? "A required JSON string value is empty" : this.name + " can not be empty");
++                }
++            }
++        }
++        if (maxLength != null) {
++            NamedJsonElement.enforceMaxByteLength(value, this.name, maxLength);
++        }
++        return value;
++    }
++
++    @Override
++    public double getAsDouble() throws PackParseException {
++        return this.getAsNumber().doubleValue();
++    }
++
++    @Override
++    public BigDecimal getAsBigDecimal() throws PackParseException {
++        try {
++            return this.unnamed.getAsBigDecimal();
++        } catch (NumberFormatException ignored) {
++            return NamedJsonElement.super.getAsBigDecimal();
++        }
++    }
++
++    @Override
++    public BigInteger getAsBigInteger() throws PackParseException {
++        try {
++            return this.unnamed.getAsBigInteger();
++        } catch (NumberFormatException ignored) {
++            return NamedJsonElement.super.getAsBigInteger();
++        }
++    }
++
++    @Override
++    public float getAsFloat() throws PackParseException {
++        return this.getAsNumber().floatValue();
++    }
++
++    @Override
++    public long getAsLong() throws PackParseException {
++        var number = this.getAsNumber();
++        var value = number.longValue();
++        if (((double) value) == this.getAsNumber().doubleValue()) {
++            return value;
++        }
++        return NamedJsonElement.super.getAsLong();
++    }
++
++    @Override
++    public short getAsShort() throws PackParseException {
++        var number = this.getAsNumber();
++        var value = number.shortValue();
++        if (((double) value) == this.getAsNumber().doubleValue()) {
++            return value;
++        }
++        return NamedJsonElement.super.getAsShort();
++    }
++
++    @Override
++    public int getAsInt() throws PackParseException {
++        var number = this.getAsNumber();
++        var value = number.intValue();
++        if (((double) value) == this.getAsNumber().doubleValue()) {
++            return value;
++        }
++        return NamedJsonElement.super.getAsInt();
++    }
++
++    @Override
++    public byte getAsByte() throws PackParseException {
++        var number = this.getAsNumber();
++        var value = number.byteValue();
++        if (((double) value) == this.getAsNumber().doubleValue()) {
++            return value;
++        }
++        return NamedJsonElement.super.getAsByte();
++    }
++
++    @Override
++    public UUID getAsUUID() throws PackParseException {
++        var asString = this.getAsString();
++        try {
++            return UUID.fromString(asString);
++        } catch (Exception e) {
++            return NamedJsonElement.super.getAsUUID();
++        }
++    }
++
++    @Override
++    public String toString() {
++        return this.toNameAndUnnamedString();
++    }
++
++    static PackParseException invalidTypeException(NamedJsonElement<?> json, Class<?> desiredType) {
++        return invalidTypeException(json, desiredType.getSimpleName());
++    }
++
++    static PackParseException invalidTypeException(NamedJsonElement<?> json, String desiredTypeName) {
++        return new PackParseException("The value " + (json.name() == null ? "" : "for '" + json.name() + "' ") + "is " + (json instanceof NamedJsonPrimitive primitive ? (primitive.isBoolean() || primitive.isNumber() ? primitive.unnamed : "'" + primitive.unnamed + "'") : "a " + json.unnamed().getClass().getSimpleName() ) + ", but must be a " + desiredTypeName);
++    }
++
++}
