@@ -1,16 +1,16 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
 Date: Sat, 6 May 2023 11:54:19 +0200
-Subject: [PATCH] Read packs - Scan for pack folders and archives
+Subject: [PATCH] Read packs - Scan for and open pack folders and archives
 
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/reader/PackReader.java b/src/main/java/org/fiddlemc/fiddle/pack/reader/PackReader.java
-index c50ad86b7a533f788d59c18973ae0d81b3b12189..07514ab582d973234ed8f4d1f8896762475d4b1c 100644
+index df7251d283b526842927bdbf03e9730fa3a3aa3e..36284f04b0afa54f726dd16c5798d5c1c781f5ec 100644
 --- a/src/main/java/org/fiddlemc/fiddle/pack/reader/PackReader.java
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/reader/PackReader.java
-@@ -6,22 +6,87 @@ import com.mojang.logging.LogUtils;
+@@ -6,28 +6,93 @@ import com.mojang.logging.LogUtils;
  import joptsimple.OptionSet;
  import org.slf4j.Logger;
  
@@ -19,7 +19,7 @@ index c50ad86b7a533f788d59c18973ae0d81b3b12189..07514ab582d973234ed8f4d1f8896762
 +import java.util.*;
 +
  /**
-  * A singleton providing the {@link #readPacks} method.
+  * A singleton providing the {@link #scanForAndOpenPacks} and {@link #closeOpenedPacks} methods.
   */
  public final class PackReader {
  
@@ -31,38 +31,24 @@ index c50ad86b7a533f788d59c18973ae0d81b3b12189..07514ab582d973234ed8f4d1f8896762
          throw new RuntimeException();
      }
  
-+    private static final List<PackBeingRead> packs = new ArrayList<>();
++    private static final List<PackBeingRead> packsBeingRead = new ArrayList<>();
++
++    /**
++     * @return The packs being read.
++     */
++    public static List<PackBeingRead> getPacksBeingRead() {
++        return Collections.unmodifiableList(packsBeingRead);
++    }
 +
      /**
       * Scans for packs in the appropriate places, and performs preparatory reading of their contents,
-      * including making sure that they are valid in every way that is possible to tell at this stage,
+      * including a bit of making sure that they are valid in ways that is possible to tell at this stage,
       * so that their contents may be used at the right moment later, such as during block registry.
++     * <br>
++     * It adds initial {@link PackBeingRead} instances to {@link #packsBeingRead}.
       */
--    public static void readPacks(OptionSet optionSet) {}
-+    public static void readPacks(OptionSet optionSet) {
-+
-+        // Scan and open the packs
-+        scanForPacks(optionSet);
-+
-+        // Close the opened packs
-+        packs.forEach(pack -> {
-+            try {
-+                pack.close();
-+            } catch (IOException e) {
-+                throw new RuntimeException("Exception while closing a pack being read", e);
-+            }
-+        });
-+
-+        // Deallocate the opened packs
-+        packs.clear();
-+
-+    }
-+
-+    /**
-+     * Scans for packs in the appropriate folders,
-+     * and adds initial {@link PackBeingRead} instances to {@link #packs}.
-+     */
-+    private static void scanForPacks(OptionSet optionSet) {
+-    public static void scanForAndOpenPacks(OptionSet optionSet) {}
++    public static void scanForAndOpenPacks(OptionSet optionSet) {
 +        for (var checkingPlugins : new boolean[] {false, true}) {
 +            var folder = checkingPlugins ? (File) optionSet.valueOf("plugins") : new File(fiddlePacksFolderName);
 +            if (folder.exists() && folder.isDirectory()) {
@@ -70,7 +56,7 @@ index c50ad86b7a533f788d59c18973ae0d81b3b12189..07514ab582d973234ed8f4d1f8896762
 +                    var lowerCaseName = file.getName().toLowerCase(Locale.ROOT);
 +                    // Accept .jar files in the packs folder too (to use them as packs without the plugin code, which is useful if the code has broken after an update)
 +                    if (lowerCaseName.endsWith(".jar") || (!checkingPlugins && (lowerCaseName.endsWith(".zip") || lowerCaseName.endsWith(".rar") || file.isDirectory()))) {
-+                        scanForPack(file);
++                        scanForAndOpenPack(file);
 +                    }
 +                }
 +            } else if (!checkingPlugins) {
@@ -79,12 +65,33 @@ index c50ad86b7a533f788d59c18973ae0d81b3b12189..07514ab582d973234ed8f4d1f8896762
 +            }
 +        }
 +    }
+ 
+     /**
+      * Closes the opened packs, i.e. closes the corresponding open file handles and data
+      * any content in memory that is no longer needed.
+      */
+-    public static void closeOpenedPacks() {}
++    public static void closeOpenedPacks() {
++
++        // Close the opened packs
++        packsBeingRead.forEach(pack -> {
++            try {
++                pack.close();
++            } catch (IOException e) {
++                throw new RuntimeException("Exception while closing a pack that was being read", e);
++            }
++        });
++
++        // Deallocate the opened packs
++        packsBeingRead.clear();
++
++    }
 +
 +    /**
 +     * Scans the given file, which may or may not be a pack.
-+     * It will be opened and added to {@link #packs} as a {@link PackBeingRead} if it appears to be a pack.
++     * It will be opened and added to {@link #packsBeingRead} as a {@link PackBeingRead} if it appears to be a pack.
 +     */
-+    private static void scanForPack(File packFile) {
++    private static void scanForAndOpenPack(File packFile) {
 +        try {
 +            PackBeingRead pack;
 +            if (packFile.isDirectory()) {

@@ -7,7 +7,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/reader/ArchivePackBeingRead.java b/src/main/java/org/fiddlemc/fiddle/pack/reader/ArchivePackBeingRead.java
-index 75477e53897e137d2f1b2865e20c8419d3f0022e..20551169d613ff0a8e91ffc9d0e4476cc56d79d0 100644
+index 40a6f98234f280a0c51f23ff9db7a7a7816c4de3..84394a25d8425a94d36048a5613bac01cca99582 100644
 --- a/src/main/java/org/fiddlemc/fiddle/pack/reader/ArchivePackBeingRead.java
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/reader/ArchivePackBeingRead.java
 @@ -2,10 +2,14 @@
@@ -75,7 +75,7 @@ index 75477e53897e137d2f1b2865e20c8419d3f0022e..20551169d613ff0a8e91ffc9d0e4476c
  
  }
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/reader/DirectoryPackBeingRead.java b/src/main/java/org/fiddlemc/fiddle/pack/reader/DirectoryPackBeingRead.java
-index aa8e59c2fed1ecc517c356608f2a68a84173b582..f2dd0eef5ca1636464f3f08f30f547a15ed06877 100644
+index cecab54adf4ac300c17445a067f25297276006bf..7f87425e2a2537020527fc73c2171e56837779a5 100644
 --- a/src/main/java/org/fiddlemc/fiddle/pack/reader/DirectoryPackBeingRead.java
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/reader/DirectoryPackBeingRead.java
 @@ -48,6 +48,15 @@ final class DirectoryPackBeingRead extends PackBeingRead {
@@ -95,10 +95,10 @@ index aa8e59c2fed1ecc517c356608f2a68a84173b582..f2dd0eef5ca1636464f3f08f30f547a1
  
  }
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/reader/PackBeingRead.java b/src/main/java/org/fiddlemc/fiddle/pack/reader/PackBeingRead.java
-index 39bd1ac237124c6861d3edd5c4412af9d43b72c3..1d72e572456a11921b1ac0a018556e11fe5414a5 100644
+index cdeb97b68aa4816523b659ae762ced7321a82d08..369eda307814e98ee8a4e16ef73d6353499c78f5 100644
 --- a/src/main/java/org/fiddlemc/fiddle/pack/reader/PackBeingRead.java
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/reader/PackBeingRead.java
-@@ -2,6 +2,7 @@
+@@ -2,11 +2,13 @@
  
  package org.fiddlemc.fiddle.pack.reader;
  
@@ -106,9 +106,15 @@ index 39bd1ac237124c6861d3edd5c4412af9d43b72c3..1d72e572456a11921b1ac0a018556e11
  import org.jetbrains.annotations.Nullable;
  
  import java.io.File;
-@@ -59,11 +60,46 @@ sealed abstract class PackBeingRead permits ArchivePackBeingRead, DirectoryPackB
-         final String pathInArchive;
-         final boolean isDirectory;
+ import java.io.IOException;
+ import java.util.Arrays;
++import java.util.List;
+ import java.util.Map;
+ import java.util.function.Function;
+ import java.util.stream.Collectors;
+@@ -59,11 +61,59 @@ public sealed abstract class PackBeingRead permits ArchivePackBeingRead, Directo
+         public final String pathInArchive;
+         public final boolean isDirectory;
  
 +        /**
 +         * The byte content of this file, or null if not currently cached.
@@ -120,13 +126,26 @@ index 39bd1ac237124c6861d3edd5c4412af9d43b72c3..1d72e572456a11921b1ac0a018556e11
              this.isDirectory = isDirectory;
          }
  
++        /**
++         * @return The files in this directory. This includes all deeply nested files, not only the top-level ones.
++         * @throws IllegalStateException If this file is not a {@linkplain #isDirectory directory}.
++         */
++        public List<FileInPack> getSubfiles() {
++            if (!this.isDirectory) {
++                throw new IllegalStateException("Tried to get sub-files at a pack path that is not a directory: " + this.pathInArchive);
++            }
++            return Arrays.stream(PackBeingRead.this.getFiles())
++                .filter(file -> file.pathInArchive.startsWith(this.pathInArchive + "/") || file.pathInArchive.startsWith(this.pathInArchive + "\\"))
++                .toList();
++        }
++
 +        protected abstract byte[] readBytes() throws PackParseException;
 +
 +        /**
 +         * @param cache Whether to cache the result (must be cleared with {@link #clearCachedBytes()} later).
 +         * @return The bytes in this file.
 +         */
-+        byte[] getBytes(boolean cache) throws PackParseException {
++        public byte[] getBytes(boolean cache) throws PackParseException {
 +            if (this.cachedBytes != null) {
 +                return this.cachedBytes;
 +            }
@@ -142,11 +161,11 @@ index 39bd1ac237124c6861d3edd5c4412af9d43b72c3..1d72e572456a11921b1ac0a018556e11
 +         *
 +         * @see #getBytes(boolean)
 +         */
-+        String getString(boolean cache) throws PackParseException {
++        public String getString(boolean cache) throws PackParseException {
 +            return new String(this.getBytes(cache), Charsets.UTF_8);
 +        }
 +
-+        void clearCachedBytes() {
++        public void clearCachedBytes() {
 +            this.cachedBytes = null;
 +        }
 +
@@ -154,20 +173,20 @@ index 39bd1ac237124c6861d3edd5c4412af9d43b72c3..1d72e572456a11921b1ac0a018556e11
  
  }
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/reader/PackReader.java b/src/main/java/org/fiddlemc/fiddle/pack/reader/PackReader.java
-index 6cf04403e2668f5354f3fa14dacba57db7095637..3f6be27889c36f9ce9ead0fc003b02fd1652855c 100644
+index ad99a611fb76ba4e39cd4135f5f1fe72c7ee982d..5a7db856f24b11af28e866f33f0d4d29c09f8bb2 100644
 --- a/src/main/java/org/fiddlemc/fiddle/pack/reader/PackReader.java
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/reader/PackReader.java
-@@ -45,6 +45,13 @@ public final class PackReader {
+@@ -73,6 +73,13 @@ public final class PackReader {
              }
          });
  
 +        // Clear any file contents stored in memory
-+        packs.forEach(pack -> {
++        packsBeingRead.forEach(pack -> {
 +            for (var file : pack.getFiles()) {
 +                file.clearCachedBytes();
 +            }
 +        });
 +
          // Deallocate the opened packs
-         packs.clear();
+         packsBeingRead.clear();
  

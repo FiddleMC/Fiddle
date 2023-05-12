@@ -1,0 +1,30 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Thu, 11 May 2023 18:36:07 +0200
+Subject: [PATCH] Load packs - Data packs - Include Fiddle repository source in
+ pack repository
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/server/packs/repository/ServerPacksSource.java b/src/main/java/net/minecraft/server/packs/repository/ServerPacksSource.java
+index 03bf7dfc289c6a02f19678d3c7041c027154b99d..d8dc268bd3f25c6c903ebcdbc56bd5930bdf9c38 100644
+--- a/src/main/java/net/minecraft/server/packs/repository/ServerPacksSource.java
++++ b/src/main/java/net/minecraft/server/packs/repository/ServerPacksSource.java
+@@ -15,6 +15,7 @@ import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
+ import net.minecraft.world.flag.FeatureFlags;
+ import net.minecraft.world.level.storage.LevelResource;
+ import net.minecraft.world.level.storage.LevelStorageSource;
++import org.fiddlemc.fiddle.pack.data.FiddleRepositorySource;
+ 
+ public class ServerPacksSource extends BuiltInPackSource {
+     private static final PackMetadataSection VERSION_METADATA_SECTION = new PackMetadataSection(Component.translatable("dataPack.vanilla.description"), SharedConstants.getCurrentVersion().getPackVersion(PackType.SERVER_DATA));
+@@ -51,7 +52,7 @@ public class ServerPacksSource extends BuiltInPackSource {
+     }
+ 
+     public static PackRepository createPackRepository(Path dataPacksPath) {
+-        return new PackRepository(new ServerPacksSource(), new FolderRepositorySource(dataPacksPath, PackType.SERVER_DATA, PackSource.WORLD));
++        return new PackRepository(new ServerPacksSource(), new FolderRepositorySource(dataPacksPath, PackType.SERVER_DATA, PackSource.WORLD), new FiddleRepositorySource()); // Fiddle - packs - data packs - include repository source
+     }
+ 
+     public static PackRepository createPackRepository(LevelStorageSource.LevelStorageAccess session) {

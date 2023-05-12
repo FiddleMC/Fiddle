@@ -8,7 +8,7 @@ Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/reader/ArchivePackBeingRead.java b/src/main/java/org/fiddlemc/fiddle/pack/reader/ArchivePackBeingRead.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..75477e53897e137d2f1b2865e20c8419d3f0022e
+index 0000000000000000000000000000000000000000..40a6f98234f280a0c51f23ff9db7a7a7816c4de3
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/reader/ArchivePackBeingRead.java
 @@ -0,0 +1,60 @@
@@ -48,7 +48,7 @@ index 0000000000000000000000000000000000000000..75477e53897e137d2f1b2865e20c8419
 +    }
 +
 +    @Override
-+    ArchiveFileInPack[] getFiles() {
++    public ArchiveFileInPack[] getFiles() {
 +        return this.files;
 +    }
 +
@@ -74,7 +74,7 @@ index 0000000000000000000000000000000000000000..75477e53897e137d2f1b2865e20c8419
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/reader/DirectoryPackBeingRead.java b/src/main/java/org/fiddlemc/fiddle/pack/reader/DirectoryPackBeingRead.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..aa8e59c2fed1ecc517c356608f2a68a84173b582
+index 0000000000000000000000000000000000000000..cecab54adf4ac300c17445a067f25297276006bf
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/reader/DirectoryPackBeingRead.java
 @@ -0,0 +1,53 @@
@@ -107,7 +107,7 @@ index 0000000000000000000000000000000000000000..aa8e59c2fed1ecc517c356608f2a68a8
 +    }
 +
 +    @Override
-+    DirectoryFileInPack[] getFiles() {
++    public DirectoryFileInPack[] getFiles() {
 +        return this.files;
 +    }
 +
@@ -133,7 +133,7 @@ index 0000000000000000000000000000000000000000..aa8e59c2fed1ecc517c356608f2a68a8
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/reader/PackBeingRead.java b/src/main/java/org/fiddlemc/fiddle/pack/reader/PackBeingRead.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..39bd1ac237124c6861d3edd5c4412af9d43b72c3
+index 0000000000000000000000000000000000000000..cdeb97b68aa4816523b659ae762ced7321a82d08
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/reader/PackBeingRead.java
 @@ -0,0 +1,69 @@
@@ -154,7 +154,7 @@ index 0000000000000000000000000000000000000000..39bd1ac237124c6861d3edd5c4412af9
 + * A pack that is being read.
 + * Values in this class are only set insofar reading the pack has progressed.
 + */
-+sealed abstract class PackBeingRead permits ArchivePackBeingRead, DirectoryPackBeingRead {
++public sealed abstract class PackBeingRead permits ArchivePackBeingRead, DirectoryPackBeingRead {
 +
 +    protected final File packFile;
 +
@@ -171,12 +171,12 @@ index 0000000000000000000000000000000000000000..39bd1ac237124c6861d3edd5c4412af9
 +     * @return All files in this pack, at all levels of nesting.
 +     * This does not contain an entry for the root directory of the archive.
 +     */
-+    abstract FileInPack[] getFiles();
++    public abstract FileInPack[] getFiles();
 +
 +    /**
 +     * @return The {@linkplain FileInPack file} in this pack at the given path, or null if it doesn't exist.
 +     */
-+    FileInPack getFileByPath(String path) {
++    public FileInPack getFileByPath(String path) {
 +        if (this.fileByPath == null) {
 +            this.fileByPath = Arrays.stream(this.getFiles())
 +                .collect(Collectors.toMap(file -> file.pathInArchive, Function.identity()));
@@ -193,10 +193,10 @@ index 0000000000000000000000000000000000000000..39bd1ac237124c6861d3edd5c4412af9
 +     * A file in a {@link PackBeingRead}.
 +     */
 +    @SuppressWarnings("InnerClassMayBeStatic")
-+    abstract class FileInPack {
++    public abstract class FileInPack {
 +
-+        final String pathInArchive;
-+        final boolean isDirectory;
++        public final String pathInArchive;
++        public final boolean isDirectory;
 +
 +        protected FileInPack(String pathInArchive, boolean isDirectory) {
 +            this.pathInArchive = pathInArchive;

@@ -8,10 +8,10 @@ Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/reader/PackReader.java b/src/main/java/org/fiddlemc/fiddle/pack/reader/PackReader.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..c50ad86b7a533f788d59c18973ae0d81b3b12189
+index 0000000000000000000000000000000000000000..df7251d283b526842927bdbf03e9730fa3a3aa3e
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/reader/PackReader.java
-@@ -0,0 +1,27 @@
+@@ -0,0 +1,33 @@
 +// Fiddle - read packs
 +
 +package org.fiddlemc.fiddle.pack.reader;
@@ -21,7 +21,7 @@ index 0000000000000000000000000000000000000000..c50ad86b7a533f788d59c18973ae0d81
 +import org.slf4j.Logger;
 +
 +/**
-+ * A singleton providing the {@link #readPacks} method.
++ * A singleton providing the {@link #scanForAndOpenPacks} and {@link #closeOpenedPacks} methods.
 + */
 +public final class PackReader {
 +
@@ -33,9 +33,15 @@ index 0000000000000000000000000000000000000000..c50ad86b7a533f788d59c18973ae0d81
 +
 +    /**
 +     * Scans for packs in the appropriate places, and performs preparatory reading of their contents,
-+     * including making sure that they are valid in every way that is possible to tell at this stage,
++     * including a bit of making sure that they are valid in ways that is possible to tell at this stage,
 +     * so that their contents may be used at the right moment later, such as during block registry.
 +     */
-+    public static void readPacks(OptionSet optionSet) {}
++    public static void scanForAndOpenPacks(OptionSet optionSet) {}
++
++    /**
++     * Closes the opened packs, i.e. closes the corresponding open file handles and data
++     * any content in memory that is no longer needed.
++     */
++    public static void closeOpenedPacks() {}
 +
 +}

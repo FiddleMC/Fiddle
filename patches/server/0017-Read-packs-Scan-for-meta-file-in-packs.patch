@@ -7,7 +7,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/reader/PackReader.java b/src/main/java/org/fiddlemc/fiddle/pack/reader/PackReader.java
-index 07514ab582d973234ed8f4d1f8896762475d4b1c..6cf04403e2668f5354f3fa14dacba57db7095637 100644
+index 36284f04b0afa54f726dd16c5798d5c1c781f5ec..ad99a611fb76ba4e39cd4135f5f1fe72c7ee982d 100644
 --- a/src/main/java/org/fiddlemc/fiddle/pack/reader/PackReader.java
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/reader/PackReader.java
 @@ -16,6 +16,7 @@ import java.util.*;
@@ -18,7 +18,7 @@ index 07514ab582d973234ed8f4d1f8896762475d4b1c..6cf04403e2668f5354f3fa14dacba57d
  
      public static final Logger LOGGER = LogUtils.getClassLogger();
  
-@@ -83,7 +84,10 @@ public final class PackReader {
+@@ -89,7 +90,10 @@ public final class PackReader {
              } else {
                  pack = new ArchivePackBeingRead(packFile);
              }

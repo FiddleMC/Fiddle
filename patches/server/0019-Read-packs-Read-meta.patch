@@ -7,7 +7,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/reader/PackBeingRead.java b/src/main/java/org/fiddlemc/fiddle/pack/reader/PackBeingRead.java
-index 1d72e572456a11921b1ac0a018556e11fe5414a5..f46a363045a93d54fdfb69544783fb3e599f9049 100644
+index 369eda307814e98ee8a4e16ef73d6353499c78f5..89f18368e950294c87cfc57c063be36441d3c4c0 100644
 --- a/src/main/java/org/fiddlemc/fiddle/pack/reader/PackBeingRead.java
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/reader/PackBeingRead.java
 @@ -3,6 +3,7 @@
@@ -18,7 +18,7 @@ index 1d72e572456a11921b1ac0a018556e11fe5414a5..f46a363045a93d54fdfb69544783fb3e
  import org.jetbrains.annotations.Nullable;
  
  import java.io.File;
-@@ -25,6 +26,11 @@ sealed abstract class PackBeingRead permits ArchivePackBeingRead, DirectoryPackB
+@@ -26,6 +27,11 @@ public sealed abstract class PackBeingRead permits ArchivePackBeingRead, Directo
       */
      private @Nullable Map<String, FileInPack> fileByPath;
  
@@ -31,7 +31,7 @@ index 1d72e572456a11921b1ac0a018556e11fe5414a5..f46a363045a93d54fdfb69544783fb3e
          this.packFile = packFile;
      }
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/reader/PackReader.java b/src/main/java/org/fiddlemc/fiddle/pack/reader/PackReader.java
-index 3f6be27889c36f9ce9ead0fc003b02fd1652855c..4c583710e95decec419dad737975c27ca578cd0d 100644
+index 5a7db856f24b11af28e866f33f0d4d29c09f8bb2..1e634b96a35607b72cc4af05f6770792c98caa1a 100644
 --- a/src/main/java/org/fiddlemc/fiddle/pack/reader/PackReader.java
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/reader/PackReader.java
 @@ -2,8 +2,11 @@
@@ -46,7 +46,7 @@ index 3f6be27889c36f9ce9ead0fc003b02fd1652855c..4c583710e95decec419dad737975c27c
  import org.slf4j.Logger;
  
  import java.io.File;
-@@ -93,7 +96,29 @@ public final class PackReader {
+@@ -99,7 +102,29 @@ public final class PackReader {
              }
              var packMetaFile = pack.getFileByPath(packMetaFilename);
              if (packMetaFile != null && !packMetaFile.isDirectory) {
@@ -68,7 +68,7 @@ index 3f6be27889c36f9ce9ead0fc003b02fd1652855c..4c583710e95decec419dad737975c27c
 +                try {
 +                    pack.meta = FiddlePackMeta.fromJson(json);
 +                    LOGGER.info(packFile.getPath() + " may be a Fiddle pack because it has a valid " + packMetaFilename);
-+                    packs.add(pack);
++                    packsBeingRead.add(pack);
 +                } catch (PackParseException e) {
 +                    LOGGER.warn("A problem occurred while parsing '" + packMetaFilename + "' in '" + packFile.getPath() + "': " + e.getMessage() + (e.getMessage().endsWith(".") || e.getMessage().endsWith("!") || e.getMessage().endsWith("?") ? "" : ".") + " The pack will not be loaded.", e);
 +                } catch (Exception e) {
