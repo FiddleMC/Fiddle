@@ -1,0 +1,175 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Mon, 15 May 2023 21:01:59 +0200
+Subject: [PATCH] Read packs - Files provider - Implementation for packs in
+ directories
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/files/DirectoryFiddlePackFilesProvider.java b/src/main/java/org/fiddlemc/fiddle/pack/files/DirectoryFiddlePackFilesProvider.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..49f121aeb579a92655e9b92eb73b76ce759ab180
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/files/DirectoryFiddlePackFilesProvider.java
+@@ -0,0 +1,160 @@
++// Fiddle - read packs - pack files - directory packs
++
++package org.fiddlemc.fiddle.pack.files;
++
++import org.fiddlemc.fiddle.pack.reader.PackParseException;
++import org.jetbrains.annotations.Nullable;
++
++import java.io.File;
++import java.io.IOException;
++import java.nio.file.Files;
++import java.nio.file.Paths;
++import java.util.ArrayList;
++import java.util.Arrays;
++import java.util.Collections;
++import java.util.List;
++
++/**
++ * A {@link FiddlePackFilesProvider} for packs that are defined in a plain file system directory.
++ */
++public class DirectoryFiddlePackFilesProvider implements FiddlePackFilesProvider {
++
++    /**
++     * The directory of this pack.
++     */
++    private final File packDirectory;
++
++    /**
++     * May be empty or incomplete while not fully computed yet (instances are added on the fly when they are created).
++     */
++    private final List<FileInDirectoryPack> files = new ArrayList<>(1);
++
++    /**
++     * Null while it has not been computed yet.
++     */
++    private @Nullable List<FileInDirectoryPack> topLevelFiles;
++
++    public DirectoryFiddlePackFilesProvider(File packDirectory) {
++        this.packDirectory = packDirectory;
++    }
++
++    @Override
++    public String getLocation() {
++        return this.packDirectory.getPath();
++    }
++
++    private List<FileInDirectoryPack> getTopLevelFilesForDirectoryAndAddToAllFiles(File directory) {
++        File[] directoryFiles = directory.listFiles();
++        if (directoryFiles == null) {
++            return Collections.emptyList();
++        } else {
++            List<FileInDirectoryPack> topLevelFiles = Arrays.stream(directoryFiles)
++                .map(file -> file.isDirectory() ? new DirectoryInDirectoryPack(file) : new RegularFileInDirectoryPack(file))
++                .toList();
++            this.files.addAll(topLevelFiles);
++            return topLevelFiles;
++        }
++    }
++
++    @Override
++    public List<FileInDirectoryPack> getTopLevelFiles() {
++        if (this.topLevelFiles == null) {
++            this.topLevelFiles = this.getTopLevelFilesForDirectoryAndAddToAllFiles(this.packDirectory);
++        }
++        return this.topLevelFiles;
++    }
++
++    @Override
++    public void closeHandlesAndClearCache() {
++        for (FileInDirectoryPack file : this.files) {
++            if (file instanceof RegularFileInPack regularFile) {
++                regularFile.clearCachedBytes();
++            }
++        }
++        this.files.clear();
++        this.topLevelFiles = null;
++    }
++
++    private interface FileInDirectoryPack extends FileInPack {
++
++        DirectoryFiddlePackFilesProvider getProvider();
++
++        File getFile();
++
++        default String getPathInArchive() throws PackParseException {
++            try {
++                return Paths.get(this.getProvider().packDirectory.getPath()).relativize(Paths.get(this.getFile().getPath())).toString();
++            } catch (IllegalArgumentException e) {
++                throw new PackParseException("Failed to get the name of a file in a pack directory ('" + this.getProvider().getLocation() + "'): " + e.getMessage(), e);
++            }
++        }
++
++        @Override
++        default String getName() throws PackParseException {
++            return FiddlePackFilesProvider.getNameFromPath(this.getPathInArchive());
++        }
++
++    }
++
++    private class RegularFileInDirectoryPack extends CachingRegularFileInPack implements FileInDirectoryPack {
++
++        private final File file;
++
++        private RegularFileInDirectoryPack(File file) {
++            this.file = file;
++        }
++
++        @Override
++        public DirectoryFiddlePackFilesProvider getProvider() {
++            return DirectoryFiddlePackFilesProvider.this;
++        }
++
++        @Override
++        public File getFile() {
++            return this.file;
++        }
++
++        @Override
++        protected byte[] readBytes() throws PackParseException {
++            try {
++                return Files.readAllBytes(this.file.toPath());
++            } catch (IOException e) {
++                throw new PackParseException("An exception of type " + e.getClass().getSimpleName() + " occurred while reading a file ('" + this.getPathInArchive() + "') in a pack folder ('" + DirectoryFiddlePackFilesProvider.this.getLocation() + "'): " + e.getMessage(), e);
++            }
++        }
++    }
++
++    private class DirectoryInDirectoryPack implements DirectoryInPack, FileInDirectoryPack {
++
++        private final File file;
++
++        /**
++         * Null while it has not been computed yet.
++         */
++        private @Nullable List<FileInDirectoryPack> topLevelFiles;
++
++        private DirectoryInDirectoryPack(File file) {
++            this.file = file;
++        }
++
++        @Override
++        public DirectoryFiddlePackFilesProvider getProvider() {
++            return DirectoryFiddlePackFilesProvider.this;
++        }
++
++        @Override
++        public File getFile() {
++            return this.file;
++        }
++
++        @Override
++        public List<FileInDirectoryPack> getTopLevelFiles() {
++            if (this.topLevelFiles == null) {
++                this.topLevelFiles = DirectoryFiddlePackFilesProvider.this.getTopLevelFilesForDirectoryAndAddToAllFiles(this.file);
++            }
++            return this.topLevelFiles;
++        }
++
++    }
++
++}

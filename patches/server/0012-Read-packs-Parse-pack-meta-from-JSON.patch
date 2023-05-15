@@ -1,57 +1,37 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
-Date: Sat, 6 May 2023 11:47:46 +0200
-Subject: [PATCH] Pack definition - Meta
+Date: Mon, 15 May 2023 20:48:34 +0200
+Subject: [PATCH] Read packs - Parse pack meta from JSON
 
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
-diff --git a/src/main/java/org/fiddlemc/fiddle/pack/FiddlePack.java b/src/main/java/org/fiddlemc/fiddle/pack/FiddlePack.java
-index 2f1b3609591c44d2e6c677a81a7256ecb79afdda..79b3614af280a049a74af157cf8dc9cfc4b3506b 100644
---- a/src/main/java/org/fiddlemc/fiddle/pack/FiddlePack.java
-+++ b/src/main/java/org/fiddlemc/fiddle/pack/FiddlePack.java
-@@ -9,4 +9,12 @@ package org.fiddlemc.fiddle.pack;
-  * instances of {@link FiddlePack} may not be fully loaded yet (for example, their custom blocks may not have been
-  * registered yet), but have already been constructed so that they can be referred to.
-  */
--public class FiddlePack {}
-+public class FiddlePack {
-+
-+    public final FiddlePackMeta meta;
-+
-+    FiddlePack(FiddlePackMeta meta) {
-+        this.meta = meta;
-+    }
-+
-+}
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java b/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java
-new file mode 100644
-index 0000000000000000000000000000000000000000..97a8c0df857f096c226205ba5261c69a20f3ccb5
---- /dev/null
+index d50f3a7a7ecfbe91f26321a66deab686fd0e2b10..cb106b02663e8d3e0c9ec5de2bcfa4bd42f8de1d 100644
+--- a/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java
-@@ -0,0 +1,256 @@
-+// Fiddle - packs
-+
-+package org.fiddlemc.fiddle.pack;
-+
+@@ -2,10 +2,16 @@
+ 
+ package org.fiddlemc.fiddle.pack;
+ 
 +import com.google.gson.JsonElement;
 +import it.unimi.dsi.fastutil.ints.IntArraySet;
 +import it.unimi.dsi.fastutil.ints.IntSet;
 +import org.fiddlemc.fiddle.pack.reader.PackParseException;
 +import org.fiddlemc.fiddle.pack.reader.json.named.NamedJsonElement;
-+import org.jetbrains.annotations.Nullable;
-+
-+import java.util.Objects;
-+import java.util.UUID;
+ import org.jetbrains.annotations.Nullable;
+ 
+ import java.util.Objects;
+ import java.util.UUID;
 +import java.util.stream.Collectors;
-+
-+/**
-+ * The meta of a {@link FiddlePack}.
-+ * <br>
-+ * This contains global information about the pack, such as its display name.
-+ */
-+public class FiddlePackMeta {
-+
+ 
+ /**
+  * The meta of a {@link FiddlePack}.
+@@ -14,6 +20,44 @@ import java.util.UUID;
+  */
+ public class FiddlePackMeta {
+ 
++    // Fiddle start - read packs - parse meta from JSON
 +    private static final int maxFormat = 1;
 +    private static final IntSet supportedResourcePackFormats = new IntArraySet(new int[]{13});
 +    private static final IntSet supportedDataPackFormats = new IntArraySet(new int[]{12});
@@ -87,94 +67,16 @@ index 0000000000000000000000000000000000000000..97a8c0df857f096c226205ba5261c69a
 +    private static final String dataPackMetaPackJsonKey = "pack";
 +    private static final String dataPackMetaFormatJsonKey = "pack_format";
 +    private static final String dataPackMetaDescriptionJsonKey = "description";
++    // Fiddle end - read packs - parse meta from JSON
 +
-+    @SuppressWarnings({"FieldCanBeLocal", "unused"})
-+    private final int givenFormat;
-+    public final UUID uuid;
-+    public final String displayName;
-+    public final String technicalName;
-+    public final @Nullable String version;
-+    public final @Nullable String description;
-+    public final String[] authors;
-+    public final Credit[] credits;
-+    public final @Nullable String website;
-+    public final ResourcePackMeta resourcePackMeta;
-+    public final @Nullable DataPackMeta dataPackMeta;
-+
-+    private FiddlePackMeta(
-+        int givenFormat,
-+        UUID uuid,
-+        String displayName,
-+        String technicalName,
-+        @Nullable String version,
-+        @Nullable String description,
-+        String[] authors,
-+        Credit[] credits,
-+        @Nullable String website,
-+        ResourcePackMeta resourcePackMeta,
-+        @Nullable DataPackMeta dataPackMeta
-+    ) {
-+        this.givenFormat = givenFormat;
-+        this.uuid = uuid;
-+        this.displayName = displayName;
-+        this.technicalName = technicalName;
-+        this.version = version;
-+        this.description = description;
-+        this.authors = authors;
-+        this.credits = credits;
-+        this.website = website;
-+        this.resourcePackMeta = resourcePackMeta;
-+        this.dataPackMeta = dataPackMeta;
-+    }
-+
-+    public static class Credit {
-+
-+        public final String name;
-+        public final @Nullable String role;
-+
-+        private Credit(String name, @Nullable String role) {
-+            this.name = name;
-+            this.role = role;
-+        }
-+
-+        @Override
-+        public int hashCode() {
-+            return this.name.hashCode() + Objects.hashCode(this.role);
-+        }
-+
-+        @Override
-+        public boolean equals(Object obj) {
-+            return obj instanceof Credit other && this.name.equals(other.name) && Objects.equals(this.role, other.role);
-+        }
-+
-+    }
-+
-+    public static class ResourcePackMeta {
-+
-+        @SuppressWarnings({"FieldCanBeLocal", "unused"})
-+        private final int givenFormat;
-+        public final @Nullable String description;
-+
-+        private ResourcePackMeta(int givenFormat, @Nullable String description) {
-+            this.givenFormat = givenFormat;
-+            this.description = description;
-+        }
-+
-+    }
-+
-+    public static class DataPackMeta {
-+
-+        @SuppressWarnings({"FieldCanBeLocal", "unused"})
-+        private final int givenFormat;
-+        public final @Nullable String description;
-+
-+        private DataPackMeta(int givenFormat, @Nullable String description) {
-+            this.givenFormat = givenFormat;
-+            this.description = description;
-+        }
-+
-+    }
-+
+     @SuppressWarnings({"FieldCanBeLocal", "unused"})
+     private final int givenFormat;
+     public final UUID uuid;
+@@ -101,4 +145,82 @@ public class FiddlePackMeta {
+ 
+     }
+ 
++    // Fiddle start - read packs - parse meta from JSON
 +    private static void enforceSupportedSubFormat(String subName, int format, IntSet supportedFormats) throws PackParseException {
 +        if (supportedFormats.contains(format)) {
 +            return;
@@ -210,41 +112,7 @@ index 0000000000000000000000000000000000000000..97a8c0df857f096c226205ba5261c69a
 +
 +        var displayName = Objects.requireNonNull(packJson.getAsString(displayNameJsonKey, true, NamedJsonElement.BlankStringParseResult.THROW_EXCEPTION, displayNameMaxLength));
 +
-+        var technicalName = packJson.getAsStringIfPresent(technicalNameJsonKey, true, NamedJsonElement.BlankStringParseResult.THROW_EXCEPTION, technicalNameMaxLength);
-+        if (technicalName != null) {
-+            for (char c : technicalName.toCharArray()) {
-+                if (!((c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '_')) {
-+                    throw new PackParseException("There is an invalid character '" + c + "' in the pack " + technicalNameJsonKey + ": " + technicalName);
-+                }
-+            }
-+            if (technicalName.startsWith("_")) {
-+                throw new PackParseException("The pack " + technicalNameJsonKey + " can not start with an underscore: " + technicalName);
-+            } else if (technicalName.endsWith("_")) {
-+                throw new PackParseException("The pack " + technicalNameJsonKey + " can not end with an underscore: " + technicalName);
-+            }
-+        } else {
-+            technicalName = displayName.chars().mapToObj(c -> {
-+                    if ((c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '_') {
-+                        return "" + (char) c;
-+                    } else if (c >= 'A' && c <= 'Z') {
-+                        return "" + (char) Character.toLowerCase(c);
-+                    } else if (" -!@#$%^&*()~`+=[]{}\\|:;\"/?<>,.".chars().anyMatch(punctuation -> punctuation == c)) {
-+                        // The ' character was specifically omitted: "John's" should become "johns", not "john_s"
-+                        return "_";
-+                    }
-+                    return null;
-+                }).filter(Objects::nonNull)
-+                .collect(Collectors.joining())
-+                .replaceAll("_+", "_")
-+                .replaceAll("^_", "")
-+                .replaceAll("_$", "");
-+            if (technicalName.length() > technicalNameMaxLength) {
-+                technicalName = technicalName.substring(0, technicalNameMaxLength);
-+            }
-+            if (technicalName.isEmpty()) {
-+                technicalName = uuid.toString().toLowerCase().replace('-', '_');
-+            }
-+        }
++        var technicalName = packJson.getAsString(technicalNameJsonKey, true, NamedJsonElement.BlankStringParseResult.THROW_EXCEPTION, technicalNameMaxLength);
 +
 +        var version = packJson.getAsStringIfPresent(versionJsonKey, false, NamedJsonElement.BlankStringParseResult.RETURN_NULL, versionMaxLength);
 +
@@ -284,5 +152,6 @@ index 0000000000000000000000000000000000000000..97a8c0df857f096c226205ba5261c69a
 +        return new FiddlePackMeta(format, uuid, displayName, technicalName, version, description, authors, credits, website, resourcePackMeta, dataPackMeta);
 +
 +    }
++    // Fiddle end - read packs - parse meta from JSON
 +
-+}
+ }

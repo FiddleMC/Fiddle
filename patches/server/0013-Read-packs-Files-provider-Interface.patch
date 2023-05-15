@@ -1,0 +1,291 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Mon, 15 May 2023 20:37:19 +0200
+Subject: [PATCH] Read packs - Files provider - Interface
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/files/FiddlePackFilesProvider.java b/src/main/java/org/fiddlemc/fiddle/pack/files/FiddlePackFilesProvider.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..91580063dd3ec7ada8eb92430e9c8d15ddb79e74
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/files/FiddlePackFilesProvider.java
+@@ -0,0 +1,277 @@
++// Fiddle - read packs - pack files - provider interface
++
++package org.fiddlemc.fiddle.pack.files;
++
++import com.google.common.base.Charsets;
++import org.fiddlemc.fiddle.pack.read.StartupPackLoadPhase;
++import org.fiddlemc.fiddle.pack.reader.PackParseException;
++import org.jetbrains.annotations.Nullable;
++
++import java.io.File;
++import java.io.IOException;
++import java.util.List;
++
++/**
++ * The provider for the file contents of a Fiddle pack.
++ * <br>
++ * To provide the files in the pack, typically some I/O operations will be performed,
++ * such as reading an archive file.
++ * <br>
++ * Details about the pack, such as the files in it or their contents, may be cached at any point.
++ * To clear the cache and clear any used I/O resources, {@linkplain #closeHandlesAndClearCache()} must be called.
++ */
++public interface FiddlePackFilesProvider {
++
++    /**
++     * @return A location for this pack, which is human-readable way of describing where this pack was detected.
++     * This is most likely a path to a file or directory on the file system.
++     * This text can be used to describe the pack when errors occur at a lower level than its post-meta content parsing
++     * (at which point we can refer to a pack by its already parsed name).
++     */
++    String getLocation();
++
++    /**
++     * @return All top-level files (files located in the root directory) in this pack.
++     */
++    List<? extends FileInPack> getTopLevelFiles() throws PackParseException;
++
++    /**
++     * @return The {@linkplain #getTopLevelFiles() top-level file} in this pack with the given name,
++     * or null if none exists.
++     */
++    default @Nullable FileInPack getTopLevelFile(String name) throws PackParseException {
++        for (FileInPack file : this.getTopLevelFiles()) {
++            try {
++                if (file.getName().equals(name)) {
++                    return file;
++                }
++            } catch (PackParseException ignored) {}
++        }
++        return null;
++    }
++
++    /**
++     * Closes any I/O resources currently open, and clears any cached pack details, such as its files or their contents.
++     */
++    void closeHandlesAndClearCache() throws IOException;
++
++    default void closeHandlesAndClearCacheUnlessInStartupLoadPhase() throws IOException {
++        if (!StartupPackLoadPhase.isInStartupLoadPhase()) {
++            this.closeHandlesAndClearCache();
++        }
++    }
++
++    /**
++     * A common base class for {@link RegularFileInPack} and {@link DirectoryInPack}.
++     */
++    interface FileInPack {
++
++        /**
++         * @return Whether this file is a {@linkplain DirectoryInPack directory}.
++         * If false, it is a {@linkplain RegularFileInPack regular file}.
++         */
++        boolean isDirectory();
++
++        /**
++         * @return The name of this file (not the full path).
++         */
++        String getName() throws PackParseException;
++
++    }
++
++    /**
++     * Provides access to one of the regular files in a pack
++     * that are provided by a {@link FiddlePackFilesProvider}.
++     */
++    interface RegularFileInPack extends FileInPack {
++
++        @Override
++        default boolean isDirectory() {
++            return false;
++        }
++
++        /**
++         * @param cache Whether to cache the result (must be cleared with {@link #clearCachedBytes()} later).
++         *              If true, an attempt to cache is made, but not guaranteed.
++         * @return The bytes in this file.
++         */
++        byte[] getBytes(boolean cache) throws PackParseException;
++
++        /**
++         * @return The content of this file as a {@linkplain Charsets#UTF_8 UTF-8 encoded} string.
++         *
++         * @see #getBytes(boolean)
++         */
++        default String getString(boolean cache) throws PackParseException {
++            return new String(this.getBytes(cache), Charsets.UTF_8);
++        }
++
++        /**
++         * Clears the cached contents of this file, if any.
++         * <br>
++         * Note that this is only for lowering memory usage, and not for checking for changes in file contents:
++         * after calling this method, the underlying open I/O handle is still the same.
++         */
++        void clearCachedBytes();
++
++    }
++
++    /**
++     * A simple base implementation of {@link RegularFileInPack} that can cache the byte contents.
++     */
++    abstract class CachingRegularFileInPack implements RegularFileInPack {
++
++        /**
++         * The byte content of this file, or null if not currently cached.
++         */
++        private byte @Nullable [] cachedBytes;
++
++        protected CachingRegularFileInPack() {}
++
++        /**
++         * @return The byte contents of this file.
++         */
++        protected abstract byte[] readBytes() throws PackParseException;
++
++        /**
++         * @param cache Whether to cache the result (must be cleared with {@link #clearCachedBytes()} later).
++         * @return The bytes in this file.
++         */
++        public byte[] getBytes(boolean cache) throws PackParseException {
++            if (this.cachedBytes != null) {
++                return this.cachedBytes;
++            }
++            byte[] bytes = this.readBytes();
++            if (cache) {
++                this.cachedBytes = bytes;
++            }
++            return bytes;
++        }
++
++        @Override
++        public void clearCachedBytes() {
++            this.cachedBytes = null;
++        }
++
++    }
++
++    /**
++     * Provides access to one of the directories in a pack
++     * that are provided by a {@link FiddlePackFilesProvider}.
++     */
++    interface DirectoryInPack extends FileInPack {
++
++        @Override
++        default boolean isDirectory() {
++            return true;
++        }
++
++        /**
++         * @return The top-level files in this directory.
++         */
++        List<? extends FileInPack> getTopLevelFiles();
++
++        /**
++         * @return Whether this directory contains a {@linkplain RegularFileInPack regular file},
++         * or some directory in this directory transitively contains a nested regular file.
++         */
++        default boolean containsAnyNestedRegularFile() {
++            List<? extends FileInPack> topLevelFiles = this.getTopLevelFiles();
++            return topLevelFiles.stream().anyMatch(file -> !file.isDirectory()) ||
++                topLevelFiles.stream().anyMatch(file -> file instanceof DirectoryInPack directory && directory.containsAnyNestedRegularFile());
++        }
++
++        /**
++         * @return The {@linkplain #getTopLevelFiles() top-level file} in this directory with the given name,
++         * or null if none exists.
++         */
++        default @Nullable FileInPack getTopLevelFile(String name) {
++            for (FileInPack file : this.getTopLevelFiles()) {
++                try {
++                    if (file.getName().equals(name)) {
++                        return file;
++                    }
++                } catch (PackParseException ignored) {}
++            }
++            return null;
++        }
++
++        /**
++         * @return The file denoted by the given path, or null if it does not exist.
++         * Any leading or trailing path separator characters are ignored.
++         * <br>
++         * This returns null if given an empty string, and does not support dots (such as '.' or '..').
++         */
++        default @Nullable FileInPack getFileByPath(String path) {
++            if (path.isEmpty()) {
++                return null;
++            }
++            while (true) {
++                char firstCharacter = path.charAt(0);
++                if (firstCharacter == '/' || firstCharacter == '\\' || firstCharacter == File.pathSeparatorChar) {
++                    if (path.length() == 1) {
++                        return null;
++                    }
++                    path = path.substring(1);
++                    continue;
++                }
++                char lastCharacter = path.charAt(path.length() - 1);
++                if (lastCharacter == '/' || lastCharacter == '\\' || lastCharacter == File.pathSeparatorChar) {
++                    if (path.length() == 1) {
++                        return null;
++                    }
++                    path = path.substring(0, path.length() - 1);
++                    continue;
++                }
++                break;
++            }
++            int firstPathSeparatorIndex = path.indexOf('/');
++            if (firstPathSeparatorIndex == -1) {
++                firstPathSeparatorIndex = path.indexOf('\\');
++                if (firstPathSeparatorIndex == -1) {
++                    firstPathSeparatorIndex = path.indexOf(File.pathSeparatorChar);
++                }
++            }
++            if (firstPathSeparatorIndex == -1) {
++                return this.getTopLevelFile(path);
++            }
++            @Nullable FileInPack topLevelFile = this.getTopLevelFile(path.substring(0, firstPathSeparatorIndex));
++            return topLevelFile instanceof DirectoryInPack directory ? directory.getFileByPath(path.substring(firstPathSeparatorIndex + 1)) : null;
++        }
++
++    }
++
++    /**
++     * A utility method to get the name of a file from a path.
++     *
++     * @param path A path, with potentially some path separators such as \ or /.
++     * @return The name of the file denoted by this path (the part after the final separator).
++     * Any path separators at the end of the path will be trimmed.
++     * If the given path is empty, an empty string will be returned.
++     */
++    static String getNameFromPath(String path) {
++        if (path.isEmpty()) {
++            return "";
++        }
++        while (true) {
++            char lastCharacter = path.charAt(path.length() - 1);
++            if (lastCharacter == '/' || lastCharacter == '\\' || lastCharacter == File.pathSeparatorChar) {
++                if (path.length() == 1) {
++                    return "";
++                }
++                path = path.substring(0, path.length() - 1);
++                continue;
++            }
++            break;
++        }
++        int lastIndex = path.indexOf('/');
++        if (lastIndex == -1) {
++            lastIndex = path.indexOf('\\');
++            if (lastIndex == -1) {
++                lastIndex = path.indexOf(File.pathSeparatorChar);
++            }
++        }
++        return lastIndex == -1 ? path : path.substring(lastIndex + 1);
++    }
++
++}

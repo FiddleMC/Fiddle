@@ -1,0 +1,30 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Mon, 15 May 2023 20:44:20 +0200
+Subject: [PATCH] Read packs - Files provider - Store in pack instance
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/FiddlePack.java b/src/main/java/org/fiddlemc/fiddle/pack/FiddlePack.java
+index 976a8d8bf68f476333ce224287f7c23c73f14646..608c19be252cb392f2f9fc02f17c23c24bf62c7e 100644
+--- a/src/main/java/org/fiddlemc/fiddle/pack/FiddlePack.java
++++ b/src/main/java/org/fiddlemc/fiddle/pack/FiddlePack.java
+@@ -2,6 +2,8 @@
+ 
+ package org.fiddlemc.fiddle.pack;
+ 
++import org.fiddlemc.fiddle.pack.files.FiddlePackFilesProvider;
++
+ /**
+  * A Fiddle pack that has been read and (partially) loaded.
+  * <br>
+@@ -9,7 +11,7 @@ package org.fiddlemc.fiddle.pack;
+  * instances of {@link FiddlePack} may not be fully loaded yet (for example, their custom blocks may not have been
+  * registered yet), but have already been constructed so that they can be referred to.
+  */
+-public record FiddlePack(FiddlePackMeta meta) {
++public record FiddlePack(FiddlePackFilesProvider filesProvider, FiddlePackMeta meta) { // Fiddle - read packs - pack files - store provider in pack instance
+ 
+     @Override
+     public String toString() {

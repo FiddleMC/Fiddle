@@ -1,0 +1,190 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sat, 6 May 2023 11:52:47 +0200
+Subject: [PATCH] Read packs - Scan for and open pack folders and archives
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
+index 9713ae194b1946ce8b1e1c15121b6231da1e3e39..1c9cb948bd40cbe9ddef0efa6c19ca6cb1d280af 100644
+--- a/src/main/java/net/minecraft/server/Main.java
++++ b/src/main/java/net/minecraft/server/Main.java
+@@ -1,7 +1,5 @@
+ package net.minecraft.server;
+ 
+-import com.mojang.authlib.GameProfile;
+-import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
+ import com.mojang.datafixers.DataFixer;
+ import com.mojang.datafixers.util.Pair;
+ import com.mojang.logging.LogUtils;
+@@ -16,17 +14,10 @@ import java.nio.file.Files;
+ import java.nio.file.Path;
+ import java.nio.file.Paths;
+ import java.util.Optional;
+-import java.util.UUID;
+ import java.util.function.BooleanSupplier;
+ import io.papermc.paper.world.ThreadedWorldUpgrader;
+-import joptsimple.NonOptionArgumentSpec;
+-import joptsimple.OptionParser;
+ import joptsimple.OptionSet;
+-import joptsimple.OptionSpec;
+-import joptsimple.util.PathConverter;
+-import joptsimple.util.PathProperties;
+ import net.minecraft.CrashReport;
+-import net.minecraft.DefaultUncaughtExceptionHandler;
+ import net.minecraft.SharedConstants;
+ import net.minecraft.Util;
+ import net.minecraft.commands.Commands;
+@@ -65,14 +56,17 @@ import net.minecraft.world.level.storage.PrimaryLevelData;
+ import net.minecraft.world.level.storage.WorldData;
+ import org.fiddlemc.fiddle.configuration.FiddleConfigurations;
+ import org.fiddlemc.fiddle.configuration.PermanenceConfirmation;
++import org.fiddlemc.fiddle.pack.FiddlePack;
++import org.fiddlemc.fiddle.pack.FiddlePacks;
+ import org.fiddlemc.fiddle.pack.read.StartupPackLoadPhase;
++import org.fiddlemc.fiddle.pack.reader.PackScanner;
+ import org.slf4j.Logger;
+ 
+ // CraftBukkit start
+ import com.google.common.base.Charsets;
+ import java.io.InputStreamReader;
+ import java.util.concurrent.atomic.AtomicReference;
+-import net.minecraft.SharedConstants;
++
+ import org.bukkit.configuration.file.YamlConfiguration;
+ // CraftBukkit end
+ 
+@@ -143,6 +137,8 @@ public class Main {
+             }
+             // Fiddle end - confirm Fiddle permanence
+ 
++            PackScanner.scanForAndOpenPacks(optionset); // Fiddle - read packs - scan for packs
++
+             io.papermc.paper.plugin.PluginInitializerManager.load(optionset); // Paper
+             Bootstrap.bootStrap();
+             Bootstrap.validate();
+@@ -300,6 +296,15 @@ public class Main {
+             }
+ 
+             StartupPackLoadPhase.endStartupLoadPhase(); // Fiddle - read packs - startup load phase - end after initial read
++            // Fiddle start - read packs - close packs after initial read
++            for (FiddlePack pack : FiddlePacks.getPacks()) {
++                try {
++                    pack.filesProvider().closeHandlesAndClearCache();
++                } catch (IOException e) {
++                    throw new RuntimeException("Exception while closing a pack that was being read", e);
++                }
++            }
++            // Fiddle end - read packs - close packs after initial read
+ 
+             /*
+             IRegistryCustom.Dimension iregistrycustom_dimension = worldstem.registries().compositeAccess();
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/reader/PackScanner.java b/src/main/java/org/fiddlemc/fiddle/pack/reader/PackScanner.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..2ccfdeca8f0cd4bd544667b77e2314bb5db00ad3
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/reader/PackScanner.java
+@@ -0,0 +1,102 @@
++// Fiddle - read packs - scan for packs
++
++package org.fiddlemc.fiddle.pack.reader;
++
++import com.google.gson.JsonElement;
++import com.google.gson.JsonParser;
++import com.mojang.logging.LogUtils;
++import joptsimple.OptionSet;
++import org.fiddlemc.fiddle.pack.FiddlePack;
++import org.fiddlemc.fiddle.pack.FiddlePackMeta;
++import org.fiddlemc.fiddle.pack.FiddlePacks;
++import org.fiddlemc.fiddle.pack.files.ArchiveFileFiddlePackFilesProvider;
++import org.fiddlemc.fiddle.pack.files.DirectoryFiddlePackFilesProvider;
++import org.fiddlemc.fiddle.pack.files.FiddlePackFilesProvider;
++import org.jetbrains.annotations.Nullable;
++import org.slf4j.Logger;
++
++import java.io.File;
++import java.util.*;
++
++/**
++ * A singleton providing the {@link #scanForAndOpenPacks} method.
++ */
++public final class PackScanner {
++
++    private static final String fiddlePacksFolderName = "fiddle_packs";
++    private static final String packMetaFilename = "pack.mcmeta";
++
++    private static final Logger LOGGER = LogUtils.getClassLogger();
++
++    private PackScanner() {
++        throw new RuntimeException();
++    }
++
++    /**
++     * Scans for packs in the appropriate places, reads their meta,
++     * and adds packs with valid meta to {@link FiddlePacks}.
++     */
++    public static void scanForAndOpenPacks(OptionSet optionSet) {
++        for (boolean checkingPlugins : new boolean[] {false, true}) {
++            File folder = checkingPlugins ? (File) optionSet.valueOf("plugins") : new File(fiddlePacksFolderName);
++            if (folder.exists() && folder.isDirectory()) {
++                for (File file : Objects.requireNonNull(folder.listFiles())) {
++                    String lowerCaseName = file.getName().toLowerCase(Locale.ROOT);
++                    // Accept .jar files in the packs folder too (to use them as packs without the plugin code, which is useful if the code has broken after an update)
++                    if (lowerCaseName.endsWith(".jar") || (!checkingPlugins && (lowerCaseName.endsWith(".zip") || lowerCaseName.endsWith(".rar") || file.isDirectory()))) {
++                        scanForAndOpenPack(file);
++                    }
++                }
++            } else if (!checkingPlugins) {
++                //noinspection ResultOfMethodCallIgnored
++                folder.mkdir();
++            }
++        }
++        FiddlePacks.freeze();
++    }
++
++    /**
++     * Scans the given file, which may or may not be a pack, as part of {@link #scanForAndOpenPacks(OptionSet)}.
++     */
++    private static void scanForAndOpenPack(File packFile) {
++        try {
++            FiddlePackFilesProvider filesProvider;
++            if (packFile.isDirectory()) {
++                filesProvider = new DirectoryFiddlePackFilesProvider(packFile);
++            } else {
++                filesProvider = new ArchiveFileFiddlePackFilesProvider(packFile);
++            }
++            @Nullable FiddlePackFilesProvider.FileInPack packMetaFile = filesProvider.getTopLevelFile(packMetaFilename);
++            if (packMetaFile instanceof FiddlePackFilesProvider.RegularFileInPack packMetaRegularFile) {
++                String packMetaFileContent;
++                try {
++                    packMetaFileContent = packMetaRegularFile.getString(false);
++                } catch (Exception e) {
++                    LOGGER.warn("An exception occurred while opening '" + packMetaFilename + "' in '" + packFile.getPath() + "'. The pack will not be loaded.", e);
++                    return;
++                }
++                JsonElement json;
++                try {
++                    json = JsonParser.parseString(packMetaFileContent);
++                } catch (Exception e) {LOGGER.warn("An exception occurred while parsing '" + packMetaFilename + "' in '" + packFile.getPath() + "' as JSON. The pack will not be loaded.", e);
++                    LOGGER.warn("'" + packMetaFilename + "' in '" + packFile.getPath() + "' is not valid JSON. The pack will not be loaded.", e);
++                    return;
++                }
++                FiddlePackMeta meta;
++                try {
++                    meta = FiddlePackMeta.fromJson(json);
++                    LOGGER.info(packFile.getPath() + " may be a Fiddle pack because it has a valid " + packMetaFilename);
++                    FiddlePack pack = new FiddlePack(filesProvider, meta);
++                    FiddlePacks.addPack(pack);
++                } catch (PackParseException e) {
++                    LOGGER.warn("A problem occurred while parsing '" + packMetaFilename + "' in '" + packFile.getPath() + "': " + e.getMessage() + (e.getMessage().endsWith(".") || e.getMessage().endsWith("!") || e.getMessage().endsWith("?") ? "" : ".") + " The pack will not be loaded.", e);
++                } catch (Exception e) {
++                    LOGGER.warn("An exception occurred while reading '" + packMetaFilename + "' in '" + packFile.getPath() + "'. The pack will not be loaded.", e);
++                }
++            }
++        } catch (Exception e) {
++            LOGGER.warn("An exception occurred while checking if a file or folder '" + packFile.getPath() + "' is a Fiddle pack. The file or folder will not be loaded.", e);
++        }
++    }
++
++}

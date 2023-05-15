@@ -1,0 +1,341 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Mon, 15 May 2023 21:01:45 +0200
+Subject: [PATCH] Read packs - Files provider - Implementation for packs in
+ archive files
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/files/ArchiveFileFiddlePackFilesProvider.java b/src/main/java/org/fiddlemc/fiddle/pack/files/ArchiveFileFiddlePackFilesProvider.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..c2082ac908a359731f607aa96054342a8e35a07e
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/files/ArchiveFileFiddlePackFilesProvider.java
+@@ -0,0 +1,326 @@
++// Fiddle - read packs - pack files - archive file packs
++
++package org.fiddlemc.fiddle.pack.files;
++
++import it.unimi.dsi.fastutil.bytes.ByteArrayList;
++import it.unimi.dsi.fastutil.bytes.ByteList;
++import it.unimi.dsi.fastutil.ints.IntArrayFIFOQueue;
++import it.unimi.dsi.fastutil.ints.IntArrayList;
++import it.unimi.dsi.fastutil.ints.IntList;
++import it.unimi.dsi.fastutil.ints.IntPriorityQueue;
++import net.sf.sevenzipjbinding.ExtractOperationResult;
++import net.sf.sevenzipjbinding.IInArchive;
++import net.sf.sevenzipjbinding.SevenZip;
++import net.sf.sevenzipjbinding.SevenZipException;
++import net.sf.sevenzipjbinding.impl.RandomAccessFileInStream;
++import net.sf.sevenzipjbinding.simple.ISimpleInArchiveItem;
++import org.fiddlemc.fiddle.pack.reader.PackParseException;
++import org.jetbrains.annotations.Nullable;
++
++import java.io.File;
++import java.io.FileNotFoundException;
++import java.io.IOException;
++import java.io.RandomAccessFile;
++import java.util.ArrayList;
++import java.util.Arrays;
++import java.util.List;
++import java.util.stream.IntStream;
++
++/**
++ * A {@link FiddlePackFilesProvider} for packs that are defined in an archive file.
++ */
++public class ArchiveFileFiddlePackFilesProvider implements FiddlePackFilesProvider {
++
++    /**
++     * The archive file of this pack.
++     */
++    private final File packFile;
++
++    /**
++     * Null while the pack archive file is not open.
++     */
++    private @Nullable RandomAccessFile randomAccessPackFile;
++
++    /**
++     * Null while the pack archive file is not open, or while it has not been computed yet.
++     */
++    private @Nullable List<FileInArchiveFilePack> files;
++
++    /**
++     * Null while the pack archive file is not open, or while it has not been computed yet.
++     */
++    private @Nullable List<FileInArchiveFilePack> topLevelFiles;
++
++    public ArchiveFileFiddlePackFilesProvider(File packFile) {
++        this.packFile = packFile;
++    }
++
++    @Override
++    public String getLocation() {
++        return this.packFile.getPath();
++    }
++
++    @Override
++    public List<? extends FileInPack> getTopLevelFiles() throws PackParseException {
++        this.readAndCacheFileStructure();
++        return this.topLevelFiles;
++    }
++
++    /**
++     * Reads the file structure from the {@link #randomAccessPackFile}
++     * and sets {@link #topLevelFiles} based on it.
++     * <br>
++     * This does nothing if the file structure has already been cached.
++     */
++    private void readAndCacheFileStructure() throws PackParseException {
++
++        // Open the random access file
++        this.openRandomAccessPackFile();
++
++        // Open the file as an archive
++        IInArchive inArchive;
++        try {
++            inArchive = SevenZip.openInArchive(null, new RandomAccessFileInStream(this.randomAccessPackFile));
++        } catch (SevenZipException e) {
++            throw new PackParseException("Failed to read the file for a pack ('" + getLocation() + "') as an archive: " + e.getMessage(), e);
++        }
++
++        // Get the items in the archive
++        ISimpleInArchiveItem[] items;
++        try {
++            items = inArchive.getSimpleInterface().getArchiveItems();
++        } catch (SevenZipException e) {
++            throw new PackParseException("Failed to read the items in the archive for a pack ('" + getLocation() + "'): " + e.getMessage(), e);
++        }
++
++        // Determine the paths of the items
++        String[] itemPaths = new String[items.length];
++        for (int i = 0; i < items.length; i++) {
++            try {
++                itemPaths[i] = items[i].getPath();
++            } catch (SevenZipException e) {
++                throw new PackParseException("Failed to determine the path of a file in an archive pack ('" + getLocation() + "'): " + e.getMessage(), e);
++            }
++        }
++
++        // Determine which items are folders
++        boolean[] itemIsFolder = new boolean[items.length];
++        for (int i = 0; i < items.length; i++) {
++            try {
++                itemIsFolder[i] = items[i].isFolder();
++            } catch (SevenZipException e) {
++                throw new PackParseException("Failed to determine for a file ('" + itemPaths[i] + "') in an archive pack ('" + getLocation() + "') whether it is a folder: " + e.getMessage(), e);
++            }
++        }
++
++        // Create an array of the folder's indices in items
++        int[] itemIndicesOfFolders = IntStream.range(0, items.length).filter(i -> itemIsFolder[i]).toArray();
++        int[] inverseItemIndicesOfFolders = new int[items.length];
++        for (int i = 0; i < itemIndicesOfFolders.length; i++) {
++            inverseItemIndicesOfFolders[itemIndicesOfFolders[i]] = i;
++        }
++
++        // Determine which items are top-level items of a folder, or top-level items of the pack
++        IntList[] folderSubItems = new IntList[itemIndicesOfFolders.length];
++        for (int i = 0; i < folderSubItems.length; i++) {
++            folderSubItems[i] = new IntArrayList(1);
++        }
++        IntList packTopLevelItems = new IntArrayList(1);
++        int[] containingFolderItemIndexPerItem = new int[items.length];
++        Arrays.fill(containingFolderItemIndexPerItem, -1);
++        for (int itemI = 0; itemI < items.length; itemI++) {
++            String itemPath = itemPaths[itemI];
++            int folderIndexFound = -1;
++            for (int folderI = 0; folderI < itemIndicesOfFolders.length; folderI++) {
++                String folderPath = itemPaths[itemIndicesOfFolders[folderI]];
++                if (itemPath.startsWith(folderPath + "/") || itemPath.startsWith(folderPath + "\\") || itemPath.startsWith(folderPath + File.separatorChar)) {
++                    if (folderIndexFound == -1 || folderPath.length() > itemPaths[itemIndicesOfFolders[folderIndexFound]].length()) {
++                        folderIndexFound = folderI;
++                    }
++                }
++            }
++            if (folderIndexFound == -1) {
++                packTopLevelItems.add(itemI);
++            } else {
++                folderSubItems[folderIndexFound].add(itemI);
++                containingFolderItemIndexPerItem[itemI] = itemIndicesOfFolders[folderIndexFound];
++            }
++        }
++
++        // Create an array of all files, and top-level files
++        FileInArchiveFilePack[] files = new FileInArchiveFilePack[items.length];
++        List<FileInArchiveFilePack> topLevelFiles = new ArrayList<>(packTopLevelItems.size());
++        IntPriorityQueue itemIndicesToDo = new IntArrayFIFOQueue(1);
++        int[] subItemsLeft = new int[items.length];
++        for (int i = 0; i < items.length; i++) {
++            subItemsLeft[i] = itemIsFolder[i] ? folderSubItems[inverseItemIndicesOfFolders[i]].size() : 0;
++            if (subItemsLeft[i] == 0) {
++                itemIndicesToDo.enqueue(i);
++            }
++        }
++        while (!itemIndicesToDo.isEmpty()) {
++            int itemIndex = itemIndicesToDo.dequeueInt();
++            if (itemIsFolder[itemIndex]) {
++                List<FileInArchiveFilePack> folderTopLevelFiles = folderSubItems[inverseItemIndicesOfFolders[itemIndex]].intStream().mapToObj(subItemIndex -> files[subItemIndex]).toList();
++                files[itemIndex] = new DirectoryInArchiveFilePack(items[itemIndex], folderTopLevelFiles);
++            } else {
++                files[itemIndex] = new RegularFileInArchiveFilePack(items[itemIndex]);
++            }
++            if (containingFolderItemIndexPerItem[itemIndex] == -1) {
++                topLevelFiles.add(files[itemIndex]);
++            } else {
++                if (--subItemsLeft[containingFolderItemIndexPerItem[itemIndex]] == 0) {
++                    itemIndicesToDo.enqueue(containingFolderItemIndexPerItem[itemIndex]);
++                }
++            }
++        }
++
++        // Set the fields
++        this.topLevelFiles = topLevelFiles;
++        this.files = Arrays.asList(files);
++
++    }
++
++    /**
++     * Sets {@link #randomAccessPackFile} as an opened {@link RandomAccessFile} for this pack's {@link #packFile}.
++     * <br>
++     * This does nothing if a {@link #randomAccessPackFile} is already open.
++     */
++    private void openRandomAccessPackFile() throws PackParseException {
++        if (this.randomAccessPackFile != null) {
++            return;
++        }
++        try {
++            this.randomAccessPackFile = new RandomAccessFile(this.packFile, "r");
++        } catch (FileNotFoundException e) {
++            throw new PackParseException("Failed to open the archive file for a pack ('" + getLocation() + "'): " + e.getMessage(), e);
++        }
++    }
++
++    @Override
++    public void closeHandlesAndClearCache() throws IOException {
++        if (this.files != null) {
++            for (FileInArchiveFilePack file : this.files) {
++                if (file instanceof RegularFileInPack regularFile) {
++                    regularFile.clearCachedBytes();
++                }
++            }
++            this.files = null;
++        }
++        this.topLevelFiles = null;
++        if (this.randomAccessPackFile != null) {
++            this.randomAccessPackFile.close();
++            this.randomAccessPackFile = null;
++        }
++    }
++
++    private interface FileInArchiveFilePack extends FileInPack {
++
++        ArchiveFileFiddlePackFilesProvider getProvider();
++
++        ISimpleInArchiveItem getItem();
++
++        default String getPathInArchive() throws PackParseException {
++            try {
++                return this.getItem().getPath();
++            } catch (SevenZipException e) {
++                throw new PackParseException("Failed to get the name of a file in a pack archive ('" + this.getProvider().getLocation() + "'): " + e.getMessage(), e);
++            }
++        }
++
++        @Override
++        default String getName() throws PackParseException {
++            return FiddlePackFilesProvider.getNameFromPath(this.getPathInArchive());
++        }
++
++    }
++
++    private class RegularFileInArchiveFilePack extends CachingRegularFileInPack implements FileInArchiveFilePack {
++
++        private final ISimpleInArchiveItem item;
++
++        private RegularFileInArchiveFilePack(ISimpleInArchiveItem item) {
++            this.item = item;
++        }
++
++        @Override
++        public ArchiveFileFiddlePackFilesProvider getProvider() {
++            return ArchiveFileFiddlePackFilesProvider.this;
++        }
++
++        @Override
++        public ISimpleInArchiveItem getItem() {
++            return this.item;
++        }
++
++        @Override
++        protected byte[] readBytes() throws PackParseException {
++            Long size;
++            try {
++                size = this.item.getSize();
++            } catch (SevenZipException e) {
++                throw new PackParseException("An exception occurred while getting the size of a file ('" + this.getPathInArchive() + "') in a pack archive ('" + ArchiveFileFiddlePackFilesProvider.this.getLocation() + "'): " + e.getMessage(), e);
++            }
++            final byte @Nullable [] bytes;
++            final int[] bytesIndex = {0};
++            final @Nullable ByteList byteList;
++            if (size != null && size >= 0) {
++                if (size > Integer.MAX_VALUE - 8) {
++                    throw new PackParseException("A file ('" + this.getPathInArchive() + "') in a pack archive ('" + ArchiveFileFiddlePackFilesProvider.this.getLocation() + "' is too large: " + size + " bytes");
++                }
++                bytes = new byte[size.intValue()];
++                byteList = null;
++            } else {
++                bytes = null;
++                byteList = new ByteArrayList(2048);
++            }
++            try {
++                ExtractOperationResult result = this.item.extractSlow(data -> {
++                    if (bytes != null) {
++                        System.arraycopy(data, 0, bytes, bytesIndex[0], data.length);
++                        bytesIndex[0] += data.length;
++                    } else {
++                        for (byte value : data) {
++                            byteList.add(value);
++                        }
++                    }
++                    return data.length;
++                });
++                if (result != ExtractOperationResult.OK) {
++                    throw new PackParseException("Reading bytes from a file ('" + this.getPathInArchive() + "') in a pack archive ('" + ArchiveFileFiddlePackFilesProvider.this.getLocation() + "' failed: " + result);
++                }
++            } catch (SevenZipException e) {
++                throw new PackParseException("An exception occurred while reading bytes from a file ('" + this.getPathInArchive() + "') in a pack archive ('" + ArchiveFileFiddlePackFilesProvider.this.getLocation() + "': " + e.getMessage(), e);
++            }
++            return bytes != null ? bytes : byteList.toArray(new byte[0]);
++        }
++
++    }
++
++    private class DirectoryInArchiveFilePack implements DirectoryInPack, FileInArchiveFilePack {
++
++        private final ISimpleInArchiveItem item;
++        private final List<FileInArchiveFilePack> topLevelFiles;
++
++        DirectoryInArchiveFilePack(ISimpleInArchiveItem item, List<FileInArchiveFilePack> topLevelFiles) {
++            this.item = item;
++            this.topLevelFiles = topLevelFiles;
++        }
++
++        @Override
++        public ArchiveFileFiddlePackFilesProvider getProvider() {
++            return ArchiveFileFiddlePackFilesProvider.this;
++        }
++
++        @Override
++        public ISimpleInArchiveItem getItem() {
++            return this.item;
++        }
++
++        @Override
++        public List<FileInArchiveFilePack> getTopLevelFiles() {
++            return this.topLevelFiles;
++        }
++    }
++
++}

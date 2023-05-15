@@ -1,14 +1,14 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
 Date: Thu, 11 May 2023 18:36:07 +0200
-Subject: [PATCH] Load packs - Data packs - Include Fiddle repository source in
- pack repository
+Subject: [PATCH] Load packs - Data packs - Include Fiddle source in pack
+ repository
 
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/packs/repository/ServerPacksSource.java b/src/main/java/net/minecraft/server/packs/repository/ServerPacksSource.java
-index 03bf7dfc289c6a02f19678d3c7041c027154b99d..d8dc268bd3f25c6c903ebcdbc56bd5930bdf9c38 100644
+index 03bf7dfc289c6a02f19678d3c7041c027154b99d..94b97b686a705f3e87bd045c2e72e4e725105bb8 100644
 --- a/src/main/java/net/minecraft/server/packs/repository/ServerPacksSource.java
 +++ b/src/main/java/net/minecraft/server/packs/repository/ServerPacksSource.java
 @@ -15,6 +15,7 @@ import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
@@ -24,7 +24,7 @@ index 03bf7dfc289c6a02f19678d3c7041c027154b99d..d8dc268bd3f25c6c903ebcdbc56bd593
  
      public static PackRepository createPackRepository(Path dataPacksPath) {
 -        return new PackRepository(new ServerPacksSource(), new FolderRepositorySource(dataPacksPath, PackType.SERVER_DATA, PackSource.WORLD));
-+        return new PackRepository(new ServerPacksSource(), new FolderRepositorySource(dataPacksPath, PackType.SERVER_DATA, PackSource.WORLD), new FiddleRepositorySource()); // Fiddle - packs - data packs - include repository source
++        return new PackRepository(new ServerPacksSource(), new FiddleRepositorySource(), new FolderRepositorySource(dataPacksPath, PackType.SERVER_DATA, PackSource.WORLD)); // Fiddle - load packs - data packs - repository source - include in pack repository
      }
  
      public static PackRepository createPackRepository(LevelStorageSource.LevelStorageAccess session) {

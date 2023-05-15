@@ -1,18 +1,18 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
 Date: Sat, 6 May 2023 11:39:16 +0200
-Subject: [PATCH] Read packs - Exception class
+Subject: [PATCH] Read packs - PackParseException class
 
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/reader/PackParseException.java b/src/main/java/org/fiddlemc/fiddle/pack/reader/PackParseException.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..743c1016da421028ec512644d5fe4d9f45ebea0e
+index 0000000000000000000000000000000000000000..1d58825ec41b2d67f68a09c4d67628892abcf04f
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/reader/PackParseException.java
 @@ -0,0 +1,18 @@
-+// Fiddle - read packs
++// Fiddle - read packs - exception class
 +
 +package org.fiddlemc.fiddle.pack.reader;
 +
