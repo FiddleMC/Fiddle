@@ -3,15 +3,15 @@ From: Martijn Muijsers <martijnmuijsers@live.nl>
 Date: Mon, 15 May 2023 20:47:48 +0200
 Subject: [PATCH] Pack definition
 
-License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/FiddlePack.java b/src/main/java/org/fiddlemc/fiddle/pack/FiddlePack.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..976a8d8bf68f476333ce224287f7c23c73f14646
+index 0000000000000000000000000000000000000000..5c02751cbad3ce8048950df5102e90befdc9b0a3
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/FiddlePack.java
-@@ -0,0 +1,19 @@
+@@ -0,0 +1,22 @@
 +// Fiddle - packs - definition
 +
 +package org.fiddlemc.fiddle.pack;
@@ -22,8 +22,11 @@ index 0000000000000000000000000000000000000000..976a8d8bf68f476333ce224287f7c23c
 + * If the server has not finished starting yet (aka reached the 'Done' console message),
 + * instances of {@link FiddlePack} may not be fully loaded yet (for example, their custom blocks may not have been
 + * registered yet), but have already been constructed so that they can be referred to.
++ *
++ * @param developmentModeEnabled Whether development mode (additional settings for pack creators) is enabled
++ *                               for this pack.
 + */
-+public record FiddlePack(FiddlePackMeta meta) {
++public record FiddlePack(FiddlePackMeta meta, boolean developmentModeEnabled) {
 +
 +    @Override
 +    public String toString() {
@@ -33,14 +36,15 @@ index 0000000000000000000000000000000000000000..976a8d8bf68f476333ce224287f7c23c
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java b/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..d50f3a7a7ecfbe91f26321a66deab686fd0e2b10
+index 0000000000000000000000000000000000000000..ff299425ded226ac3610b2aa1017a8ea35b1f660
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java
-@@ -0,0 +1,104 @@
+@@ -0,0 +1,105 @@
 +// Fiddle - packs - definition - meta
 +
 +package org.fiddlemc.fiddle.pack;
 +
++import com.google.gson.JsonElement;
 +import org.jetbrains.annotations.Nullable;
 +
 +import java.util.Objects;
@@ -131,9 +135,9 @@ index 0000000000000000000000000000000000000000..d50f3a7a7ecfbe91f26321a66deab686
 +
 +        @SuppressWarnings({"FieldCanBeLocal", "unused"})
 +        private final int givenFormat;
-+        public final @Nullable String description;
++        public final @Nullable JsonElement description;
 +
-+        private DataPackMeta(int givenFormat, @Nullable String description) {
++        private DataPackMeta(int givenFormat, @Nullable JsonElement description) {
 +            this.givenFormat = givenFormat;
 +            this.description = description;
 +        }

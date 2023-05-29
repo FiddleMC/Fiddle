@@ -3,7 +3,7 @@ From: Martijn Muijsers <martijnmuijsers@live.nl>
 Date: Fri, 14 Apr 2023 17:27:27 +0200
 Subject: [PATCH] Confirm Fiddle permanence
 
-License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java

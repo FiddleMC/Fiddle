@@ -4,7 +4,7 @@ Date: Thu, 11 May 2023 18:36:07 +0200
 Subject: [PATCH] Load packs - Data packs - Include Fiddle source in pack
  repository
 
-License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/packs/repository/ServerPacksSource.java b/src/main/java/net/minecraft/server/packs/repository/ServerPacksSource.java

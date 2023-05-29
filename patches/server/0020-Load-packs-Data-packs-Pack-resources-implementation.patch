@@ -1,0 +1,246 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Wed, 17 May 2023 18:51:57 +0200
+Subject: [PATCH] Load packs - Data packs - Pack resources implementation
+
+License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/server/packs/FilePackResources.java b/src/main/java/net/minecraft/server/packs/FilePackResources.java
+index cd723e5f51c587df28335ceb14db8c137dc9c4cb..41c782f14521430f414e631d5ef2be521e2b9dfb 100644
+--- a/src/main/java/net/minecraft/server/packs/FilePackResources.java
++++ b/src/main/java/net/minecraft/server/packs/FilePackResources.java
+@@ -52,7 +52,7 @@ public class FilePackResources extends AbstractPackResources {
+         }
+     }
+ 
+-    private static String getPathFromLocation(PackType type, ResourceLocation id) {
++    public static String getPathFromLocation(PackType type, ResourceLocation id) { // Fiddle - load packs - data packs - pack resources - private -> public
+         return String.format(Locale.ROOT, "%s/%s/%s", type.getDirectory(), id.getNamespace(), id.getPath());
+     }
+ 
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java b/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java
+index c3d47fad1b4c08498feba1ce506328d40bf8620d..15581ee245164d417ad4ea7afb249ee5fb88de1a 100644
+--- a/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java
++++ b/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java
+@@ -3,6 +3,7 @@
+ package org.fiddlemc.fiddle.pack;
+ 
+ import com.google.gson.JsonElement;
++import com.google.gson.JsonObject;
+ import it.unimi.dsi.fastutil.ints.IntArraySet;
+ import it.unimi.dsi.fastutil.ints.IntSet;
+ import org.fiddlemc.fiddle.pack.reader.PackParseException;
+@@ -51,9 +52,9 @@ public class FiddlePackMeta {
+     private static final String resourcePackMetaFormatJsonKey = "pack_format";
+     private static final String resourcePackMetaDescriptionJsonKey = "description";
+     private static final String dataPackMetaJsonKey = "data_pack_meta";
+-    private static final String dataPackMetaPackJsonKey = "pack";
++    public static final String dataPackMetaPackJsonKey = "pack"; // Fiddle - load packs - data packs - pack resources - meta - private -> public
+     private static final String dataPackMetaFormatJsonKey = "pack_format";
+-    private static final String dataPackMetaDescriptionJsonKey = "description";
++    public static final String dataPackMetaDescriptionJsonKey = "description"; // Fiddle - load packs - data packs - pack resources - meta - private -> public
+     // Fiddle end - read packs - parse meta from JSON
+ 
+     @SuppressWarnings({"FieldCanBeLocal", "unused"})
+@@ -135,10 +136,12 @@ public class FiddlePackMeta {
+         @SuppressWarnings({"FieldCanBeLocal", "unused"})
+         private final int givenFormat;
+         public final @Nullable JsonElement description;
++        public final JsonObject originalJson; // Fiddle - load packs - data packs - pack resources - meta
+ 
+-        private DataPackMeta(int givenFormat, @Nullable JsonElement description) {
++        private DataPackMeta(int givenFormat, @Nullable JsonElement description, JsonObject originalJson) { // Fiddle - load packs - data packs - pack resources - meta
+             this.givenFormat = givenFormat;
+             this.description = description;
++            this.originalJson = originalJson; // Fiddle - load packs - data packs - pack resources - meta
+         }
+ 
+     }
+@@ -216,7 +219,7 @@ public class FiddlePackMeta {
+             if (dataPackDescription != null && dataPackDescription.isJsonNull()) {
+                 throw new PackParseException("The value " + (dataPackDescription.name() == null ? "" : "for '" + dataPackDescription.name() + "' ") + "is null, but it must be non-null");
+             }
+-            dataPackMeta = new DataPackMeta(dataPackFormat, dataPackDescription == null ? null : dataPackDescription.unnamed());
++            dataPackMeta = new DataPackMeta(dataPackFormat, dataPackDescription == null ? null : dataPackDescription.unnamed(), dataPackMetaJson.unnamed()); // Fiddle - load packs - data packs - pack resources - meta
+         }
+ 
+         return new FiddlePackMeta(format, uuid, displayName, technicalName, version, description, authors, credits, website, resourcePackMeta, dataPackMeta);
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/data/FiddlePackResources.java b/src/main/java/org/fiddlemc/fiddle/pack/data/FiddlePackResources.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..611b6947acd0f2491d40d9bc589572e35afd7a25
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/data/FiddlePackResources.java
+@@ -0,0 +1,172 @@
++// Fiddle - load packs - data packs - pack resources
++
++package org.fiddlemc.fiddle.pack.data;
++
++import com.google.gson.JsonObject;
++import com.google.gson.JsonPrimitive;
++import com.mojang.logging.LogUtils;
++import net.minecraft.resources.ResourceLocation;
++import net.minecraft.server.packs.FilePackResources;
++import net.minecraft.server.packs.PackResources;
++import net.minecraft.server.packs.PackType;
++import net.minecraft.server.packs.metadata.MetadataSectionSerializer;
++import net.minecraft.server.packs.resources.IoSupplier;
++import org.fiddlemc.fiddle.pack.FiddlePack;
++import org.fiddlemc.fiddle.pack.FiddlePackMeta;
++import org.fiddlemc.fiddle.pack.files.DirectoryInPack;
++import org.fiddlemc.fiddle.pack.files.FiddlePackFilesProvider;
++import org.fiddlemc.fiddle.pack.files.FileInPack;
++import org.fiddlemc.fiddle.pack.files.RegularFileInPack;
++import org.fiddlemc.fiddle.pack.reader.PackParseException;
++import org.jetbrains.annotations.NotNull;
++import org.slf4j.Logger;
++
++import javax.annotation.Nullable;
++import java.io.IOException;
++import java.io.InputStream;
++import java.util.*;
++
++/**
++ * An implementation of {@link PackResources} for Fiddle packs,
++ * backed by a {@link FiddlePackFilesProvider}.
++ */
++public class FiddlePackResources implements PackResources {
++
++    private static final Logger LOGGER = LogUtils.getLogger();
++
++    private final String name;
++    private final FiddlePack pack;
++
++    FiddlePackResources(String name, FiddlePack pack) {
++        this.name = name;
++        this.pack = pack;
++    }
++
++    private FiddlePackFilesProvider getFilesProvider() {
++        return this.pack.filesProvider();
++    }
++
++    @Override
++    public @Nullable IoSupplier<InputStream> getRootResource(String @NotNull ... segments) {
++        return this.getResource(String.join("/", segments));
++    }
++
++    @Override
++    public @Nullable IoSupplier<InputStream> getResource(@NotNull PackType type, @NotNull ResourceLocation id) {
++        return this.getResource(FilePackResources.getPathFromLocation(type, id));
++    }
++
++    private @Nullable IoSupplier<InputStream> getResource(String path) {
++        try {
++            @Nullable RegularFileInPack regularFileInPack = this.getFilesProvider().getRegularFileByPath(path);
++            return regularFileInPack == null ? null : regularFileInPack.getInputStreamSupplier(false, () -> path);
++        } catch (PackParseException e) {
++            throw new RuntimeException("An exception occurred while preparing to read a resource ('" + path + "') in a Fiddle data pack: " + e.getMessage(), e);
++        }
++    }
++
++    private @Nullable DirectoryInPack getPackTypeDirectory(PackType type) {
++        try {
++            return this.getFilesProvider().getTopLevelDirectory(type.getDirectory());
++        } catch (PackParseException e) {
++            LOGGER.warn("Exception while trying to get the '" + type.getDirectory() + "' folder of Fiddle pack '" + this.getFilesProvider().getLocation() + "': " + e.getMessage(), e);
++            return null;
++        }
++    }
++
++    @Override
++    public void listResources(@NotNull PackType type, @NotNull String namespace, @NotNull String prefix, PackResources.@NotNull ResourceOutput consumer) {
++        @Nullable DirectoryInPack typeDirectory = this.getPackTypeDirectory(type);
++        if (typeDirectory == null) {
++            return;
++        }
++        @Nullable DirectoryInPack namespaceDirectory = typeDirectory.getTopLevelDirectory(namespace);
++        if (namespaceDirectory == null) {
++            return;
++        }
++        @Nullable DirectoryInPack prefixDirectory = namespaceDirectory.getTopLevelDirectory(prefix);
++        if (prefixDirectory == null) {
++            return;
++        }
++        try {
++            prefixDirectory.getNestedRegularFilesWithPathsStream().forEach(nestedRegularFileWithPath -> {
++                RegularFileInPack nestedRegularFile = nestedRegularFileWithPath.left();
++                String nestedRegularFilePath = nestedRegularFileWithPath.right();
++                String resourcePathPart = prefix + "/" + nestedRegularFilePath;
++                ResourceLocation resourceLocation = ResourceLocation.tryBuild(namespace, resourcePathPart);
++                if (resourceLocation != null) {
++                    consumer.accept(resourceLocation, nestedRegularFile.getInputStreamSupplier(false, () -> nestedRegularFilePath));
++                } else {
++                    LOGGER.warn("Invalid path in datapack: {}:{}, ignoring", namespace, resourcePathPart);
++                }
++            });
++        } catch (PackParseException e) {
++            LOGGER.warn("Exception while trying to list the data pack resources in Fiddle pack '" + this.getFilesProvider().getLocation() + "': " + e.getMessage(), e);
++        }
++    }
++
++    @Override
++    public @NotNull Set<String> getNamespaces(@NotNull PackType type) {
++        DirectoryInPack typeDirectory = this.getPackTypeDirectory(type);
++        if (typeDirectory == null) {
++            return Collections.emptySet();
++        }
++        Set<String> namespaces = new HashSet<>(1);
++        for (FileInPack fileInTypeDirectory : typeDirectory.getTopLevelFiles()) {
++            if (fileInTypeDirectory instanceof DirectoryInPack directoryInTypeDirectory && directoryInTypeDirectory.containsAnyNestedRegularFile()) {
++                try {
++                    String name = directoryInTypeDirectory.getName();
++                    if (name.equals(name.toLowerCase(Locale.ROOT))) {
++                        namespaces.add(name);
++                    } else {
++                        LOGGER.warn("Ignored non-lowercase namespace: {} in {}", name, this.getFilesProvider().getLocation());
++                    }
++                } catch (PackParseException e) {
++                    LOGGER.warn("Exception while trying to get the name of a namespace folder in " + type.getDirectory() + " folder of Fiddle pack '" + this.getFilesProvider().getLocation() + "': " + e.getMessage(), e);
++                }
++            }
++        }
++        return namespaces;
++    }
++
++    @Override
++    public <T> @org.jetbrains.annotations.Nullable T getMetadataSection(@NotNull MetadataSectionSerializer<T> metaReader) {
++        // We can only provide a metadata section for packs: ignore any other meta readers
++        if (!metaReader.getMetadataSectionName().equals(FiddlePackMeta.dataPackMetaPackJsonKey)) {
++            return null;
++        }
++        FiddlePackMeta.DataPackMeta dataPackMeta = Objects.requireNonNull(this.pack.meta().dataPackMeta);
++        JsonObject metaPackJson = dataPackMeta.originalJson.getAsJsonObject(FiddlePackMeta.dataPackMetaPackJsonKey).deepCopy();
++        // Set a description for the data pack if it was not explicitly given
++        if (dataPackMeta.description == null) {
++            metaPackJson.add(FiddlePackMeta.dataPackMetaDescriptionJsonKey, new JsonPrimitive(pack.meta().displayName + " data pack"));
++        }
++        return metaReader.fromJson(metaPackJson);
++    }
++
++    @Override
++    public @NotNull String packId() {
++        return this.name;
++    }
++
++    @Override
++    public boolean isBuiltin() {
++        return false;
++    }
++
++    @Override
++    protected void finalize() throws Throwable {
++        this.close();
++        super.finalize();
++    }
++
++    @Override
++    public void close() {
++        try {
++            this.getFilesProvider().closeHandlesAndClearCacheUnlessInStartupLoadPhase();
++        } catch (IOException e) {
++            LOGGER.warn("IOException while closing pack resources: " + e.getMessage(), e);
++        }
++    }
++
++}

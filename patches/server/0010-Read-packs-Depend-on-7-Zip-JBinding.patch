@@ -3,7 +3,7 @@ From: Martijn Muijsers <martijnmuijsers@live.nl>
 Date: Fri, 14 Apr 2023 18:00:01 +0200
 Subject: [PATCH] Read packs - Depend on 7-Zip-JBinding
 
-License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/build.gradle.kts b/build.gradle.kts

@@ -3,18 +3,17 @@ From: Martijn Muijsers <martijnmuijsers@live.nl>
 Date: Mon, 15 May 2023 20:48:34 +0200
 Subject: [PATCH] Read packs - Parse pack meta from JSON
 
-License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java b/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java
-index d50f3a7a7ecfbe91f26321a66deab686fd0e2b10..cb106b02663e8d3e0c9ec5de2bcfa4bd42f8de1d 100644
+index ff299425ded226ac3610b2aa1017a8ea35b1f660..c3d47fad1b4c08498feba1ce506328d40bf8620d 100644
 --- a/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java
-@@ -2,10 +2,16 @@
- 
+@@ -3,6 +3,10 @@
  package org.fiddlemc.fiddle.pack;
  
-+import com.google.gson.JsonElement;
+ import com.google.gson.JsonElement;
 +import it.unimi.dsi.fastutil.ints.IntArraySet;
 +import it.unimi.dsi.fastutil.ints.IntSet;
 +import org.fiddlemc.fiddle.pack.reader.PackParseException;
@@ -22,12 +21,7 @@ index d50f3a7a7ecfbe91f26321a66deab686fd0e2b10..cb106b02663e8d3e0c9ec5de2bcfa4bd
  import org.jetbrains.annotations.Nullable;
  
  import java.util.Objects;
- import java.util.UUID;
-+import java.util.stream.Collectors;
- 
- /**
-  * The meta of a {@link FiddlePack}.
-@@ -14,6 +20,44 @@ import java.util.UUID;
+@@ -15,6 +19,43 @@ import java.util.UUID;
   */
  public class FiddlePackMeta {
  
@@ -45,7 +39,6 @@ index d50f3a7a7ecfbe91f26321a66deab686fd0e2b10..cb106b02663e8d3e0c9ec5de2bcfa4bd
 +    private static final int creditsRoleMaxLength = 4095;
 +    private static final int websiteMaxLength = 4095;
 +    private static final int resourcePackMetaDescriptionMaxLength = 262143;
-+    private static final int dataPackMetaDescriptionMaxLength = 262143;
 +
 +    private static final String packJsonKey = "pack";
 +    private static final String formatJsonKey = "format";
@@ -72,7 +65,7 @@ index d50f3a7a7ecfbe91f26321a66deab686fd0e2b10..cb106b02663e8d3e0c9ec5de2bcfa4bd
      @SuppressWarnings({"FieldCanBeLocal", "unused"})
      private final int givenFormat;
      public final UUID uuid;
-@@ -101,4 +145,82 @@ public class FiddlePackMeta {
+@@ -102,4 +143,85 @@ public class FiddlePackMeta {
  
      }
  
@@ -145,8 +138,11 @@ index d50f3a7a7ecfbe91f26321a66deab686fd0e2b10..cb106b02663e8d3e0c9ec5de2bcfa4bd
 +            var dataPackMetaPackJson = dataPackMetaJson.getAsJsonObject(dataPackMetaPackJsonKey);
 +            int dataPackFormat = dataPackMetaPackJson.getAsInt(dataPackMetaFormatJsonKey);
 +            enforceSupportedSubFormat("data pack", dataPackFormat, supportedDataPackFormats);
-+            var dataPackDescription = dataPackMetaPackJson.getAsStringIfPresent(dataPackMetaDescriptionJsonKey, false, NamedJsonElement.BlankStringParseResult.RETURN_STRING, dataPackMetaDescriptionMaxLength);
-+            dataPackMeta = new DataPackMeta(dataPackFormat, dataPackDescription);
++            var dataPackDescription = dataPackMetaPackJson.getOrNull(dataPackMetaDescriptionJsonKey);
++            if (dataPackDescription != null && dataPackDescription.isJsonNull()) {
++                throw new PackParseException("The value " + (dataPackDescription.name() == null ? "" : "for '" + dataPackDescription.name() + "' ") + "is null, but it must be non-null");
++            }
++            dataPackMeta = new DataPackMeta(dataPackFormat, dataPackDescription == null ? null : dataPackDescription.unnamed());
 +        }
 +
 +        return new FiddlePackMeta(format, uuid, displayName, technicalName, version, description, authors, credits, website, resourcePackMeta, dataPackMeta);

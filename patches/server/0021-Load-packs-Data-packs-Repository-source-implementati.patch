@@ -1,0 +1,105 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Thu, 11 May 2023 18:35:26 +0200
+Subject: [PATCH] Load packs - Data packs - Repository source implementation
+
+License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java b/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java
+index 15581ee245164d417ad4ea7afb249ee5fb88de1a..d3a3940426db816c3168675607cd88322aa9d45b 100644
+--- a/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java
++++ b/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java
+@@ -51,7 +51,7 @@ public class FiddlePackMeta {
+     private static final String resourcePackMetaPackJsonKey = "pack";
+     private static final String resourcePackMetaFormatJsonKey = "pack_format";
+     private static final String resourcePackMetaDescriptionJsonKey = "description";
+-    private static final String dataPackMetaJsonKey = "data_pack_meta";
++    public static final String dataPackMetaJsonKey = "data_pack_meta"; // Fiddle - load packs - data packs - repository source - private -> public
+     public static final String dataPackMetaPackJsonKey = "pack"; // Fiddle - load packs - data packs - pack resources - meta - private -> public
+     private static final String dataPackMetaFormatJsonKey = "pack_format";
+     public static final String dataPackMetaDescriptionJsonKey = "description"; // Fiddle - load packs - data packs - pack resources - meta - private -> public
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/data/FiddleRepositorySource.java b/src/main/java/org/fiddlemc/fiddle/pack/data/FiddleRepositorySource.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..aa1672402dbe911ddc7f353452042e6bdcab9335
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/data/FiddleRepositorySource.java
+@@ -0,0 +1,65 @@
++// Fiddle - load packs - data packs - repository source
++
++package org.fiddlemc.fiddle.pack.data;
++
++import net.minecraft.network.chat.Component;
++import net.minecraft.server.packs.PackType;
++import net.minecraft.server.packs.repository.Pack;
++import net.minecraft.server.packs.repository.PackSource;
++import net.minecraft.server.packs.repository.RepositorySource;
++import com.mojang.logging.LogUtils;
++import org.fiddlemc.fiddle.configuration.FiddleGlobalConfiguration;
++import org.fiddlemc.fiddle.pack.FiddlePack;
++import org.fiddlemc.fiddle.pack.FiddlePackMeta;
++import org.fiddlemc.fiddle.pack.FiddlePacks;
++import org.fiddlemc.fiddle.pack.files.DirectoryInPack;
++import org.fiddlemc.fiddle.pack.files.FiddlePackFilesProvider;
++import org.fiddlemc.fiddle.pack.reader.PackParseException;
++import org.fiddlemc.fiddle.pack.reader.PackScanner;
++import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
++import org.slf4j.Logger;
++
++import java.util.function.Consumer;
++
++/**
++ * A {@link RepositorySource} that provides the data packs from Fiddle packs.
++ */
++public class FiddleRepositorySource implements RepositorySource {
++
++    private static final PackType packType = PackType.SERVER_DATA; // Obviously
++    private static final PackSource packSource = PackSource.SERVER; // Arbitrary choice
++    private static final String packNamePrefix = "fiddle/";
++
++    private static final String dataFolderName = PackType.SERVER_DATA.getDirectory();
++
++    private static final Logger LOGGER = LogUtils.getLogger();
++
++    @Override
++    public void loadPacks(@NotNull Consumer<Pack> profileAdder) {
++        for (FiddlePack pack : FiddlePacks.getPacks()) {
++            FiddlePackFilesProvider filesProvider = pack.filesProvider();
++            // Check that there is a data folder
++            @Nullable DirectoryInPack dataFolder;
++            try {
++                dataFolder = filesProvider.getTopLevelDirectory(dataFolderName);
++            } catch (PackParseException e) {
++                LOGGER.warn("Failed to check for a directory named '" + dataFolderName + "' in a pack ('" + pack + "'): " + e.getMessage(), e);
++                continue;
++            }
++            if (dataFolder != null) {
++                // Check that the data folder is non-empty (i.e. it contains some actual file)
++                if (dataFolder.containsAnyNestedRegularFile()) {
++                    @Nullable FiddlePackMeta.DataPackMeta dataPackMeta = pack.meta().dataPackMeta;
++                    if (dataPackMeta == null && pack.developmentModeEnabled() && FiddleGlobalConfiguration.get().packCreatorSettings.printDebugInformationToConsole) {
++                        LOGGER.info("Pack '" + pack + "' has a " + dataFolderName + " directory, but no " + FiddlePackMeta.dataPackMetaJsonKey + " in the " + PackScanner.packMetaFilename + " file");
++                    }
++                    Pack.ResourcesSupplier dataPackResourcesSupplier = (name) -> new FiddlePackResources(name, pack);
++                    Pack dataPack = Pack.readMetaAndCreate(packNamePrefix + pack.meta().technicalName, Component.literal(pack.meta().displayName), false, dataPackResourcesSupplier, packType, Pack.Position.TOP, packSource);
++                    profileAdder.accept(dataPack);
++                }
++            }
++        }
++    }
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/reader/PackScanner.java b/src/main/java/org/fiddlemc/fiddle/pack/reader/PackScanner.java
+index 90cb3f5a9a88bd7ccb1d0b576e52986cee26a114..ab858e507bd69b28924a7ed7069311b94dafff55 100644
+--- a/src/main/java/org/fiddlemc/fiddle/pack/reader/PackScanner.java
++++ b/src/main/java/org/fiddlemc/fiddle/pack/reader/PackScanner.java
+@@ -26,7 +26,7 @@ import java.util.*;
+ public final class PackScanner {
+ 
+     private static final String fiddlePacksFolderName = "fiddle_packs";
+-    private static final String packMetaFilename = "pack.mcmeta";
++    public static final String packMetaFilename = "pack.mcmeta"; // Fiddle - load packs - data packs - repository source - private -> public
+ 
+     private static final Logger LOGGER = LogUtils.getClassLogger();
+ 

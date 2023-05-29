@@ -34,7 +34,7 @@ index 6008617bd7ffd6f00e708ec16f8b90edc1044eae..60484bf70fff7e35658bbbf2fc88e687
              "Specification-Title" to "Bukkit",
              "Specification-Version" to project.version,
 diff --git a/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java b/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
-index bf42969859545a8a520923ef1836ffa4a5cc24a0..fc105a24f7e6da4ad15deac019aeb36fe6a4ce0b 100644
+index 9d687da5bdf398bb3f6c84cdf1249a7213d09f2e..0393a61ef229868568fe8127e71d9c442d835a58 100644
 --- a/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
 +++ b/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
 @@ -1,85 +1,40 @@
@@ -67,7 +67,7 @@ index bf42969859545a8a520923ef1836ffa4a5cc24a0..fc105a24f7e6da4ad15deac019aeb36f
 -public class PaperVersionFetcher implements VersionFetcher {
 -    private static final java.util.regex.Pattern VER_PATTERN = java.util.regex.Pattern.compile("^([0-9\\.]*)\\-.*R"); // R is an anchor, will always give '-R' at end
 -    private static final String GITHUB_BRANCH_NAME = "master";
--    private static final String DOWNLOAD_PAGE = "https://papermc.io/downloads";
+-    private static final String DOWNLOAD_PAGE = "https://papermc.io/downloads/paper";
 -    private static @Nullable String mcVer;
 +// Fiddle start - branding changes - version fetcher
 +/**
@@ -80,7 +80,7 @@ index bf42969859545a8a520923ef1836ffa4a5cc24a0..fc105a24f7e6da4ad15deac019aeb36f
 -    public long getCacheTime() {
 -        return 720000;
 +    public PaperVersionFetcher() {
-+        super("master", "https://papermc.io/downloads", "Paper", "PaperMC", "PaperMC", "Paper");
++        super("master", "https://papermc.io/downloads/paper", "Paper", "PaperMC", "PaperMC", "Paper");
      }
  
 -    @Nonnull
@@ -232,10 +232,10 @@ index 9f15d9dbdfa74a0640b1a2b4ff695609d4758a4c..31243f5f1b2c54624cc110038618c53b
  
      public SystemReport fillSystemReport(SystemReport details) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 4cd95134811fd65465681d159b2f30cf77455830..5b17ff36492b43ddfecef358d206c210110c4cb4 100644
+index e769f7b0904814ee63e2a73dca57e5dc33382fba..1ddec0427bd55c3c5a4bfdb27471ac27ac400c4a 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -256,7 +256,7 @@ import javax.annotation.Nullable; // Paper
+@@ -257,7 +257,7 @@ import javax.annotation.Nullable; // Paper
  import javax.annotation.Nonnull; // Paper
  
  public final class CraftServer implements Server {

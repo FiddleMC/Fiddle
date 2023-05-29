@@ -1,0 +1,28 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Wed, 17 May 2023 18:50:34 +0200
+Subject: [PATCH] Configuration - Settings for pack creators
+
+License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/fiddlemc/fiddle/configuration/FiddleGlobalConfiguration.java b/src/main/java/org/fiddlemc/fiddle/configuration/FiddleGlobalConfiguration.java
+index a351868379448a6c300ef6d271a6b84c8feb1461..265fbc50ad9ee7d3d0eebe4c78c13d5dd082177a 100644
+--- a/src/main/java/org/fiddlemc/fiddle/configuration/FiddleGlobalConfiguration.java
++++ b/src/main/java/org/fiddlemc/fiddle/configuration/FiddleGlobalConfiguration.java
+@@ -20,4 +20,15 @@ public class FiddleGlobalConfiguration extends ConfigurationPart {
+     @Setting(Configuration.VERSION_FIELD)
+     public int version = CURRENT_VERSION;
+ 
++    // Fiddle start - settings for pack creators
++    public PackCreatorSettings packCreatorSettings;
++    public class PackCreatorSettings extends ConfigurationPart {
++
++        public boolean enabled = true;
++        public boolean onlyForFolderPacks = true;
++        public boolean printDebugInformationToConsole = true;
++
++    }
++    // Fiddle end - settings for pack creators
++
+ }

@@ -3,11 +3,11 @@ From: Martijn Muijsers <martijnmuijsers@live.nl>
 Date: Mon, 15 May 2023 20:44:20 +0200
 Subject: [PATCH] Read packs - Files provider - Store in pack instance
 
-License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/FiddlePack.java b/src/main/java/org/fiddlemc/fiddle/pack/FiddlePack.java
-index 976a8d8bf68f476333ce224287f7c23c73f14646..608c19be252cb392f2f9fc02f17c23c24bf62c7e 100644
+index 5c02751cbad3ce8048950df5102e90befdc9b0a3..446b7d507432062bdbd54dade79c7c35952cb42d 100644
 --- a/src/main/java/org/fiddlemc/fiddle/pack/FiddlePack.java
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/FiddlePack.java
 @@ -2,6 +2,8 @@
@@ -19,12 +19,12 @@ index 976a8d8bf68f476333ce224287f7c23c73f14646..608c19be252cb392f2f9fc02f17c23c2
  /**
   * A Fiddle pack that has been read and (partially) loaded.
   * <br>
-@@ -9,7 +11,7 @@ package org.fiddlemc.fiddle.pack;
-  * instances of {@link FiddlePack} may not be fully loaded yet (for example, their custom blocks may not have been
-  * registered yet), but have already been constructed so that they can be referred to.
+@@ -12,7 +14,7 @@ package org.fiddlemc.fiddle.pack;
+  * @param developmentModeEnabled Whether development mode (additional settings for pack creators) is enabled
+  *                               for this pack.
   */
--public record FiddlePack(FiddlePackMeta meta) {
-+public record FiddlePack(FiddlePackFilesProvider filesProvider, FiddlePackMeta meta) { // Fiddle - read packs - pack files - store provider in pack instance
+-public record FiddlePack(FiddlePackMeta meta, boolean developmentModeEnabled) {
++public record FiddlePack(FiddlePackFilesProvider filesProvider, boolean developmentModeEnabled, FiddlePackMeta meta) { // Fiddle - read packs - pack files - store provider in pack instance
  
      @Override
      public String toString() {

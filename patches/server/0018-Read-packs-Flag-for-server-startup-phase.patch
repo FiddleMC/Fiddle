@@ -3,11 +3,11 @@ From: Martijn Muijsers <martijnmuijsers@live.nl>
 Date: Mon, 15 May 2023 20:59:39 +0200
 Subject: [PATCH] Read packs - Flag for server startup phase
 
-License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index edd4620c9378f459bbc4244be002e749f33f6e85..9713ae194b1946ce8b1e1c15121b6231da1e3e39 100644
+index 0ec18a0e832250a1f8af1a16bbabd1358c37781f..ce24e72620a6d406bdb11ab3ed9715998f187bfd 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
 @@ -65,6 +65,7 @@ import net.minecraft.world.level.storage.PrimaryLevelData;
@@ -29,16 +29,17 @@ index edd4620c9378f459bbc4244be002e749f33f6e85..9713ae194b1946ce8b1e1c15121b6231
  
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/StartupPackLoadPhase.java b/src/main/java/org/fiddlemc/fiddle/pack/read/StartupPackLoadPhase.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..faadc3119146e2bc72efa9e37eb3fac017d232b5
+index 0000000000000000000000000000000000000000..8fec3e9d10f66fb4183302586fb46cca4f2b3f90
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/read/StartupPackLoadPhase.java
-@@ -0,0 +1,38 @@
+@@ -0,0 +1,39 @@
 +// Fiddle - read packs - startup load phase
 +
 +package org.fiddlemc.fiddle.pack.read;
 +
 +import joptsimple.OptionSet;
 +import net.minecraft.server.Main;
++import org.fiddlemc.fiddle.pack.files.FiddlePackFilesProvider;
 +
 +/**
 + * A singleton that manages a {@linkplain #inStartupLoadPhase flag} for whether the server
