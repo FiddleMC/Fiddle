@@ -1,0 +1,24 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sun, 4 Jun 2023 11:25:27 +0200
+Subject: [PATCH] Modify Bukkit enums - Cached enum values
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
+index 3dfc0f2b8f1bc4b4b7bf7bd84f106c875bb9e681..b6e6c99f207b106691e3b3541f129fbef2e248cb 100644
+--- a/src/main/java/org/bukkit/Material.java
++++ b/src/main/java/org/bukkit/Material.java
+@@ -4577,6 +4577,11 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+         }
+     }
+ 
++    // Fiddle start - modify Bukkit enums - Material - cached enum values
++    private static final Material[] values = values();
++    private static final int length = values.length;
++    // Fiddle end - modify Bukkit enums - Material - cached enum values
++
+     // Paper start
+ 
+     /**

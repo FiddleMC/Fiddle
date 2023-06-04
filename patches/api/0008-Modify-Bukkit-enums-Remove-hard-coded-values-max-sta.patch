@@ -1,0 +1,1594 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sun, 4 Jun 2023 11:25:57 +0200
+Subject: [PATCH] Modify Bukkit enums - Remove hard-coded values - max stack
+ size, durability
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
+index 33678ed08bc2145045d88a09bd292034c2d5c60d..8a439b5044dcb14743b88c918e9892a7b23ba547 100644
+--- a/src/main/java/org/bukkit/Material.java
++++ b/src/main/java/org/bukkit/Material.java
+@@ -123,7 +123,7 @@ import org.jetbrains.annotations.Nullable;
+ @SuppressWarnings({"DeprecatedIsStillUsed", "deprecation"}) // Paper
+ public enum Material implements Keyed, Translatable, net.kyori.adventure.translation.Translatable { // Paper
+     //<editor-fold desc="Materials" defaultstate="collapsed">
+-    AIR(9648, 0),
++    AIR(9648), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     STONE(22948),
+     GRANITE(21091),
+     POLISHED_GRANITE(5477),
+@@ -800,7 +800,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+      */
+     @MinecraftExperimental
+     @ApiStatus.Experimental
+-    DECORATED_POT(8720, 1, DecoratedPot.class),
++    DECORATED_POT(8720, DecoratedPot.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     MOSSY_COBBLESTONE(21900),
+     OBSIDIAN(32723),
+     TORCH(6063),
+@@ -1407,71 +1407,71 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+     /**
+      * BlockData: {@link Directional}
+      */
+-    SHULKER_BOX(7776, 1, Directional.class),
++    SHULKER_BOX(7776, Directional.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Directional}
+      */
+-    WHITE_SHULKER_BOX(31750, 1, Directional.class),
++    WHITE_SHULKER_BOX(31750, Directional.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Directional}
+      */
+-    ORANGE_SHULKER_BOX(21673, 1, Directional.class),
++    ORANGE_SHULKER_BOX(21673, Directional.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Directional}
+      */
+-    MAGENTA_SHULKER_BOX(21566, 1, Directional.class),
++    MAGENTA_SHULKER_BOX(21566, Directional.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Directional}
+      */
+-    LIGHT_BLUE_SHULKER_BOX(18226, 1, Directional.class),
++    LIGHT_BLUE_SHULKER_BOX(18226, Directional.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Directional}
+      */
+-    YELLOW_SHULKER_BOX(28700, 1, Directional.class),
++    YELLOW_SHULKER_BOX(28700, Directional.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Directional}
+      */
+-    LIME_SHULKER_BOX(28360, 1, Directional.class),
++    LIME_SHULKER_BOX(28360, Directional.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Directional}
+      */
+-    PINK_SHULKER_BOX(24968, 1, Directional.class),
++    PINK_SHULKER_BOX(24968, Directional.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Directional}
+      */
+-    GRAY_SHULKER_BOX(12754, 1, Directional.class),
++    GRAY_SHULKER_BOX(12754, Directional.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Directional}
+      */
+-    LIGHT_GRAY_SHULKER_BOX(21345, 1, Directional.class),
++    LIGHT_GRAY_SHULKER_BOX(21345, Directional.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Directional}
+      */
+-    CYAN_SHULKER_BOX(28123, 1, Directional.class),
++    CYAN_SHULKER_BOX(28123, Directional.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Directional}
+      */
+-    PURPLE_SHULKER_BOX(10373, 1, Directional.class),
++    PURPLE_SHULKER_BOX(10373, Directional.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Directional}
+      */
+-    BLUE_SHULKER_BOX(11476, 1, Directional.class),
++    BLUE_SHULKER_BOX(11476, Directional.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Directional}
+      */
+-    BROWN_SHULKER_BOX(24230, 1, Directional.class),
++    BROWN_SHULKER_BOX(24230, Directional.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Directional}
+      */
+-    GREEN_SHULKER_BOX(9377, 1, Directional.class),
++    GREEN_SHULKER_BOX(9377, Directional.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Directional}
+      */
+-    RED_SHULKER_BOX(32448, 1, Directional.class),
++    RED_SHULKER_BOX(32448, Directional.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Directional}
+      */
+-    BLACK_SHULKER_BOX(24076, 1, Directional.class),
++    BLACK_SHULKER_BOX(24076, Directional.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Directional}
+      */
+@@ -2183,41 +2183,47 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+      * BlockData: {@link RedstoneRail}
+      */
+     ACTIVATOR_RAIL(5834, RedstoneRail.class),
+-    SADDLE(30206, 1),
+-    MINECART(14352, 1),
+-    CHEST_MINECART(4497, 1),
+-    FURNACE_MINECART(14196, 1),
+-    TNT_MINECART(4277, 1),
+-    HOPPER_MINECART(19024, 1),
+-    CARROT_ON_A_STICK(27809, 1, 25),
+-    WARPED_FUNGUS_ON_A_STICK(11706, 1, 100),
+-    ELYTRA(23829, 1, 432),
+-    OAK_BOAT(17570, 1),
+-    OAK_CHEST_BOAT(7765, 1),
+-    SPRUCE_BOAT(31427, 1),
+-    SPRUCE_CHEST_BOAT(30841, 1),
+-    BIRCH_BOAT(28104, 1),
+-    BIRCH_CHEST_BOAT(18546, 1),
+-    JUNGLE_BOAT(4495, 1),
+-    JUNGLE_CHEST_BOAT(20133, 1),
+-    ACACIA_BOAT(27326, 1),
+-    ACACIA_CHEST_BOAT(28455, 1),
++    // Fiddle start - remove hard-coded Bukkit values - Material - max stack size
++    SADDLE(30206),
++    MINECART(14352),
++    CHEST_MINECART(4497),
++    FURNACE_MINECART(14196),
++    TNT_MINECART(4277),
++    HOPPER_MINECART(19024),
++    // Fiddle start - remove hard-coded Bukkit values - Material - durability
++    CARROT_ON_A_STICK(27809),
++    WARPED_FUNGUS_ON_A_STICK(11706),
++    ELYTRA(23829),
++    // Fiddle end - remove hard-coded Bukkit values - Material - durability
++    OAK_BOAT(17570),
++    OAK_CHEST_BOAT(7765),
++    SPRUCE_BOAT(31427),
++    SPRUCE_CHEST_BOAT(30841),
++    BIRCH_BOAT(28104),
++    BIRCH_CHEST_BOAT(18546),
++    JUNGLE_BOAT(4495),
++    JUNGLE_CHEST_BOAT(20133),
++    ACACIA_BOAT(27326),
++    ACACIA_CHEST_BOAT(28455),
++    // Fiddle end - remove hard-coded Bukkit values - Material - max stack size
+     @MinecraftExperimental
+     @ApiStatus.Experimental
+-    CHERRY_BOAT(13628, 1),
++    CHERRY_BOAT(13628), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @MinecraftExperimental
+     @ApiStatus.Experimental
+-    CHERRY_CHEST_BOAT(7165, 1),
+-    DARK_OAK_BOAT(28618, 1),
+-    DARK_OAK_CHEST_BOAT(8733, 1),
+-    MANGROVE_BOAT(20792, 1),
+-    MANGROVE_CHEST_BOAT(18572, 1),
++    // Fiddle start - remove hard-coded Bukkit values - Material - max stack size
++    CHERRY_CHEST_BOAT(7165),
++    DARK_OAK_BOAT(28618),
++    DARK_OAK_CHEST_BOAT(8733),
++    MANGROVE_BOAT(20792),
++    MANGROVE_CHEST_BOAT(18572),
++    // Fiddle end - remove hard-coded Bukkit values - Material - max stack size
+     @MinecraftExperimental // Paper
+     @ApiStatus.Experimental // Paper
+-    BAMBOO_RAFT(25901, 1),
++    BAMBOO_RAFT(25901), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @MinecraftExperimental // Paper
+     @ApiStatus.Experimental // Paper
+-    BAMBOO_CHEST_RAFT(20056, 1),
++    BAMBOO_CHEST_RAFT(20056), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link StructureBlock}
+      */
+@@ -2226,11 +2232,11 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+      * BlockData: {@link Jigsaw}
+      */
+     JIGSAW(17398, Jigsaw.class),
+-    TURTLE_HELMET(30120, 1, 275),
++    TURTLE_HELMET(30120), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     SCUTE(11914),
+-    FLINT_AND_STEEL(28620, 1, 64),
++    FLINT_AND_STEEL(28620), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     APPLE(7720),
+-    BOW(8745, 1, 384),
++    BOW(8745), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     ARROW(31091),
+     COAL(29067),
+     CHARCOAL(5390),
+@@ -2247,39 +2253,41 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+     GOLD_INGOT(28927),
+     NETHERITE_INGOT(32457),
+     NETHERITE_SCRAP(29331),
+-    WOODEN_SWORD(7175, 1, 59),
+-    WOODEN_SHOVEL(28432, 1, 59),
+-    WOODEN_PICKAXE(12792, 1, 59),
+-    WOODEN_AXE(6292, 1, 59),
+-    WOODEN_HOE(16043, 1, 59),
+-    STONE_SWORD(25084, 1, 131),
+-    STONE_SHOVEL(9520, 1, 131),
+-    STONE_PICKAXE(14611, 1, 131),
+-    STONE_AXE(6338, 1, 131),
+-    STONE_HOE(22855, 1, 131),
+-    GOLDEN_SWORD(10505, 1, 32),
+-    GOLDEN_SHOVEL(15597, 1, 32),
+-    GOLDEN_PICKAXE(25898, 1, 32),
+-    GOLDEN_AXE(4878, 1, 32),
+-    GOLDEN_HOE(19337, 1, 32),
+-    IRON_SWORD(10904, 1, 250),
+-    IRON_SHOVEL(30045, 1, 250),
+-    IRON_PICKAXE(8842, 1, 250),
+-    IRON_AXE(15894, 1, 250),
+-    IRON_HOE(11339, 1, 250),
+-    DIAMOND_SWORD(27707, 1, 1561),
+-    DIAMOND_SHOVEL(25415, 1, 1561),
+-    DIAMOND_PICKAXE(24291, 1, 1561),
+-    DIAMOND_AXE(27277, 1, 1561),
+-    DIAMOND_HOE(24050, 1, 1561),
+-    NETHERITE_SWORD(23871, 1, 2031),
+-    NETHERITE_SHOVEL(29728, 1, 2031),
+-    NETHERITE_PICKAXE(9930, 1, 2031),
+-    NETHERITE_AXE(29533, 1, 2031),
+-    NETHERITE_HOE(27385, 1, 2031),
++    // Fiddle start - remove hard-coded Bukkit values - Material - max stack size
++    WOODEN_SWORD(7175),
++    WOODEN_SHOVEL(28432),
++    WOODEN_PICKAXE(12792),
++    WOODEN_AXE(6292),
++    WOODEN_HOE(16043),
++    STONE_SWORD(25084),
++    STONE_SHOVEL(9520),
++    STONE_PICKAXE(14611),
++    STONE_AXE(6338),
++    STONE_HOE(22855),
++    GOLDEN_SWORD(10505),
++    GOLDEN_SHOVEL(15597),
++    GOLDEN_PICKAXE(25898),
++    GOLDEN_AXE(4878),
++    GOLDEN_HOE(19337),
++    IRON_SWORD(10904),
++    IRON_SHOVEL(30045),
++    IRON_PICKAXE(8842),
++    IRON_AXE(15894),
++    IRON_HOE(11339),
++    DIAMOND_SWORD(27707),
++    DIAMOND_SHOVEL(25415),
++    DIAMOND_PICKAXE(24291),
++    DIAMOND_AXE(27277),
++    DIAMOND_HOE(24050),
++    NETHERITE_SWORD(23871),
++    NETHERITE_SHOVEL(29728),
++    NETHERITE_PICKAXE(9930),
++    NETHERITE_AXE(29533),
++    NETHERITE_HOE(27385),
++    // Fiddle end - remove hard-coded Bukkit values - Material - max stack size, durability
+     STICK(9773),
+     BOWL(32661),
+-    MUSHROOM_STEW(16336, 1),
++    MUSHROOM_STEW(16336), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     STRING(12806),
+     FEATHER(30548),
+     GUNPOWDER(29974),
+@@ -2289,30 +2297,32 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+      */
+     WHEAT(27709, Ageable.class),
+     BREAD(32049),
+-    LEATHER_HELMET(11624, 1, 55),
+-    LEATHER_CHESTPLATE(29275, 1, 80),
+-    LEATHER_LEGGINGS(28210, 1, 75),
+-    LEATHER_BOOTS(15282, 1, 65),
+-    CHAINMAIL_HELMET(26114, 1, 165),
+-    CHAINMAIL_CHESTPLATE(23602, 1, 240),
+-    CHAINMAIL_LEGGINGS(19087, 1, 225),
+-    CHAINMAIL_BOOTS(17953, 1, 195),
+-    IRON_HELMET(12025, 1, 165),
+-    IRON_CHESTPLATE(28112, 1, 240),
+-    IRON_LEGGINGS(18951, 1, 225),
+-    IRON_BOOTS(8531, 1, 195),
+-    DIAMOND_HELMET(10755, 1, 363),
+-    DIAMOND_CHESTPLATE(32099, 1, 528),
+-    DIAMOND_LEGGINGS(26500, 1, 495),
+-    DIAMOND_BOOTS(16522, 1, 429),
+-    GOLDEN_HELMET(7945, 1, 77),
+-    GOLDEN_CHESTPLATE(4507, 1, 112),
+-    GOLDEN_LEGGINGS(21002, 1, 105),
+-    GOLDEN_BOOTS(7859, 1, 91),
+-    NETHERITE_HELMET(15907, 1, 407),
+-    NETHERITE_CHESTPLATE(6106, 1, 592),
+-    NETHERITE_LEGGINGS(25605, 1, 555),
+-    NETHERITE_BOOTS(8923, 1, 481),
++    // Fiddle start - remove hard-coded Bukkit values - Material - max stack size, durability
++    LEATHER_HELMET(11624),
++    LEATHER_CHESTPLATE(29275),
++    LEATHER_LEGGINGS(28210),
++    LEATHER_BOOTS(15282),
++    CHAINMAIL_HELMET(26114),
++    CHAINMAIL_CHESTPLATE(23602),
++    CHAINMAIL_LEGGINGS(19087),
++    CHAINMAIL_BOOTS(17953),
++    IRON_HELMET(12025),
++    IRON_CHESTPLATE(28112),
++    IRON_LEGGINGS(18951),
++    IRON_BOOTS(8531),
++    DIAMOND_HELMET(10755),
++    DIAMOND_CHESTPLATE(32099),
++    DIAMOND_LEGGINGS(26500),
++    DIAMOND_BOOTS(16522),
++    GOLDEN_HELMET(7945),
++    GOLDEN_CHESTPLATE(4507),
++    GOLDEN_LEGGINGS(21002),
++    GOLDEN_BOOTS(7859),
++    NETHERITE_HELMET(15907),
++    NETHERITE_CHESTPLATE(6106),
++    NETHERITE_LEGGINGS(25605),
++    NETHERITE_BOOTS(8923),
++    // Fiddle end - remove hard-coded Bukkit values - Material - max stack size, durability
+     FLINT(23596),
+     PORKCHOP(30896),
+     COOKED_PORKCHOP(27231),
+@@ -2322,145 +2332,151 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+     /**
+      * BlockData: {@link Sign}
+      */
+-    OAK_SIGN(8192, 16, Sign.class),
++    OAK_SIGN(8192, Sign.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Sign}
+      */
+-    SPRUCE_SIGN(21502, 16, Sign.class),
++    SPRUCE_SIGN(21502, Sign.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Sign}
+      */
+-    BIRCH_SIGN(11351, 16, Sign.class),
++    BIRCH_SIGN(11351, Sign.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Sign}
+      */
+-    JUNGLE_SIGN(24717, 16, Sign.class),
++    JUNGLE_SIGN(24717, Sign.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Sign}
+      */
+-    ACACIA_SIGN(29808, 16, Sign.class),
++    ACACIA_SIGN(29808, Sign.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Sign}
+      */
+     @MinecraftExperimental
+     @ApiStatus.Experimental
+-    CHERRY_SIGN(16520, 16, Sign.class),
++    CHERRY_SIGN(16520, Sign.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Sign}
+      */
+-    DARK_OAK_SIGN(15127, 16, Sign.class),
++    DARK_OAK_SIGN(15127, Sign.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Sign}
+      */
+-    MANGROVE_SIGN(21975, 16, Sign.class),
++    MANGROVE_SIGN(21975, Sign.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Sign}
+      */
+     @MinecraftExperimental // Paper
+     @ApiStatus.Experimental // Paper
+-    BAMBOO_SIGN(26139, 16, Sign.class),
++    BAMBOO_SIGN(26139, Sign.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Sign}
+      */
+-    CRIMSON_SIGN(12162, 16, Sign.class),
++    CRIMSON_SIGN(12162, Sign.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Sign}
+      */
+-    WARPED_SIGN(10407, 16, Sign.class),
++    WARPED_SIGN(10407, Sign.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link HangingSign}
+      */
+     @MinecraftExperimental
+     @ApiStatus.Experimental
+-    OAK_HANGING_SIGN(20116, 16, HangingSign.class),
++    OAK_HANGING_SIGN(20116, HangingSign.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link HangingSign}
+      */
+     @MinecraftExperimental
+     @ApiStatus.Experimental
+-    SPRUCE_HANGING_SIGN(24371, 16, HangingSign.class),
++    SPRUCE_HANGING_SIGN(24371, HangingSign.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link HangingSign}
+      */
+     @MinecraftExperimental
+     @ApiStatus.Experimental
+-    BIRCH_HANGING_SIGN(17938, 16, HangingSign.class),
++    BIRCH_HANGING_SIGN(17938, HangingSign.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link HangingSign}
+      */
+     @MinecraftExperimental
+     @ApiStatus.Experimental
+-    JUNGLE_HANGING_SIGN(27671, 16, HangingSign.class),
++    JUNGLE_HANGING_SIGN(27671, HangingSign.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link HangingSign}
+      */
+     @MinecraftExperimental
+     @ApiStatus.Experimental
+-    ACACIA_HANGING_SIGN(30257, 16, HangingSign.class),
++    ACACIA_HANGING_SIGN(30257, HangingSign.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link HangingSign}
+      */
+     @MinecraftExperimental
+     @ApiStatus.Experimental
+-    CHERRY_HANGING_SIGN(5088, 16, HangingSign.class),
++    CHERRY_HANGING_SIGN(5088, HangingSign.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link HangingSign}
+      */
+     @MinecraftExperimental
+     @ApiStatus.Experimental
+-    DARK_OAK_HANGING_SIGN(23360, 16, HangingSign.class),
++    DARK_OAK_HANGING_SIGN(23360, HangingSign.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link HangingSign}
+      */
+     @MinecraftExperimental
+     @ApiStatus.Experimental
+-    MANGROVE_HANGING_SIGN(25106, 16, HangingSign.class),
++    MANGROVE_HANGING_SIGN(25106, HangingSign.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link HangingSign}
+      */
+     @MinecraftExperimental
+     @ApiStatus.Experimental
+-    BAMBOO_HANGING_SIGN(4726, 16, HangingSign.class),
++    BAMBOO_HANGING_SIGN(4726, HangingSign.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link HangingSign}
+      */
+     @MinecraftExperimental
+     @ApiStatus.Experimental
+-    CRIMSON_HANGING_SIGN(20696, 16, HangingSign.class),
++    CRIMSON_HANGING_SIGN(20696, HangingSign.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link HangingSign}
+      */
+     @MinecraftExperimental
+     @ApiStatus.Experimental
+-    WARPED_HANGING_SIGN(8195, 16, HangingSign.class),
+-    BUCKET(15215, 16),
+-    WATER_BUCKET(8802, 1),
+-    LAVA_BUCKET(9228, 1),
+-    POWDER_SNOW_BUCKET(31101, 1),
+-    SNOWBALL(19487, 16),
++    // Fiddle start - remove hard-coded Bukkit values - Material - max stack size
++    WARPED_HANGING_SIGN(8195, HangingSign.class),
++    BUCKET(15215),
++    WATER_BUCKET(8802),
++    LAVA_BUCKET(9228),
++    POWDER_SNOW_BUCKET(31101),
++    SNOWBALL(19487),
++    // Fiddle end - remove hard-coded Bukkit values - Material - max stack size
+     LEATHER(16414),
+-    MILK_BUCKET(9680, 1),
+-    PUFFERFISH_BUCKET(8861, 1),
+-    SALMON_BUCKET(9606, 1),
+-    COD_BUCKET(28601, 1),
+-    TROPICAL_FISH_BUCKET(29995, 1),
+-    AXOLOTL_BUCKET(20669, 1),
+-    TADPOLE_BUCKET(9731, 1),
++    // Fiddle start - remove hard-coded Bukkit values - Material - max stack size
++    MILK_BUCKET(9680),
++    PUFFERFISH_BUCKET(8861),
++    SALMON_BUCKET(9606),
++    COD_BUCKET(28601),
++    TROPICAL_FISH_BUCKET(29995),
++    AXOLOTL_BUCKET(20669),
++    TADPOLE_BUCKET(9731),
++    // Fiddle end - remove hard-coded Bukkit values - Material - max stack size
+     BRICK(6820),
+     CLAY_BALL(24603),
+     DRIED_KELP_BLOCK(12966),
+     PAPER(9923),
+     BOOK(23097),
+     SLIME_BALL(5242),
+-    EGG(21603, 16),
++    EGG(21603), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     COMPASS(24139),
+     RECOVERY_COMPASS(12710),
+     @MinecraftExperimental
+     @ApiStatus.Experimental
+-    BUNDLE(16835, 1),
+-    FISHING_ROD(4167, 1, 64),
++    // Fiddle start - remove hard-coded Bukkit values - Material - max stack size
++    BUNDLE(16835),
++    FISHING_ROD(4167), // Fiddle - remove hard-coded Bukkit values - Material - durability
++    // Fiddle end - remove hard-coded Bukkit values - Material - max stack size
+     CLOCK(14980),
+-    SPYGLASS(27490, 1),
++    SPYGLASS(27490), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     GLOWSTONE_DUST(6665),
+     COD(24691),
+     SALMON(18516),
+@@ -2493,74 +2509,74 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+     /**
+      * BlockData: {@link Cake}
+      */
+-    CAKE(27048, 1, Cake.class),
++    CAKE(27048, Cake.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Bed}
+      */
+-    WHITE_BED(8185, 1, Bed.class),
++    WHITE_BED(8185, Bed.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Bed}
+      */
+-    ORANGE_BED(11194, 1, Bed.class),
++    ORANGE_BED(11194, Bed.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Bed}
+      */
+-    MAGENTA_BED(20061, 1, Bed.class),
++    MAGENTA_BED(20061, Bed.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Bed}
+      */
+-    LIGHT_BLUE_BED(20957, 1, Bed.class),
++    LIGHT_BLUE_BED(20957, Bed.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Bed}
+      */
+-    YELLOW_BED(30410, 1, Bed.class),
++    YELLOW_BED(30410, Bed.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Bed}
+      */
+-    LIME_BED(27860, 1, Bed.class),
++    LIME_BED(27860, Bed.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Bed}
+      */
+-    PINK_BED(13795, 1, Bed.class),
++    PINK_BED(13795, Bed.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Bed}
+      */
+-    GRAY_BED(15745, 1, Bed.class),
++    GRAY_BED(15745, Bed.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Bed}
+      */
+-    LIGHT_GRAY_BED(5090, 1, Bed.class),
++    LIGHT_GRAY_BED(5090, Bed.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Bed}
+      */
+-    CYAN_BED(16746, 1, Bed.class),
++    CYAN_BED(16746, Bed.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Bed}
+      */
+-    PURPLE_BED(29755, 1, Bed.class),
++    PURPLE_BED(29755, Bed.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Bed}
+      */
+-    BLUE_BED(12714, 1, Bed.class),
++    BLUE_BED(12714, Bed.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Bed}
+      */
+-    BROWN_BED(26672, 1, Bed.class),
++    BROWN_BED(26672, Bed.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Bed}
+      */
+-    GREEN_BED(13797, 1, Bed.class),
++    GREEN_BED(13797, Bed.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Bed}
+      */
+-    RED_BED(30910, 1, Bed.class),
++    RED_BED(30910, Bed.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Bed}
+      */
+-    BLACK_BED(20490, 1, Bed.class),
++    BLACK_BED(20490, Bed.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     COOKIE(27431),
+     FILLED_MAP(23504),
+-    SHEARS(27971, 1, 238),
++    SHEARS(27971), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     MELON_SLICE(5347),
+     DRIED_KELP(21042),
+     PUMPKIN_SEEDS(28985),
+@@ -2570,7 +2586,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+     CHICKEN(17281),
+     COOKED_CHICKEN(16984),
+     ROTTEN_FLESH(21591),
+-    ENDER_PEARL(5259, 16),
++    ENDER_PEARL(5259), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     BLAZE_ROD(8289),
+     GHAST_TEAR(18222),
+     GOLD_NUGGET(28814),
+@@ -2578,7 +2594,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+      * BlockData: {@link Ageable}
+      */
+     NETHER_WART(29227, Ageable.class),
+-    POTION(24020, 1),
++    POTION(24020), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     GLASS_BOTTLE(6116),
+     SPIDER_EYE(9318),
+     FERMENTED_SPIDER_EYE(19386),
+@@ -2674,8 +2690,10 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+     ZOMBIFIED_PIGLIN_SPAWN_EGG(6626),
+     EXPERIENCE_BOTTLE(12858),
+     FIRE_CHARGE(4842),
+-    WRITABLE_BOOK(13393, 1),
+-    WRITTEN_BOOK(24164, 16),
++    // Fiddle start - remove hard-coded Bukkit values - Material - max stack size
++    WRITABLE_BOOK(13393),
++    WRITTEN_BOOK(24164),
++    // Fiddle end - remove hard-coded Bukkit values - Material - max stack size
+     ITEM_FRAME(27318),
+     GLOW_ITEM_FRAME(26473),
+     FLOWER_POT(30567),
+@@ -2719,89 +2737,91 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+     PUMPKIN_PIE(28725),
+     FIREWORK_ROCKET(23841),
+     FIREWORK_STAR(12190),
+-    ENCHANTED_BOOK(11741, 1),
++    ENCHANTED_BOOK(11741), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     NETHER_BRICK(19996),
+     PRISMARINE_SHARD(10993),
+     PRISMARINE_CRYSTALS(31546),
+     RABBIT(23068),
+     COOKED_RABBIT(4454),
+-    RABBIT_STEW(25318, 1),
++    RABBIT_STEW(25318), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     RABBIT_FOOT(13864),
+     RABBIT_HIDE(12467),
+-    ARMOR_STAND(12852, 16),
+-    IRON_HORSE_ARMOR(30108, 1),
+-    GOLDEN_HORSE_ARMOR(7996, 1),
+-    DIAMOND_HORSE_ARMOR(10321, 1),
+-    LEATHER_HORSE_ARMOR(30667, 1),
++    // Fiddle start - remove hard-coded Bukkit values - Material - max stack size
++    ARMOR_STAND(12852),
++    IRON_HORSE_ARMOR(30108),
++    GOLDEN_HORSE_ARMOR(7996),
++    DIAMOND_HORSE_ARMOR(10321),
++    LEATHER_HORSE_ARMOR(30667),
++    // Fiddle end - remove hard-coded Bukkit values - Material - max stack size
+     LEAD(29539),
+     NAME_TAG(30731),
+-    COMMAND_BLOCK_MINECART(7992, 1),
++    COMMAND_BLOCK_MINECART(7992), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     MUTTON(4792),
+     COOKED_MUTTON(31447),
+     /**
+      * BlockData: {@link Rotatable}
+      */
+-    WHITE_BANNER(17562, 16, Rotatable.class),
++    WHITE_BANNER(17562, Rotatable.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Rotatable}
+      */
+-    ORANGE_BANNER(4839, 16, Rotatable.class),
++    ORANGE_BANNER(4839, Rotatable.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Rotatable}
+      */
+-    MAGENTA_BANNER(15591, 16, Rotatable.class),
++    MAGENTA_BANNER(15591, Rotatable.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Rotatable}
+      */
+-    LIGHT_BLUE_BANNER(18060, 16, Rotatable.class),
++    LIGHT_BLUE_BANNER(18060, Rotatable.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Rotatable}
+      */
+-    YELLOW_BANNER(30382, 16, Rotatable.class),
++    YELLOW_BANNER(30382, Rotatable.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Rotatable}
+      */
+-    LIME_BANNER(18887, 16, Rotatable.class),
++    LIME_BANNER(18887, Rotatable.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Rotatable}
+      */
+-    PINK_BANNER(19439, 16, Rotatable.class),
++    PINK_BANNER(19439, Rotatable.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Rotatable}
+      */
+-    GRAY_BANNER(12053, 16, Rotatable.class),
++    GRAY_BANNER(12053, Rotatable.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Rotatable}
+      */
+-    LIGHT_GRAY_BANNER(11417, 16, Rotatable.class),
++    LIGHT_GRAY_BANNER(11417, Rotatable.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Rotatable}
+      */
+-    CYAN_BANNER(9839, 16, Rotatable.class),
++    CYAN_BANNER(9839, Rotatable.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Rotatable}
+      */
+-    PURPLE_BANNER(29027, 16, Rotatable.class),
++    PURPLE_BANNER(29027, Rotatable.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Rotatable}
+      */
+-    BLUE_BANNER(18481, 16, Rotatable.class),
++    BLUE_BANNER(18481, Rotatable.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Rotatable}
+      */
+-    BROWN_BANNER(11481, 16, Rotatable.class),
++    BROWN_BANNER(11481, Rotatable.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Rotatable}
+      */
+-    GREEN_BANNER(10698, 16, Rotatable.class),
++    GREEN_BANNER(10698, Rotatable.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Rotatable}
+      */
+-    RED_BANNER(26961, 16, Rotatable.class),
++    RED_BANNER(26961, Rotatable.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Rotatable}
+      */
+-    BLACK_BANNER(9365, 16, Rotatable.class),
++    BLACK_BANNER(9365, Rotatable.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     END_CRYSTAL(19090),
+     CHORUS_FRUIT(7652),
+     POPPED_CHORUS_FRUIT(27844),
+@@ -2810,51 +2830,59 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+     TORCHFLOWER_SEEDS(18153),
+     BEETROOT(23305),
+     BEETROOT_SEEDS(21282),
+-    BEETROOT_SOUP(16036, 1),
++    BEETROOT_SOUP(16036), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     DRAGON_BREATH(20154),
+-    SPLASH_POTION(30248, 1),
++    SPLASH_POTION(30248), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     SPECTRAL_ARROW(4568),
+     TIPPED_ARROW(25164),
+-    LINGERING_POTION(25857, 1),
+-    SHIELD(29943, 1, 336),
+-    TOTEM_OF_UNDYING(10139, 1),
++    // Fiddle start - remove hard-coded Bukkit values - Material - max stack size
++    LINGERING_POTION(25857),
++    SHIELD(29943), // Fiddle - remove hard-coded Bukkit values - Material - durability
++    TOTEM_OF_UNDYING(10139),
++    // Fiddle end - remove hard-coded Bukkit values - Material - max stack size
+     SHULKER_SHELL(27848),
+     IRON_NUGGET(13715),
+-    KNOWLEDGE_BOOK(12646, 1),
+-    DEBUG_STICK(24562, 1),
+-    MUSIC_DISC_13(16359, 1),
+-    MUSIC_DISC_CAT(16246, 1),
+-    MUSIC_DISC_BLOCKS(26667, 1),
+-    MUSIC_DISC_CHIRP(19436, 1),
+-    MUSIC_DISC_FAR(31742, 1),
+-    MUSIC_DISC_MALL(11517, 1),
+-    MUSIC_DISC_MELLOHI(26117, 1),
+-    MUSIC_DISC_STAL(14989, 1),
+-    MUSIC_DISC_STRAD(16785, 1),
+-    MUSIC_DISC_WARD(24026, 1),
+-    MUSIC_DISC_11(27426, 1),
+-    MUSIC_DISC_WAIT(26499, 1),
+-    MUSIC_DISC_OTHERSIDE(12974, 1),
+-    MUSIC_DISC_5(9212, 1),
+-    MUSIC_DISC_PIGSTEP(21323, 1),
++    // Fiddle start - remove hard-coded Bukkit values - Material - max stack size
++    KNOWLEDGE_BOOK(12646),
++    DEBUG_STICK(24562),
++    MUSIC_DISC_13(16359),
++    MUSIC_DISC_CAT(16246),
++    MUSIC_DISC_BLOCKS(26667),
++    MUSIC_DISC_CHIRP(19436),
++    MUSIC_DISC_FAR(31742),
++    MUSIC_DISC_MALL(11517),
++    MUSIC_DISC_MELLOHI(26117),
++    MUSIC_DISC_STAL(14989),
++    MUSIC_DISC_STRAD(16785),
++    MUSIC_DISC_WARD(24026),
++    MUSIC_DISC_11(27426),
++    MUSIC_DISC_WAIT(26499),
++    MUSIC_DISC_OTHERSIDE(12974),
++    MUSIC_DISC_5(9212),
++    MUSIC_DISC_PIGSTEP(21323),
++    // Fiddle end - remove hard-coded Bukkit values - Material - max stack size
+     DISC_FRAGMENT_5(29729),
+-    TRIDENT(7534, 1, 250),
++    TRIDENT(7534), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     PHANTOM_MEMBRANE(18398),
+     NAUTILUS_SHELL(19989),
+     HEART_OF_THE_SEA(11807),
+-    CROSSBOW(4340, 1, 465),
+-    SUSPICIOUS_STEW(8173, 1),
++    // Fiddle start - remove hard-coded Bukkit values - Material - max stack size
++    CROSSBOW(4340), // Fiddle - remove hard-coded Bukkit values - Material - durability
++    SUSPICIOUS_STEW(8173),
++    // Fiddle end - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Directional}
+      */
+     LOOM(14276, Directional.class),
+-    FLOWER_BANNER_PATTERN(5762, 1),
+-    CREEPER_BANNER_PATTERN(15774, 1),
+-    SKULL_BANNER_PATTERN(7680, 1),
+-    MOJANG_BANNER_PATTERN(11903, 1),
+-    GLOBE_BANNER_PATTERN(27753, 1),
+-    PIGLIN_BANNER_PATTERN(22028, 1),
+-    GOAT_HORN(28237, 1),
++    // Fiddle start - remove hard-coded Bukkit values - Material - max stack size
++    FLOWER_BANNER_PATTERN(5762),
++    CREEPER_BANNER_PATTERN(15774),
++    SKULL_BANNER_PATTERN(7680),
++    MOJANG_BANNER_PATTERN(11903),
++    GLOBE_BANNER_PATTERN(27753),
++    PIGLIN_BANNER_PATTERN(22028),
++    GOAT_HORN(28237),
++    // Fiddle end - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link Levelled}
+      */
+@@ -2914,7 +2942,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+      * BlockData: {@link Beehive}
+      */
+     BEEHIVE(11830, Beehive.class),
+-    HONEY_BOTTLE(22927, 16),
++    HONEY_BOTTLE(22927), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     HONEYCOMB_BLOCK(28780),
+     LODESTONE(23127),
+     CRYING_OBSIDIAN(31545),
+@@ -3056,7 +3084,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+     ECHO_SHARD(12529),
+     @MinecraftExperimental
+     @ApiStatus.Experimental
+-    BRUSH(30569, 1, 64),
++    BRUSH(30569), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @MinecraftExperimental
+     @ApiStatus.Experimental
+     NETHERITE_UPGRADE_SMITHING_TEMPLATE(7615),
+@@ -3141,43 +3169,43 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+     /**
+      * BlockData: {@link WallSign}
+      */
+-    OAK_WALL_SIGN(12984, 16, WallSign.class),
++    OAK_WALL_SIGN(12984, WallSign.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link WallSign}
+      */
+-    SPRUCE_WALL_SIGN(7352, 16, WallSign.class),
++    SPRUCE_WALL_SIGN(7352, WallSign.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link WallSign}
+      */
+-    BIRCH_WALL_SIGN(9887, 16, WallSign.class),
++    BIRCH_WALL_SIGN(9887, WallSign.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link WallSign}
+      */
+-    ACACIA_WALL_SIGN(20316, 16, WallSign.class),
++    ACACIA_WALL_SIGN(20316, WallSign.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link WallSign}
+      */
+     @MinecraftExperimental
+     @ApiStatus.Experimental
+-    CHERRY_WALL_SIGN(20188, 16, WallSign.class),
++    CHERRY_WALL_SIGN(20188, WallSign.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link WallSign}
+      */
+-    JUNGLE_WALL_SIGN(29629, 16, WallSign.class),
++    JUNGLE_WALL_SIGN(29629, WallSign.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link WallSign}
+      */
+-    DARK_OAK_WALL_SIGN(9508, 16, WallSign.class),
++    DARK_OAK_WALL_SIGN(9508, WallSign.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link WallSign}
+      */
+-    MANGROVE_WALL_SIGN(27203, 16, WallSign.class),
++    MANGROVE_WALL_SIGN(27203, WallSign.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link WallSign}
+      */
+     @MinecraftExperimental // Paper
+     @ApiStatus.Experimental // Paper
+-    BAMBOO_WALL_SIGN(18857, 16, WallSign.class),
++    BAMBOO_WALL_SIGN(18857, WallSign.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link WallHangingSign}
+      */
+@@ -3496,11 +3524,11 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+     /**
+      * BlockData: {@link WallSign}
+      */
+-    CRIMSON_WALL_SIGN(19242, 16, WallSign.class),
++    CRIMSON_WALL_SIGN(19242, WallSign.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     /**
+      * BlockData: {@link WallSign}
+      */
+-    WARPED_WALL_SIGN(13534, 16, WallSign.class),
++    WARPED_WALL_SIGN(13534, WallSign.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     POTTED_CRIMSON_FUNGUS(5548),
+     POTTED_WARPED_FUNGUS(30800),
+     POTTED_CRIMSON_ROOTS(13852),
+@@ -3590,7 +3618,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+     POTTED_FLOWERING_AZALEA_BUSH(10609),
+     // ----- Legacy Separator -----
+     @Deprecated
+-    LEGACY_AIR(0, 0),
++    LEGACY_AIR(0), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+     LEGACY_STONE(1),
+     @Deprecated
+@@ -3716,7 +3744,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+     @Deprecated
+     LEGACY_BURNING_FURNACE(62, org.bukkit.material.Furnace.class),
+     @Deprecated
+-    LEGACY_SIGN_POST(63, 64, org.bukkit.material.Sign.class),
++    LEGACY_SIGN_POST(63, org.bukkit.material.Sign.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+     LEGACY_WOODEN_DOOR(64, org.bukkit.material.Door.class),
+     @Deprecated
+@@ -3726,7 +3754,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+     @Deprecated
+     LEGACY_COBBLESTONE_STAIRS(67, org.bukkit.material.Stairs.class),
+     @Deprecated
+-    LEGACY_WALL_SIGN(68, 64, org.bukkit.material.Sign.class),
++    LEGACY_WALL_SIGN(68, org.bukkit.material.Sign.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+     LEGACY_LEVER(69, org.bukkit.material.Lever.class),
+     @Deprecated
+@@ -3774,7 +3802,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+     @Deprecated
+     LEGACY_JACK_O_LANTERN(91, org.bukkit.material.Pumpkin.class),
+     @Deprecated
+-    LEGACY_CAKE_BLOCK(92, 64, org.bukkit.material.Cake.class),
++    LEGACY_CAKE_BLOCK(92, org.bukkit.material.Cake.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+     LEGACY_DIODE_BLOCK_OFF(93, org.bukkit.material.Diode.class),
+     @Deprecated
+@@ -4028,37 +4056,37 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+     @Deprecated
+     LEGACY_OBSERVER(218, org.bukkit.material.Observer.class),
+     @Deprecated
+-    LEGACY_WHITE_SHULKER_BOX(219, 1),
++    LEGACY_WHITE_SHULKER_BOX(219), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_ORANGE_SHULKER_BOX(220, 1),
++    LEGACY_ORANGE_SHULKER_BOX(220), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_MAGENTA_SHULKER_BOX(221, 1),
++    LEGACY_MAGENTA_SHULKER_BOX(221), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_LIGHT_BLUE_SHULKER_BOX(222, 1),
++    LEGACY_LIGHT_BLUE_SHULKER_BOX(222), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_YELLOW_SHULKER_BOX(223, 1),
++    LEGACY_YELLOW_SHULKER_BOX(223), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_LIME_SHULKER_BOX(224, 1),
++    LEGACY_LIME_SHULKER_BOX(224), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_PINK_SHULKER_BOX(225, 1),
++    LEGACY_PINK_SHULKER_BOX(225), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_GRAY_SHULKER_BOX(226, 1),
++    LEGACY_GRAY_SHULKER_BOX(226), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_SILVER_SHULKER_BOX(227, 1),
++    LEGACY_SILVER_SHULKER_BOX(227), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_CYAN_SHULKER_BOX(228, 1),
++    LEGACY_CYAN_SHULKER_BOX(228), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_PURPLE_SHULKER_BOX(229, 1),
++    LEGACY_PURPLE_SHULKER_BOX(229), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_BLUE_SHULKER_BOX(230, 1),
++    LEGACY_BLUE_SHULKER_BOX(230), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_BROWN_SHULKER_BOX(231, 1),
++    LEGACY_BROWN_SHULKER_BOX(231), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_GREEN_SHULKER_BOX(232, 1),
++    LEGACY_GREEN_SHULKER_BOX(232), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_RED_SHULKER_BOX(233, 1),
++    LEGACY_RED_SHULKER_BOX(233), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_BLACK_SHULKER_BOX(234, 1),
++    LEGACY_BLACK_SHULKER_BOX(234), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+     LEGACY_WHITE_GLAZED_TERRACOTTA(235),
+     @Deprecated
+@@ -4099,17 +4127,17 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+     LEGACY_STRUCTURE_BLOCK(255),
+     // ----- Item Separator -----
+     @Deprecated
+-    LEGACY_IRON_SPADE(256, 1, 250),
++    LEGACY_IRON_SPADE(256), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+-    LEGACY_IRON_PICKAXE(257, 1, 250),
++    LEGACY_IRON_PICKAXE(257), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+-    LEGACY_IRON_AXE(258, 1, 250),
++    LEGACY_IRON_AXE(258), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+-    LEGACY_FLINT_AND_STEEL(259, 1, 64),
++    LEGACY_FLINT_AND_STEEL(259), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+     LEGACY_APPLE(260),
+     @Deprecated
+-    LEGACY_BOW(261, 1, 384),
++    LEGACY_BOW(261), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+     LEGACY_ARROW(262),
+     @Deprecated
+@@ -4121,45 +4149,45 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+     @Deprecated
+     LEGACY_GOLD_INGOT(266),
+     @Deprecated
+-    LEGACY_IRON_SWORD(267, 1, 250),
++    LEGACY_IRON_SWORD(267), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+-    LEGACY_WOOD_SWORD(268, 1, 59),
++    LEGACY_WOOD_SWORD(268), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+-    LEGACY_WOOD_SPADE(269, 1, 59),
++    LEGACY_WOOD_SPADE(269), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+-    LEGACY_WOOD_PICKAXE(270, 1, 59),
++    LEGACY_WOOD_PICKAXE(270), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+-    LEGACY_WOOD_AXE(271, 1, 59),
++    LEGACY_WOOD_AXE(271), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+-    LEGACY_STONE_SWORD(272, 1, 131),
++    LEGACY_STONE_SWORD(272), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+-    LEGACY_STONE_SPADE(273, 1, 131),
++    LEGACY_STONE_SPADE(273), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+-    LEGACY_STONE_PICKAXE(274, 1, 131),
++    LEGACY_STONE_PICKAXE(274), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+-    LEGACY_STONE_AXE(275, 1, 131),
++    LEGACY_STONE_AXE(275), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+-    LEGACY_DIAMOND_SWORD(276, 1, 1561),
++    LEGACY_DIAMOND_SWORD(276), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+-    LEGACY_DIAMOND_SPADE(277, 1, 1561),
++    LEGACY_DIAMOND_SPADE(277), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+-    LEGACY_DIAMOND_PICKAXE(278, 1, 1561),
++    LEGACY_DIAMOND_PICKAXE(278), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+-    LEGACY_DIAMOND_AXE(279, 1, 1561),
++    LEGACY_DIAMOND_AXE(279), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+     LEGACY_STICK(280),
+     @Deprecated
+     LEGACY_BOWL(281),
+     @Deprecated
+-    LEGACY_MUSHROOM_SOUP(282, 1),
++    LEGACY_MUSHROOM_SOUP(282), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_GOLD_SWORD(283, 1, 32),
++    LEGACY_GOLD_SWORD(283), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+-    LEGACY_GOLD_SPADE(284, 1, 32),
++    LEGACY_GOLD_SPADE(284), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+-    LEGACY_GOLD_PICKAXE(285, 1, 32),
++    LEGACY_GOLD_PICKAXE(285), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+-    LEGACY_GOLD_AXE(286, 1, 32),
++    LEGACY_GOLD_AXE(286), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+     LEGACY_STRING(287),
+     @Deprecated
+@@ -4167,15 +4195,15 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+     @Deprecated
+     LEGACY_SULPHUR(289),
+     @Deprecated
+-    LEGACY_WOOD_HOE(290, 1, 59),
++    LEGACY_WOOD_HOE(290), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+-    LEGACY_STONE_HOE(291, 1, 131),
++    LEGACY_STONE_HOE(291), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+-    LEGACY_IRON_HOE(292, 1, 250),
++    LEGACY_IRON_HOE(292), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+-    LEGACY_DIAMOND_HOE(293, 1, 1561),
++    LEGACY_DIAMOND_HOE(293), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+-    LEGACY_GOLD_HOE(294, 1, 32),
++    LEGACY_GOLD_HOE(294), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+     LEGACY_SEEDS(295),
+     @Deprecated
+@@ -4183,45 +4211,45 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+     @Deprecated
+     LEGACY_BREAD(297),
+     @Deprecated
+-    LEGACY_LEATHER_HELMET(298, 1, 55),
++    LEGACY_LEATHER_HELMET(298), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+-    LEGACY_LEATHER_CHESTPLATE(299, 1, 80),
++    LEGACY_LEATHER_CHESTPLATE(299), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+-    LEGACY_LEATHER_LEGGINGS(300, 1, 75),
++    LEGACY_LEATHER_LEGGINGS(300), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+-    LEGACY_LEATHER_BOOTS(301, 1, 65),
++    LEGACY_LEATHER_BOOTS(301), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+-    LEGACY_CHAINMAIL_HELMET(302, 1, 165),
++    LEGACY_CHAINMAIL_HELMET(302), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+-    LEGACY_CHAINMAIL_CHESTPLATE(303, 1, 240),
++    LEGACY_CHAINMAIL_CHESTPLATE(303), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+-    LEGACY_CHAINMAIL_LEGGINGS(304, 1, 225),
++    LEGACY_CHAINMAIL_LEGGINGS(304), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+-    LEGACY_CHAINMAIL_BOOTS(305, 1, 195),
++    LEGACY_CHAINMAIL_BOOTS(305), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+-    LEGACY_IRON_HELMET(306, 1, 165),
++    LEGACY_IRON_HELMET(306), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+-    LEGACY_IRON_CHESTPLATE(307, 1, 240),
++    LEGACY_IRON_CHESTPLATE(307), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+-    LEGACY_IRON_LEGGINGS(308, 1, 225),
++    LEGACY_IRON_LEGGINGS(308), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+-    LEGACY_IRON_BOOTS(309, 1, 195),
++    LEGACY_IRON_BOOTS(309), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+-    LEGACY_DIAMOND_HELMET(310, 1, 363),
++    LEGACY_DIAMOND_HELMET(310), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+-    LEGACY_DIAMOND_CHESTPLATE(311, 1, 528),
++    LEGACY_DIAMOND_CHESTPLATE(311), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+-    LEGACY_DIAMOND_LEGGINGS(312, 1, 495),
++    LEGACY_DIAMOND_LEGGINGS(312), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+-    LEGACY_DIAMOND_BOOTS(313, 1, 429),
++    LEGACY_DIAMOND_BOOTS(313), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+-    LEGACY_GOLD_HELMET(314, 1, 77),
++    LEGACY_GOLD_HELMET(314), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+-    LEGACY_GOLD_CHESTPLATE(315, 1, 112),
++    LEGACY_GOLD_CHESTPLATE(315), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+-    LEGACY_GOLD_LEGGINGS(316, 1, 105),
++    LEGACY_GOLD_LEGGINGS(316), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+-    LEGACY_GOLD_BOOTS(317, 1, 91),
++    LEGACY_GOLD_BOOTS(317), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+     LEGACY_FLINT(318),
+     @Deprecated
+@@ -4233,31 +4261,31 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+     @Deprecated
+     LEGACY_GOLDEN_APPLE(322),
+     @Deprecated
+-    LEGACY_SIGN(323, 16),
++    LEGACY_SIGN(323), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_WOOD_DOOR(324, 64),
++    LEGACY_WOOD_DOOR(324), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_BUCKET(325, 16),
++    LEGACY_BUCKET(325), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_WATER_BUCKET(326, 1),
++    LEGACY_WATER_BUCKET(326), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_LAVA_BUCKET(327, 1),
++    LEGACY_LAVA_BUCKET(327), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_MINECART(328, 1),
++    LEGACY_MINECART(328), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_SADDLE(329, 1),
++    LEGACY_SADDLE(329), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_IRON_DOOR(330, 64),
++    LEGACY_IRON_DOOR(330), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+     LEGACY_REDSTONE(331),
+     @Deprecated
+-    LEGACY_SNOW_BALL(332, 16),
++    LEGACY_SNOW_BALL(332), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_BOAT(333, 1),
++    LEGACY_BOAT(333), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+     LEGACY_LEATHER(334),
+     @Deprecated
+-    LEGACY_MILK_BUCKET(335, 1),
++    LEGACY_MILK_BUCKET(335), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+     LEGACY_CLAY_BRICK(336),
+     @Deprecated
+@@ -4271,15 +4299,15 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+     @Deprecated
+     LEGACY_SLIME_BALL(341),
+     @Deprecated
+-    LEGACY_STORAGE_MINECART(342, 1),
++    LEGACY_STORAGE_MINECART(342), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_POWERED_MINECART(343, 1),
++    LEGACY_POWERED_MINECART(343), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_EGG(344, 16),
++    LEGACY_EGG(344), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+     LEGACY_COMPASS(345),
+     @Deprecated
+-    LEGACY_FISHING_ROD(346, 1, 64),
++    LEGACY_FISHING_ROD(346), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+     LEGACY_WATCH(347),
+     @Deprecated
+@@ -4295,9 +4323,9 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+     @Deprecated
+     LEGACY_SUGAR(353),
+     @Deprecated
+-    LEGACY_CAKE(354, 1),
++    LEGACY_CAKE(354), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_BED(355, 1),
++    LEGACY_BED(355), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+     LEGACY_DIODE(356),
+     @Deprecated
+@@ -4308,7 +4336,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+     @Deprecated
+     LEGACY_MAP(358, org.bukkit.material.MaterialData.class),
+     @Deprecated
+-    LEGACY_SHEARS(359, 1, 238),
++    LEGACY_SHEARS(359), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+     LEGACY_MELON(360),
+     @Deprecated
+@@ -4326,7 +4354,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+     @Deprecated
+     LEGACY_ROTTEN_FLESH(367),
+     @Deprecated
+-    LEGACY_ENDER_PEARL(368, 16),
++    LEGACY_ENDER_PEARL(368), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+     LEGACY_BLAZE_ROD(369),
+     @Deprecated
+@@ -4336,7 +4364,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+     @Deprecated
+     LEGACY_NETHER_STALK(372),
+     @Deprecated
+-    LEGACY_POTION(373, 1, org.bukkit.material.MaterialData.class),
++    LEGACY_POTION(373, org.bukkit.material.MaterialData.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+     LEGACY_GLASS_BOTTLE(374),
+     @Deprecated
+@@ -4356,17 +4384,17 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+     @Deprecated
+     LEGACY_SPECKLED_MELON(382),
+     @Deprecated
+-    LEGACY_MONSTER_EGG(383, 64, org.bukkit.material.SpawnEgg.class),
++    LEGACY_MONSTER_EGG(383, org.bukkit.material.SpawnEgg.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_EXP_BOTTLE(384, 64),
++    LEGACY_EXP_BOTTLE(384), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_FIREBALL(385, 64),
++    LEGACY_FIREBALL(385), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_BOOK_AND_QUILL(386, 1),
++    LEGACY_BOOK_AND_QUILL(386), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_WRITTEN_BOOK(387, 16),
++    LEGACY_WRITTEN_BOOK(387), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_EMERALD(388, 64),
++    LEGACY_EMERALD(388), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+     LEGACY_ITEM_FRAME(389),
+     @Deprecated
+@@ -4386,7 +4414,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+     @Deprecated
+     LEGACY_SKULL_ITEM(397),
+     @Deprecated
+-    LEGACY_CARROT_STICK(398, 1, 25),
++    LEGACY_CARROT_STICK(398), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+     LEGACY_NETHER_STAR(399),
+     @Deprecated
+@@ -4396,7 +4424,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+     @Deprecated
+     LEGACY_FIREWORK_CHARGE(402),
+     @Deprecated
+-    LEGACY_ENCHANTED_BOOK(403, 1),
++    LEGACY_ENCHANTED_BOOK(403), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+     LEGACY_REDSTONE_COMPARATOR(404),
+     @Deprecated
+@@ -4404,9 +4432,9 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+     @Deprecated
+     LEGACY_QUARTZ(406),
+     @Deprecated
+-    LEGACY_EXPLOSIVE_MINECART(407, 1),
++    LEGACY_EXPLOSIVE_MINECART(407), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_HOPPER_MINECART(408, 1),
++    LEGACY_HOPPER_MINECART(408), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+     LEGACY_PRISMARINE_SHARD(409),
+     @Deprecated
+@@ -4416,31 +4444,31 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+     @Deprecated
+     LEGACY_COOKED_RABBIT(412),
+     @Deprecated
+-    LEGACY_RABBIT_STEW(413, 1),
++    LEGACY_RABBIT_STEW(413), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+     LEGACY_RABBIT_FOOT(414),
+     @Deprecated
+     LEGACY_RABBIT_HIDE(415),
+     @Deprecated
+-    LEGACY_ARMOR_STAND(416, 16),
++    LEGACY_ARMOR_STAND(416), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_IRON_BARDING(417, 1),
++    LEGACY_IRON_BARDING(417), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_GOLD_BARDING(418, 1),
++    LEGACY_GOLD_BARDING(418), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_DIAMOND_BARDING(419, 1),
++    LEGACY_DIAMOND_BARDING(419), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+     LEGACY_LEASH(420),
+     @Deprecated
+     LEGACY_NAME_TAG(421),
+     @Deprecated
+-    LEGACY_COMMAND_MINECART(422, 1),
++    LEGACY_COMMAND_MINECART(422), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+     LEGACY_MUTTON(423),
+     @Deprecated
+     LEGACY_COOKED_MUTTON(424),
+     @Deprecated
+-    LEGACY_BANNER(425, 16),
++    LEGACY_BANNER(425), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+     LEGACY_END_CRYSTAL(426),
+     @Deprecated
+@@ -4462,63 +4490,63 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+     @Deprecated
+     LEGACY_BEETROOT_SEEDS(435),
+     @Deprecated
+-    LEGACY_BEETROOT_SOUP(436, 1),
++    LEGACY_BEETROOT_SOUP(436), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+     LEGACY_DRAGONS_BREATH(437),
+     @Deprecated
+-    LEGACY_SPLASH_POTION(438, 1),
++    LEGACY_SPLASH_POTION(438), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+     LEGACY_SPECTRAL_ARROW(439),
+     @Deprecated
+     LEGACY_TIPPED_ARROW(440),
+     @Deprecated
+-    LEGACY_LINGERING_POTION(441, 1),
++    LEGACY_LINGERING_POTION(441), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_SHIELD(442, 1, 336),
++    LEGACY_SHIELD(442), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+-    LEGACY_ELYTRA(443, 1, 431),
++    LEGACY_ELYTRA(443), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+     @Deprecated
+-    LEGACY_BOAT_SPRUCE(444, 1),
++    LEGACY_BOAT_SPRUCE(444), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_BOAT_BIRCH(445, 1),
++    LEGACY_BOAT_BIRCH(445), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_BOAT_JUNGLE(446, 1),
++    LEGACY_BOAT_JUNGLE(446), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_BOAT_ACACIA(447, 1),
++    LEGACY_BOAT_ACACIA(447), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_BOAT_DARK_OAK(448, 1),
++    LEGACY_BOAT_DARK_OAK(448), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_TOTEM(449, 1),
++    LEGACY_TOTEM(449), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+     LEGACY_SHULKER_SHELL(450),
+     @Deprecated
+     LEGACY_IRON_NUGGET(452),
+     @Deprecated
+-    LEGACY_KNOWLEDGE_BOOK(453, 1),
++    LEGACY_KNOWLEDGE_BOOK(453), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_GOLD_RECORD(2256, 1),
++    LEGACY_GOLD_RECORD(2256), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_GREEN_RECORD(2257, 1),
++    LEGACY_GREEN_RECORD(2257), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_RECORD_3(2258, 1),
++    LEGACY_RECORD_3(2258), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_RECORD_4(2259, 1),
++    LEGACY_RECORD_4(2259), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_RECORD_5(2260, 1),
++    LEGACY_RECORD_5(2260), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_RECORD_6(2261, 1),
++    LEGACY_RECORD_6(2261), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_RECORD_7(2262, 1),
++    LEGACY_RECORD_7(2262), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_RECORD_8(2263, 1),
++    LEGACY_RECORD_8(2263), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_RECORD_9(2264, 1),
++    LEGACY_RECORD_9(2264), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_RECORD_10(2265, 1),
++    LEGACY_RECORD_10(2265), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_RECORD_11(2266, 1),
++    LEGACY_RECORD_11(2266), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     @Deprecated
+-    LEGACY_RECORD_12(2267, 1),
++    LEGACY_RECORD_12(2267), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     // Fiddle - added values placeholder
+     ;
+     //</editor-fold>
+@@ -4529,37 +4557,17 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+     private final int id;
+     private final Constructor<? extends MaterialData> ctor;
+     private static final Map<String, Material> BY_NAME = Maps.newHashMap();
+-    private final int maxStack;
+-    private final short durability;
+     public final Class<?> data;
+     private final boolean legacy;
+     private final NamespacedKey key;
+     private boolean isBlock; // Paper
+ 
+     private Material(final int id) {
+-        this(id, 64);
++        this(id, MaterialData.class); // Fiddle - remove hard-coded Bukkit values - Material - max stack size
+     }
+ 
+-    private Material(final int id, final int stack) {
+-        this(id, stack, MaterialData.class);
+-    }
+-
+-    private Material(final int id, final int stack, final int durability) {
+-        this(id, stack, durability, MaterialData.class);
+-    }
+-
+-    private Material(final int id, /*@NotNull*/ final Class<?> data) {
+-        this(id, 64, data);
+-    }
+-
+-    private Material(final int id, final int stack, /*@NotNull*/ final Class<?> data) {
+-        this(id, stack, 0, data);
+-    }
+-
+-    private Material(final int id, final int stack, final int durability, /*@NotNull*/ final Class<?> data) {
++    private Material(final int id, /*@NotNull*/ final Class<?> data) { // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
+         this.id = id;
+-        this.durability = (short) durability;
+-        this.maxStack = stack;
+         this.data = data;
+         this.legacy = this.name().startsWith(LEGACY_PREFIX);
+         this.key = NamespacedKey.minecraft(this.name().toLowerCase(Locale.ROOT));
+@@ -4673,22 +4681,42 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+         return key;
+     }
+ 
++    private static int[] maxStackSize = null; // Fiddle - remove hard-coded Bukkit values - Material - max stack size
++
+     /**
+      * Gets the maximum amount of this material that can be held in a stack
+      *
+      * @return Maximum stack size for this material
+      */
+     public int getMaxStackSize() {
+-        return maxStack;
++        // Fiddle start - remove hard-coded Bukkit values - Material - max stack size
++        if (maxStackSize == null) {
++            maxStackSize = new int[length];
++            for (Material material : values) {
++                maxStackSize[material.ordinal()] = Bukkit.getUnsafe().getMaxStackSize(this);
++            }
++        }
++        return maxStackSize[this.ordinal()];
++        // Fiddle end - remove hard-coded Bukkit values - Material - max stack size
+     }
+ 
++    private static short[] maxDurability = null; // Fiddle - remove hard-coded Bukkit values - Material - durability
++
+     /**
+      * Gets the maximum durability of this material
+      *
+      * @return Maximum durability for this material
+      */
+     public short getMaxDurability() {
+-        return durability;
++        // Fiddle end - remove hard-coded Bukkit values - Material - durability
++        if (maxDurability == null) {
++            maxDurability = new short[length];
++            for (Material material : values) {
++                maxDurability[material.ordinal()] = Bukkit.getUnsafe().getMaxDurability(this);
++            }
++        }
++        return maxDurability[this.ordinal()];
++        // Fiddle end - remove hard-coded Bukkit values - Material - durability
+     }
+ 
+     /**
+diff --git a/src/main/java/org/bukkit/UnsafeValues.java b/src/main/java/org/bukkit/UnsafeValues.java
+index ae8e51bba38bec7e744e485162ddf2cad11c2f45..9f2c87450805ef6488310daa684cc25c6415f280 100644
+--- a/src/main/java/org/bukkit/UnsafeValues.java
++++ b/src/main/java/org/bukkit/UnsafeValues.java
+@@ -248,6 +248,10 @@ public interface UnsafeValues {
+     void setBiomeKey(RegionAccessor accessor, int x, int y, int z, NamespacedKey biomeKey);
+     // Paper end
+ 
++    int getMaxStackSize(Material material); // Fiddle - remove hard-coded Bukkit values - Material - max stack size
++
++    short getMaxDurability(Material material); // Fiddle - remove hard-coded Bukkit values - Material - durability
++
+     boolean isBlock(Material material); // Fiddle - remove hard-coded Bukkit values - Material - is block
+ 
+     boolean isEdible(Material material); // Fiddle - remove hard-coded Bukkit values - Material - is edible

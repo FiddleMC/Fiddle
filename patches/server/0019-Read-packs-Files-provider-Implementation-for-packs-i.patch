@@ -9,10 +9,10 @@ Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/files/archive/ArchiveFileFiddlePackFilesProvider.java b/src/main/java/org/fiddlemc/fiddle/pack/files/archive/ArchiveFileFiddlePackFilesProvider.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..23c85e9324dd92554974ba0bc1cfe4b706d55b1b
+index 0000000000000000000000000000000000000000..49d317e98e755be26069a2abe5e74c6f49b30711
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/files/archive/ArchiveFileFiddlePackFilesProvider.java
-@@ -0,0 +1,223 @@
+@@ -0,0 +1,228 @@
 +// Fiddle - read packs - pack files - archive file packs
 +
 +package org.fiddlemc.fiddle.pack.files.archive;
@@ -29,7 +29,7 @@ index 0000000000000000000000000000000000000000..23c85e9324dd92554974ba0bc1cfe4b7
 +import org.fiddlemc.fiddle.pack.files.FiddlePackFilesProvider;
 +import org.fiddlemc.fiddle.pack.files.FileInPack;
 +import org.fiddlemc.fiddle.pack.files.RegularFileInPack;
-+import org.fiddlemc.fiddle.pack.reader.PackParseException;
++import org.fiddlemc.fiddle.pack.read.PackParseException;
 +import org.jetbrains.annotations.Nullable;
 +
 +import java.io.File;
@@ -95,6 +95,11 @@ index 0000000000000000000000000000000000000000..23c85e9324dd92554974ba0bc1cfe4b7
 +     */
 +    private void readAndCacheFileStructure() throws PackParseException {
 +
++        // Do nothing if the file structure has already been cached
++        if (this.topLevelFiles != null) {
++            return;
++        }
++
 +        // Open the random access file
 +        this.openRandomAccessPackFile();
 +
@@ -103,7 +108,7 @@ index 0000000000000000000000000000000000000000..23c85e9324dd92554974ba0bc1cfe4b7
 +        try {
 +            inArchive = SevenZip.openInArchive(null, new RandomAccessFileInStream(this.randomAccessPackFile));
 +        } catch (SevenZipException e) {
-+            throw new PackParseException("Failed to read the file for a pack ('" + getLocation() + "') as an archive: " + e.getMessage(), e);
++            throw new PackParseException("Failed to read the file for a pack ('" + this.getLocation() + "') as an archive: " + e.getMessage(), e);
 +        }
 +
 +        // Get the items in the archive
@@ -111,7 +116,7 @@ index 0000000000000000000000000000000000000000..23c85e9324dd92554974ba0bc1cfe4b7
 +        try {
 +            items = inArchive.getSimpleInterface().getArchiveItems();
 +        } catch (SevenZipException e) {
-+            throw new PackParseException("Failed to read the items in the archive for a pack ('" + getLocation() + "'): " + e.getMessage(), e);
++            throw new PackParseException("Failed to read the items in the archive for a pack ('" + this.getLocation() + "'): " + e.getMessage(), e);
 +        }
 +
 +        // Determine the paths of the items
@@ -120,7 +125,7 @@ index 0000000000000000000000000000000000000000..23c85e9324dd92554974ba0bc1cfe4b7
 +            try {
 +                itemPaths[i] = items[i].getPath();
 +            } catch (SevenZipException e) {
-+                throw new PackParseException("Failed to determine the path of a file in an archive pack ('" + getLocation() + "'): " + e.getMessage(), e);
++                throw new PackParseException("Failed to determine the path of a file in an archive pack ('" + this.getLocation() + "'): " + e.getMessage(), e);
 +            }
 +        }
 +
@@ -214,7 +219,7 @@ index 0000000000000000000000000000000000000000..23c85e9324dd92554974ba0bc1cfe4b7
 +        try {
 +            this.randomAccessPackFile = new RandomAccessFile(this.packFile, "r");
 +        } catch (FileNotFoundException e) {
-+            throw new PackParseException("Failed to open the archive file for a pack ('" + getLocation() + "'): " + e.getMessage(), e);
++            throw new PackParseException("Failed to open the archive file for a pack ('" + this.getLocation() + "'): " + e.getMessage(), e);
 +        }
 +    }
 +
@@ -238,10 +243,12 @@ index 0000000000000000000000000000000000000000..23c85e9324dd92554974ba0bc1cfe4b7
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/files/archive/DirectoryInArchiveFilePack.java b/src/main/java/org/fiddlemc/fiddle/pack/files/archive/DirectoryInArchiveFilePack.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..1e677c504f2a8066c50409e97105ed7c8cd92449
+index 0000000000000000000000000000000000000000..a9c47f29b937dcee8ac7c315dece6f246b3ce378
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/files/archive/DirectoryInArchiveFilePack.java
-@@ -0,0 +1,41 @@
+@@ -0,0 +1,43 @@
++// Fiddle - read packs - pack files - archive file packs
++
 +package org.fiddlemc.fiddle.pack.files.archive;
 +
 +import net.sf.sevenzipjbinding.simple.ISimpleInArchiveItem;
@@ -285,17 +292,19 @@ index 0000000000000000000000000000000000000000..1e677c504f2a8066c50409e97105ed7c
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/files/archive/FileInArchivePack.java b/src/main/java/org/fiddlemc/fiddle/pack/files/archive/FileInArchivePack.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..03afb26aa6159ec072ba0a676df487b852df844e
+index 0000000000000000000000000000000000000000..b4d7df400e9af44dd4e18d118265205f747a4a45
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/files/archive/FileInArchivePack.java
-@@ -0,0 +1,28 @@
+@@ -0,0 +1,30 @@
++// Fiddle - read packs - pack files - archive file packs
++
 +package org.fiddlemc.fiddle.pack.files.archive;
 +
 +import net.sf.sevenzipjbinding.SevenZipException;
 +import net.sf.sevenzipjbinding.simple.ISimpleInArchiveItem;
 +import org.fiddlemc.fiddle.pack.files.FiddlePackFilesProvider;
 +import org.fiddlemc.fiddle.pack.files.FileInPack;
-+import org.fiddlemc.fiddle.pack.reader.PackParseException;
++import org.fiddlemc.fiddle.pack.read.PackParseException;
 +
 +interface FileInArchiveFilePack extends FileInPack {
 +
@@ -319,10 +328,12 @@ index 0000000000000000000000000000000000000000..03afb26aa6159ec072ba0a676df487b8
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/files/archive/RegularFileInArchivePack.java b/src/main/java/org/fiddlemc/fiddle/pack/files/archive/RegularFileInArchivePack.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..daebf64d392bf53b759fdb89ede40dea2134725c
+index 0000000000000000000000000000000000000000..51bae77173beecf18d8c324f22c49ad1d2b52537
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/files/archive/RegularFileInArchivePack.java
-@@ -0,0 +1,74 @@
+@@ -0,0 +1,76 @@
++// Fiddle - read packs - pack files - archive file packs
++
 +package org.fiddlemc.fiddle.pack.files.archive;
 +
 +import it.unimi.dsi.fastutil.bytes.ByteArrayList;
@@ -331,7 +342,7 @@ index 0000000000000000000000000000000000000000..daebf64d392bf53b759fdb89ede40dea
 +import net.sf.sevenzipjbinding.SevenZipException;
 +import net.sf.sevenzipjbinding.simple.ISimpleInArchiveItem;
 +import org.fiddlemc.fiddle.pack.files.CachingRegularFileInPack;
-+import org.fiddlemc.fiddle.pack.reader.PackParseException;
++import org.fiddlemc.fiddle.pack.read.PackParseException;
 +import org.jetbrains.annotations.Nullable;
 +
 +class RegularFileInArchiveFilePack extends CachingRegularFileInPack implements FileInArchiveFilePack {

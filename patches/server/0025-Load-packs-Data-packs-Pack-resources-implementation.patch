@@ -20,7 +20,7 @@ index cd723e5f51c587df28335ceb14db8c137dc9c4cb..41c782f14521430f414e631d5ef2be52
      }
  
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java b/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java
-index c3d47fad1b4c08498feba1ce506328d40bf8620d..15581ee245164d417ad4ea7afb249ee5fb88de1a 100644
+index 37dfeea15e81bcf373e9ccabf83ab98d17678929..92ee4f5e31a228dcf48084f2bc214f2bee82b9ad 100644
 --- a/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java
 @@ -3,6 +3,7 @@
@@ -30,7 +30,7 @@ index c3d47fad1b4c08498feba1ce506328d40bf8620d..15581ee245164d417ad4ea7afb249ee5
 +import com.google.gson.JsonObject;
  import it.unimi.dsi.fastutil.ints.IntArraySet;
  import it.unimi.dsi.fastutil.ints.IntSet;
- import org.fiddlemc.fiddle.pack.reader.PackParseException;
+ import org.fiddlemc.fiddle.pack.read.PackParseException;
 @@ -51,9 +52,9 @@ public class FiddlePackMeta {
      private static final String resourcePackMetaFormatJsonKey = "pack_format";
      private static final String resourcePackMetaDescriptionJsonKey = "description";
@@ -63,12 +63,12 @@ index c3d47fad1b4c08498feba1ce506328d40bf8620d..15581ee245164d417ad4ea7afb249ee5
              }
 -            dataPackMeta = new DataPackMeta(dataPackFormat, dataPackDescription == null ? null : dataPackDescription.unnamed());
 +            dataPackMeta = new DataPackMeta(dataPackFormat, dataPackDescription == null ? null : dataPackDescription.unnamed(), dataPackMetaJson.unnamed()); // Fiddle - load packs - data packs - pack resources - meta
+         } else {
+             dataPackMeta = null;
          }
- 
-         return new FiddlePackMeta(format, uuid, displayName, technicalName, version, description, authors, credits, website, resourcePackMeta, dataPackMeta);
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/data/FiddlePackResources.java b/src/main/java/org/fiddlemc/fiddle/pack/data/FiddlePackResources.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..611b6947acd0f2491d40d9bc589572e35afd7a25
+index 0000000000000000000000000000000000000000..088d553dce5cc062505417d432e3d26a022b493d
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/data/FiddlePackResources.java
 @@ -0,0 +1,172 @@
@@ -91,7 +91,7 @@ index 0000000000000000000000000000000000000000..611b6947acd0f2491d40d9bc589572e3
 +import org.fiddlemc.fiddle.pack.files.FiddlePackFilesProvider;
 +import org.fiddlemc.fiddle.pack.files.FileInPack;
 +import org.fiddlemc.fiddle.pack.files.RegularFileInPack;
-+import org.fiddlemc.fiddle.pack.reader.PackParseException;
++import org.fiddlemc.fiddle.pack.read.PackParseException;
 +import org.jetbrains.annotations.NotNull;
 +import org.slf4j.Logger;
 +
@@ -106,7 +106,7 @@ index 0000000000000000000000000000000000000000..611b6947acd0f2491d40d9bc589572e3
 + */
 +public class FiddlePackResources implements PackResources {
 +
-+    private static final Logger LOGGER = LogUtils.getLogger();
++    private static final Logger LOGGER = LogUtils.getClassLogger();
 +
 +    private final String name;
 +    private final FiddlePack pack;

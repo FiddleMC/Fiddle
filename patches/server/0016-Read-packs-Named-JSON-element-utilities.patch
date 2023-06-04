@@ -6,19 +6,19 @@ Subject: [PATCH] Read packs - Named JSON element utilities
 License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
-diff --git a/src/main/java/org/fiddlemc/fiddle/pack/reader/json/named/NamedJsonArray.java b/src/main/java/org/fiddlemc/fiddle/pack/reader/json/named/NamedJsonArray.java
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/json/NamedJsonArray.java b/src/main/java/org/fiddlemc/fiddle/pack/read/json/NamedJsonArray.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..8d9fda956b3aa5d8295f500d68831cf12337455c
+index 0000000000000000000000000000000000000000..88f963f971bd266eaebe6223e59c85bee01f2fe2
 --- /dev/null
-+++ b/src/main/java/org/fiddlemc/fiddle/pack/reader/json/named/NamedJsonArray.java
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/json/NamedJsonArray.java
 @@ -0,0 +1,171 @@
 +// Fiddle - read packs - JSON utils - named elements
 +
-+package org.fiddlemc.fiddle.pack.reader.json.named;
++package org.fiddlemc.fiddle.pack.read.json;
 +
 +import com.google.gson.JsonArray;
 +import com.google.gson.JsonElement;
-+import org.fiddlemc.fiddle.pack.reader.PackParseException;
++import org.fiddlemc.fiddle.pack.read.PackParseException;
 +import org.jetbrains.annotations.NotNull;
 +import org.jetbrains.annotations.Nullable;
 +
@@ -183,18 +183,18 @@ index 0000000000000000000000000000000000000000..8d9fda956b3aa5d8295f500d68831cf1
 +    }
 +
 +}
-diff --git a/src/main/java/org/fiddlemc/fiddle/pack/reader/json/named/NamedJsonElement.java b/src/main/java/org/fiddlemc/fiddle/pack/reader/json/named/NamedJsonElement.java
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/json/NamedJsonElement.java b/src/main/java/org/fiddlemc/fiddle/pack/read/json/NamedJsonElement.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..0d5d6d810fa693f087d3afc0675d55d8b33cafcd
+index 0000000000000000000000000000000000000000..161a632a7f9028ca897a9367fea6675e9822b402
 --- /dev/null
-+++ b/src/main/java/org/fiddlemc/fiddle/pack/reader/json/named/NamedJsonElement.java
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/json/NamedJsonElement.java
 @@ -0,0 +1,177 @@
 +// Fiddle - read packs - JSON utils - named elements
 +
-+package org.fiddlemc.fiddle.pack.reader.json.named;
++package org.fiddlemc.fiddle.pack.read.json;
 +
 +import com.google.gson.*;
-+import org.fiddlemc.fiddle.pack.reader.PackParseException;
++import org.fiddlemc.fiddle.pack.read.PackParseException;
 +import org.jetbrains.annotations.Nullable;
 +
 +import java.math.BigDecimal;
@@ -366,15 +366,15 @@ index 0000000000000000000000000000000000000000..0d5d6d810fa693f087d3afc0675d55d8
 +    }
 +
 +}
-diff --git a/src/main/java/org/fiddlemc/fiddle/pack/reader/json/named/NamedJsonNull.java b/src/main/java/org/fiddlemc/fiddle/pack/reader/json/named/NamedJsonNull.java
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/json/NamedJsonNull.java b/src/main/java/org/fiddlemc/fiddle/pack/read/json/NamedJsonNull.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..57676a1aed869c217028368c97e9946047aa61cc
+index 0000000000000000000000000000000000000000..4b2e7b6c499c7423f91d43bef7a1810e01e4abb0
 --- /dev/null
-+++ b/src/main/java/org/fiddlemc/fiddle/pack/reader/json/named/NamedJsonNull.java
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/json/NamedJsonNull.java
 @@ -0,0 +1,32 @@
 +// Fiddle - read packs - JSON utils - named elements
 +
-+package org.fiddlemc.fiddle.pack.reader.json.named;
++package org.fiddlemc.fiddle.pack.read.json;
 +
 +import com.google.gson.JsonNull;
 +import org.jetbrains.annotations.Nullable;
@@ -404,18 +404,18 @@ index 0000000000000000000000000000000000000000..57676a1aed869c217028368c97e99460
 +    }
 +
 +}
-diff --git a/src/main/java/org/fiddlemc/fiddle/pack/reader/json/named/NamedJsonObject.java b/src/main/java/org/fiddlemc/fiddle/pack/reader/json/named/NamedJsonObject.java
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/json/NamedJsonObject.java b/src/main/java/org/fiddlemc/fiddle/pack/read/json/NamedJsonObject.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..5c20e6c1e6b41825b7ebab24fcbe294322c9cf62
+index 0000000000000000000000000000000000000000..818baaf1cf5a5186d18cfee1a4ea08fdf980ce59
 --- /dev/null
-+++ b/src/main/java/org/fiddlemc/fiddle/pack/reader/json/named/NamedJsonObject.java
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/json/NamedJsonObject.java
 @@ -0,0 +1,335 @@
 +// Fiddle - read packs - JSON utils - named elements
 +
-+package org.fiddlemc.fiddle.pack.reader.json.named;
++package org.fiddlemc.fiddle.pack.read.json;
 +
 +import com.google.gson.*;
-+import org.fiddlemc.fiddle.pack.reader.PackParseException;
++import org.fiddlemc.fiddle.pack.read.PackParseException;
 +import org.jetbrains.annotations.Nullable;
 +
 +import java.math.BigDecimal;
@@ -745,18 +745,18 @@ index 0000000000000000000000000000000000000000..5c20e6c1e6b41825b7ebab24fcbe2943
 +    }
 +
 +}
-diff --git a/src/main/java/org/fiddlemc/fiddle/pack/reader/json/named/NamedJsonPrimitive.java b/src/main/java/org/fiddlemc/fiddle/pack/reader/json/named/NamedJsonPrimitive.java
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/json/NamedJsonPrimitive.java b/src/main/java/org/fiddlemc/fiddle/pack/read/json/NamedJsonPrimitive.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..162abdabbadf86d1af88fbcebeb5ec38e770f47e
+index 0000000000000000000000000000000000000000..6da6a07efdf1db7c081abe4622a1786385967d01
 --- /dev/null
-+++ b/src/main/java/org/fiddlemc/fiddle/pack/reader/json/named/NamedJsonPrimitive.java
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/json/NamedJsonPrimitive.java
 @@ -0,0 +1,172 @@
 +// Fiddle - read packs - JSON utils - named elements
 +
-+package org.fiddlemc.fiddle.pack.reader.json.named;
++package org.fiddlemc.fiddle.pack.read.json;
 +
 +import com.google.gson.JsonPrimitive;
-+import org.fiddlemc.fiddle.pack.reader.PackParseException;
++import org.fiddlemc.fiddle.pack.read.PackParseException;
 +import org.jetbrains.annotations.Nullable;
 +
 +import java.math.BigDecimal;

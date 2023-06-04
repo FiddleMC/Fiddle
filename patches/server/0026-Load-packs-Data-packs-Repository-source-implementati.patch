@@ -7,7 +7,7 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java b/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java
-index 15581ee245164d417ad4ea7afb249ee5fb88de1a..d3a3940426db816c3168675607cd88322aa9d45b 100644
+index 92ee4f5e31a228dcf48084f2bc214f2bee82b9ad..45422c50a172966012e60590aec1894aa77a3ff5 100644
 --- a/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java
 @@ -51,7 +51,7 @@ public class FiddlePackMeta {
@@ -21,7 +21,7 @@ index 15581ee245164d417ad4ea7afb249ee5fb88de1a..d3a3940426db816c3168675607cd8832
      public static final String dataPackMetaDescriptionJsonKey = "description"; // Fiddle - load packs - data packs - pack resources - meta - private -> public
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/data/FiddleRepositorySource.java b/src/main/java/org/fiddlemc/fiddle/pack/data/FiddleRepositorySource.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..aa1672402dbe911ddc7f353452042e6bdcab9335
+index 0000000000000000000000000000000000000000..b0e2721ec9662d8b4f7113f33888a72fdacc8c95
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/data/FiddleRepositorySource.java
 @@ -0,0 +1,65 @@
@@ -41,8 +41,8 @@ index 0000000000000000000000000000000000000000..aa1672402dbe911ddc7f353452042e6b
 +import org.fiddlemc.fiddle.pack.FiddlePacks;
 +import org.fiddlemc.fiddle.pack.files.DirectoryInPack;
 +import org.fiddlemc.fiddle.pack.files.FiddlePackFilesProvider;
-+import org.fiddlemc.fiddle.pack.reader.PackParseException;
-+import org.fiddlemc.fiddle.pack.reader.PackScanner;
++import org.fiddlemc.fiddle.pack.read.PackParseException;
++import org.fiddlemc.fiddle.pack.read.PackScanner;
 +import org.jetbrains.annotations.NotNull;
 +import org.jetbrains.annotations.Nullable;
 +import org.slf4j.Logger;
@@ -60,7 +60,7 @@ index 0000000000000000000000000000000000000000..aa1672402dbe911ddc7f353452042e6b
 +
 +    private static final String dataFolderName = PackType.SERVER_DATA.getDirectory();
 +
-+    private static final Logger LOGGER = LogUtils.getLogger();
++    private static final Logger LOGGER = LogUtils.getClassLogger();
 +
 +    @Override
 +    public void loadPacks(@NotNull Consumer<Pack> profileAdder) {
@@ -90,10 +90,10 @@ index 0000000000000000000000000000000000000000..aa1672402dbe911ddc7f353452042e6b
 +    }
 +
 +}
-diff --git a/src/main/java/org/fiddlemc/fiddle/pack/reader/PackScanner.java b/src/main/java/org/fiddlemc/fiddle/pack/reader/PackScanner.java
-index 90cb3f5a9a88bd7ccb1d0b576e52986cee26a114..ab858e507bd69b28924a7ed7069311b94dafff55 100644
---- a/src/main/java/org/fiddlemc/fiddle/pack/reader/PackScanner.java
-+++ b/src/main/java/org/fiddlemc/fiddle/pack/reader/PackScanner.java
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/PackScanner.java b/src/main/java/org/fiddlemc/fiddle/pack/read/PackScanner.java
+index 49fc4cb507d4b26e244a9162a3f1f40dd61d104c..9e5eeb4682719c71b197416c1926d2d20d1c6b2d 100644
+--- a/src/main/java/org/fiddlemc/fiddle/pack/read/PackScanner.java
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/PackScanner.java
 @@ -26,7 +26,7 @@ import java.util.*;
  public final class PackScanner {
  

@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
 Date: Wed, 23 Nov 2022 21:03:04 +0100
-Subject: [PATCH] Fiddle configuration
+Subject: [PATCH] Configuration - Get with Bukkit API
 
 License: MIT (https://opensource.org/licenses/MIT)
 Fiddle - https://fiddlemc.org

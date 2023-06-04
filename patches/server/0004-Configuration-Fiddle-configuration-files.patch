@@ -499,7 +499,7 @@ index 973ecd50f9cb6b86c353586e84d15dcb118ccb60..083d945c184d7da04bf8b900e91fa0e1
          this.world = new CraftWorld((ServerLevel) this, gen, biomeProvider, env);
  
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 1ddec0427bd55c3c5a4bfdb27471ac27ac400c4a..b8ddb963390bd00181791099336d32751ff4491a 100644
+index 1ddec0427bd55c3c5a4bfdb27471ac27ac400c4a..aadf7baedff4e4a1a24e8f9a81f2ceb49801b02d 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 @@ -235,7 +235,6 @@ import org.bukkit.plugin.PluginManager;
@@ -526,21 +526,6 @@ index 1ddec0427bd55c3c5a4bfdb27471ac27ac400c4a..b8ddb963390bd00181791099336d3275
          for (ServerLevel world : this.console.getAllLevels()) {
              // world.serverLevelData.setDifficulty(config.difficulty); // Paper - per level difficulty
              world.setSpawnSettings(world.serverLevelData.getDifficulty() != Difficulty.PEACEFUL && config.spawnMonsters, config.spawnAnimals); // Paper - per level difficulty (from MinecraftServer#setDifficulty(ServerLevel, Difficulty, boolean))
-@@ -2741,6 +2742,14 @@ public final class CraftServer implements Server {
-             return CraftServer.this.console.paperConfigurations.createLegacyObject(CraftServer.this.console);
-         }
- 
-+        // Fiddle start - Fiddle configuration - API
-+        @Override
-+        public YamlConfiguration getFiddleConfig()
-+        {
-+            return FiddleConfigurations.get(null).createLegacyObject(CraftServer.this.console);
-+        }
-+        // Fiddle end - Fiddle configuration - API
-+
-         @Override
-         public void restart() {
-             org.spigotmc.RestartCommand.restart();
 diff --git a/src/main/java/org/fiddlemc/fiddle/configuration/FiddleConfigurations.java b/src/main/java/org/fiddlemc/fiddle/configuration/FiddleConfigurations.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..c787a0cbf24b008bcdf23c25fd577a1bbdaf8062

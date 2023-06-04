@@ -6,15 +6,15 @@ Subject: [PATCH] Read packs - PackParseException class
 License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
-diff --git a/src/main/java/org/fiddlemc/fiddle/pack/reader/PackParseException.java b/src/main/java/org/fiddlemc/fiddle/pack/reader/PackParseException.java
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/PackParseException.java b/src/main/java/org/fiddlemc/fiddle/pack/read/PackParseException.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..1d58825ec41b2d67f68a09c4d67628892abcf04f
+index 0000000000000000000000000000000000000000..ad8ba3247d2113773f161ee89a1005413bcea4d7
 --- /dev/null
-+++ b/src/main/java/org/fiddlemc/fiddle/pack/reader/PackParseException.java
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/PackParseException.java
 @@ -0,0 +1,18 @@
 +// Fiddle - read packs - exception class
 +
-+package org.fiddlemc.fiddle.pack.reader;
++package org.fiddlemc.fiddle.pack.read;
 +
 +/**
 + * A checked exception that occurred while parsing part of a pack.

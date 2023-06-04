@@ -8,13 +8,15 @@ Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/files/CachingRegularFileInPack.java b/src/main/java/org/fiddlemc/fiddle/pack/files/CachingRegularFileInPack.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..0a17450eec5d7ffe6e94e11d33a4cf45541013a5
+index 0000000000000000000000000000000000000000..d1f1d138a9e3d9ea560339464ff268e86fffeb8c
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/files/CachingRegularFileInPack.java
-@@ -0,0 +1,43 @@
+@@ -0,0 +1,45 @@
++// Fiddle - read packs - pack files - caching regular file implementation
++
 +package org.fiddlemc.fiddle.pack.files;
 +
-+import org.fiddlemc.fiddle.pack.reader.PackParseException;
++import org.fiddlemc.fiddle.pack.read.PackParseException;
 +import org.jetbrains.annotations.Nullable;
 +
 +/**
@@ -57,10 +59,12 @@ index 0000000000000000000000000000000000000000..0a17450eec5d7ffe6e94e11d33a4cf45
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/files/DirectoryInPack.java b/src/main/java/org/fiddlemc/fiddle/pack/files/DirectoryInPack.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..a54d4d14de91f32d0922566f3fd1f4d090b522d3
+index 0000000000000000000000000000000000000000..0154e1fc0fd55d769079cd0bf56864f76a9f5f6e
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/files/DirectoryInPack.java
-@@ -0,0 +1,14 @@
+@@ -0,0 +1,16 @@
++// Fiddle - read packs - pack files - provider interface
++
 +package org.fiddlemc.fiddle.pack.files;
 +
 +/**
@@ -77,7 +81,7 @@ index 0000000000000000000000000000000000000000..a54d4d14de91f32d0922566f3fd1f4d0
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/files/FiddlePackFilesProvider.java b/src/main/java/org/fiddlemc/fiddle/pack/files/FiddlePackFilesProvider.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..b850b93c78701673b56699c1da65f1cbb51a815e
+index 0000000000000000000000000000000000000000..e506699bb87a96c7e15caea1cd78f86e3c0b4388
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/files/FiddlePackFilesProvider.java
 @@ -0,0 +1,74 @@
@@ -86,7 +90,7 @@ index 0000000000000000000000000000000000000000..b850b93c78701673b56699c1da65f1cb
 +package org.fiddlemc.fiddle.pack.files;
 +
 +import org.fiddlemc.fiddle.pack.read.StartupPackLoadPhase;
-+import org.fiddlemc.fiddle.pack.reader.PackParseException;
++import org.fiddlemc.fiddle.pack.read.PackParseException;
 +
 +import java.io.File;
 +import java.io.IOException;
@@ -157,13 +161,15 @@ index 0000000000000000000000000000000000000000..b850b93c78701673b56699c1da65f1cb
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/files/FileInPack.java b/src/main/java/org/fiddlemc/fiddle/pack/files/FileInPack.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..7aa1c3246f8f43b299b4ea125c72f582657c57f6
+index 0000000000000000000000000000000000000000..6fa9511e133fd758bcd026b9fec691cdeff134d2
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/files/FileInPack.java
-@@ -0,0 +1,21 @@
+@@ -0,0 +1,23 @@
++// Fiddle - read packs - pack files - provider interface
++
 +package org.fiddlemc.fiddle.pack.files;
 +
-+import org.fiddlemc.fiddle.pack.reader.PackParseException;
++import org.fiddlemc.fiddle.pack.read.PackParseException;
 +
 +/**
 + * A common base class for {@link RegularFileInPack} and {@link DirectoryInPack}.
@@ -184,14 +190,16 @@ index 0000000000000000000000000000000000000000..7aa1c3246f8f43b299b4ea125c72f582
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/files/PackFilesContainer.java b/src/main/java/org/fiddlemc/fiddle/pack/files/PackFilesContainer.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..03ec486e96426e2f27d9fe26dd9cc840cdf222f1
+index 0000000000000000000000000000000000000000..b51ace66be1c28b9dfa44b79a56266038e2f1627
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/files/PackFilesContainer.java
-@@ -0,0 +1,218 @@
+@@ -0,0 +1,220 @@
++// Fiddle - read packs - pack files - provider interface
++
 +package org.fiddlemc.fiddle.pack.files;
 +
 +import it.unimi.dsi.fastutil.Pair;
-+import org.fiddlemc.fiddle.pack.reader.PackParseException;
++import org.fiddlemc.fiddle.pack.read.PackParseException;
 +import org.jetbrains.annotations.Nullable;
 +
 +import java.io.File;
@@ -408,15 +416,17 @@ index 0000000000000000000000000000000000000000..03ec486e96426e2f27d9fe26dd9cc840
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/files/RegularFileInPack.java b/src/main/java/org/fiddlemc/fiddle/pack/files/RegularFileInPack.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..ea5cb7f4cc2cc6b690d3e551687a594fc1151865
+index 0000000000000000000000000000000000000000..513a8f2e5ecbd7db4cf2871bb9b6ff7cad228703
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/files/RegularFileInPack.java
-@@ -0,0 +1,77 @@
+@@ -0,0 +1,79 @@
++// Fiddle - read packs - pack files - provider interface
++
 +package org.fiddlemc.fiddle.pack.files;
 +
 +import com.google.common.base.Charsets;
 +import net.minecraft.server.packs.resources.IoSupplier;
-+import org.fiddlemc.fiddle.pack.reader.PackParseException;
++import org.fiddlemc.fiddle.pack.read.PackParseException;
 +import org.jetbrains.annotations.Nullable;
 +
 +import java.io.ByteArrayInputStream;

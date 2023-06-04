@@ -7,7 +7,7 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java b/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java
-index ff299425ded226ac3610b2aa1017a8ea35b1f660..c3d47fad1b4c08498feba1ce506328d40bf8620d 100644
+index ff299425ded226ac3610b2aa1017a8ea35b1f660..37dfeea15e81bcf373e9ccabf83ab98d17678929 100644
 --- a/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java
 @@ -3,6 +3,10 @@
@@ -16,8 +16,8 @@ index ff299425ded226ac3610b2aa1017a8ea35b1f660..c3d47fad1b4c08498feba1ce506328d4
  import com.google.gson.JsonElement;
 +import it.unimi.dsi.fastutil.ints.IntArraySet;
 +import it.unimi.dsi.fastutil.ints.IntSet;
-+import org.fiddlemc.fiddle.pack.reader.PackParseException;
-+import org.fiddlemc.fiddle.pack.reader.json.named.NamedJsonElement;
++import org.fiddlemc.fiddle.pack.read.PackParseException;
++import org.fiddlemc.fiddle.pack.read.json.NamedJsonElement;
  import org.jetbrains.annotations.Nullable;
  
  import java.util.Objects;
@@ -65,7 +65,7 @@ index ff299425ded226ac3610b2aa1017a8ea35b1f660..c3d47fad1b4c08498feba1ce506328d4
      @SuppressWarnings({"FieldCanBeLocal", "unused"})
      private final int givenFormat;
      public final UUID uuid;
-@@ -102,4 +143,85 @@ public class FiddlePackMeta {
+@@ -102,4 +143,87 @@ public class FiddlePackMeta {
  
      }
  
@@ -133,7 +133,7 @@ index ff299425ded226ac3610b2aa1017a8ea35b1f660..c3d47fad1b4c08498feba1ce506328d4
 +        var resourcePackMeta = new ResourcePackMeta(resourcePackFormat, resourcePackDescription);
 +
 +        var dataPackMetaJson = packJson.getAsJsonObjectIfPresent(dataPackMetaJsonKey);
-+        DataPackMeta dataPackMeta = null;
++        DataPackMeta dataPackMeta;
 +        if (dataPackMetaJson != null) {
 +            var dataPackMetaPackJson = dataPackMetaJson.getAsJsonObject(dataPackMetaPackJsonKey);
 +            int dataPackFormat = dataPackMetaPackJson.getAsInt(dataPackMetaFormatJsonKey);
@@ -143,6 +143,8 @@ index ff299425ded226ac3610b2aa1017a8ea35b1f660..c3d47fad1b4c08498feba1ce506328d4
 +                throw new PackParseException("The value " + (dataPackDescription.name() == null ? "" : "for '" + dataPackDescription.name() + "' ") + "is null, but it must be non-null");
 +            }
 +            dataPackMeta = new DataPackMeta(dataPackFormat, dataPackDescription == null ? null : dataPackDescription.unnamed());
++        } else {
++            dataPackMeta = null;
 +        }
 +
 +        return new FiddlePackMeta(format, uuid, displayName, technicalName, version, description, authors, credits, website, resourcePackMeta, dataPackMeta);

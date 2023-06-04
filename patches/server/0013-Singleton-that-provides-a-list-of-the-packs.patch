@@ -8,17 +8,13 @@ Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/FiddlePacks.java b/src/main/java/org/fiddlemc/fiddle/pack/FiddlePacks.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..3c4d9e3286efa4ed25451734f5a558447ce1f660
+index 0000000000000000000000000000000000000000..490b6ab378b2b38382360d7d772159c9a8d114d4
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/FiddlePacks.java
-@@ -0,0 +1,48 @@
+@@ -0,0 +1,44 @@
 +// Fiddle - packs - singleton containing packs
 +
 +package org.fiddlemc.fiddle.pack;
-+
-+import joptsimple.OptionSet;
-+import net.minecraft.server.Main;
-+import org.fiddlemc.fiddle.pack.files.FiddlePackFilesProvider;
 +
 +import java.util.ArrayList;
 +import java.util.Collections;

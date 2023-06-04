@@ -1,0 +1,44 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Thu, 1 Jun 2023 19:30:16 +0200
+Subject: [PATCH] Configuration - Get with Bukkit API
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+This patch is based on the following patch:
+"Gale configuration"
+By: Martijn Muijsers <martijnmuijsers@live.nl>
+As part of: Gale (https://github.com/GaleMC/Gale)
+Licensed under: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+
+* Gale description *
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Gale - https://galemc.org
+
+This patch is based on the following patch:
+"Paper config files"
+By: Jake Potrebic <jake.m.potrebic@gmail.com>
+As part of: Paper (https://github.com/PaperMC/Paper)
+Licensed under: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+
+diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
+index aadf7baedff4e4a1a24e8f9a81f2ceb49801b02d..b8ddb963390bd00181791099336d32751ff4491a 100644
+--- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
++++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
+@@ -2742,6 +2742,14 @@ public final class CraftServer implements Server {
+             return CraftServer.this.console.paperConfigurations.createLegacyObject(CraftServer.this.console);
+         }
+ 
++        // Fiddle start - Fiddle configuration - API
++        @Override
++        public YamlConfiguration getFiddleConfig()
++        {
++            return FiddleConfigurations.get(null).createLegacyObject(CraftServer.this.console);
++        }
++        // Fiddle end - Fiddle configuration - API
++
+         @Override
+         public void restart() {
+             org.spigotmc.RestartCommand.restart();

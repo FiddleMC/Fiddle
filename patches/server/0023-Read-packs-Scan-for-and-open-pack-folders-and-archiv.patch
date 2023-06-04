@@ -7,7 +7,7 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index ce24e72620a6d406bdb11ab3ed9715998f187bfd..bcaa6338832629f967405112ba9e28f189f3ba2f 100644
+index ce24e72620a6d406bdb11ab3ed9715998f187bfd..62ace39d8faea52dc8557cc661bb673a2f8c95c3 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
 @@ -1,7 +1,5 @@
@@ -43,7 +43,7 @@ index ce24e72620a6d406bdb11ab3ed9715998f187bfd..bcaa6338832629f967405112ba9e28f1
 +import org.fiddlemc.fiddle.pack.FiddlePack;
 +import org.fiddlemc.fiddle.pack.FiddlePacks;
  import org.fiddlemc.fiddle.pack.read.StartupPackLoadPhase;
-+import org.fiddlemc.fiddle.pack.reader.PackScanner;
++import org.fiddlemc.fiddle.pack.read.PackScanner;
  import org.slf4j.Logger;
  
  // CraftBukkit start
@@ -80,15 +80,15 @@ index ce24e72620a6d406bdb11ab3ed9715998f187bfd..bcaa6338832629f967405112ba9e28f1
  
              /*
              IRegistryCustom.Dimension iregistrycustom_dimension = worldstem.registries().compositeAccess();
-diff --git a/src/main/java/org/fiddlemc/fiddle/pack/reader/PackScanner.java b/src/main/java/org/fiddlemc/fiddle/pack/reader/PackScanner.java
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/PackScanner.java b/src/main/java/org/fiddlemc/fiddle/pack/read/PackScanner.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..90cb3f5a9a88bd7ccb1d0b576e52986cee26a114
+index 0000000000000000000000000000000000000000..49fc4cb507d4b26e244a9162a3f1f40dd61d104c
 --- /dev/null
-+++ b/src/main/java/org/fiddlemc/fiddle/pack/reader/PackScanner.java
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/PackScanner.java
 @@ -0,0 +1,104 @@
 +// Fiddle - read packs - scan for packs
 +
-+package org.fiddlemc.fiddle.pack.reader;
++package org.fiddlemc.fiddle.pack.read;
 +
 +import com.google.gson.JsonElement;
 +import com.google.gson.JsonParser;

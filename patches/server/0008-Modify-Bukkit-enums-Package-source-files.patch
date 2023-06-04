@@ -1,0 +1,35 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Thu, 1 Jun 2023 19:27:37 +0200
+Subject: [PATCH] Modify Bukkit enums - Package source files
+
+License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
+Fiddle - https://fiddlemc.org
+
+diff --git a/build.gradle.kts b/build.gradle.kts
+index 44007adf0a0ff693fce66a3c54535cb7ece3d276..16642bb6683c0acd1a390f216dc7456f8a079f1d 100644
+--- a/build.gradle.kts
++++ b/build.gradle.kts
+@@ -204,3 +204,22 @@ tasks.registerRunTask("runDev") {
+     description = "Spin up a non-relocated Mojang-mapped test server"
+     classpath(sourceSets.main.map { it.runtimeClasspath })
+ }
++
++// Fiddle start - modify Bukkit enums - package source files
++tasks.register<Copy>("copyBukkitEnumSources") {
++    from(layout.projectDirectory.file("../$apiProjectName/src/main/java/org/bukkit/Material.java"))
++    into(layout.buildDirectory.dir("tmp/copiedresources/enumsrc"))
++}
++
++tasks.processResources {
++    dependsOn("copyBukkitEnumSources")
++}
++
++sourceSets {
++    main {
++        resources {
++            srcDir(layout.buildDirectory.dir("tmp/copiedresources"))
++        }
++    }
++}
++// Fiddle end - modify Bukkit enums - package source files

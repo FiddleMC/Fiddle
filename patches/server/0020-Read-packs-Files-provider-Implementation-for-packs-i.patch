@@ -97,10 +97,12 @@ index 0000000000000000000000000000000000000000..0e52238afa95c6276bb11b3bffe33901
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/files/directory/DirectoryInDirectoryPack.java b/src/main/java/org/fiddlemc/fiddle/pack/files/directory/DirectoryInDirectoryPack.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..d12b7e5e0ad22b51ca160eabfea18723b176d46a
+index 0000000000000000000000000000000000000000..2fc9a7f57d99d609b5e1ec3d1276d8d47f4a8436
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/files/directory/DirectoryInDirectoryPack.java
-@@ -0,0 +1,48 @@
+@@ -0,0 +1,50 @@
++// Fiddle - read packs - pack files - directory packs
++
 +package org.fiddlemc.fiddle.pack.files.directory;
 +
 +import org.fiddlemc.fiddle.pack.files.DirectoryInPack;
@@ -151,15 +153,17 @@ index 0000000000000000000000000000000000000000..d12b7e5e0ad22b51ca160eabfea18723
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/files/directory/FileInDirectoryPack.java b/src/main/java/org/fiddlemc/fiddle/pack/files/directory/FileInDirectoryPack.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..71d43e6de0c5139c8f96967a3a58bb64c7a529fc
+index 0000000000000000000000000000000000000000..964e6d812009e34f18370b8a2d0c15ec5aea9379
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/files/directory/FileInDirectoryPack.java
-@@ -0,0 +1,29 @@
+@@ -0,0 +1,31 @@
++// Fiddle - read packs - pack files - directory packs
++
 +package org.fiddlemc.fiddle.pack.files.directory;
 +
 +import org.fiddlemc.fiddle.pack.files.FiddlePackFilesProvider;
 +import org.fiddlemc.fiddle.pack.files.FileInPack;
-+import org.fiddlemc.fiddle.pack.reader.PackParseException;
++import org.fiddlemc.fiddle.pack.read.PackParseException;
 +
 +import java.io.File;
 +import java.nio.file.Paths;
@@ -186,14 +190,16 @@ index 0000000000000000000000000000000000000000..71d43e6de0c5139c8f96967a3a58bb64
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/files/directory/RegularFileInDirectoryPack.java b/src/main/java/org/fiddlemc/fiddle/pack/files/directory/RegularFileInDirectoryPack.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..1e312a59f57d257df05e156e77c133d1f1ff3cb8
+index 0000000000000000000000000000000000000000..9781dd3dd5ddf102922e881291832ca335f73bbf
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/files/directory/RegularFileInDirectoryPack.java
-@@ -0,0 +1,38 @@
+@@ -0,0 +1,40 @@
++// Fiddle - read packs - pack files - directory packs
++
 +package org.fiddlemc.fiddle.pack.files.directory;
 +
 +import org.fiddlemc.fiddle.pack.files.CachingRegularFileInPack;
-+import org.fiddlemc.fiddle.pack.reader.PackParseException;
++import org.fiddlemc.fiddle.pack.read.PackParseException;
 +
 +import java.io.File;
 +import java.io.IOException;
