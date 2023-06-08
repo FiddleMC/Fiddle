@@ -1,6 +1,10 @@
 import io.papermc.paperweight.tasks.ZippedTask
+import io.papermc.paperweight.util.path
+import io.papermc.paperweight.util.pathOrNull
 import org.gradle.configurationcache.extensions.capitalized
 import java.nio.file.Path
+import kotlin.io.path.createDirectories
+import kotlin.io.path.deleteRecursively
 import kotlin.io.path.readLines
 import kotlin.io.path.writeLines
 
@@ -74,104 +78,49 @@ paperweight {
 }
 
 // Fiddle start - extend jar manifest
-enum class RunnableJarKind(val text: String) {
-    BUNDLER("bundler"),
-    PAPERCLIP("paperclip")
-}
-
-enum class RunnableJarMappings(val text: String) {
-    MOJMAP("mojmap"),
-    REOBF("reobf")
-}
-
-@CacheableTask
-abstract class RejarWithExtendedManifestTask : ZippedTask() {
-
-    private lateinit var manifestElements: List<Pair<String, String>>
-
-    fun configure(
-        kind: RunnableJarKind,
-        classifier: RunnableJarMappings,
-        manifestElements: List<Pair<String, String>>
-    ) {
-
-        this.manifestElements = manifestElements
-
-        // Based on io.papermc.paperweight.taskcontainers.BundlerJarTasks
-        fun jarName(kind: RunnableJarKind, classifier: RunnableJarMappings, withExtendedManifest: Boolean) =
-            listOfNotNull(
-                project.name,
-                kind.text,
-                project.version,
-                classifier.text,
-//                "WithExtendedManifest".takeIf { withExtendedManifest } // Commented out, to replace the original .jar
-            ).joinToString("-") + ".jar"
-
-        // Based on io.papermc.paperweight.taskcontainers.BundlerJarTasks
-        fun jarFileProvider(kind: RunnableJarKind, classifier: RunnableJarMappings, withExtendedManifest: Boolean) =
-            layout.buildDirectory.file("libs/${jarName(kind, classifier, withExtendedManifest)}")
-
-        inputZip.set(jarFileProvider(kind, classifier, false))
-        outputZip.set(jarFileProvider(kind, classifier, true))
-
-    }
-
-    override fun run(rootDir: Path) {
-        val manifestFile = rootDir.resolve("META-INF/MANIFEST.MF")
-        manifestFile.writeLines(ArrayList(manifestFile.readLines()).apply {
-            addAll(
-                indexOfFirst { it.startsWith("Main-Class:") } + 1,
-                manifestElements.map { "${it.first}: ${it.second}" }
-            )
-        })
-
-    }
-
-}
-
 val extendedManifestElements: List<Pair<String, String>> = listOf(
     "Add-Opens" to "java.base/java.lang" // Fiddle - remove hard-coded Bukkit values - modify classes - add module opens to server jar
 )
 
 if (extendedManifestElements.isNotEmpty()) {
-    for (kind in RunnableJarKind.values()) {
-        for (classifier in RunnableJarMappings.values()) {
+    for (classifier in arrayOf("mojmap", "reobf")) {
+        // Based on io.papermc.paperweight.taskcontainers.BundlerJarTasks
+        tasks.named("create${classifier.capitalized()}BundlerJar") {
+            doLast {
 
-            // Based on io.papermc.paperweight.taskcontainers.BundlerJarTasks
-            fun createOriginalTaskName(kind: RunnableJarKind) =
-                "create${classifier.text.capitalized()}${kind.text.capitalized()}Jar"
+                // Based on io.papermc.paperweight.taskcontainers.BundlerJarTasks
+                val jarName = listOfNotNull(
+                    project.name,
+                    "bundler",
+                    project.version,
+                    classifier
+                ).joinToString("-") + ".jar"
 
-            fun createRejarTaskName(originalTaskName: String) =
-                "${originalTaskName}WithExtendedManifest"
+                // Based on io.papermc.paperweight.taskcontainers.BundlerJarTasks
+                val zipFile = layout.buildDirectory.file("libs/$jarName").path
 
-            val originalTaskName = createOriginalTaskName(kind)
+                val rootDir = io.papermc.paperweight.util.findOutputDir(zipFile)
 
-            when (kind) {
-                RunnableJarKind.BUNDLER -> {
-                    val rejarTaskName = createRejarTaskName(originalTaskName)
-                    tasks.register<RejarWithExtendedManifestTask>(rejarTaskName) {
+                try {
+                    io.papermc.paperweight.util.unzip(zipFile, rootDir)
 
-                        group = "paperweight"
-                        description = "Build a runnable $kind jar with $classifier mappings and an extended manifest"
+                    val manifestFile = rootDir.resolve("META-INF/MANIFEST.MF")
+                    manifestFile.writeLines(ArrayList(manifestFile.readLines()).apply {
+                        addAll(
+                            indexOfFirst { it.startsWith("Main-Class:") } + 1,
+                            extendedManifestElements.map { "${it.first}: ${it.second}" }
+                        )
+                    })
 
-                        dependsOn(originalTaskName)
+                    io.papermc.paperweight.util.ensureDeleted(zipFile)
 
-                        configure(kind, classifier, extendedManifestElements)
-
-                    }
-                    tasks.named(originalTaskName) {
-                        finalizedBy(rejarTaskName)
-                    }
+                    io.papermc.paperweight.util.zip(rootDir, zipFile)
+                } finally {
+                    @OptIn(kotlin.io.path.ExperimentalPathApi::class)
+                    rootDir.deleteRecursively()
                 }
 
-                RunnableJarKind.PAPERCLIP -> {
-                    val bundlerRejarTaskName = createRejarTaskName(createOriginalTaskName(RunnableJarKind.BUNDLER))
-                    tasks.named(originalTaskName) {
-                        dependsOn(bundlerRejarTaskName)
-                    }
-                }
             }
-
         }
     }
 }
