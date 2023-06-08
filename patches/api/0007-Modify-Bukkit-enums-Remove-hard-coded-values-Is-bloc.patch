@@ -11,7 +11,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 4159a01959f4593f56949aef32c43fd76455d86d..2a90fac4ce83ff359a5d802923ae05e95ce55497 100644
+index ac38454772cdcb705fe20f947559359e3c808170..9fc53117fee13b84823d0e304bd5c3275077cb44 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
 @@ -4768,1073 +4768,51 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
@@ -5702,19 +5702,10 @@ index 4159a01959f4593f56949aef32c43fd76455d86d..2a90fac4ce83ff359a5d802923ae05e9
  
      /**
 diff --git a/src/main/java/org/bukkit/UnsafeValues.java b/src/main/java/org/bukkit/UnsafeValues.java
-index 83bfcd11eafc44488ecf47f1cfc62d55939652d2..681adb635bbceb228f637750a0f5ab280d71d132 100644
+index 008ec1c4f74a926df805095fa99fdc21436fe34a..56a033b29b1b694b4f7bcc274d6c703bed6df464 100644
 --- a/src/main/java/org/bukkit/UnsafeValues.java
 +++ b/src/main/java/org/bukkit/UnsafeValues.java
-@@ -12,6 +12,8 @@ import org.bukkit.inventory.ItemStack;
- import org.bukkit.material.MaterialData;
- import org.bukkit.plugin.InvalidPluginException;
- import org.bukkit.plugin.PluginDescriptionFile;
-+import org.jetbrains.annotations.NotNull;
-+import org.jetbrains.annotations.Nullable;
- 
- /**
-  * This interface provides value conversions that may be specific to a
-@@ -260,4 +262,39 @@ public interface UnsafeValues {
+@@ -265,4 +265,39 @@ public interface UnsafeValues {
       */
      void setBiomeKey(RegionAccessor accessor, int x, int y, int z, NamespacedKey biomeKey);
      // Paper end

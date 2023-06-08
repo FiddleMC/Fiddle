@@ -21,7 +21,7 @@ Licensed (except for image files) under: GPL-3.0 (https://www.gnu.org/licenses/g
 Gale - https://galemc.org
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 384c5d99d4dd6a6c8b695bdbb0cb5efb275359d6..44007adf0a0ff693fce66a3c54535cb7ece3d276 100644
+index 439f8aa0e09f51ddab2186e400516f04768d9687..8e0eb28724376a3db26513c6de6b09b201abb8ef 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -80,7 +80,7 @@ tasks.jar {
@@ -232,10 +232,10 @@ index 9f15d9dbdfa74a0640b1a2b4ff695609d4758a4c..31243f5f1b2c54624cc110038618c53b
  
      public SystemReport fillSystemReport(SystemReport details) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index e769f7b0904814ee63e2a73dca57e5dc33382fba..1ddec0427bd55c3c5a4bfdb27471ac27ac400c4a 100644
+index 9f2536d9a73bdb15b5b3004d4da79ca32cee205b..4a67ad815ab1767d0706ec014a153b230e68a96c 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -257,7 +257,7 @@ import javax.annotation.Nullable; // Paper
+@@ -262,7 +262,7 @@ import javax.annotation.Nullable; // Paper
  import javax.annotation.Nonnull; // Paper
  
  public final class CraftServer implements Server {
@@ -258,10 +258,10 @@ index cdefb2025eedea7e204d70d568adaf1c1ec4c03c..e10074ee348401d7b9343d48ea9e9069
                  // (async tasks must live with race-conditions if they attempt to cancel between these few lines of code)
              }
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-index 64c50c52c11214740de7903e5592b8b6b2c170b3..bc972d68aa7b0b9b381afe9d23942f5a40d5fb83 100644
+index 1179e9fbff93ec8ff82aa3aae477f6bf4ce9b885..7fa40b7666901cf1e39cb9e0aba9b0dde7bcbc28 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-@@ -464,7 +464,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
+@@ -472,7 +472,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
  
      @Override
      public com.destroystokyo.paper.util.VersionFetcher getVersionFetcher() {

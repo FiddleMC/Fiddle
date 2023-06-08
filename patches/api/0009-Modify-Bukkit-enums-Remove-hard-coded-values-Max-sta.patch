@@ -8,7 +8,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 3abc9ce2c7b14ae569c8a32de72fb1210b93e8b2..2df52345152bd8be2bd272000b583f06ded85f4e 100644
+index 9525b8d591b973ea844b03d7ef2210bc93f84e12..beba1e3ad801a3f60139c1ed77dd3e38fe637216 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
 @@ -123,7 +123,7 @@ import org.jetbrains.annotations.Nullable;
@@ -1578,10 +1578,10 @@ index 3abc9ce2c7b14ae569c8a32de72fb1210b93e8b2..2df52345152bd8be2bd272000b583f06
  
      /**
 diff --git a/src/main/java/org/bukkit/UnsafeValues.java b/src/main/java/org/bukkit/UnsafeValues.java
-index 681adb635bbceb228f637750a0f5ab280d71d132..4a4d1ce71c3078465d354422955b08af52f30119 100644
+index 56a033b29b1b694b4f7bcc274d6c703bed6df464..ecdc74fc163337c4d191259702817d4a38e93586 100644
 --- a/src/main/java/org/bukkit/UnsafeValues.java
 +++ b/src/main/java/org/bukkit/UnsafeValues.java
-@@ -263,6 +263,10 @@ public interface UnsafeValues {
+@@ -266,6 +266,10 @@ public interface UnsafeValues {
      void setBiomeKey(RegionAccessor accessor, int x, int y, int z, NamespacedKey biomeKey);
      // Paper end
  
