@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
 Date: Sun, 4 Jun 2023 11:24:05 +0200
-Subject: [PATCH] Modify Bukkit enums - Remove hard-coded values - is block, is
+Subject: [PATCH] Modify Bukkit enums - Remove hard-coded values - Is block, is
  edible, is record, is solid, is air, is flammable, is burnable, is fuel, is
  occluding, has gravity, is item, is interactable, block hardness, block blast
  resistance, block slipperiness, item crafting remaining item, item equipment
@@ -11,7 +11,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index b6e6c99f207b106691e3b3541f129fbef2e248cb..3de413d3c76c3956ffb41caf7980d2ff36e1f904 100644
+index 4159a01959f4593f56949aef32c43fd76455d86d..2a90fac4ce83ff359a5d802923ae05e95ce55497 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
 @@ -4768,1073 +4768,51 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
@@ -30,7 +30,7 @@ index b6e6c99f207b106691e3b3541f129fbef2e248cb..3de413d3c76c3956ffb41caf7980d2ff
 +        // Fiddle start - remove hard-coded Bukkit values - Material - is block
 +        if (!isBlockIsSet) {
 +            for (Material material : values) {
-+                material.isBlock = material.isLegacy() ? material.isBlockLegacy() : Bukkit.getUnsafe().isBlock(this);
++                material.isBlock = material.isLegacy() ? material.isBlockLegacy() : Bukkit.getUnsafe().isBlock(material);
 +            }
 +            isBlockIsSet = true;
 +        }
@@ -1061,7 +1061,7 @@ index b6e6c99f207b106691e3b3541f129fbef2e248cb..3de413d3c76c3956ffb41caf7980d2ff
 +        if (isEdible == null) {
 +            isEdible = new boolean[length];
 +            for (Material material : values) {
-+                isEdible[material.ordinal()] = material.isLegacy() ? material.isEdibleLegacy() : Bukkit.getUnsafe().isEdible(this);
++                isEdible[material.ordinal()] = material.isLegacy() ? material.isEdibleLegacy() : Bukkit.getUnsafe().isEdible(material);
 +            }
 +        }
 +        return isEdible[this.ordinal()];
@@ -1116,7 +1116,7 @@ index b6e6c99f207b106691e3b3541f129fbef2e248cb..3de413d3c76c3956ffb41caf7980d2ff
              case LEGACY_BREAD:
              case LEGACY_CARROT_ITEM:
              case LEGACY_BAKED_POTATO:
-@@ -5960,825 +4938,52 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -5961,825 +4939,52 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      static {
          for (Material material : values()) {
              BY_NAME.put(material.name(), material);
@@ -1155,7 +1155,7 @@ index b6e6c99f207b106691e3b3541f129fbef2e248cb..3de413d3c76c3956ffb41caf7980d2ff
 +        if (isRecord == null) {
 +            isRecord = new boolean[length];
 +            for (Material material : values) {
-+                isRecord[material.ordinal()] = material.isLegacy() ? material.isRecordLegacy() : Bukkit.getUnsafe().isRecord(this);
++                isRecord[material.ordinal()] = material.isLegacy() ? material.isRecordLegacy() : Bukkit.getUnsafe().isRecord(material);
 +            }
          }
 +        return isRecord[this.ordinal()];
@@ -1180,7 +1180,7 @@ index b6e6c99f207b106691e3b3541f129fbef2e248cb..3de413d3c76c3956ffb41caf7980d2ff
 +        if (isSolid == null) {
 +            isSolid = new boolean[length];
 +            for (Material material : values) {
-+                isSolid[material.ordinal()] = material.isLegacy() ? material.isSolidLegacy() : Bukkit.getUnsafe().isSolid(this);
++                isSolid[material.ordinal()] = material.isLegacy() ? material.isSolidLegacy() : Bukkit.getUnsafe().isSolid(material);
 +            }
          }
 +        return isSolid[this.ordinal()];
@@ -1970,7 +1970,7 @@ index b6e6c99f207b106691e3b3541f129fbef2e248cb..3de413d3c76c3956ffb41caf7980d2ff
              case LEGACY_STONE:
              case LEGACY_GRASS:
              case LEGACY_DIRT:
-@@ -6985,24 +5190,27 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -6986,24 +5191,27 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
          }
      }
  
@@ -1997,7 +1997,7 @@ index b6e6c99f207b106691e3b3541f129fbef2e248cb..3de413d3c76c3956ffb41caf7980d2ff
 +        if (isAir == null) {
 +            isAir = new boolean[length];
 +            for (Material material : values) {
-+                isAir[material.ordinal()] = material.isLegacy() ? material.isAirLegacy() : Bukkit.getUnsafe().isAir(this);
++                isAir[material.ordinal()] = material.isLegacy() ? material.isAirLegacy() : Bukkit.getUnsafe().isAir(material);
 +            }
          }
 +        return isAir[this.ordinal()];
@@ -2009,7 +2009,7 @@ index b6e6c99f207b106691e3b3541f129fbef2e248cb..3de413d3c76c3956ffb41caf7980d2ff
      }
  
      /**
-@@ -7204,294 +5412,28 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -7205,294 +5413,28 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
          }
      }
  
@@ -2027,7 +2027,7 @@ index b6e6c99f207b106691e3b3541f129fbef2e248cb..3de413d3c76c3956ffb41caf7980d2ff
 +        if (isFlammable == null) {
 +            isFlammable = new boolean[length];
 +            for (Material material : values) {
-+                isFlammable[material.ordinal()] = material.isLegacy() ? material.isFlammableLegacy() : Bukkit.getUnsafe().isFlammable(this);
++                isFlammable[material.ordinal()] = material.isLegacy() ? material.isFlammableLegacy() : Bukkit.getUnsafe().isFlammable(material);
 +            }
          }
 +        return isFlammable[this.ordinal()];
@@ -2318,7 +2318,7 @@ index b6e6c99f207b106691e3b3541f129fbef2e248cb..3de413d3c76c3956ffb41caf7980d2ff
              case LEGACY_WOOD:
              case LEGACY_LOG:
              case LEGACY_LEAVES:
-@@ -7554,190 +5496,28 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -7555,190 +5497,28 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
          }
      }
  
@@ -2336,7 +2336,7 @@ index b6e6c99f207b106691e3b3541f129fbef2e248cb..3de413d3c76c3956ffb41caf7980d2ff
 +        if (isBurnable == null) {
 +            isBurnable = new boolean[length];
 +            for (Material material : values) {
-+                isBurnable[material.ordinal()] = material.isLegacy() ? material.isBurnableLegacy() : Bukkit.getUnsafe().isBurnable(this);
++                isBurnable[material.ordinal()] = material.isLegacy() ? material.isBurnableLegacy() : Bukkit.getUnsafe().isBurnable(material);
 +            }
          }
 +        return isBurnable[this.ordinal()];
@@ -2523,7 +2523,7 @@ index b6e6c99f207b106691e3b3541f129fbef2e248cb..3de413d3c76c3956ffb41caf7980d2ff
              case LEGACY_WOOD:
              case LEGACY_LOG:
              case LEGACY_LEAVES:
-@@ -7782,263 +5562,28 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -7783,263 +5563,28 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
          }
      }
  
@@ -2539,7 +2539,7 @@ index b6e6c99f207b106691e3b3541f129fbef2e248cb..3de413d3c76c3956ffb41caf7980d2ff
 +        if (isFuel == null) {
 +            isFuel = new boolean[length];
 +            for (Material material : values) {
-+                isFuel[material.ordinal()] = material.isLegacy() ? material.isFuelLegacy() : Bukkit.getUnsafe().isFuel(this);
++                isFuel[material.ordinal()] = material.isLegacy() ? material.isFuelLegacy() : Bukkit.getUnsafe().isFuel(material);
 +            }
 +        }
 +        return isFuel[this.ordinal()];
@@ -2802,7 +2802,7 @@ index b6e6c99f207b106691e3b3541f129fbef2e248cb..3de413d3c76c3956ffb41caf7980d2ff
              case LEGACY_LAVA_BUCKET:
              case LEGACY_COAL_BLOCK:
              case LEGACY_BLAZE_ROD:
-@@ -8109,6 +5654,8 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -8110,6 +5655,8 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
          }
      }
  
@@ -2811,7 +2811,7 @@ index b6e6c99f207b106691e3b3541f129fbef2e248cb..3de413d3c76c3956ffb41caf7980d2ff
      /**
       * Check if the material is a block and occludes light in the lighting engine.
       * <p>
-@@ -8128,367 +5675,20 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -8129,367 +5676,20 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material is a block and occludes light
       */
      public boolean isOccluding() {
@@ -2821,7 +2821,7 @@ index b6e6c99f207b106691e3b3541f129fbef2e248cb..3de413d3c76c3956ffb41caf7980d2ff
 +        if (isOccluding == null) {
 +            isOccluding = new boolean[length];
 +            for (Material material : values) {
-+                isOccluding[material.ordinal()] = material.isLegacy() ? material.isOccludingLegacy() : Bukkit.getUnsafe().isOccluding(this);
++                isOccluding[material.ordinal()] = material.isLegacy() ? material.isOccludingLegacy() : Bukkit.getUnsafe().isOccluding(material);
 +            }
          }
 +        return isOccluding[this.ordinal()];
@@ -3191,7 +3191,7 @@ index b6e6c99f207b106691e3b3541f129fbef2e248cb..3de413d3c76c3956ffb41caf7980d2ff
              case LEGACY_STONE:
              case LEGACY_GRASS:
              case LEGACY_DIRT:
-@@ -8594,39 +5794,26 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -8595,39 +5795,26 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
          }
      }
  
@@ -3207,7 +3207,7 @@ index b6e6c99f207b106691e3b3541f129fbef2e248cb..3de413d3c76c3956ffb41caf7980d2ff
 +        if (hasGravity == null) {
 +            hasGravity = new boolean[length];
 +            for (Material material : values) {
-+                hasGravity[material.ordinal()] = material.isLegacy() ? material.hasGravityLegacy() : Bukkit.getUnsafe().hasGravity(this);
++                hasGravity[material.ordinal()] = material.isLegacy() ? material.hasGravityLegacy() : Bukkit.getUnsafe().hasGravity(material);
 +            }
          }
 +        return hasGravity[this.ordinal()];
@@ -3245,7 +3245,7 @@ index b6e6c99f207b106691e3b3541f129fbef2e248cb..3de413d3c76c3956ffb41caf7980d2ff
              case LEGACY_SAND:
              case LEGACY_GRAVEL:
              case LEGACY_ANVIL:
-@@ -8638,161 +5825,28 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -8639,161 +5826,28 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
          }
      }
  
@@ -3261,7 +3261,7 @@ index b6e6c99f207b106691e3b3541f129fbef2e248cb..3de413d3c76c3956ffb41caf7980d2ff
 +        if (isItem == null) {
 +            isItem = new boolean[length];
 +            for (Material material : values) {
-+                isItem[material.ordinal()] = material.isLegacy() ? material.isItemLegacy() : Bukkit.getUnsafe().isItem(this);
++                isItem[material.ordinal()] = material.isLegacy() ? material.isItemLegacy() : Bukkit.getUnsafe().isItem(material);
 +            }
 +        }
 +        return isItem[this.ordinal()];
@@ -3422,7 +3422,7 @@ index b6e6c99f207b106691e3b3541f129fbef2e248cb..3de413d3c76c3956ffb41caf7980d2ff
              case LEGACY_ACACIA_DOOR:
              case LEGACY_BED_BLOCK:
              case LEGACY_BEETROOT_BLOCK:
-@@ -8852,6 +5906,8 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -8853,6 +5907,8 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
          }
      }
  
@@ -3431,7 +3431,7 @@ index b6e6c99f207b106691e3b3541f129fbef2e248cb..3de413d3c76c3956ffb41caf7980d2ff
      /**
       * Checks if this Material can be interacted with.
       *
-@@ -8869,333 +5925,19 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -8870,333 +5926,19 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return true if this material can be interacted with.
       */
      public boolean isInteractable() {
@@ -3763,7 +3763,7 @@ index b6e6c99f207b106691e3b3541f129fbef2e248cb..3de413d3c76c3956ffb41caf7980d2ff
 +        if (isInteractable == null) {
 +            isInteractable = new boolean[length];
 +            for (Material material : values) {
-+                isInteractable[material.ordinal()] = Bukkit.getUnsafe().isInteractable(this);
++                isInteractable[material.ordinal()] = Bukkit.getUnsafe().isInteractable(material);
 +            }
          }
 +        return isInteractable[this.ordinal()];
@@ -3775,7 +3775,7 @@ index b6e6c99f207b106691e3b3541f129fbef2e248cb..3de413d3c76c3956ffb41caf7980d2ff
      /**
       * Obtains the block's hardness level (also known as "strength").
       * <br>
-@@ -9207,884 +5949,21 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -9208,884 +5950,21 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       */
      public float getHardness() {
          Preconditions.checkArgument(isBlock(), "The Material is not a block!");
@@ -4659,7 +4659,7 @@ index b6e6c99f207b106691e3b3541f129fbef2e248cb..3de413d3c76c3956ffb41caf7980d2ff
 +            hardness = new float[length];
 +            for (Material material : values) {
 +                if (material.isBlock()) {
-+                    hardness[material.ordinal()] = Bukkit.getUnsafe().getBlockHardness(this);
++                    hardness[material.ordinal()] = Bukkit.getUnsafe().getBlockHardness(material);
 +                }
 +            }
          }
@@ -4672,7 +4672,7 @@ index b6e6c99f207b106691e3b3541f129fbef2e248cb..3de413d3c76c3956ffb41caf7980d2ff
      /**
       * Obtains the blast resistance value (also known as block "durability").
       * <br>
-@@ -10097,883 +5976,21 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -10098,883 +5977,21 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       */
      public float getBlastResistance() {
          Preconditions.checkArgument(isBlock(), "The Material is not a block!");
@@ -5555,7 +5555,7 @@ index b6e6c99f207b106691e3b3541f129fbef2e248cb..3de413d3c76c3956ffb41caf7980d2ff
 +            blastResistance = new float[length];
 +            for (Material material : values) {
 +                if (material.isBlock()) {
-+                    blastResistance[material.ordinal()] = Bukkit.getUnsafe().getBlockBlastResistance(this);
++                    blastResistance[material.ordinal()] = Bukkit.getUnsafe().getBlockBlastResistance(material);
 +                }
 +            }
          }
@@ -5568,7 +5568,7 @@ index b6e6c99f207b106691e3b3541f129fbef2e248cb..3de413d3c76c3956ffb41caf7980d2ff
      /**
       * Returns a value that represents how 'slippery' the block is.
       *
-@@ -10988,22 +6005,21 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -10989,22 +6006,21 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       */
      public float getSlipperiness() {
          Preconditions.checkArgument(isBlock(), "The Material is not a block!");
@@ -5590,7 +5590,7 @@ index b6e6c99f207b106691e3b3541f129fbef2e248cb..3de413d3c76c3956ffb41caf7980d2ff
 +            slipperiness = new float[length];
 +            for (Material material : values) {
 +                if (material.isBlock()) {
-+                    slipperiness[material.ordinal()] = Bukkit.getUnsafe().getBlockSlipperiness(this);
++                    slipperiness[material.ordinal()] = Bukkit.getUnsafe().getBlockSlipperiness(material);
 +                }
 +            }
          }
@@ -5603,7 +5603,7 @@ index b6e6c99f207b106691e3b3541f129fbef2e248cb..3de413d3c76c3956ffb41caf7980d2ff
      /**
       * Determines the remaining item in a crafting grid after crafting with this
       * ingredient.
-@@ -11015,21 +6031,21 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -11016,21 +6032,21 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      @Nullable
      public Material getCraftingRemainingItem() {
          Preconditions.checkArgument(isItem(), "The Material is not an item!");
@@ -5624,7 +5624,7 @@ index b6e6c99f207b106691e3b3541f129fbef2e248cb..3de413d3c76c3956ffb41caf7980d2ff
 +            craftingRemainingItem = new Material[length];
 +            for (Material material : values) {
 +                if (material.isItem()) {
-+                    craftingRemainingItem[material.ordinal()] = Bukkit.getUnsafe().getItemCraftingRemainingItem(this);
++                    craftingRemainingItem[material.ordinal()] = Bukkit.getUnsafe().getItemCraftingRemainingItem(material);
 +                }
 +            }
          }
@@ -5637,7 +5637,7 @@ index b6e6c99f207b106691e3b3541f129fbef2e248cb..3de413d3c76c3956ffb41caf7980d2ff
      /**
       * Get the best suitable slot for this Material.
       *
-@@ -11040,53 +6056,17 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -11041,53 +6057,17 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      @NotNull
      public EquipmentSlot getEquipmentSlot() {
          Preconditions.checkArgument(isItem(), "The Material is not an item!");
@@ -5692,7 +5692,7 @@ index b6e6c99f207b106691e3b3541f129fbef2e248cb..3de413d3c76c3956ffb41caf7980d2ff
 +            equipmentSlot = new EquipmentSlot[length];
 +            for (Material material : values) {
 +                if (material.isItem()) {
-+                    equipmentSlot[material.ordinal()] = Bukkit.getUnsafe().getItemEquipmentSlot(this);
++                    equipmentSlot[material.ordinal()] = Bukkit.getUnsafe().getItemEquipmentSlot(material);
 +                }
 +            }
          }
@@ -5702,7 +5702,7 @@ index b6e6c99f207b106691e3b3541f129fbef2e248cb..3de413d3c76c3956ffb41caf7980d2ff
  
      /**
 diff --git a/src/main/java/org/bukkit/UnsafeValues.java b/src/main/java/org/bukkit/UnsafeValues.java
-index b92255a9c87620f46adb140689b1cd328a476d61..ae8e51bba38bec7e744e485162ddf2cad11c2f45 100644
+index 83bfcd11eafc44488ecf47f1cfc62d55939652d2..681adb635bbceb228f637750a0f5ab280d71d132 100644
 --- a/src/main/java/org/bukkit/UnsafeValues.java
 +++ b/src/main/java/org/bukkit/UnsafeValues.java
 @@ -12,6 +12,8 @@ import org.bukkit.inventory.ItemStack;
@@ -5714,7 +5714,7 @@ index b92255a9c87620f46adb140689b1cd328a476d61..ae8e51bba38bec7e744e485162ddf2ca
  
  /**
   * This interface provides value conversions that may be specific to a
-@@ -245,4 +247,39 @@ public interface UnsafeValues {
+@@ -260,4 +262,39 @@ public interface UnsafeValues {
       */
      void setBiomeKey(RegionAccessor accessor, int x, int y, int z, NamespacedKey biomeKey);
      // Paper end

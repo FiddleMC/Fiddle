@@ -91,13 +91,13 @@ index 0000000000000000000000000000000000000000..b0e2721ec9662d8b4f7113f33888a72f
 +
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/PackScanner.java b/src/main/java/org/fiddlemc/fiddle/pack/read/PackScanner.java
-index 49fc4cb507d4b26e244a9162a3f1f40dd61d104c..9e5eeb4682719c71b197416c1926d2d20d1c6b2d 100644
+index 3ff4f09f0c16a34f6c3d98f5a6fd6db34e7b6ec4..bcf2c201c646e4ce518ce7761c31486c58487b0c 100644
 --- a/src/main/java/org/fiddlemc/fiddle/pack/read/PackScanner.java
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/read/PackScanner.java
 @@ -26,7 +26,7 @@ import java.util.*;
+  */
  public final class PackScanner {
  
-     private static final String fiddlePacksFolderName = "fiddle_packs";
 -    private static final String packMetaFilename = "pack.mcmeta";
 +    public static final String packMetaFilename = "pack.mcmeta"; // Fiddle - load packs - data packs - repository source - private -> public
  

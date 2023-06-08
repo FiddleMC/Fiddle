@@ -1,0 +1,244 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Tue, 6 Jun 2023 12:06:42 +0200
+Subject: [PATCH] Modify Bukkit enums - Remove hard-coded values - Fix legacy
+ item conversion
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/bukkit/craftbukkit/inventory/CraftInventory.java b/src/main/java/org/bukkit/craftbukkit/inventory/CraftInventory.java
+index 092f6843e3b43d4c615d2eee344f5966e96ae850..5f01a0716f85d46809887fef25592466dff3a442 100644
+--- a/src/main/java/org/bukkit/craftbukkit/inventory/CraftInventory.java
++++ b/src/main/java/org/bukkit/craftbukkit/inventory/CraftInventory.java
+@@ -104,7 +104,7 @@ public class CraftInventory implements Inventory {
+     @Override
+     public boolean contains(Material material) {
+         Validate.notNull(material, "Material cannot be null");
+-        material = CraftLegacy.fromLegacy(material);
++        material = CraftLegacy.fromLegacy(material, true); // Fiddle - remove hard-coded Bukkit values - Material - fix legacy item conversion
+         for (ItemStack item : this.getStorageContents()) {
+             if (item != null && item.getType() == material) {
+                 return true;
+@@ -129,7 +129,7 @@ public class CraftInventory implements Inventory {
+     @Override
+     public boolean contains(Material material, int amount) {
+         Validate.notNull(material, "Material cannot be null");
+-        material = CraftLegacy.fromLegacy(material);
++        material = CraftLegacy.fromLegacy(material, true); // Fiddle - remove hard-coded Bukkit values - Material - fix legacy item conversion
+         if (amount <= 0) {
+             return true;
+         }
+@@ -178,7 +178,7 @@ public class CraftInventory implements Inventory {
+     @Override
+     public HashMap<Integer, ItemStack> all(Material material) {
+         Validate.notNull(material, "Material cannot be null");
+-        material = CraftLegacy.fromLegacy(material);
++        material = CraftLegacy.fromLegacy(material, true); // Fiddle - remove hard-coded Bukkit values - Material - fix legacy item conversion
+         HashMap<Integer, ItemStack> slots = new HashMap<Integer, ItemStack>();
+ 
+         ItemStack[] inventory = this.getStorageContents();
+@@ -208,7 +208,7 @@ public class CraftInventory implements Inventory {
+     @Override
+     public int first(Material material) {
+         Validate.notNull(material, "Material cannot be null");
+-        material = CraftLegacy.fromLegacy(material);
++        material = CraftLegacy.fromLegacy(material, true); // Fiddle - remove hard-coded Bukkit values - Material - fix legacy item conversion
+         ItemStack[] inventory = this.getStorageContents();
+         for (int i = 0; i < inventory.length; i++) {
+             ItemStack item = inventory[i];
+@@ -263,7 +263,7 @@ public class CraftInventory implements Inventory {
+ 
+     public int firstPartial(Material material) {
+         Validate.notNull(material, "Material cannot be null");
+-        material = CraftLegacy.fromLegacy(material);
++        material = CraftLegacy.fromLegacy(material, true); // Fiddle - remove hard-coded Bukkit values - Material - fix legacy item conversion
+         ItemStack[] inventory = this.getStorageContents();
+         for (int i = 0; i < inventory.length; i++) {
+             ItemStack item = inventory[i];
+@@ -420,7 +420,7 @@ public class CraftInventory implements Inventory {
+     @Override
+     public void remove(Material material) {
+         Validate.notNull(material, "Material cannot be null");
+-        material = CraftLegacy.fromLegacy(material);
++        material = CraftLegacy.fromLegacy(material, true); // Fiddle - remove hard-coded Bukkit values - Material - fix legacy item conversion
+         ItemStack[] items = this.getStorageContents();
+         for (int i = 0; i < items.length; i++) {
+             if (items[i] != null && items[i].getType() == material) {
+diff --git a/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemFactory.java b/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemFactory.java
+index 9a87b32a4bf0a912b8de267d71e56c8505db0e9f..13b6f1df3e574f176cbcd358705c61087387ccb6 100644
+--- a/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemFactory.java
++++ b/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemFactory.java
+@@ -38,7 +38,7 @@ public final class CraftItemFactory implements ItemFactory {
+ 
+     @Override
+     public boolean isApplicable(ItemMeta meta, Material type) {
+-        type = CraftLegacy.fromLegacy(type); // This may be called from legacy item stacks, try to get the right material
++        type = CraftLegacy.fromLegacy(type, true); // This may be called from legacy item stacks, try to get the right material // Fiddle - remove hard-coded Bukkit values - Material - fix legacy item conversion
+         if (type == null || meta == null) {
+             return false;
+         }
+@@ -56,7 +56,7 @@ public final class CraftItemFactory implements ItemFactory {
+     }
+ 
+     private ItemMeta getItemMeta(Material material, CraftMetaItem meta) {
+-        material = CraftLegacy.fromLegacy(material); // This may be called from legacy item stacks, try to get the right material
++        material = CraftLegacy.fromLegacy(material, true); // This may be called from legacy item stacks, try to get the right material // Fiddle - remove hard-coded Bukkit values - Material - fix legacy item conversion
+         switch (material) {
+         case AIR:
+             return null;
+diff --git a/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemStack.java b/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemStack.java
+index 0e7a6a5a83b4630f53e6dba1b5b29f67d91c7240..6a307cd6b17bf3aa806b7302999783c490122264 100644
+--- a/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemStack.java
++++ b/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemStack.java
+@@ -653,7 +653,7 @@ public final class CraftItemStack extends ItemStack {
+         if (this.handle == null || that.handle == null) {
+             return false;
+         }
+-        Material comparisonType = CraftLegacy.fromLegacy(that.getType()); // This may be called from legacy item stacks, try to get the right material
++        Material comparisonType = CraftLegacy.fromLegacy(that.getType(), true); // This may be called from legacy item stacks, try to get the right material // Fiddle - remove hard-coded Bukkit values - Material - fix legacy item conversion
+         if (!(comparisonType == this.getType() && this.getDurability() == that.getDurability())) {
+             return false;
+         }
+diff --git a/src/main/java/org/bukkit/craftbukkit/inventory/CraftMetaSpawnEgg.java b/src/main/java/org/bukkit/craftbukkit/inventory/CraftMetaSpawnEgg.java
+index 3ab43aab043ae59e541f708c8558ddf9bdd82f84..2a07886ffb23040e492f1bbe272311de5a1aa44b 100644
+--- a/src/main/java/org/bukkit/craftbukkit/inventory/CraftMetaSpawnEgg.java
++++ b/src/main/java/org/bukkit/craftbukkit/inventory/CraftMetaSpawnEgg.java
+@@ -307,7 +307,7 @@ public class CraftMetaSpawnEgg extends CraftMetaItem implements SpawnEggMeta {
+                 this.entityTag.remove(ENTITY_ID.NBT);
+             }
+ 
+-            return CraftLegacy.fromLegacy(new MaterialData(Material.LEGACY_MONSTER_EGG, (byte) this.spawnedType.getTypeId()));
++            return CraftLegacy.fromLegacy(new MaterialData(Material.LEGACY_MONSTER_EGG, (byte) this.spawnedType.getTypeId()), true); // Fiddle - remove hard-coded Bukkit values - Material - fix legacy item conversion
+         }
+ 
+         return super.updateMaterial(material);
+diff --git a/src/main/java/org/bukkit/craftbukkit/legacy/CraftLegacy.java b/src/main/java/org/bukkit/craftbukkit/legacy/CraftLegacy.java
+index 110503062b3043cffa082a1cda6b8d57152869aa..2e0c054c65d94ce3729a2c1e7b1166415602855b 100644
+--- a/src/main/java/org/bukkit/craftbukkit/legacy/CraftLegacy.java
++++ b/src/main/java/org/bukkit/craftbukkit/legacy/CraftLegacy.java
+@@ -165,16 +165,12 @@ public final class CraftLegacy {
+         return (mappedData == null) ? new MaterialData(Material.LEGACY_AIR) : mappedData;
+     }
+ 
+-    public static Material fromLegacy(Material material) {
++    public static Material fromLegacy(Material material, boolean itemPriority) { // Fiddle - remove hard-coded Bukkit values - Material - fix legacy item conversion
+         if (material == null || !material.isLegacy()) {
+             return material;
+         }
+ 
+-        return CraftLegacy.fromLegacy(new MaterialData(material));
+-    }
+-
+-    public static Material fromLegacy(MaterialData materialData) {
+-        return CraftLegacy.fromLegacy(materialData, false);
++        return CraftLegacy.fromLegacy(new MaterialData(material), itemPriority); // Fiddle - remove hard-coded Bukkit values - Material - fix legacy item conversion
+     }
+ 
+     public static Material fromLegacy(MaterialData materialData, boolean itemPriority) {
+diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftLegacy.java b/src/main/java/org/bukkit/craftbukkit/util/CraftLegacy.java
+index c8dde75de231b5fdde88f5bc111c21883d9c3f49..f83b2288ebc64272c16b140cd2c9b0fce3b8bcfa 100644
+--- a/src/main/java/org/bukkit/craftbukkit/util/CraftLegacy.java
++++ b/src/main/java/org/bukkit/craftbukkit/util/CraftLegacy.java
+@@ -14,16 +14,18 @@ public final class CraftLegacy {
+         //
+     }
+ 
+-    public static Material fromLegacy(Material material) {
++    public static Material fromLegacy(Material material, boolean itemPriority) { // Fiddle - remove hard-coded Bukkit values - Material - fix legacy item conversion
+         if (material == null || !material.isLegacy()) {
+             return material;
+         }
+ 
+-        return org.bukkit.craftbukkit.legacy.CraftLegacy.fromLegacy(material);
++        return org.bukkit.craftbukkit.legacy.CraftLegacy.fromLegacy(material, itemPriority); // Fiddle - remove hard-coded Bukkit values - Material - fix legacy item conversion
+     }
+ 
+-    public static Material fromLegacy(MaterialData materialData) {
+-        return org.bukkit.craftbukkit.legacy.CraftLegacy.fromLegacy(materialData);
++    // Fiddle start - remove hard-coded Bukkit values - Material - fix legacy item conversion
++    public static Material fromLegacy(MaterialData materialData, boolean itemPriority) {
++        return org.bukkit.craftbukkit.legacy.CraftLegacy.fromLegacy(materialData, itemPriority);
++        // Fiddle end - remove hard-coded Bukkit values - Material - fix legacy item conversion
+     }
+ 
+     public static Material[] modern_values() {
+diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
+index bc972d68aa7b0b9b381afe9d23942f5a40d5fb83..0f43de9c15ed8128dcf71b22da80fb4fda1714d9 100644
+--- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
++++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
+@@ -192,7 +192,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
+ 
+     public static Item getItem(Material material) {
+         if (material != null && material.isLegacy()) {
+-            material = CraftLegacy.fromLegacy(material);
++            material = CraftLegacy.fromLegacy(material, true); // Fiddle - remove hard-coded Bukkit values - Material - fix legacy item conversion
+         }
+ 
+         return CraftMagicNumbers.MATERIAL_ITEM.get(material);
+@@ -200,7 +200,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
+ 
+     public static Block getBlock(Material material) {
+         if (material != null && material.isLegacy()) {
+-            material = CraftLegacy.fromLegacy(material);
++            material = CraftLegacy.fromLegacy(material, false); // Fiddle - remove hard-coded Bukkit values - Material - fix legacy item conversion
+         }
+ 
+         return CraftMagicNumbers.MATERIAL_BLOCK.get(material);
+@@ -240,12 +240,19 @@ public final class CraftMagicNumbers implements UnsafeValues {
+ 
+     @Override
+     public Material fromLegacy(Material material) {
+-        return CraftLegacy.fromLegacy(material);
++        // Fiddle start - remove hard-coded Bukkit values - Material - fix legacy item conversion
++        return this.fromLegacy(material, false);
++    }
++
++    @Override
++    public Material fromLegacy(Material material, boolean itemPriority) {
++        return CraftLegacy.fromLegacy(material, itemPriority);
++        // Fiddle end - remove hard-coded Bukkit values - Material - fix legacy item conversion
+     }
+ 
+     @Override
+     public Material fromLegacy(MaterialData material) {
+-        return CraftLegacy.fromLegacy(material);
++        return this.fromLegacy(material, false); // Fiddle - remove hard-coded Bukkit values - Material - fix legacy item conversion
+     }
+ 
+     @Override
+diff --git a/src/test/java/org/bukkit/craftbukkit/legacy/LegacyTest.java b/src/test/java/org/bukkit/craftbukkit/legacy/LegacyTest.java
+index c1323a88e82e1505ad04b28099529979e07878bf..424c24497c0b185a6972ef83514c1439580cfab3 100644
+--- a/src/test/java/org/bukkit/craftbukkit/legacy/LegacyTest.java
++++ b/src/test/java/org/bukkit/craftbukkit/legacy/LegacyTest.java
+@@ -123,10 +123,10 @@ public class LegacyTest extends AbstractTestingBase {
+                 Assert.assertNotEquals("Could not toLegacy " + material, Material.LEGACY_AIR, converted.getItemType());
+ 
+                 if (!this.INVALIDATED_MATERIALS.contains(converted.getItemType())) {
+-                    Assert.assertNotEquals("Could not fromLegacy(toLegacy) " + converted + "(" + material + ")", Material.AIR, CraftLegacy.fromLegacy(converted));
++                    Assert.assertNotEquals("Could not fromLegacy(toLegacy) " + converted + "(" + material + ")", Material.AIR, CraftLegacy.fromLegacy(converted, false)); // Fiddle - remove hard-coded Bukkit values - Material - fix legacy item conversion
+                 }
+                 if (!this.INVERSION_FAILS.contains(material)) {
+-                    Assert.assertEquals("Could not fromLegacy(toLegacy) " + converted + "(" + material + ")", material, CraftLegacy.fromLegacy(converted));
++                    Assert.assertEquals("Could not fromLegacy(toLegacy) " + converted + "(" + material + ")", material, CraftLegacy.fromLegacy(converted, false)); // Fiddle - remove hard-coded Bukkit values - Material - fix legacy item conversion
+                 }
+             }
+         }
+@@ -138,7 +138,7 @@ public class LegacyTest extends AbstractTestingBase {
+     public void fromLegacyMaterial() {
+         for (Material material : Material.values()) {
+             if (!this.INVALIDATED_MATERIALS.contains(material) && material.isLegacy()) {
+-                Material converted = CraftLegacy.fromLegacy(material);
++                Material converted = CraftLegacy.fromLegacy(material, false); // Fiddle - remove hard-coded Bukkit values - Material - fix legacy item conversion
+                 Assert.assertNotEquals("Could not fromLegacy " + material, Material.AIR, converted);
+ 
+                 Assert.assertNotEquals("Could not toLegacy(fromLegacy) " + converted + "(" + material + ")", Material.AIR, CraftLegacy.toLegacy(converted));
+@@ -148,7 +148,7 @@ public class LegacyTest extends AbstractTestingBase {
+             }
+         }
+ 
+-        Assert.assertEquals("Could not fromLegacy Air", Material.AIR, CraftLegacy.fromLegacy(Material.LEGACY_AIR));
++        Assert.assertEquals("Could not fromLegacy Air", Material.AIR, CraftLegacy.fromLegacy(Material.LEGACY_AIR, false)); // Fiddle - remove hard-coded Bukkit values - Material - fix legacy item conversion
+     }
+ 
+     @Test

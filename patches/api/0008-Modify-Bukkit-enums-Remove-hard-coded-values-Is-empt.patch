@@ -1,14 +1,14 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
 Date: Sun, 4 Jun 2023 11:25:01 +0200
-Subject: [PATCH] Modify Bukkit enums - Remove hard-coded values - is empty, is
+Subject: [PATCH] Modify Bukkit enums - Remove hard-coded values - Is empty, is
  transparent
 
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 3de413d3c76c3956ffb41caf7980d2ff36e1f904..33678ed08bc2145045d88a09bd292034c2d5c60d 100644
+index 2a90fac4ce83ff359a5d802923ae05e95ce55497..3abc9ce2c7b14ae569c8a32de72fb1210b93e8b2 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
 @@ -4586,6 +4586,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
@@ -19,7 +19,7 @@ index 3de413d3c76c3956ffb41caf7980d2ff36e1f904..33678ed08bc2145045d88a09bd292034
       */
      public boolean isEmpty() {
          switch (this) {
-@@ -5219,6 +5220,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -5220,6 +5221,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material is a block and does not block any light
       * @deprecated currently does not have an implementation which is well
       * linked to the underlying server. Contributions welcome.

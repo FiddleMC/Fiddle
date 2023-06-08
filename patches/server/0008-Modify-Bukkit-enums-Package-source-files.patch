@@ -7,18 +7,26 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 44007adf0a0ff693fce66a3c54535cb7ece3d276..16642bb6683c0acd1a390f216dc7456f8a079f1d 100644
+index 44007adf0a0ff693fce66a3c54535cb7ece3d276..38b44c81a58f54f497071bffeb162012cc8b795f 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
-@@ -204,3 +204,22 @@ tasks.registerRunTask("runDev") {
+@@ -204,3 +204,30 @@ tasks.registerRunTask("runDev") {
      description = "Spin up a non-relocated Mojang-mapped test server"
      classpath(sourceSets.main.map { it.runtimeClasspath })
  }
 +
 +// Fiddle start - modify Bukkit enums - package source files
-+tasks.register<Copy>("copyBukkitEnumSources") {
-+    from(layout.projectDirectory.file("../$apiProjectName/src/main/java/org/bukkit/Material.java"))
-+    into(layout.buildDirectory.dir("tmp/copiedresources/enumsrc"))
++val bukkitEnumClassesToLoad = arrayOf(
++    "org/bukkit/Material"
++)
++
++bukkitEnumClassesToLoad.forEach { classToLoad ->
++    tasks.register<Copy>("copyBukkitEnumSources") {
++        from(layout.projectDirectory.file("../$apiProjectName/src/main/java/$classToLoad.java"))
++        into(layout.buildDirectory.dir("tmp/copiedresources/enumsrc${
++            classToLoad.takeIf { it.contains('/') }?.let { "/${it.substring(0, it.lastIndexOf('/'))}" } ?: ""
++        }"))
++    }
 +}
 +
 +tasks.processResources {

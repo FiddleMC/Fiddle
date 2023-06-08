@@ -7,7 +7,7 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 16642bb6683c0acd1a390f216dc7456f8a079f1d..2d9dc9e24e032c81f5f1b999cfbda29b1e58ac22 100644
+index b7e93f2dca9e881e464ef7c651e87c3260393a9e..74cc8741dbd32e62c724cde5ac71ebb54ace4631 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -55,6 +55,10 @@ dependencies {

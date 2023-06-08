@@ -1,17 +1,17 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
 Date: Sun, 4 Jun 2023 11:32:13 +0200
-Subject: [PATCH] Modify Bukkit enums - Remove hard-coded values - max stack
+Subject: [PATCH] Modify Bukkit enums - Remove hard-coded values - Max stack
  size, durability
 
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-index b5a161f9ec47ce379f2bab70c67cca6b96879d77..b09dc3dae20bce22c78bfdbc23ff2885f61ff375 100644
+index 05ee785ca90ef073da78ab8a19ba0bc25aa9832f..af5e7fc55a58e56681b6722f316df756c69e2be6 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-@@ -654,6 +654,31 @@ public final class CraftMagicNumbers implements UnsafeValues {
+@@ -661,6 +661,31 @@ public final class CraftMagicNumbers implements UnsafeValues {
          public static final int TAG_ANY_NUMBER = 99;
      }
  
@@ -27,7 +27,7 @@ index b5a161f9ec47ce379f2bab70c67cca6b96879d77..b09dc3dae20bce22c78bfdbc23ff2885
 +        }
 +        return getItem(material).getMaxStackSize();
 +    }
-+    // Fiddle end - remove hard-coded Bukkit values - Material - max stack sizez
++    // Fiddle end - remove hard-coded Bukkit values - Material - max stack size
 +
 +    // Fiddle start - remove hard-coded Bukkit values - Material - durability
 +    @Override

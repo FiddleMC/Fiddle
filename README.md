@@ -8,7 +8,7 @@
   <h3>
     A Paper server fork that lets you
     <br>
-    add server-side custom blocks and items
+    add modded blocks and items
   </h3>
 
   [![Discord](https://img.shields.io/discord/1091830813240348732?color=5865F2&label=discord&style=for-the-badge)](https://discord.gg/EduvcVmKS7)
@@ -50,16 +50,17 @@
 
 Fiddle is a Paper server fork that lets you add new blocks and items into Minecraft.
 
-Unlike modded platforms, Fiddle:
-* works with Bukkit plugins
-* works with the vanilla client
-* doesn't require custom content to be updated for new Minecraft versions
-* has the speed and optimizations from Paper
+Fiddle:
+* works with existing Bukkit plugins[^1]
+* adds blocks and items into the game in the same way a Minecraft update would
+* works with the vanilla client, both with/without a resource pack, and also offers a client-side mod with extra performance
+* modded blocks and items keep working after Minecraft updates
+* adding new blocks and items is simple using the standard resource and data pack format
+* allows Bukkit plugins to include custom blocks and items when used on a Fiddle server
 
 ## Installation
 
-Fiddle is a drop-in replacement for Paper.
-
+Fiddle is a drop-in replacement for Paper.\
 You can download the latest stable JAR from [releases](https://github.com/FiddleMC/Fiddle/releases) and the latest development JAR from [actions](https://github.com/FiddleMC/Fiddle/actions).
 
 After running Fiddle once, you must open `fiddle.txt`, read the warning carefully, and set `modded=true`.
@@ -81,116 +82,48 @@ After running Fiddle once, you must open `fiddle.txt`, read the warning carefull
   </table>
 </div>
 
+[^1]: Some older plugins have still not updated to use 1.13+ namespaced ids. These plugins can still be used on Fiddle, but require having [backwards compatibility mode](https://github.com/FiddleMC/Fiddle/wiki/Plugin-compatibility#backwards-compatibility) enabled.
+
 ## Adding blocks/items
 
-You can easily add custom blocks or items by [installing packs and plugins](https://github.com/FiddleMC/Fiddle/wiki/Installing-packs).
+Modded blocks and items are defined in a pack (similar to a resource or data pack). 
+You can download packs made by others, or [create your own packs](https://github.com/FiddleMC/Fiddle/wiki/Making-packs) and share them.
 
-* A pack is a `.zip` or `.rar` file, and can be placed into the `fiddle_packs` folder in the server root.\
-  *For example:* `fiddle_packs/WillowTrees.zip`
+A pack is a `.zip` or `.rar` file. Packs can be placed in the `fiddle_packs` folder in the server root.\
+*Example location:* `fiddle_packs/WillowTrees.zip`
 
-* Regular Bukkit plugins can also add their own custom blocks and items when added on a Fiddle server!\
-  *For example:* `plugins/WarpObelisks.jar`
+Bukkit plugins can also include custom blocks and items when used on a Fiddle server.
 
-## Background
+## Demo
 
-To add custom blocks to Minecraft, but stay within the Paper ecosystem, and allow vanilla players to join, a fork of Paper that does exactly this was originally written for a small community server.
+An experimental version of Fiddle is already running on a small community server.
 You can join *sucraft.org* and do `/warp Demo` to see it in action yourself.
 
-The goal of this project is to re-write it in a generic way, so that everyone can use it, and add their own custom blocks just as easily, smoothly and reliably.
+
 
 You are very welcome to join the project by adding code parts, testing, sharing knowledge or giving suggestions.
 
 ## Goals of the project
 
-### Supports any client
+### Supports any player
 
-The blocks and items can be used by anyone.
-* Players with a corresponding client mod receive the custom blocks and items directly.
-* Players with a resource pack can see the custom blocks and items through a collection of replaced block states and item and entity models.
-* Anyone without the resource pack sees the closest vanilla equivalent, with the custom item's name as display name.
+* A client mod that supports the custom blocks and items directly
+* A resource pack that allows vanilla clients to see the custom blocks and items
+* Players do not have to accept the resource pack, and will be shown custom blocks and items as closely as possible
 
-### Can be seamlessly updated
+### Seamless updates
 
-Mods adding custom blocks frequently have the problem that they stop being updated, or need to be updated for every version, which makes it hard for servers to use them.
-The custom blocks added to a Fiddle server are updated automatically, and remain saved in the world and placeable/breakable as before.
+Mods adding custom blocks frequently have the problem that they break with a new Minecraft version, and then sometimes stop being updated.
+
+The blocks and items added to a Fiddle server do not need to be updated, and always remain saved in the world and loadable, placeable and breakable as before.
 
 ### Works with plugins
 
-Custom blocks and items work fully with almost all plugins out of the box.
+Custom blocks and items work fully with Bukkit plugins out of the box.
 
 ## Architecture
 
 <img src="design/architecture.svg" width="100%">
-
-## Current state
-
-There are global and per-world configuration files containing a single, unused placeholder option.
-
-## Design considerations
-
-### Namespaced keys
-
-Minecraft introduced namespaced keys as a way of differentiating what source resources belong to.
-The `minecraft:` namespace is for vanilla resources, and other namespaces (for example `quark:`) can be used by mods.
-
-However, neither Bukkit, nor most Bukkit plugins, work with this.
-There are many plugins that assume that Bukkit's `Material` can be turned directly into a `minecraft:` namespaced key (so `Material.OAK_PLANKS` corresponds to `minecraft:oak_planks`).
-It is not possible to add a fitting value to `Material` for other namespaces, like `quark:birch_bookshelf`.
-
-There are many plugins that make the hard-coded assumption that `Material` corresponds to the namespaced keys, including common plugins like WorldEdit and CoreProtect.
-Such plugins simply do not work with different namespaces.
-If all custom resources use the `minecraft:` namespace, nearly all of these plugins fully work.
-
-Therefore, against the purpose of namespaced keys, Fiddle uses the `minecraft:` namespace, with a prefix in the key, for example `minecraft:quark_birch_bookshelf`.
-
-Furthermore, most plugins assume that `Material` names contain uppercase letters, digits and underscores, and that namespaced keys are identical but lowercase.
-Therefore, all namespaced keys in Fiddle can only contain lowercase letters, digits and underscores.
-
-### Block entities
-
-Duplicate visual block states (such as note block properties, leaves distance, infested stone bricks) can be overridden in a resource pack with the look of a custom block.
-However, some properties of these overridden block states are hard-coded in the client, and limit what they can be used for.
-
-Most importantly, the collision box of a block state is hard-coded in the client.
-This means that to be able to add custom stairs, the client must always receive a block state with the collision box as the custom block state, or else it won't be possible to walk on it properly.
-There are only 4 duplicate visual stairs (waxed copper stairs) that could be used.
-This allows the addition of only 4 types of custom stairs.
-
-An alternative method is sending some regular stairs as a block, and drawing the desired block as an entity around it.
-Many such entities will cause the client FPS to drop.
-
-To allow the potential use of any collision box, using the entity method is supported.
-
-### Breaking speed
-
-Block breaking speed is initially managed client-side.
-When breaking a block, the client determines how much the damage that has been done to a block, and when to send a packet to the server indicating it has finished.
-The server then only checks whether the breaking time was reasonable, and approves or denies the breaking.
-
-There is no clean way to make breaking the block go slower.
-Because of the short time needed to break most blocks, packets sent to influence the breaking will often take too much time to arrive, leading to visual glitches, including invisible blocks.
-
-The client determines the block breaking speed only from the block type (not the specific block state) and whether an appropriate tool is being used.
-The breaking speed per block is hard-coded and cannot be modified.
-This means that for example, if a note block state is sent to a client with a resource pack, then the client will assume the block takes as long to break as a regular note block.
-If the resource pack overrides the block state's texture to be calcite bricks, then the block breaking speed is unnaturally fast.
-
-However, no good solution for this appears to be possible.
-Denying the block break from the client does not slow down block breaking, but forces the client to begin again.
-Therefore, it is chosen that, if a server block X (for example, calcite bricks) is sent to the client as block Y (for example, a note block), then we will accept any block breaks sent by the client using a calculation for block Y.
-
-Similarly, because the appropriate tools to break a block can be determined by the server, but only for a block type as a whole (not individual block states), if a note block state is overridden to look like calcite bricks, and calcite bricks must be breakable quickly by using a pickaxe, then all note block states will be breakable quickly by using a pickaxe.
-It may be possible to modify the appropriate tools to break a block at the last second when a player looks at it, by sending an [Update Tags](https://wiki.vg/Protocol#Update_Tags) packet.
-
-## Issues
-
-### Plugin data
-
-Many plugins store data, usually referring to blocks and items by their namespaced key (or using the `Material` names, which is worse).
-This means that deleting namespaced keys from the server (which also happens in vanilla Minecraft, such as with the renaming of `grass_path` to `dirt_path`) may affect the plugin.
-
-Therefore, it is generally best to assume that added blocks or items must always keep the same namespaced key from that moment on.
-Even if the world data can be updated, there is no guarantee that plugins can handle such a change.
 
 ## Acknowledgements
 
@@ -198,31 +131,31 @@ This project has been made possible by:
 * the generous donations from
   <table>
     <tr>
-      <td align="center"><a href="https://github.com/EnzoMortelli"><img src="https://avatars.githubusercontent.com/u/10728176" width="54"><br>EnzoMortelli</a></td>
-      <td align="center">Rammus</td>
-      <td align="center">Heedi93</td>
-      <td align="center"><a href="https://github.com/SielStudent"><img src="https://avatars.githubusercontent.com/u/124888543" width="54"><br>SielStudent</a></td>
-      <td align="center">Avidan2</td>
-      <td align="center">BangboomJoe</td>
-      <td align="center">Saigai</td>
+      <td align="center"><a href="https://github.com/EnzoMortelli"><img src="https://avatars.githubusercontent.com/u/10728176" width="48"><br>EnzoMortelli</a></td>
+      <td align="center"><img src="https://www.fractalcamo.com/uploads/5/9/0/2/5902948/s189772745713394276_p7013_i157_w1500.jpeg" width="48"><br>Rammus</td>
+      <td align="center"><img src="https://www.fractalcamo.com/uploads/5/9/0/2/5902948/s189772745713394276_p7013_i157_w1500.jpeg" width="48"><br>Heedi93</td>
+      <td align="center"><a href="https://github.com/SielStudent"><img src="https://avatars.githubusercontent.com/u/124888543" width="48"><br>SielStudent</a></td>
+      <td align="center"><img src="https://www.fractalcamo.com/uploads/5/9/0/2/5902948/s189772745713394276_p7013_i157_w1500.jpeg" width="48"><br>Avidan2</td>
+      <td align="center"><img src="https://www.fractalcamo.com/uploads/5/9/0/2/5902948/s189772745713394276_p7013_i157_w1500.jpeg" width="48"><br>BangboomJoe</td>
+      <td align="center"><img src="https://www.fractalcamo.com/uploads/5/9/0/2/5902948/s189772745713394276_p7013_i157_w1500.jpeg" width="48"><br>Saigai</td>
     </tr>
     <tr>
-      <td align="center"><a href="https://github.com/WarturtleChips99"><img src="https://avatars.githubusercontent.com/u/110665347" width="54"><br>Thomas</a></td>
-      <td align="center">Chi168</td>
-      <td align="center"><a href="https://github.com/pontaoski"><img src="https://avatars.githubusercontent.com/u/20326855" width="54"><br>Janet Blackquill</a></td>
-      <td align="center">__Dragonfly__</td>
-      <td align="center">TrunkS</td>
-      <td align="center">Bingus1</td>
-      <td align="center"><a href="https://github.com/RoelHospel"><img src="https://avatars.githubusercontent.com/u/10463997" width="54"><br>Roel Hospel</a></td>
+      <td align="center"><a href="https://github.com/WarturtleChips99"><img src="https://avatars.githubusercontent.com/u/110665347" width="48"><br>Thomas</a></td>
+      <td align="center"><img src="https://www.fractalcamo.com/uploads/5/9/0/2/5902948/s189772745713394276_p7013_i157_w1500.jpeg" width="48"><br>Chi168</td>
+      <td align="center"><a href="https://github.com/pontaoski"><img src="https://avatars.githubusercontent.com/u/20326855" width="48"><br>Janet&nbsp;Blackquill</a></td>
+      <td align="center"><img src="https://www.fractalcamo.com/uploads/5/9/0/2/5902948/s189772745713394276_p7013_i157_w1500.jpeg" width="48"><br>__Dragonfly__</td>
+      <td align="center"><img src="https://www.fractalcamo.com/uploads/5/9/0/2/5902948/s189772745713394276_p7013_i157_w1500.jpeg" width="48"><br>TrunkS</td>
+      <td align="center"><img src="https://www.fractalcamo.com/uploads/5/9/0/2/5902948/s189772745713394276_p7013_i157_w1500.jpeg" width="48"><br>Bingus1</td>
+      <td align="center"><a href="https://github.com/RoelHospel"><img src="https://avatars.githubusercontent.com/u/10463997" width="48"><br>Roel&nbsp;Hospel</a></td>
     </tr>
     <tr>
-      <td align="center">SpiderLock</td>
-      <td align="center">hkwhipitup</td>
-      <td align="center">LukePage111</td>
-      <td align="center"><a href="https://github.com/thunderm"><img src="https://avatars.githubusercontent.com/u/4498583" width="54"><br>Michael</a></td>
-      <td align="center"><a href="https://github.com/y0giOP"><img src="https://avatars.githubusercontent.com/u/105310539" width="54"><br>y0giOP</a></td>
+      <td align="center"><img src="https://www.fractalcamo.com/uploads/5/9/0/2/5902948/s189772745713394276_p7013_i157_w1500.jpeg" width="48"><br>SpiderLock</td>
+      <td align="center"><img src="https://www.fractalcamo.com/uploads/5/9/0/2/5902948/s189772745713394276_p7013_i157_w1500.jpeg" width="48"><br>hkwhipitup</td>
+      <td align="center"><img src="https://www.fractalcamo.com/uploads/5/9/0/2/5902948/s189772745713394276_p7013_i157_w1500.jpeg" width="48"><br>LukePage111</td>
+      <td align="center"><a href="https://github.com/thunderm"><img src="https://avatars.githubusercontent.com/u/4498583" width="48"><br>Michael</a></td>
+      <td align="center"><a href="https://github.com/y0giOP"><img src="https://avatars.githubusercontent.com/u/105310539" width="48"><br>y0giOP</a></td>
     </tr>
   </table>
 
 * the authors and maintainers of the Bukkit, [Spigot](https://www.spigotmc.org/) and [Paper](https://github.com/PaperMC/Paper) projects
-* everyone on GitHub and the [Discord](https://discord.gg/EduvcVmKS7) server who helped test Fiddle and provided feedback and suggestions
+* everyone on GitHub and the [Discord](https://discord.gg/EduvcVmKS7) server who help test Fiddle and provide feedback and suggestions

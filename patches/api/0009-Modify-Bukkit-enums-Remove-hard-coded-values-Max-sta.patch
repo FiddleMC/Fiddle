@@ -1,14 +1,14 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
 Date: Sun, 4 Jun 2023 11:25:57 +0200
-Subject: [PATCH] Modify Bukkit enums - Remove hard-coded values - max stack
+Subject: [PATCH] Modify Bukkit enums - Remove hard-coded values - Max stack
  size, durability
 
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 33678ed08bc2145045d88a09bd292034c2d5c60d..8a439b5044dcb14743b88c918e9892a7b23ba547 100644
+index 3abc9ce2c7b14ae569c8a32de72fb1210b93e8b2..2df52345152bd8be2bd272000b583f06ded85f4e 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
 @@ -123,7 +123,7 @@ import org.jetbrains.annotations.Nullable;
@@ -1549,7 +1549,7 @@ index 33678ed08bc2145045d88a09bd292034c2d5c60d..8a439b5044dcb14743b88c918e9892a7
 +        if (maxStackSize == null) {
 +            maxStackSize = new int[length];
 +            for (Material material : values) {
-+                maxStackSize[material.ordinal()] = Bukkit.getUnsafe().getMaxStackSize(this);
++                maxStackSize[material.ordinal()] = Bukkit.getUnsafe().getMaxStackSize(material);
 +            }
 +        }
 +        return maxStackSize[this.ordinal()];
@@ -1569,7 +1569,7 @@ index 33678ed08bc2145045d88a09bd292034c2d5c60d..8a439b5044dcb14743b88c918e9892a7
 +        if (maxDurability == null) {
 +            maxDurability = new short[length];
 +            for (Material material : values) {
-+                maxDurability[material.ordinal()] = Bukkit.getUnsafe().getMaxDurability(this);
++                maxDurability[material.ordinal()] = Bukkit.getUnsafe().getMaxDurability(material);
 +            }
 +        }
 +        return maxDurability[this.ordinal()];
@@ -1578,10 +1578,10 @@ index 33678ed08bc2145045d88a09bd292034c2d5c60d..8a439b5044dcb14743b88c918e9892a7
  
      /**
 diff --git a/src/main/java/org/bukkit/UnsafeValues.java b/src/main/java/org/bukkit/UnsafeValues.java
-index ae8e51bba38bec7e744e485162ddf2cad11c2f45..9f2c87450805ef6488310daa684cc25c6415f280 100644
+index 681adb635bbceb228f637750a0f5ab280d71d132..4a4d1ce71c3078465d354422955b08af52f30119 100644
 --- a/src/main/java/org/bukkit/UnsafeValues.java
 +++ b/src/main/java/org/bukkit/UnsafeValues.java
-@@ -248,6 +248,10 @@ public interface UnsafeValues {
+@@ -263,6 +263,10 @@ public interface UnsafeValues {
      void setBiomeKey(RegionAccessor accessor, int x, int y, int z, NamespacedKey biomeKey);
      // Paper end
  
