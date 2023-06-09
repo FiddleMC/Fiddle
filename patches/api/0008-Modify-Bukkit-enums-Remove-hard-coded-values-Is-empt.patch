@@ -8,10 +8,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 2a90fac4ce83ff359a5d802923ae05e95ce55497..3abc9ce2c7b14ae569c8a32de72fb1210b93e8b2 100644
+index 678c19810e23d18d1f4c00fd56980f56d8466bc9..4dcff369e3e69fe3503ff1f6cbb81ff3304215ea 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -4586,6 +4586,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4451,6 +4451,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
  
      /**
       * @return If the type is either AIR, CAVE_AIR or VOID_AIR
@@ -19,7 +19,7 @@ index 2a90fac4ce83ff359a5d802923ae05e95ce55497..3abc9ce2c7b14ae569c8a32de72fb121
       */
      public boolean isEmpty() {
          switch (this) {
-@@ -5220,6 +5221,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -5085,6 +5086,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material is a block and does not block any light
       * @deprecated currently does not have an implementation which is well
       * linked to the underlying server. Contributions welcome.

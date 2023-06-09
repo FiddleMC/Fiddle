@@ -66,7 +66,7 @@ index 092f6843e3b43d4c615d2eee344f5966e96ae850..5f01a0716f85d46809887fef25592466
          for (int i = 0; i < items.length; i++) {
              if (items[i] != null && items[i].getType() == material) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemFactory.java b/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemFactory.java
-index 9a87b32a4bf0a912b8de267d71e56c8505db0e9f..13b6f1df3e574f176cbcd358705c61087387ccb6 100644
+index b88a29623c280fcf2e3dd6d16646c23ca809efe1..760c16d8561d40fdbba49692434e521b1dd72471 100644
 --- a/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemFactory.java
 +++ b/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemFactory.java
 @@ -38,7 +38,7 @@ public final class CraftItemFactory implements ItemFactory {
@@ -88,10 +88,10 @@ index 9a87b32a4bf0a912b8de267d71e56c8505db0e9f..13b6f1df3e574f176cbcd358705c6108
          case AIR:
              return null;
 diff --git a/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemStack.java b/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemStack.java
-index 0e7a6a5a83b4630f53e6dba1b5b29f67d91c7240..6a307cd6b17bf3aa806b7302999783c490122264 100644
+index 24fac69bc63f949001252811f792b21955a13e9d..4c73878ecd4059151db4548b6b22bca45461441d 100644
 --- a/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemStack.java
 +++ b/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemStack.java
-@@ -653,7 +653,7 @@ public final class CraftItemStack extends ItemStack {
+@@ -655,7 +655,7 @@ public final class CraftItemStack extends ItemStack {
          if (this.handle == null || that.handle == null) {
              return false;
          }
@@ -164,7 +164,7 @@ index c8dde75de231b5fdde88f5bc111c21883d9c3f49..f83b2288ebc64272c16b140cd2c9b0fc
  
      public static Material[] modern_values() {
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-index 7fa40b7666901cf1e39cb9e0aba9b0dde7bcbc28..4706134c535b506d0b17bdd51f39ac6e9d50fbda 100644
+index 5a61b5b8d64fc3bd6d01f996d4b3ad02c78307da..b4ce020c8f8a67369a3f779752dbd24a00172d0e 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 @@ -194,7 +194,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
@@ -208,10 +208,10 @@ index 7fa40b7666901cf1e39cb9e0aba9b0dde7bcbc28..4706134c535b506d0b17bdd51f39ac6e
  
      @Override
 diff --git a/src/test/java/org/bukkit/craftbukkit/legacy/LegacyTest.java b/src/test/java/org/bukkit/craftbukkit/legacy/LegacyTest.java
-index c1323a88e82e1505ad04b28099529979e07878bf..424c24497c0b185a6972ef83514c1439580cfab3 100644
+index 7e3452542e954ad202f4bbb861d9a2f9ef8262ef..316eed19a0c0833b79b57b9c35f64bae1f0c59cf 100644
 --- a/src/test/java/org/bukkit/craftbukkit/legacy/LegacyTest.java
 +++ b/src/test/java/org/bukkit/craftbukkit/legacy/LegacyTest.java
-@@ -123,10 +123,10 @@ public class LegacyTest extends AbstractTestingBase {
+@@ -128,10 +128,10 @@ public class LegacyTest extends AbstractTestingBase {
                  Assert.assertNotEquals("Could not toLegacy " + material, Material.LEGACY_AIR, converted.getItemType());
  
                  if (!this.INVALIDATED_MATERIALS.contains(converted.getItemType())) {
@@ -224,7 +224,7 @@ index c1323a88e82e1505ad04b28099529979e07878bf..424c24497c0b185a6972ef83514c1439
                  }
              }
          }
-@@ -138,7 +138,7 @@ public class LegacyTest extends AbstractTestingBase {
+@@ -143,7 +143,7 @@ public class LegacyTest extends AbstractTestingBase {
      public void fromLegacyMaterial() {
          for (Material material : Material.values()) {
              if (!this.INVALIDATED_MATERIALS.contains(material) && material.isLegacy()) {
@@ -233,7 +233,7 @@ index c1323a88e82e1505ad04b28099529979e07878bf..424c24497c0b185a6972ef83514c1439
                  Assert.assertNotEquals("Could not fromLegacy " + material, Material.AIR, converted);
  
                  Assert.assertNotEquals("Could not toLegacy(fromLegacy) " + converted + "(" + material + ")", Material.AIR, CraftLegacy.toLegacy(converted));
-@@ -148,7 +148,7 @@ public class LegacyTest extends AbstractTestingBase {
+@@ -153,7 +153,7 @@ public class LegacyTest extends AbstractTestingBase {
              }
          }
  

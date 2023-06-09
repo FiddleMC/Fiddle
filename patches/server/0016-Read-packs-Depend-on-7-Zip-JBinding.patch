@@ -7,7 +7,7 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index b7e93f2dca9e881e464ef7c651e87c3260393a9e..74cc8741dbd32e62c724cde5ac71ebb54ace4631 100644
+index b0dc3e2db1f9834a4b6b7ba6d9873826436d91b7..de267a45a828fd48fadf30c2d45e060f8151ec7b 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -55,6 +55,10 @@ dependencies {
@@ -20,4 +20,4 @@ index b7e93f2dca9e881e464ef7c651e87c3260393a9e..74cc8741dbd32e62c724cde5ac71ebb5
 +    // Fiddle end - read packs - depend on 7-Zip-JBinding
  }
  
- val craftbukkitPackageVersion = "1_19_R3" // Paper
+ val craftbukkitPackageVersion = "1_20_R1" // Paper

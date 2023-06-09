@@ -21,7 +21,7 @@ Licensed (except for image files) under: GPL-3.0 (https://www.gnu.org/licenses/g
 Gale - https://galemc.org
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 439f8aa0e09f51ddab2186e400516f04768d9687..8e0eb28724376a3db26513c6de6b09b201abb8ef 100644
+index df6d01119cf78971e7e9964eb3e860f0ab8647c7..430c1f4d062e30e1a8920923c5a73b0f2977818a 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -80,7 +80,7 @@ tasks.jar {
@@ -204,10 +204,10 @@ index c5d5648f4ca603ef2b1df723b58f9caf4dd3c722..374acd34f435ec98b9f9b5851a316f2a
                  .completer(new ConsoleCommandCompleter(this.server))
                  .option(LineReader.Option.COMPLETE_IN_WORD, true);
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 9f15d9dbdfa74a0640b1a2b4ff695609d4758a4c..31243f5f1b2c54624cc110038618c53b788d4375 100644
+index fb82bb52f219e7683fe1d3c0fb3acbe2251de8d4..cf239e2e57643b27684c1f9bbf105563ce59b538 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -925,7 +925,13 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -923,7 +923,13 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          shutdownThread = Thread.currentThread();
          org.spigotmc.WatchdogThread.doStop(); // Paper
          if (!isSameThread()) {
@@ -222,7 +222,7 @@ index 9f15d9dbdfa74a0640b1a2b4ff695609d4758a4c..31243f5f1b2c54624cc110038618c53b
              while (this.getRunningThread().isAlive()) {
                  this.getRunningThread().stop();
                  try {
-@@ -1682,7 +1688,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1681,7 +1687,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
      @DontObfuscate
      public String getServerModName() {
@@ -232,7 +232,7 @@ index 9f15d9dbdfa74a0640b1a2b4ff695609d4758a4c..31243f5f1b2c54624cc110038618c53b
  
      public SystemReport fillSystemReport(SystemReport details) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 9f2536d9a73bdb15b5b3004d4da79ca32cee205b..4a67ad815ab1767d0706ec014a153b230e68a96c 100644
+index ffa27c9c02dc4d12411fc089de3af8e8e12ba06e..6ee358f74464ce7bb5f8864ef41fe41ae0c677e2 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 @@ -262,7 +262,7 @@ import javax.annotation.Nullable; // Paper
@@ -258,7 +258,7 @@ index cdefb2025eedea7e204d70d568adaf1c1ec4c03c..e10074ee348401d7b9343d48ea9e9069
                  // (async tasks must live with race-conditions if they attempt to cancel between these few lines of code)
              }
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-index 1179e9fbff93ec8ff82aa3aae477f6bf4ce9b885..7fa40b7666901cf1e39cb9e0aba9b0dde7bcbc28 100644
+index b059bb46b649cbf82debdb8d58fe4ba77d040276..5a61b5b8d64fc3bd6d01f996d4b3ad02c78307da 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 @@ -472,7 +472,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
@@ -470,7 +470,7 @@ index 0000000000000000000000000000000000000000..4a942eb75d5ccf9633b66a51e6208732
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/version/FiddleVersionFetcher.java b/src/main/java/org/fiddlemc/fiddle/version/FiddleVersionFetcher.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..7d109ebc2615f48e933d986e45231506b52255b0
+index 0000000000000000000000000000000000000000..06a7aba5a79a227674c2d2412cd2eb7cd880751c
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/version/FiddleVersionFetcher.java
 @@ -0,0 +1,11 @@
@@ -481,12 +481,12 @@ index 0000000000000000000000000000000000000000..7d109ebc2615f48e933d986e45231506
 +public class FiddleVersionFetcher extends AbstractPaperVersionFetcher {
 +
 +    public FiddleVersionFetcher() {
-+        super("ver/1.19.4", "https://github.com/FiddleMC/Fiddle", "Fiddle", "FiddleMC", "FiddleMC", "Fiddle");
++        super("ver/1.20", "https://github.com/FiddleMC/Fiddle", "Fiddle", "FiddleMC", "FiddleMC", "Fiddle");
 +    }
 +
 +}
 diff --git a/src/main/java/org/spigotmc/WatchdogThread.java b/src/main/java/org/spigotmc/WatchdogThread.java
-index e9fa7faaa4451e36b3908cbcbbe0baf213abde96..c9936a5bcdd7674da524528e69aa433e9ff3adcf 100644
+index 98fba0288be9ed2cb18ffba5cf81148157dd4fcf..984096eb376ab62d7046f52835052b73e47b0c11 100644
 --- a/src/main/java/org/spigotmc/WatchdogThread.java
 +++ b/src/main/java/org/spigotmc/WatchdogThread.java
 @@ -155,14 +155,20 @@ public final class WatchdogThread extends io.papermc.paper.util.TickThread // Pa

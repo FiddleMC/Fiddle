@@ -8,10 +8,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 9525b8d591b973ea844b03d7ef2210bc93f84e12..beba1e3ad801a3f60139c1ed77dd3e38fe637216 100644
+index 4dcff369e3e69fe3503ff1f6cbb81ff3304215ea..b8d8ce8bf4de2ba8304897d524a2fa87bd4028d0 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -123,7 +123,7 @@ import org.jetbrains.annotations.Nullable;
+@@ -125,7 +125,7 @@ import org.jetbrains.annotations.Nullable;
  @SuppressWarnings({"DeprecatedIsStillUsed", "deprecation"}) // Paper
  public enum Material implements Keyed, Translatable, net.kyori.adventure.translation.Translatable { // Paper
      //<editor-fold desc="Materials" defaultstate="collapsed">
@@ -20,16 +20,16 @@ index 9525b8d591b973ea844b03d7ef2210bc93f84e12..beba1e3ad801a3f60139c1ed77dd3e38
      STONE(22948),
      GRANITE(21091),
      POLISHED_GRANITE(5477),
-@@ -800,7 +800,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -772,7 +772,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+     /**
+      * BlockData: {@link DecoratedPot}
       */
-     @MinecraftExperimental
-     @ApiStatus.Experimental
 -    DECORATED_POT(8720, 1, DecoratedPot.class),
 +    DECORATED_POT(8720, DecoratedPot.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
      MOSSY_COBBLESTONE(21900),
      OBSIDIAN(32723),
      TORCH(6063),
-@@ -1407,71 +1407,71 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -1369,71 +1369,71 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      /**
       * BlockData: {@link Directional}
       */
@@ -118,7 +118,7 @@ index 9525b8d591b973ea844b03d7ef2210bc93f84e12..beba1e3ad801a3f60139c1ed77dd3e38
      /**
       * BlockData: {@link Directional}
       */
-@@ -2183,41 +2183,47 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -2133,33 +2133,35 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * BlockData: {@link RedstoneRail}
       */
      ACTIVATOR_RAIL(5834, RedstoneRail.class),
@@ -141,6 +141,14 @@ index 9525b8d591b973ea844b03d7ef2210bc93f84e12..beba1e3ad801a3f60139c1ed77dd3e38
 -    JUNGLE_CHEST_BOAT(20133, 1),
 -    ACACIA_BOAT(27326, 1),
 -    ACACIA_CHEST_BOAT(28455, 1),
+-    CHERRY_BOAT(13628, 1),
+-    CHERRY_CHEST_BOAT(7165, 1),
+-    DARK_OAK_BOAT(28618, 1),
+-    DARK_OAK_CHEST_BOAT(8733, 1),
+-    MANGROVE_BOAT(20792, 1),
+-    MANGROVE_CHEST_BOAT(18572, 1),
+-    BAMBOO_RAFT(25901, 1),
+-    BAMBOO_CHEST_RAFT(20056, 1),
 +    // Fiddle start - remove hard-coded Bukkit values - Material - max stack size
 +    SADDLE(30206),
 +    MINECART(14352),
@@ -148,11 +156,9 @@ index 9525b8d591b973ea844b03d7ef2210bc93f84e12..beba1e3ad801a3f60139c1ed77dd3e38
 +    FURNACE_MINECART(14196),
 +    TNT_MINECART(4277),
 +    HOPPER_MINECART(19024),
-+    // Fiddle start - remove hard-coded Bukkit values - Material - durability
 +    CARROT_ON_A_STICK(27809),
 +    WARPED_FUNGUS_ON_A_STICK(11706),
 +    ELYTRA(23829),
-+    // Fiddle end - remove hard-coded Bukkit values - Material - durability
 +    OAK_BOAT(17570),
 +    OAK_CHEST_BOAT(7765),
 +    SPRUCE_BOAT(31427),
@@ -163,37 +169,19 @@ index 9525b8d591b973ea844b03d7ef2210bc93f84e12..beba1e3ad801a3f60139c1ed77dd3e38
 +    JUNGLE_CHEST_BOAT(20133),
 +    ACACIA_BOAT(27326),
 +    ACACIA_CHEST_BOAT(28455),
-+    // Fiddle end - remove hard-coded Bukkit values - Material - max stack size
-     @MinecraftExperimental
-     @ApiStatus.Experimental
--    CHERRY_BOAT(13628, 1),
-+    CHERRY_BOAT(13628), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
-     @MinecraftExperimental
-     @ApiStatus.Experimental
--    CHERRY_CHEST_BOAT(7165, 1),
--    DARK_OAK_BOAT(28618, 1),
--    DARK_OAK_CHEST_BOAT(8733, 1),
--    MANGROVE_BOAT(20792, 1),
--    MANGROVE_CHEST_BOAT(18572, 1),
-+    // Fiddle start - remove hard-coded Bukkit values - Material - max stack size
++    CHERRY_BOAT(13628),
 +    CHERRY_CHEST_BOAT(7165),
 +    DARK_OAK_BOAT(28618),
 +    DARK_OAK_CHEST_BOAT(8733),
 +    MANGROVE_BOAT(20792),
 +    MANGROVE_CHEST_BOAT(18572),
++    BAMBOO_RAFT(25901),
++    BAMBOO_CHEST_RAFT(20056),
 +    // Fiddle end - remove hard-coded Bukkit values - Material - max stack size
-     @MinecraftExperimental // Paper
-     @ApiStatus.Experimental // Paper
--    BAMBOO_RAFT(25901, 1),
-+    BAMBOO_RAFT(25901), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
-     @MinecraftExperimental // Paper
-     @ApiStatus.Experimental // Paper
--    BAMBOO_CHEST_RAFT(20056, 1),
-+    BAMBOO_CHEST_RAFT(20056), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
      /**
       * BlockData: {@link StructureBlock}
       */
-@@ -2226,11 +2232,11 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -2168,11 +2170,11 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * BlockData: {@link Jigsaw}
       */
      JIGSAW(17398, Jigsaw.class),
@@ -208,7 +196,7 @@ index 9525b8d591b973ea844b03d7ef2210bc93f84e12..beba1e3ad801a3f60139c1ed77dd3e38
      ARROW(31091),
      COAL(29067),
      CHARCOAL(5390),
-@@ -2247,39 +2253,41 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -2189,39 +2191,41 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      GOLD_INGOT(28927),
      NETHERITE_INGOT(32457),
      NETHERITE_SCRAP(29331),
@@ -281,7 +269,7 @@ index 9525b8d591b973ea844b03d7ef2210bc93f84e12..beba1e3ad801a3f60139c1ed77dd3e38
      STRING(12806),
      FEATHER(30548),
      GUNPOWDER(29974),
-@@ -2289,30 +2297,32 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -2231,30 +2235,32 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       */
      WHEAT(27709, Ageable.class),
      BREAD(32049),
@@ -338,7 +326,7 @@ index 9525b8d591b973ea844b03d7ef2210bc93f84e12..beba1e3ad801a3f60139c1ed77dd3e38
      FLINT(23596),
      PORKCHOP(30896),
      COOKED_PORKCHOP(27231),
-@@ -2322,145 +2332,151 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -2264,117 +2270,123 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      /**
       * BlockData: {@link Sign}
       */
@@ -367,8 +355,6 @@ index 9525b8d591b973ea844b03d7ef2210bc93f84e12..beba1e3ad801a3f60139c1ed77dd3e38
      /**
       * BlockData: {@link Sign}
       */
-     @MinecraftExperimental
-     @ApiStatus.Experimental
 -    CHERRY_SIGN(16520, 16, Sign.class),
 +    CHERRY_SIGN(16520, Sign.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
      /**
@@ -384,8 +370,6 @@ index 9525b8d591b973ea844b03d7ef2210bc93f84e12..beba1e3ad801a3f60139c1ed77dd3e38
      /**
       * BlockData: {@link Sign}
       */
-     @MinecraftExperimental // Paper
-     @ApiStatus.Experimental // Paper
 -    BAMBOO_SIGN(26139, 16, Sign.class),
 +    BAMBOO_SIGN(26139, Sign.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
      /**
@@ -401,78 +385,56 @@ index 9525b8d591b973ea844b03d7ef2210bc93f84e12..beba1e3ad801a3f60139c1ed77dd3e38
      /**
       * BlockData: {@link HangingSign}
       */
-     @MinecraftExperimental
-     @ApiStatus.Experimental
 -    OAK_HANGING_SIGN(20116, 16, HangingSign.class),
 +    OAK_HANGING_SIGN(20116, HangingSign.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
      /**
       * BlockData: {@link HangingSign}
       */
-     @MinecraftExperimental
-     @ApiStatus.Experimental
 -    SPRUCE_HANGING_SIGN(24371, 16, HangingSign.class),
 +    SPRUCE_HANGING_SIGN(24371, HangingSign.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
      /**
       * BlockData: {@link HangingSign}
       */
-     @MinecraftExperimental
-     @ApiStatus.Experimental
 -    BIRCH_HANGING_SIGN(17938, 16, HangingSign.class),
 +    BIRCH_HANGING_SIGN(17938, HangingSign.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
      /**
       * BlockData: {@link HangingSign}
       */
-     @MinecraftExperimental
-     @ApiStatus.Experimental
 -    JUNGLE_HANGING_SIGN(27671, 16, HangingSign.class),
 +    JUNGLE_HANGING_SIGN(27671, HangingSign.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
      /**
       * BlockData: {@link HangingSign}
       */
-     @MinecraftExperimental
-     @ApiStatus.Experimental
 -    ACACIA_HANGING_SIGN(30257, 16, HangingSign.class),
 +    ACACIA_HANGING_SIGN(30257, HangingSign.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
      /**
       * BlockData: {@link HangingSign}
       */
-     @MinecraftExperimental
-     @ApiStatus.Experimental
 -    CHERRY_HANGING_SIGN(5088, 16, HangingSign.class),
 +    CHERRY_HANGING_SIGN(5088, HangingSign.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
      /**
       * BlockData: {@link HangingSign}
       */
-     @MinecraftExperimental
-     @ApiStatus.Experimental
 -    DARK_OAK_HANGING_SIGN(23360, 16, HangingSign.class),
 +    DARK_OAK_HANGING_SIGN(23360, HangingSign.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
      /**
       * BlockData: {@link HangingSign}
       */
-     @MinecraftExperimental
-     @ApiStatus.Experimental
 -    MANGROVE_HANGING_SIGN(25106, 16, HangingSign.class),
 +    MANGROVE_HANGING_SIGN(25106, HangingSign.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
      /**
       * BlockData: {@link HangingSign}
       */
-     @MinecraftExperimental
-     @ApiStatus.Experimental
 -    BAMBOO_HANGING_SIGN(4726, 16, HangingSign.class),
 +    BAMBOO_HANGING_SIGN(4726, HangingSign.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
      /**
       * BlockData: {@link HangingSign}
       */
-     @MinecraftExperimental
-     @ApiStatus.Experimental
 -    CRIMSON_HANGING_SIGN(20696, 16, HangingSign.class),
 +    CRIMSON_HANGING_SIGN(20696, HangingSign.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
      /**
       * BlockData: {@link HangingSign}
       */
-     @MinecraftExperimental
-     @ApiStatus.Experimental
 -    WARPED_HANGING_SIGN(8195, 16, HangingSign.class),
 -    BUCKET(15215, 16),
 -    WATER_BUCKET(8802, 1),
@@ -514,8 +476,6 @@ index 9525b8d591b973ea844b03d7ef2210bc93f84e12..beba1e3ad801a3f60139c1ed77dd3e38
 +    EGG(21603), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
      COMPASS(24139),
      RECOVERY_COMPASS(12710),
-     @MinecraftExperimental
-     @ApiStatus.Experimental
 -    BUNDLE(16835, 1),
 -    FISHING_ROD(4167, 1, 64),
 +    // Fiddle start - remove hard-coded Bukkit values - Material - max stack size
@@ -528,7 +488,7 @@ index 9525b8d591b973ea844b03d7ef2210bc93f84e12..beba1e3ad801a3f60139c1ed77dd3e38
      GLOWSTONE_DUST(6665),
      COD(24691),
      SALMON(18516),
-@@ -2493,74 +2509,74 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -2407,74 +2419,74 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      /**
       * BlockData: {@link Cake}
       */
@@ -621,7 +581,7 @@ index 9525b8d591b973ea844b03d7ef2210bc93f84e12..beba1e3ad801a3f60139c1ed77dd3e38
      MELON_SLICE(5347),
      DRIED_KELP(21042),
      PUMPKIN_SEEDS(28985),
-@@ -2570,7 +2586,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -2484,7 +2496,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      CHICKEN(17281),
      COOKED_CHICKEN(16984),
      ROTTEN_FLESH(21591),
@@ -630,7 +590,7 @@ index 9525b8d591b973ea844b03d7ef2210bc93f84e12..beba1e3ad801a3f60139c1ed77dd3e38
      BLAZE_ROD(8289),
      GHAST_TEAR(18222),
      GOLD_NUGGET(28814),
-@@ -2578,7 +2594,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -2492,7 +2504,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * BlockData: {@link Ageable}
       */
      NETHER_WART(29227, Ageable.class),
@@ -639,7 +599,7 @@ index 9525b8d591b973ea844b03d7ef2210bc93f84e12..beba1e3ad801a3f60139c1ed77dd3e38
      GLASS_BOTTLE(6116),
      SPIDER_EYE(9318),
      FERMENTED_SPIDER_EYE(19386),
-@@ -2674,8 +2690,10 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -2584,8 +2596,10 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      ZOMBIFIED_PIGLIN_SPAWN_EGG(6626),
      EXPERIENCE_BOTTLE(12858),
      FIRE_CHARGE(4842),
@@ -652,7 +612,7 @@ index 9525b8d591b973ea844b03d7ef2210bc93f84e12..beba1e3ad801a3f60139c1ed77dd3e38
      ITEM_FRAME(27318),
      GLOW_ITEM_FRAME(26473),
      FLOWER_POT(30567),
-@@ -2719,89 +2737,91 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -2627,89 +2641,91 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      PUMPKIN_PIE(28725),
      FIREWORK_ROCKET(23841),
      FIREWORK_STAR(12190),
@@ -768,8 +728,8 @@ index 9525b8d591b973ea844b03d7ef2210bc93f84e12..beba1e3ad801a3f60139c1ed77dd3e38
      END_CRYSTAL(19090),
      CHORUS_FRUIT(7652),
      POPPED_CHORUS_FRUIT(27844),
-@@ -2810,51 +2830,59 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
-     TORCHFLOWER_SEEDS(18153),
+@@ -2717,52 +2733,60 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+     PITCHER_POD(7977),
      BEETROOT(23305),
      BEETROOT_SEEDS(21282),
 -    BEETROOT_SOUP(16036, 1),
@@ -804,6 +764,7 @@ index 9525b8d591b973ea844b03d7ef2210bc93f84e12..beba1e3ad801a3f60139c1ed77dd3e38
 -    MUSIC_DISC_11(27426, 1),
 -    MUSIC_DISC_WAIT(26499, 1),
 -    MUSIC_DISC_OTHERSIDE(12974, 1),
+-    MUSIC_DISC_RELIC(8200, 1),
 -    MUSIC_DISC_5(9212, 1),
 -    MUSIC_DISC_PIGSTEP(21323, 1),
 +    // Fiddle start - remove hard-coded Bukkit values - Material - max stack size
@@ -822,6 +783,7 @@ index 9525b8d591b973ea844b03d7ef2210bc93f84e12..beba1e3ad801a3f60139c1ed77dd3e38
 +    MUSIC_DISC_11(27426),
 +    MUSIC_DISC_WAIT(26499),
 +    MUSIC_DISC_OTHERSIDE(12974),
++    MUSIC_DISC_RELIC(8200),
 +    MUSIC_DISC_5(9212),
 +    MUSIC_DISC_PIGSTEP(21323),
 +    // Fiddle end - remove hard-coded Bukkit values - Material - max stack size
@@ -860,7 +822,7 @@ index 9525b8d591b973ea844b03d7ef2210bc93f84e12..beba1e3ad801a3f60139c1ed77dd3e38
      /**
       * BlockData: {@link Levelled}
       */
-@@ -2914,7 +2942,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -2822,7 +2846,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * BlockData: {@link Beehive}
       */
      BEEHIVE(11830, Beehive.class),
@@ -869,16 +831,16 @@ index 9525b8d591b973ea844b03d7ef2210bc93f84e12..beba1e3ad801a3f60139c1ed77dd3e38
      HONEYCOMB_BLOCK(28780),
      LODESTONE(23127),
      CRYING_OBSIDIAN(31545),
-@@ -3056,7 +3084,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -2962,7 +2986,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+     PEARLESCENT_FROGLIGHT(21441, Orientable.class),
+     FROGSPAWN(8350),
      ECHO_SHARD(12529),
-     @MinecraftExperimental
-     @ApiStatus.Experimental
 -    BRUSH(30569, 1, 64),
 +    BRUSH(30569), // Fiddle - remove hard-coded Bukkit values - Material - max stack size, durability
-     @MinecraftExperimental
-     @ApiStatus.Experimental
      NETHERITE_UPGRADE_SMITHING_TEMPLATE(7615),
-@@ -3141,43 +3169,43 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+     SENTRY_ARMOR_TRIM_SMITHING_TEMPLATE(16124),
+     DUNE_ARMOR_TRIM_SMITHING_TEMPLATE(30925),
+@@ -3036,39 +3060,39 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      /**
       * BlockData: {@link WallSign}
       */
@@ -902,8 +864,6 @@ index 9525b8d591b973ea844b03d7ef2210bc93f84e12..beba1e3ad801a3f60139c1ed77dd3e38
      /**
       * BlockData: {@link WallSign}
       */
-     @MinecraftExperimental
-     @ApiStatus.Experimental
 -    CHERRY_WALL_SIGN(20188, 16, WallSign.class),
 +    CHERRY_WALL_SIGN(20188, WallSign.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
      /**
@@ -924,14 +884,12 @@ index 9525b8d591b973ea844b03d7ef2210bc93f84e12..beba1e3ad801a3f60139c1ed77dd3e38
      /**
       * BlockData: {@link WallSign}
       */
-     @MinecraftExperimental // Paper
-     @ApiStatus.Experimental // Paper
 -    BAMBOO_WALL_SIGN(18857, 16, WallSign.class),
 +    BAMBOO_WALL_SIGN(18857, WallSign.class), // Fiddle - remove hard-coded Bukkit values - Material - max stack size
      /**
       * BlockData: {@link WallHangingSign}
       */
-@@ -3496,11 +3524,11 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -3361,11 +3385,11 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      /**
       * BlockData: {@link WallSign}
       */
@@ -945,7 +903,7 @@ index 9525b8d591b973ea844b03d7ef2210bc93f84e12..beba1e3ad801a3f60139c1ed77dd3e38
      POTTED_CRIMSON_FUNGUS(5548),
      POTTED_WARPED_FUNGUS(30800),
      POTTED_CRIMSON_ROOTS(13852),
-@@ -3590,7 +3618,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -3455,7 +3479,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      POTTED_FLOWERING_AZALEA_BUSH(10609),
      // ----- Legacy Separator -----
      @Deprecated
@@ -954,7 +912,7 @@ index 9525b8d591b973ea844b03d7ef2210bc93f84e12..beba1e3ad801a3f60139c1ed77dd3e38
      @Deprecated
      LEGACY_STONE(1),
      @Deprecated
-@@ -3716,7 +3744,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -3581,7 +3605,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      @Deprecated
      LEGACY_BURNING_FURNACE(62, org.bukkit.material.Furnace.class),
      @Deprecated
@@ -963,7 +921,7 @@ index 9525b8d591b973ea844b03d7ef2210bc93f84e12..beba1e3ad801a3f60139c1ed77dd3e38
      @Deprecated
      LEGACY_WOODEN_DOOR(64, org.bukkit.material.Door.class),
      @Deprecated
-@@ -3726,7 +3754,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -3591,7 +3615,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      @Deprecated
      LEGACY_COBBLESTONE_STAIRS(67, org.bukkit.material.Stairs.class),
      @Deprecated
@@ -972,7 +930,7 @@ index 9525b8d591b973ea844b03d7ef2210bc93f84e12..beba1e3ad801a3f60139c1ed77dd3e38
      @Deprecated
      LEGACY_LEVER(69, org.bukkit.material.Lever.class),
      @Deprecated
-@@ -3774,7 +3802,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -3639,7 +3663,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      @Deprecated
      LEGACY_JACK_O_LANTERN(91, org.bukkit.material.Pumpkin.class),
      @Deprecated
@@ -981,7 +939,7 @@ index 9525b8d591b973ea844b03d7ef2210bc93f84e12..beba1e3ad801a3f60139c1ed77dd3e38
      @Deprecated
      LEGACY_DIODE_BLOCK_OFF(93, org.bukkit.material.Diode.class),
      @Deprecated
-@@ -4028,37 +4056,37 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -3893,37 +3917,37 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      @Deprecated
      LEGACY_OBSERVER(218, org.bukkit.material.Observer.class),
      @Deprecated
@@ -1035,7 +993,7 @@ index 9525b8d591b973ea844b03d7ef2210bc93f84e12..beba1e3ad801a3f60139c1ed77dd3e38
      @Deprecated
      LEGACY_WHITE_GLAZED_TERRACOTTA(235),
      @Deprecated
-@@ -4099,17 +4127,17 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -3964,17 +3988,17 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      LEGACY_STRUCTURE_BLOCK(255),
      // ----- Item Separator -----
      @Deprecated
@@ -1058,7 +1016,7 @@ index 9525b8d591b973ea844b03d7ef2210bc93f84e12..beba1e3ad801a3f60139c1ed77dd3e38
      @Deprecated
      LEGACY_ARROW(262),
      @Deprecated
-@@ -4121,45 +4149,45 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -3986,45 +4010,45 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      @Deprecated
      LEGACY_GOLD_INGOT(266),
      @Deprecated
@@ -1122,7 +1080,7 @@ index 9525b8d591b973ea844b03d7ef2210bc93f84e12..beba1e3ad801a3f60139c1ed77dd3e38
      @Deprecated
      LEGACY_STRING(287),
      @Deprecated
-@@ -4167,15 +4195,15 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4032,15 +4056,15 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      @Deprecated
      LEGACY_SULPHUR(289),
      @Deprecated
@@ -1143,7 +1101,7 @@ index 9525b8d591b973ea844b03d7ef2210bc93f84e12..beba1e3ad801a3f60139c1ed77dd3e38
      @Deprecated
      LEGACY_SEEDS(295),
      @Deprecated
-@@ -4183,45 +4211,45 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4048,45 +4072,45 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      @Deprecated
      LEGACY_BREAD(297),
      @Deprecated
@@ -1209,7 +1167,7 @@ index 9525b8d591b973ea844b03d7ef2210bc93f84e12..beba1e3ad801a3f60139c1ed77dd3e38
      @Deprecated
      LEGACY_FLINT(318),
      @Deprecated
-@@ -4233,31 +4261,31 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4098,31 +4122,31 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      @Deprecated
      LEGACY_GOLDEN_APPLE(322),
      @Deprecated
@@ -1252,7 +1210,7 @@ index 9525b8d591b973ea844b03d7ef2210bc93f84e12..beba1e3ad801a3f60139c1ed77dd3e38
      @Deprecated
      LEGACY_CLAY_BRICK(336),
      @Deprecated
-@@ -4271,15 +4299,15 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4136,15 +4160,15 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      @Deprecated
      LEGACY_SLIME_BALL(341),
      @Deprecated
@@ -1272,7 +1230,7 @@ index 9525b8d591b973ea844b03d7ef2210bc93f84e12..beba1e3ad801a3f60139c1ed77dd3e38
      @Deprecated
      LEGACY_WATCH(347),
      @Deprecated
-@@ -4295,9 +4323,9 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4160,9 +4184,9 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      @Deprecated
      LEGACY_SUGAR(353),
      @Deprecated
@@ -1284,7 +1242,7 @@ index 9525b8d591b973ea844b03d7ef2210bc93f84e12..beba1e3ad801a3f60139c1ed77dd3e38
      @Deprecated
      LEGACY_DIODE(356),
      @Deprecated
-@@ -4308,7 +4336,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4173,7 +4197,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      @Deprecated
      LEGACY_MAP(358, org.bukkit.material.MaterialData.class),
      @Deprecated
@@ -1293,7 +1251,7 @@ index 9525b8d591b973ea844b03d7ef2210bc93f84e12..beba1e3ad801a3f60139c1ed77dd3e38
      @Deprecated
      LEGACY_MELON(360),
      @Deprecated
-@@ -4326,7 +4354,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4191,7 +4215,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      @Deprecated
      LEGACY_ROTTEN_FLESH(367),
      @Deprecated
@@ -1302,7 +1260,7 @@ index 9525b8d591b973ea844b03d7ef2210bc93f84e12..beba1e3ad801a3f60139c1ed77dd3e38
      @Deprecated
      LEGACY_BLAZE_ROD(369),
      @Deprecated
-@@ -4336,7 +4364,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4201,7 +4225,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      @Deprecated
      LEGACY_NETHER_STALK(372),
      @Deprecated
@@ -1311,7 +1269,7 @@ index 9525b8d591b973ea844b03d7ef2210bc93f84e12..beba1e3ad801a3f60139c1ed77dd3e38
      @Deprecated
      LEGACY_GLASS_BOTTLE(374),
      @Deprecated
-@@ -4356,17 +4384,17 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4221,17 +4245,17 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      @Deprecated
      LEGACY_SPECKLED_MELON(382),
      @Deprecated
@@ -1335,7 +1293,7 @@ index 9525b8d591b973ea844b03d7ef2210bc93f84e12..beba1e3ad801a3f60139c1ed77dd3e38
      @Deprecated
      LEGACY_ITEM_FRAME(389),
      @Deprecated
-@@ -4386,7 +4414,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4251,7 +4275,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      @Deprecated
      LEGACY_SKULL_ITEM(397),
      @Deprecated
@@ -1344,7 +1302,7 @@ index 9525b8d591b973ea844b03d7ef2210bc93f84e12..beba1e3ad801a3f60139c1ed77dd3e38
      @Deprecated
      LEGACY_NETHER_STAR(399),
      @Deprecated
-@@ -4396,7 +4424,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4261,7 +4285,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      @Deprecated
      LEGACY_FIREWORK_CHARGE(402),
      @Deprecated
@@ -1353,7 +1311,7 @@ index 9525b8d591b973ea844b03d7ef2210bc93f84e12..beba1e3ad801a3f60139c1ed77dd3e38
      @Deprecated
      LEGACY_REDSTONE_COMPARATOR(404),
      @Deprecated
-@@ -4404,9 +4432,9 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4269,9 +4293,9 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      @Deprecated
      LEGACY_QUARTZ(406),
      @Deprecated
@@ -1365,7 +1323,7 @@ index 9525b8d591b973ea844b03d7ef2210bc93f84e12..beba1e3ad801a3f60139c1ed77dd3e38
      @Deprecated
      LEGACY_PRISMARINE_SHARD(409),
      @Deprecated
-@@ -4416,31 +4444,31 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4281,31 +4305,31 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      @Deprecated
      LEGACY_COOKED_RABBIT(412),
      @Deprecated
@@ -1404,7 +1362,7 @@ index 9525b8d591b973ea844b03d7ef2210bc93f84e12..beba1e3ad801a3f60139c1ed77dd3e38
      @Deprecated
      LEGACY_END_CRYSTAL(426),
      @Deprecated
-@@ -4462,63 +4490,63 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4327,63 +4351,63 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      @Deprecated
      LEGACY_BEETROOT_SEEDS(435),
      @Deprecated
@@ -1492,7 +1450,7 @@ index 9525b8d591b973ea844b03d7ef2210bc93f84e12..beba1e3ad801a3f60139c1ed77dd3e38
      // Fiddle - added values placeholder
      ;
      //</editor-fold>
-@@ -4529,37 +4557,17 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4394,37 +4418,17 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      private final int id;
      private final Constructor<? extends MaterialData> ctor;
      private static final Map<String, Material> BY_NAME = Maps.newHashMap();
@@ -1532,7 +1490,7 @@ index 9525b8d591b973ea844b03d7ef2210bc93f84e12..beba1e3ad801a3f60139c1ed77dd3e38
          this.data = data;
          this.legacy = this.name().startsWith(LEGACY_PREFIX);
          this.key = NamespacedKey.minecraft(this.name().toLowerCase(Locale.ROOT));
-@@ -4673,22 +4681,42 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4538,22 +4542,42 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
          return key;
      }
  

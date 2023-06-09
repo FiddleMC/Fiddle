@@ -8,7 +8,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 38b44c81a58f54f497071bffeb162012cc8b795f..b7e93f2dca9e881e464ef7c651e87c3260393a9e 100644
+index 10f617e1998a6ae6a5be8fe212e170b770cd031c..b0dc3e2db1f9834a4b6b7ba6d9873826436d91b7 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -79,6 +79,7 @@ tasks.jar {
@@ -19,7 +19,7 @@ index 38b44c81a58f54f497071bffeb162012cc8b795f..b7e93f2dca9e881e464ef7c651e87c32
              "Implementation-Title" to "CraftBukkit",
              "Implementation-Version" to "git-Fiddle-$implementationVersion", // Fiddle - branding changes
              "Implementation-Vendor" to date, // Paper
-@@ -175,6 +176,7 @@ fun TaskContainer.registerRunTask(
+@@ -176,6 +177,7 @@ fun TaskContainer.registerRunTask(
      val memoryGb = providers.gradleProperty("paper.runMemoryGb").getOrElse("2")
      minHeapSize = "${memoryGb}G"
      maxHeapSize = "${memoryGb}G"
@@ -28,7 +28,7 @@ index 38b44c81a58f54f497071bffeb162012cc8b795f..b7e93f2dca9e881e464ef7c651e87c32
      doFirst {
          workingDir.mkdirs()
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index 0ec18a0e832250a1f8af1a16bbabd1358c37781f..07404d5f86f9b44533fe23de3ba67bd1cd5bc1cd 100644
+index 0031765eb9f50c46f450b02dce456555ca2d513e..46b22270cc2e8758033b893720d911c997342632 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
 @@ -149,6 +149,42 @@ public class Main {

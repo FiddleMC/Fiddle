@@ -11,10 +11,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index ac38454772cdcb705fe20f947559359e3c808170..9fc53117fee13b84823d0e304bd5c3275077cb44 100644
+index a071700d016e774b530d7221275d101125673846..678c19810e23d18d1f4c00fd56980f56d8466bc9 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -4768,1073 +4768,51 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4633,1078 +4633,51 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
          }
      }
  
@@ -191,6 +191,7 @@ index ac38454772cdcb705fe20f947559359e3c808170..9fc53117fee13b84823d0e304bd5c327
 -            case CACTUS:
 -            case CAKE:
 -            case CALCITE:
+-            case CALIBRATED_SCULK_SENSOR:
 -            case CAMPFIRE:
 -            case CANDLE:
 -            case CANDLE_CAKE:
@@ -692,6 +693,8 @@ index ac38454772cdcb705fe20f947559359e3c808170..9fc53117fee13b84823d0e304bd5c327
 -            case PINK_WOOL:
 -            case PISTON:
 -            case PISTON_HEAD:
+-            case PITCHER_CROP:
+-            case PITCHER_PLANT:
 -            case PLAYER_HEAD:
 -            case PLAYER_WALL_HEAD:
 -            case PODZOL:
@@ -868,6 +871,7 @@ index ac38454772cdcb705fe20f947559359e3c808170..9fc53117fee13b84823d0e304bd5c327
 -            case SMOOTH_SANDSTONE_STAIRS:
 -            case SMOOTH_STONE:
 -            case SMOOTH_STONE_SLAB:
+-            case SNIFFER_EGG:
 -            case SNOW:
 -            case SNOW_BLOCK:
 -            case SOUL_CAMPFIRE:
@@ -933,6 +937,7 @@ index ac38454772cdcb705fe20f947559359e3c808170..9fc53117fee13b84823d0e304bd5c327
 -            case STRUCTURE_VOID:
 -            case SUGAR_CANE:
 -            case SUNFLOWER:
+-            case SUSPICIOUS_GRAVEL:
 -            case SUSPICIOUS_SAND:
 -            case SWEET_BERRY_BUSH:
 -            case TALL_GRASS:
@@ -1116,7 +1121,7 @@ index ac38454772cdcb705fe20f947559359e3c808170..9fc53117fee13b84823d0e304bd5c327
              case LEGACY_BREAD:
              case LEGACY_CARROT_ITEM:
              case LEGACY_BAKED_POTATO:
-@@ -5961,825 +4939,52 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -5831,829 +4804,52 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      static {
          for (Material material : values()) {
              BY_NAME.put(material.name(), material);
@@ -1143,6 +1148,7 @@ index ac38454772cdcb705fe20f947559359e3c808170..9fc53117fee13b84823d0e304bd5c327
 -            case MUSIC_DISC_MELLOHI:
 -            case MUSIC_DISC_OTHERSIDE:
 -            case MUSIC_DISC_PIGSTEP:
+-            case MUSIC_DISC_RELIC:
 -            case MUSIC_DISC_STAL:
 -            case MUSIC_DISC_STRAD:
 -            case MUSIC_DISC_WAIT:
@@ -1309,6 +1315,7 @@ index ac38454772cdcb705fe20f947559359e3c808170..9fc53117fee13b84823d0e304bd5c327
 -            case CACTUS:
 -            case CAKE:
 -            case CALCITE:
+-            case CALIBRATED_SCULK_SENSOR:
 -            case CAMPFIRE:
 -            case CANDLE_CAKE:
 -            case CARTOGRAPHY_TABLE:
@@ -1838,6 +1845,7 @@ index ac38454772cdcb705fe20f947559359e3c808170..9fc53117fee13b84823d0e304bd5c327
 -            case SMOOTH_SANDSTONE_STAIRS:
 -            case SMOOTH_STONE:
 -            case SMOOTH_STONE_SLAB:
+-            case SNIFFER_EGG:
 -            case SNOW_BLOCK:
 -            case SOUL_CAMPFIRE:
 -            case SOUL_LANTERN:
@@ -1892,6 +1900,7 @@ index ac38454772cdcb705fe20f947559359e3c808170..9fc53117fee13b84823d0e304bd5c327
 -            case STRIPPED_WARPED_HYPHAE:
 -            case STRIPPED_WARPED_STEM:
 -            case STRUCTURE_BLOCK:
+-            case SUSPICIOUS_GRAVEL:
 -            case SUSPICIOUS_SAND:
 -            case TARGET:
 -            case TERRACOTTA:
@@ -1970,7 +1979,7 @@ index ac38454772cdcb705fe20f947559359e3c808170..9fc53117fee13b84823d0e304bd5c327
              case LEGACY_STONE:
              case LEGACY_GRASS:
              case LEGACY_DIRT:
-@@ -6986,24 +5191,27 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -6860,24 +5056,27 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
          }
      }
  
@@ -2009,7 +2018,7 @@ index ac38454772cdcb705fe20f947559359e3c808170..9fc53117fee13b84823d0e304bd5c327
      }
  
      /**
-@@ -7205,294 +5413,28 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -7079,292 +5278,28 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
          }
      }
  
@@ -2085,6 +2094,7 @@ index ac38454772cdcb705fe20f947559359e3c808170..9fc53117fee13b84823d0e304bd5c327
 -            case BIRCH_SLAB:
 -            case BIRCH_STAIRS:
 -            case BIRCH_TRAPDOOR:
+-            case BIRCH_WALL_HANGING_SIGN:
 -            case BIRCH_WALL_SIGN:
 -            case BIRCH_WOOD:
 -            case BLACK_BANNER:
@@ -2125,8 +2135,6 @@ index ac38454772cdcb705fe20f947559359e3c808170..9fc53117fee13b84823d0e304bd5c327
 -            case CHISELED_BOOKSHELF:
 -            case COMPOSTER:
 -            case CRAFTING_TABLE:
--            case CRIMSON_HANGING_SIGN:
--            case CRIMSON_WALL_HANGING_SIGN:
 -            case CYAN_BANNER:
 -            case CYAN_BED:
 -            case CYAN_CARPET:
@@ -2249,6 +2257,7 @@ index ac38454772cdcb705fe20f947559359e3c808170..9fc53117fee13b84823d0e304bd5c327
 -            case PINK_CARPET:
 -            case PINK_WALL_BANNER:
 -            case PINK_WOOL:
+-            case PITCHER_PLANT:
 -            case PURPLE_BANNER:
 -            case PURPLE_BED:
 -            case PURPLE_CARPET:
@@ -2300,8 +2309,6 @@ index ac38454772cdcb705fe20f947559359e3c808170..9fc53117fee13b84823d0e304bd5c327
 -            case TNT:
 -            case TRAPPED_CHEST:
 -            case VINE:
--            case WARPED_HANGING_SIGN:
--            case WARPED_WALL_HANGING_SIGN:
 -            case WHITE_BANNER:
 -            case WHITE_BED:
 -            case WHITE_CARPET:
@@ -2318,7 +2325,7 @@ index ac38454772cdcb705fe20f947559359e3c808170..9fc53117fee13b84823d0e304bd5c327
              case LEGACY_WOOD:
              case LEGACY_LOG:
              case LEGACY_LEAVES:
-@@ -7555,190 +5497,28 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -7427,192 +5362,28 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
          }
      }
  
@@ -2470,6 +2477,7 @@ index ac38454772cdcb705fe20f947559359e3c808170..9fc53117fee13b84823d0e304bd5c327
 -            case PINK_PETALS:
 -            case PINK_TULIP:
 -            case PINK_WOOL:
+-            case PITCHER_PLANT:
 -            case POPPY:
 -            case PURPLE_CARPET:
 -            case PURPLE_WOOL:
@@ -2510,6 +2518,7 @@ index ac38454772cdcb705fe20f947559359e3c808170..9fc53117fee13b84823d0e304bd5c327
 -            case TALL_GRASS:
 -            case TARGET:
 -            case TNT:
+-            case TORCHFLOWER:
 -            case VINE:
 -            case WHITE_CARPET:
 -            case WHITE_TULIP:
@@ -2523,7 +2532,7 @@ index ac38454772cdcb705fe20f947559359e3c808170..9fc53117fee13b84823d0e304bd5c327
              case LEGACY_WOOD:
              case LEGACY_LOG:
              case LEGACY_LEAVES:
-@@ -7783,263 +5563,28 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -7657,263 +5428,28 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
          }
      }
  
@@ -2802,7 +2811,7 @@ index ac38454772cdcb705fe20f947559359e3c808170..9fc53117fee13b84823d0e304bd5c327
              case LEGACY_LAVA_BUCKET:
              case LEGACY_COAL_BLOCK:
              case LEGACY_BLAZE_ROD:
-@@ -8110,6 +5655,8 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -7984,6 +5520,8 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
          }
      }
  
@@ -2811,7 +2820,7 @@ index ac38454772cdcb705fe20f947559359e3c808170..9fc53117fee13b84823d0e304bd5c327
      /**
       * Check if the material is a block and occludes light in the lighting engine.
       * <p>
-@@ -8129,367 +5676,20 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -8003,368 +5541,20 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material is a block and occludes light
       */
      public boolean isOccluding() {
@@ -3151,6 +3160,7 @@ index ac38454772cdcb705fe20f947559359e3c808170..9fc53117fee13b84823d0e304bd5c327
 -            case STRIPPED_WARPED_HYPHAE:
 -            case STRIPPED_WARPED_STEM:
 -            case STRUCTURE_BLOCK:
+-            case SUSPICIOUS_GRAVEL:
 -            case SUSPICIOUS_SAND:
 -            case TARGET:
 -            case TERRACOTTA:
@@ -3191,7 +3201,7 @@ index ac38454772cdcb705fe20f947559359e3c808170..9fc53117fee13b84823d0e304bd5c327
              case LEGACY_STONE:
              case LEGACY_GRASS:
              case LEGACY_DIRT:
-@@ -8595,39 +5795,26 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -8470,39 +5660,26 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
          }
      }
  
@@ -3245,7 +3255,7 @@ index ac38454772cdcb705fe20f947559359e3c808170..9fc53117fee13b84823d0e304bd5c327
              case LEGACY_SAND:
              case LEGACY_GRAVEL:
              case LEGACY_ANVIL:
-@@ -8639,161 +5826,28 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -8514,162 +5691,28 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
          }
      }
  
@@ -3347,6 +3357,7 @@ index ac38454772cdcb705fe20f947559359e3c808170..9fc53117fee13b84823d0e304bd5c327
 -            case PINK_CANDLE_CAKE:
 -            case PINK_WALL_BANNER:
 -            case PISTON_HEAD:
+-            case PITCHER_CROP:
 -            case PLAYER_WALL_HEAD:
 -            case POTATOES:
 -            case POTTED_ACACIA_SAPLING:
@@ -3422,7 +3433,7 @@ index ac38454772cdcb705fe20f947559359e3c808170..9fc53117fee13b84823d0e304bd5c327
              case LEGACY_ACACIA_DOOR:
              case LEGACY_BED_BLOCK:
              case LEGACY_BEETROOT_BLOCK:
-@@ -8853,6 +5907,8 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -8729,6 +5772,8 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
          }
      }
  
@@ -3431,7 +3442,7 @@ index ac38454772cdcb705fe20f947559359e3c808170..9fc53117fee13b84823d0e304bd5c327
      /**
       * Checks if this Material can be interacted with.
       *
-@@ -8870,333 +5926,19 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -8746,333 +5791,19 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return true if this material can be interacted with.
       */
      public boolean isInteractable() {
@@ -3775,7 +3786,7 @@ index ac38454772cdcb705fe20f947559359e3c808170..9fc53117fee13b84823d0e304bd5c327
      /**
       * Obtains the block's hardness level (also known as "strength").
       * <br>
-@@ -9208,884 +5950,21 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -9084,887 +5815,21 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       */
      public float getHardness() {
          Preconditions.checkArgument(isBlock(), "The Material is not a block!");
@@ -3872,6 +3883,7 @@ index ac38454772cdcb705fe20f947559359e3c808170..9fc53117fee13b84823d0e304bd5c327
 -            case YELLOW_BED:
 -                return 0.2F;
 -            case POWDER_SNOW:
+-            case SUSPICIOUS_GRAVEL:
 -            case SUSPICIOUS_SAND:
 -                return 0.25F;
 -            case BEE_NEST:
@@ -3992,6 +4004,7 @@ index ac38454772cdcb705fe20f947559359e3c808170..9fc53117fee13b84823d0e304bd5c327
 -            case RED_SAND:
 -            case ROOTED_DIRT:
 -            case SAND:
+-            case SNIFFER_EGG:
 -            case SOUL_SAND:
 -            case SOUL_SOIL:
 -            case SPRUCE_BUTTON:
@@ -4220,6 +4233,7 @@ index ac38454772cdcb705fe20f947559359e3c808170..9fc53117fee13b84823d0e304bd5c327
 -            case BRAIN_CORAL_BLOCK:
 -            case BUBBLE_CORAL_BLOCK:
 -            case BUDDING_AMETHYST:
+-            case CALIBRATED_SCULK_SENSOR:
 -            case CHISELED_BOOKSHELF:
 -            case CHISELED_POLISHED_BLACKSTONE:
 -            case CHISELED_STONE_BRICKS:
@@ -4672,7 +4686,7 @@ index ac38454772cdcb705fe20f947559359e3c808170..9fc53117fee13b84823d0e304bd5c327
      /**
       * Obtains the blast resistance value (also known as block "durability").
       * <br>
-@@ -10098,883 +5977,21 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -9977,886 +5842,21 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       */
      public float getBlastResistance() {
          Preconditions.checkArgument(isBlock(), "The Material is not a block!");
@@ -4754,6 +4768,7 @@ index ac38454772cdcb705fe20f947559359e3c808170..9fc53117fee13b84823d0e304bd5c327
 -            case YELLOW_BED:
 -                return 0.2F;
 -            case POWDER_SNOW:
+-            case SUSPICIOUS_GRAVEL:
 -            case SUSPICIOUS_SAND:
 -                return 0.25F;
 -            case BEE_NEST:
@@ -4873,6 +4888,7 @@ index ac38454772cdcb705fe20f947559359e3c808170..9fc53117fee13b84823d0e304bd5c327
 -            case RED_SAND:
 -            case ROOTED_DIRT:
 -            case SAND:
+-            case SNIFFER_EGG:
 -            case SOUL_SAND:
 -            case SOUL_SOIL:
 -            case SPRUCE_BUTTON:
@@ -5072,6 +5088,7 @@ index ac38454772cdcb705fe20f947559359e3c808170..9fc53117fee13b84823d0e304bd5c327
 -            case AMETHYST_CLUSTER:
 -            case BOOKSHELF:
 -            case BUDDING_AMETHYST:
+-            case CALIBRATED_SCULK_SENSOR:
 -            case CHISELED_BOOKSHELF:
 -            case LARGE_AMETHYST_BUD:
 -            case MEDIUM_AMETHYST_BUD:
@@ -5568,7 +5585,7 @@ index ac38454772cdcb705fe20f947559359e3c808170..9fc53117fee13b84823d0e304bd5c327
      /**
       * Returns a value that represents how 'slippery' the block is.
       *
-@@ -10989,22 +6006,21 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -10871,22 +5871,21 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       */
      public float getSlipperiness() {
          Preconditions.checkArgument(isBlock(), "The Material is not a block!");
@@ -5603,7 +5620,7 @@ index ac38454772cdcb705fe20f947559359e3c808170..9fc53117fee13b84823d0e304bd5c327
      /**
       * Determines the remaining item in a crafting grid after crafting with this
       * ingredient.
-@@ -11016,21 +6032,21 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -10898,21 +5897,21 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      @Nullable
      public Material getCraftingRemainingItem() {
          Preconditions.checkArgument(isItem(), "The Material is not an item!");
@@ -5637,7 +5654,7 @@ index ac38454772cdcb705fe20f947559359e3c808170..9fc53117fee13b84823d0e304bd5c327
      /**
       * Get the best suitable slot for this Material.
       *
-@@ -11041,53 +6057,17 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -10923,52 +5922,17 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      @NotNull
      public EquipmentSlot getEquipmentSlot() {
          Preconditions.checkArgument(isItem(), "The Material is not an item!");
@@ -5650,7 +5667,6 @@ index ac38454772cdcb705fe20f947559359e3c808170..9fc53117fee13b84823d0e304bd5c327
 -            case DRAGON_HEAD:
 -            case GOLDEN_HELMET:
 -            case IRON_HELMET:
--            case JACK_O_LANTERN:
 -            case LEATHER_HELMET:
 -            case NETHERITE_HELMET:
 -            case PLAYER_HEAD:

@@ -8,10 +8,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 922071b7a44a7255ddfcd4fd6a2e43c7e5ef2c95..ac38454772cdcb705fe20f947559359e3c808170 100644
+index 184562b21855c9b0c932ca6b2f59fea326254493..a071700d016e774b530d7221275d101125673846 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -5900,6 +5900,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -5770,6 +5770,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @param name Name of the material to get
       * @param legacyName whether this is a legacy name lookup
       * @return Material if found, or null
@@ -19,7 +19,7 @@ index 922071b7a44a7255ddfcd4fd6a2e43c7e5ef2c95..ac38454772cdcb705fe20f947559359e
       */
      @Nullable
      public static Material getMaterial(@NotNull String name, boolean legacyName) {
-@@ -5909,7 +5910,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -5779,7 +5780,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
              }
  
              Material match = BY_NAME.get(name);

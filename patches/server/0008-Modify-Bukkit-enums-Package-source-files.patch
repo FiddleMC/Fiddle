@@ -7,10 +7,10 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 44007adf0a0ff693fce66a3c54535cb7ece3d276..38b44c81a58f54f497071bffeb162012cc8b795f 100644
+index 430c1f4d062e30e1a8920923c5a73b0f2977818a..10f617e1998a6ae6a5be8fe212e170b770cd031c 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
-@@ -204,3 +204,30 @@ tasks.registerRunTask("runDev") {
+@@ -205,3 +205,30 @@ tasks.registerRunTask("runDev") {
      description = "Spin up a non-relocated Mojang-mapped test server"
      classpath(sourceSets.main.map { it.runtimeClasspath })
  }
