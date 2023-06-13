@@ -137,22 +137,24 @@ This project has been made possible by:
       <td align="center"><a href="https://github.com/SielStudent"><img src="https://avatars.githubusercontent.com/u/124888543" width="48"><br>SielStudent</a></td>
       <td align="center"><img src="https://www.fractalcamo.com/uploads/5/9/0/2/5902948/s189772745713394276_p7013_i157_w1500.jpeg" width="48"><br>Avidan2</td>
       <td align="center"><img src="https://www.fractalcamo.com/uploads/5/9/0/2/5902948/s189772745713394276_p7013_i157_w1500.jpeg" width="48"><br>BangboomJoe</td>
-      <td align="center"><img src="https://www.fractalcamo.com/uploads/5/9/0/2/5902948/s189772745713394276_p7013_i157_w1500.jpeg" width="48"><br>Saigai</td>
     </tr>
     <tr>
+      <td align="center"><img src="https://www.fractalcamo.com/uploads/5/9/0/2/5902948/s189772745713394276_p7013_i157_w1500.jpeg" width="48"><br>Saigai</td>
       <td align="center"><a href="https://github.com/WarturtleChips99"><img src="https://avatars.githubusercontent.com/u/110665347" width="48"><br>Thomas</a></td>
       <td align="center"><img src="https://www.fractalcamo.com/uploads/5/9/0/2/5902948/s189772745713394276_p7013_i157_w1500.jpeg" width="48"><br>Chi168</td>
       <td align="center"><a href="https://github.com/pontaoski"><img src="https://avatars.githubusercontent.com/u/20326855" width="48"><br>Janet&nbsp;Blackquill</a></td>
       <td align="center"><img src="https://www.fractalcamo.com/uploads/5/9/0/2/5902948/s189772745713394276_p7013_i157_w1500.jpeg" width="48"><br>__Dragonfly__</td>
       <td align="center"><img src="https://www.fractalcamo.com/uploads/5/9/0/2/5902948/s189772745713394276_p7013_i157_w1500.jpeg" width="48"><br>TrunkS</td>
-      <td align="center"><img src="https://www.fractalcamo.com/uploads/5/9/0/2/5902948/s189772745713394276_p7013_i157_w1500.jpeg" width="48"><br>Bingus1</td>
-      <td align="center"><a href="https://github.com/RoelHospel"><img src="https://avatars.githubusercontent.com/u/10463997" width="48"><br>Roel&nbsp;Hospel</a></td>
     </tr>
     <tr>
+      <td align="center"><img src="https://www.fractalcamo.com/uploads/5/9/0/2/5902948/s189772745713394276_p7013_i157_w1500.jpeg" width="48"><br>Bingus1</td>
+      <td align="center"><a href="https://github.com/RoelHospel"><img src="https://avatars.githubusercontent.com/u/10463997" width="48"><br>Roel&nbsp;Hospel</a></td>
       <td align="center"><img src="https://www.fractalcamo.com/uploads/5/9/0/2/5902948/s189772745713394276_p7013_i157_w1500.jpeg" width="48"><br>SpiderLock</td>
       <td align="center"><img src="https://www.fractalcamo.com/uploads/5/9/0/2/5902948/s189772745713394276_p7013_i157_w1500.jpeg" width="48"><br>hkwhipitup</td>
       <td align="center"><img src="https://www.fractalcamo.com/uploads/5/9/0/2/5902948/s189772745713394276_p7013_i157_w1500.jpeg" width="48"><br>LukePage111</td>
       <td align="center"><a href="https://github.com/thunderm"><img src="https://avatars.githubusercontent.com/u/4498583" width="48"><br>Michael</a></td>
+    </tr>
+    <tr>
       <td align="center"><a href="https://github.com/y0giOP"><img src="https://avatars.githubusercontent.com/u/105310539" width="48"><br>y0giOP</a></td>
     </tr>
   </table>
