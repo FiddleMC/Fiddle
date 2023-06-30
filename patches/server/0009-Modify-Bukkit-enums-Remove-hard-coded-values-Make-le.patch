@@ -1,14 +1,14 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
 Date: Tue, 6 Jun 2023 12:06:42 +0200
-Subject: [PATCH] Modify Bukkit enums - Remove hard-coded values - Fix legacy
- item conversion
+Subject: [PATCH] Modify Bukkit enums - Remove hard-coded values - Make legacy
+ conversion explicit
 
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/inventory/CraftInventory.java b/src/main/java/org/bukkit/craftbukkit/inventory/CraftInventory.java
-index 092f6843e3b43d4c615d2eee344f5966e96ae850..5f01a0716f85d46809887fef25592466dff3a442 100644
+index 10844fecc01370dcd0cc36f83e166bacb48ded30..08b88fbcc1609ea4beb7a3d3524b7ca76a683d15 100644
 --- a/src/main/java/org/bukkit/craftbukkit/inventory/CraftInventory.java
 +++ b/src/main/java/org/bukkit/craftbukkit/inventory/CraftInventory.java
 @@ -104,7 +104,7 @@ public class CraftInventory implements Inventory {
