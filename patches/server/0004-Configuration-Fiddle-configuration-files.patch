@@ -171,17 +171,10 @@ index a0aa1f1a7adf986d500a2135aa42e138aa3c4f08..2e82d6067d3b643281b55fd88743755c
      }
  }
 diff --git a/src/main/java/io/papermc/paper/configuration/PaperConfigurations.java b/src/main/java/io/papermc/paper/configuration/PaperConfigurations.java
-index f6b9d216c24d8858802f85209fe1a869e5a9be31..ed1027e0d3c8c9f491aea7c641fbd070a65937a4 100644
+index ad2177cdbc61a6f41c7e2ed81af262d4ffe7d861..294eadf976853692e73505996963893ca101891b 100644
 --- a/src/main/java/io/papermc/paper/configuration/PaperConfigurations.java
 +++ b/src/main/java/io/papermc/paper/configuration/PaperConfigurations.java
-@@ -127,13 +127,13 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
-         See https://docs.papermc.io/paper/configuration for more information.
-         """;
- 
--    private static final Supplier<SpigotWorldConfig> SPIGOT_WORLD_DEFAULTS = Suppliers.memoize(() -> new SpigotWorldConfig(RandomStringUtils.randomAlphabetic(255)) {
-+    public static final Supplier<SpigotWorldConfig> SPIGOT_WORLD_DEFAULTS = Suppliers.memoize(() -> new SpigotWorldConfig(RandomStringUtils.randomAlphabetic(255)) { // Fiddle - Fiddle configuration
-         @Override // override to ensure "verbose" is false
-         public void init() {
+@@ -134,7 +134,7 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
              SpigotConfig.readConfig(SpigotWorldConfig.class, this);
          }
      });
@@ -190,7 +183,7 @@ index f6b9d216c24d8858802f85209fe1a869e5a9be31..ed1027e0d3c8c9f491aea7c641fbd070
  
  
      public PaperConfigurations(final Path globalFolder) {
-@@ -297,7 +297,7 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+@@ -298,7 +298,7 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
          }
      }
  
@@ -199,7 +192,7 @@ index f6b9d216c24d8858802f85209fe1a869e5a9be31..ed1027e0d3c8c9f491aea7c641fbd070
          return createWorldContextMap(level.convertable.levelDirectory.path(), level.serverLevelData.getLevelName(), level.dimension().location(), level.spigotConfig);
      }
  
-@@ -398,17 +398,6 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+@@ -399,17 +399,6 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
          return Files.exists(legacyConfig) && Files.isRegularFile(legacyConfig);
      }
  
@@ -217,7 +210,7 @@ index f6b9d216c24d8858802f85209fe1a869e5a9be31..ed1027e0d3c8c9f491aea7c641fbd070
      @Deprecated
      public static YamlConfiguration loadLegacyConfigFile(File configFile) throws Exception {
          YamlConfiguration config = new YamlConfiguration();
-@@ -431,9 +420,16 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+@@ -432,9 +421,16 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
      }
  
      // Symlinks are not correctly checked in createDirectories
@@ -260,7 +253,7 @@ index dae36c6452ccd57a436dd918547b64d59957ab0a..af8fae4135aa5cc7f568efe62465b24b
              Bootstrap.bootStrap();
              Bootstrap.validate();
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index cf239e2e57643b27684c1f9bbf105563ce59b538..eb4b868b9f3e208236ac8edfb9e66308be6370b6 100644
+index 2783399f78d2df48328cc4d235c6ded065679227..b9462605d5e732557b238b6a9b7159663d07c5ea 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -3,9 +3,6 @@ package net.minecraft.server;
@@ -481,10 +474,10 @@ index 147d802d9207e358fdb2d1c7806fc2f634dcfd98..bc824973ad9202a5c77e28fff3c18753
          this.world = new CraftWorld((ServerLevel) this, gen, biomeProvider, env);
  
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 6ee358f74464ce7bb5f8864ef41fe41ae0c677e2..818f6aa28054a67ed6f8e3a699ba5e753d906c51 100644
+index d5af5f7f7af4a2a94b15395962472be8952ef63c..30793d299e0abd41a9d47a5524ce113c8a4825a7 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -240,7 +240,6 @@ import org.bukkit.plugin.PluginManager;
+@@ -242,7 +242,6 @@ import org.bukkit.plugin.PluginManager;
  import org.bukkit.plugin.ServicesManager;
  import org.bukkit.plugin.SimplePluginManager;
  import org.bukkit.plugin.SimpleServicesManager;
@@ -492,7 +485,7 @@ index 6ee358f74464ce7bb5f8864ef41fe41ae0c677e2..818f6aa28054a67ed6f8e3a699ba5e75
  import org.bukkit.plugin.messaging.Messenger;
  import org.bukkit.plugin.messaging.StandardMessenger;
  import org.bukkit.potion.Potion;
-@@ -251,6 +250,7 @@ import org.bukkit.scoreboard.Criteria;
+@@ -253,6 +252,7 @@ import org.bukkit.scoreboard.Criteria;
  import org.bukkit.structure.StructureManager;
  import org.bukkit.util.StringUtil;
  import org.bukkit.util.permissions.DefaultPermissions;
@@ -500,7 +493,7 @@ index 6ee358f74464ce7bb5f8864ef41fe41ae0c677e2..818f6aa28054a67ed6f8e3a699ba5e75
  import org.yaml.snakeyaml.LoaderOptions;
  import org.yaml.snakeyaml.Yaml;
  import org.yaml.snakeyaml.constructor.SafeConstructor;
-@@ -979,6 +979,7 @@ public final class CraftServer implements Server {
+@@ -1056,6 +1056,7 @@ public final class CraftServer implements Server {
  
          org.spigotmc.SpigotConfig.init((File) console.options.valueOf("spigot-settings")); // Spigot
          this.console.paperConfigurations.reloadConfigs(this.console);

@@ -14,10 +14,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/legacy/CraftLegacy.java b/src/main/java/org/bukkit/craftbukkit/legacy/CraftLegacy.java
-index 28d0625a672b44bf8734a55a38dbb8013fb9069a..60e3c358ae4716b00955317cff38aaafe4e0d6a1 100644
+index 62ca7c06f8dbcb3315ffa97c0e9c3fecf3acb87f..06f9d3280c8bd5f51ad673b8560baa1d5057cbc8 100644
 --- a/src/main/java/org/bukkit/craftbukkit/legacy/CraftLegacy.java
 +++ b/src/main/java/org/bukkit/craftbukkit/legacy/CraftLegacy.java
-@@ -377,7 +377,7 @@ public final class CraftLegacy {
+@@ -373,7 +373,7 @@ public final class CraftLegacy {
              }
  
              // Handle items (and second fallback for blocks)
@@ -26,7 +26,7 @@ index 28d0625a672b44bf8734a55a38dbb8013fb9069a..60e3c358ae4716b00955317cff38aaaf
              // Manually do oldold spawn eggs
              if (material == Material.LEGACY_MONSTER_EGG) {
                  maxData = 121; // Vilager + 1
-@@ -489,6 +489,18 @@ public final class CraftLegacy {
+@@ -485,6 +485,18 @@ public final class CraftLegacy {
          }
          // Fiddle end - modifiable Bukkit enums - Material - make legacy conversion complete - ensure correct LEGACY_LONG_GRASS
  
@@ -46,7 +46,7 @@ index 28d0625a672b44bf8734a55a38dbb8013fb9069a..60e3c358ae4716b00955317cff38aaaf
  
      public static void main(String[] args) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-index 4c182ca08e73a661f1949fef3f773aa413067b85..0b63786e6826ab47a38dbddc1f3a509ba47840e7 100644
+index 8911adc5c07b73872d9234ae5fe6e14c7c14b6dd..b9da47a97cdf6cd417fbcf136ba3b9c233f7df92 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 @@ -76,10 +76,7 @@ import org.bukkit.inventory.ItemStack;
@@ -95,7 +95,7 @@ index 4c182ca08e73a661f1949fef3f773aa413067b85..0b63786e6826ab47a38dbddc1f3a509b
      // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
      private final CachedMaterialBooleanProperty isBlockCache = new CachedMaterialBooleanProperty(material -> {
          if (material.isLegacy()) {
-@@ -789,6 +813,20 @@ public final class CraftMagicNumbers implements UnsafeValues {
+@@ -787,6 +811,20 @@ public final class CraftMagicNumbers implements UnsafeValues {
          public static final int TAG_ANY_NUMBER = 99;
      }
  

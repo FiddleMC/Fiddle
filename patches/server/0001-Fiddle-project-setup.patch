@@ -7,12 +7,12 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index e7a03ea1dab56e7725f718da0b44c736018ac995..01429ed39049eeac189439bc2ef035447d19c3de 100644
+index 57f2c414dbfe127c193002fbc8eeb22e94e9cb55..09bf8edf8bc7681f6eefc89fa429e734fb7ad30b 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
-@@ -6,9 +6,17 @@ plugins {
-     id("com.github.johnrengelman.shadow")
+@@ -12,9 +12,17 @@ configurations.named(log4jPlugins.compileClasspathConfigurationName) {
  }
+ val alsoShade: Configuration by configurations.creating
  
 +val apiProjectName = "fiddle-api" // Fiddle - project setup
 +
@@ -23,7 +23,7 @@ index e7a03ea1dab56e7725f718da0b44c736018ac995..01429ed39049eeac189439bc2ef03544
 +    // Depend on own API
 +    implementation(project(":$apiProjectName"))
 +    // Depend on Paper MojangAPI
-+    implementation("io.papermc.paper:paper-mojangapi:1.20-R0.1-SNAPSHOT") {
++    implementation("io.papermc.paper:paper-mojangapi:1.20.1-R0.1-SNAPSHOT") {
 +        exclude("io.papermc.paper", "paper-api")
 +    }
 +    // Fiddle end - project setup

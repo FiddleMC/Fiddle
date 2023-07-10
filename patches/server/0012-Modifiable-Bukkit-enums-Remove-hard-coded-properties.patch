@@ -12,10 +12,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-index 0b63786e6826ab47a38dbddc1f3a509ba47840e7..e011a7de29f6db19dac757dbe8255bee5fbb4a3b 100644
+index b9da47a97cdf6cd417fbcf136ba3b9c233f7df92..aac3da4621d83919308097954c22ffdb2245195d 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-@@ -853,6 +853,150 @@ public final class CraftMagicNumbers implements UnsafeValues {
+@@ -851,6 +851,150 @@ public final class CraftMagicNumbers implements UnsafeValues {
          return this.isAirCache.get(material);
      }
  

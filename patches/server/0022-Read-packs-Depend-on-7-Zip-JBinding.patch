@@ -7,10 +7,10 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 32c20477c0ff00e4a063c92c804b4a74dd6db88f..7500adba71ac4aacd995f2ab95f822f8c81c8858 100644
+index 22f44b1d5d390d0960d97e8767c9988d4330995f..4df143da14f94f7c630717839782ffdb3a9fc075 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
-@@ -55,6 +55,10 @@ dependencies {
+@@ -65,6 +65,10 @@ dependencies {
      testImplementation("org.hamcrest:hamcrest-library:1.3")
  
      implementation("io.netty:netty-all:4.1.87.Final"); // Paper - Bump netty

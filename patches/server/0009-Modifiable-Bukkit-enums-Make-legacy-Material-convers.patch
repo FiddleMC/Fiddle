@@ -12,49 +12,49 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/inventory/CraftInventory.java b/src/main/java/org/bukkit/craftbukkit/inventory/CraftInventory.java
-index 10844fecc01370dcd0cc36f83e166bacb48ded30..9722743d454900f3219adad304a512e9dc2d46e8 100644
+index 471ae4458e7ea7c29d7551b32cec98180fbccd4e..42572f9bf1439b49ff4e9e358a0268873e94cef6 100644
 --- a/src/main/java/org/bukkit/craftbukkit/inventory/CraftInventory.java
 +++ b/src/main/java/org/bukkit/craftbukkit/inventory/CraftInventory.java
-@@ -104,7 +104,7 @@ public class CraftInventory implements Inventory {
+@@ -102,7 +102,7 @@ public class CraftInventory implements Inventory {
      @Override
      public boolean contains(Material material) {
-         Validate.notNull(material, "Material cannot be null");
+         Preconditions.checkArgument(material != null, "Material cannot be null");
 -        material = CraftLegacy.fromLegacy(material);
 +        material = CraftLegacy.fromLegacy(material, true); // Fiddle - modifiable Bukkit enums - Material - make legacy conversion complete
          for (ItemStack item : this.getStorageContents()) {
              if (item != null && item.getType() == material) {
                  return true;
-@@ -129,7 +129,7 @@ public class CraftInventory implements Inventory {
+@@ -127,7 +127,7 @@ public class CraftInventory implements Inventory {
      @Override
      public boolean contains(Material material, int amount) {
-         Validate.notNull(material, "Material cannot be null");
+         Preconditions.checkArgument(material != null, "Material cannot be null");
 -        material = CraftLegacy.fromLegacy(material);
 +        material = CraftLegacy.fromLegacy(material, true); // Fiddle - modifiable Bukkit enums - Material - make legacy conversion complete
          if (amount <= 0) {
              return true;
          }
-@@ -178,7 +178,7 @@ public class CraftInventory implements Inventory {
+@@ -176,7 +176,7 @@ public class CraftInventory implements Inventory {
      @Override
      public HashMap<Integer, ItemStack> all(Material material) {
-         Validate.notNull(material, "Material cannot be null");
+         Preconditions.checkArgument(material != null, "Material cannot be null");
 -        material = CraftLegacy.fromLegacy(material);
 +        material = CraftLegacy.fromLegacy(material, true); // Fiddle - modifiable Bukkit enums - Material - make legacy conversion complete
-         HashMap<Integer, ItemStack> slots = new HashMap<Integer, ItemStack>();
+         HashMap<Integer, ItemStack> slots = new HashMap<>();
  
          ItemStack[] inventory = this.getStorageContents();
-@@ -208,7 +208,7 @@ public class CraftInventory implements Inventory {
+@@ -206,7 +206,7 @@ public class CraftInventory implements Inventory {
      @Override
      public int first(Material material) {
-         Validate.notNull(material, "Material cannot be null");
+         Preconditions.checkArgument(material != null, "Material cannot be null");
 -        material = CraftLegacy.fromLegacy(material);
 +        material = CraftLegacy.fromLegacy(material, true); // Fiddle - modifiable Bukkit enums - Material - make legacy conversion complete
          ItemStack[] inventory = this.getStorageContents();
          for (int i = 0; i < inventory.length; i++) {
              ItemStack item = inventory[i];
-@@ -263,7 +263,7 @@ public class CraftInventory implements Inventory {
+@@ -261,7 +261,7 @@ public class CraftInventory implements Inventory {
  
      public int firstPartial(Material material) {
-         Validate.notNull(material, "Material cannot be null");
+         Preconditions.checkArgument(material != null, "Material cannot be null");
 -        material = CraftLegacy.fromLegacy(material);
 +        material = CraftLegacy.fromLegacy(material, true); // Fiddle - modifiable Bukkit enums - Material - make legacy conversion complete
          ItemStack[] inventory = this.getStorageContents();
@@ -63,17 +63,17 @@ index 10844fecc01370dcd0cc36f83e166bacb48ded30..9722743d454900f3219adad304a512e9
 @@ -420,7 +420,7 @@ public class CraftInventory implements Inventory {
      @Override
      public void remove(Material material) {
-         Validate.notNull(material, "Material cannot be null");
+         Preconditions.checkArgument(material != null, "Material cannot be null");
 -        material = CraftLegacy.fromLegacy(material);
 +        material = CraftLegacy.fromLegacy(material, true); // Fiddle - modifiable Bukkit enums - Material - make legacy conversion complete
          ItemStack[] items = this.getStorageContents();
          for (int i = 0; i < items.length; i++) {
              if (items[i] != null && items[i].getType() == material) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemFactory.java b/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemFactory.java
-index b88a29623c280fcf2e3dd6d16646c23ca809efe1..8b6f25184009195009c187ef5e2ca4f5d927e487 100644
+index 849e93a8a0645de4c3e6ab8047815d78a722d4f6..64682960669c81ef051e4d97755cf95dfc4f391c 100644
 --- a/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemFactory.java
 +++ b/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemFactory.java
-@@ -38,7 +38,7 @@ public final class CraftItemFactory implements ItemFactory {
+@@ -37,7 +37,7 @@ public final class CraftItemFactory implements ItemFactory {
  
      @Override
      public boolean isApplicable(ItemMeta meta, Material type) {
@@ -82,7 +82,7 @@ index b88a29623c280fcf2e3dd6d16646c23ca809efe1..8b6f25184009195009c187ef5e2ca4f5
          if (type == null || meta == null) {
              return false;
          }
-@@ -56,7 +56,7 @@ public final class CraftItemFactory implements ItemFactory {
+@@ -54,7 +54,7 @@ public final class CraftItemFactory implements ItemFactory {
      }
  
      private ItemMeta getItemMeta(Material material, CraftMetaItem meta) {
@@ -92,10 +92,10 @@ index b88a29623c280fcf2e3dd6d16646c23ca809efe1..8b6f25184009195009c187ef5e2ca4f5
          case AIR:
              return null;
 diff --git a/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemStack.java b/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemStack.java
-index 24fac69bc63f949001252811f792b21955a13e9d..59ae5551d46367ca999c5a442d5dcd72b0a168e9 100644
+index 8657736cdfe2d5d2a1c0851ca54dd26ce17e0a83..6ff2c1399052a5c4e6a775836c308c6e8b208d4f 100644
 --- a/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemStack.java
 +++ b/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemStack.java
-@@ -655,7 +655,7 @@ public final class CraftItemStack extends ItemStack {
+@@ -656,7 +656,7 @@ public final class CraftItemStack extends ItemStack {
          if (this.handle == null || that.handle == null) {
              return false;
          }
@@ -118,7 +118,7 @@ index 3ab43aab043ae59e541f708c8558ddf9bdd82f84..0a3150427e6887b4cdade2607c8837ce
  
          return super.updateMaterial(material);
 diff --git a/src/main/java/org/bukkit/craftbukkit/legacy/CraftLegacy.java b/src/main/java/org/bukkit/craftbukkit/legacy/CraftLegacy.java
-index 110503062b3043cffa082a1cda6b8d57152869aa..28d0625a672b44bf8734a55a38dbb8013fb9069a 100644
+index 2677e21d8239bf0361a3bc5c9a50c328e54d70f6..62ca7c06f8dbcb3315ffa97c0e9c3fecf3acb87f 100644
 --- a/src/main/java/org/bukkit/craftbukkit/legacy/CraftLegacy.java
 +++ b/src/main/java/org/bukkit/craftbukkit/legacy/CraftLegacy.java
 @@ -165,16 +165,12 @@ public final class CraftLegacy {
@@ -140,7 +140,7 @@ index 110503062b3043cffa082a1cda6b8d57152869aa..28d0625a672b44bf8734a55a38dbb801
      }
  
      public static Material fromLegacy(MaterialData materialData, boolean itemPriority) {
-@@ -432,6 +428,67 @@ public final class CraftLegacy {
+@@ -428,6 +424,67 @@ public final class CraftLegacy {
                  itemToMaterial.put(newMaterial, matData);
              }
          }
@@ -236,7 +236,7 @@ index c8dde75de231b5fdde88f5bc111c21883d9c3f49..16640f83c14b907b26dff8d5490e8916
  
      public static Material[] modern_values() {
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-index 5a61b5b8d64fc3bd6d01f996d4b3ad02c78307da..132303b2b833ad2a36e541a098612d6bec789877 100644
+index 90a3f82a2491379318db6382ed8b8f80524dbc0a..84d3c58e0cc120faa8d3dbe78246c8612bc3e5cd 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 @@ -194,7 +194,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
