@@ -7,7 +7,7 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index 07404d5f86f9b44533fe23de3ba67bd1cd5bc1cd..fdb28757cc252f316f7b3d4e417c25cb5c39f806 100644
+index 10d1b630a3543a9939162925848351412796297d..4c67e52c685a6d44f4169db8cb974a90e284ff04 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
 @@ -65,6 +65,7 @@ import net.minecraft.world.level.storage.PrimaryLevelData;
@@ -18,7 +18,7 @@ index 07404d5f86f9b44533fe23de3ba67bd1cd5bc1cd..fdb28757cc252f316f7b3d4e417c25cb
  import org.slf4j.Logger;
  
  // CraftBukkit start
-@@ -334,6 +335,8 @@ public class Main {
+@@ -330,6 +331,8 @@ public class Main {
                  return;
              }
  

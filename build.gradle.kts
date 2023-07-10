@@ -84,7 +84,7 @@ paperweight {
 
 // Fiddle start - extend jar manifest
 val extendedManifestElements: List<Pair<String, String>> = listOf(
-    "Add-Opens" to "java.base/java.lang" // Fiddle - remove hard-coded Bukkit values - modify classes - add module opens to server jar
+    "Add-Opens" to "java.base/java.lang" // Fiddle - modifiable Bukkit enums - inject runtime versions - add module opens to server jar
 )
 
 if (extendedManifestElements.isNotEmpty()) {

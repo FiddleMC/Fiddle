@@ -7,7 +7,7 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index a0146670f4728f85ba1373a2652755ef231a343d..0ec18a0e832250a1f8af1a16bbabd1358c37781f 100644
+index 142a3b3e3280dbede3c78153bf596fd58ff13499..0031765eb9f50c46f450b02dce456555ca2d513e 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
 @@ -64,6 +64,7 @@ import net.minecraft.world.level.storage.LevelSummary;

@@ -1,0 +1,32 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Mon, 10 Jul 2023 22:05:08 +0200
+Subject: [PATCH] Modifiable Bukkit enums - Inject runtime versions - Add
+ module opens
+
+Add module opens, to both the server JAR and to development runs,
+that are needed to perform internal operations on the system class loader.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/build.gradle.kts b/build.gradle.kts
+index 430c1f4d062e30e1a8920923c5a73b0f2977818a..32c20477c0ff00e4a063c92c804b4a74dd6db88f 100644
+--- a/build.gradle.kts
++++ b/build.gradle.kts
+@@ -79,6 +79,7 @@ tasks.jar {
+         val gitBranch = git("rev-parse", "--abbrev-ref", "HEAD").getText().trim() // Paper
+         attributes(
+             "Main-Class" to "org.bukkit.craftbukkit.Main",
++            "Add-Opens" to "java.base/java.lang", // Fiddle - modifiable Bukkit enums - inject runtime versions - add module opens to server jar
+             "Implementation-Title" to "CraftBukkit",
+             "Implementation-Version" to "git-Fiddle-$implementationVersion", // Fiddle - branding changes
+             "Implementation-Vendor" to date, // Paper
+@@ -176,6 +177,7 @@ fun TaskContainer.registerRunTask(
+     val memoryGb = providers.gradleProperty("paper.runMemoryGb").getOrElse("2")
+     minHeapSize = "${memoryGb}G"
+     maxHeapSize = "${memoryGb}G"
++    jvmArgs("--add-opens=java.base/java.lang=ALL-UNNAMED") // Fiddle - modifiable Bukkit enums - inject runtime versions - add module opens to development runs
+ 
+     doFirst {
+         workingDir.mkdirs()

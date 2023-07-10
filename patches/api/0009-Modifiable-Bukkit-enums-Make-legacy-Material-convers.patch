@@ -1,0 +1,62 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Mon, 10 Jul 2023 22:05:08 +0200
+Subject: [PATCH] Modifiable Bukkit enums - Make legacy Material conversion
+ complete
+
+This makes sure that every legacy Material can be converted
+to a non-AIR (except if the original is LEGACY_AIR) non-legacy Material,
+both explicitly as an item and explicitly as a block.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
+index 039d8152639b22fbb6af9dfbcc7eb38466ef0f6a..2da927d14e2139836d8d989b12eeb239feed4ddc 100644
+--- a/src/main/java/org/bukkit/Material.java
++++ b/src/main/java/org/bukkit/Material.java
+@@ -5760,6 +5760,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+      * @param name Name of the material to get
+      * @param legacyName whether this is a legacy name lookup
+      * @return Material if found, or null
++     * @deprecated Do not use legacy names. <!-- // Fiddle - modifiable Bukkit enums - Material - make legacy conversion complete -->
+      */
+     @Nullable
+     public static Material getMaterial(@NotNull String name, boolean legacyName) {
+@@ -5769,7 +5770,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+             }
+ 
+             Material match = BY_NAME.get(name);
+-            return Bukkit.getUnsafe().fromLegacy(match);
++            return Bukkit.getUnsafe().fromLegacy(match, false); // Fiddle - modifiable Bukkit enums - Material - make legacy conversion complete
+         }
+ 
+         return BY_NAME.get(name);
+diff --git a/src/main/java/org/bukkit/UnsafeValues.java b/src/main/java/org/bukkit/UnsafeValues.java
+index c661eab343ae76488de701630424e2d589f44fc0..995e0a05c3b39f0fd76b83143f298c30f8f4cd48 100644
+--- a/src/main/java/org/bukkit/UnsafeValues.java
++++ b/src/main/java/org/bukkit/UnsafeValues.java
+@@ -38,8 +38,23 @@ public interface UnsafeValues {
+     void reportTimings(); // Paper
+     Material toLegacy(Material material);
+ 
++
++    // Fiddle start - modifiable Bukkit enums - Material - make legacy conversion complete
++    /**
++     * @deprecated Use {@link #fromLegacy(Material, boolean)} instead.
++     */
++    @Deprecated
++    // Fiddle end - modifiable Bukkit enums - Material - make legacy conversion complete
+     Material fromLegacy(Material material);
+ 
++    // Fiddle start - modifiable Bukkit enums - Material - make legacy conversion complete
++    Material fromLegacy(Material material, boolean itemPriority);
++
++    /**
++     * @deprecated Use {@link #fromLegacy(MaterialData, boolean)} instead.
++     */
++    @Deprecated
++    // Fiddle end - modifiable Bukkit enums - Material - make legacy conversion complete
+     Material fromLegacy(MaterialData material);
+ 
+     Material fromLegacy(MaterialData material, boolean itemPriority);

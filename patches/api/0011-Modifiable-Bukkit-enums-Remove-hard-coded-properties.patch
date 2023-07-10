@@ -1,40 +1,65 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
-Date: Sun, 4 Jun 2023 11:24:05 +0200
-Subject: [PATCH] Modify Bukkit enums - Remove hard-coded values - Is block, is
- edible, is record, is solid, is air, is flammable, is burnable, is fuel, is
- occluding, has gravity, is item, is interactable, block hardness, block blast
- resistance, block slipperiness, item crafting remaining item, item equipment
- slot
+Date: Tue, 4 Jul 2023 19:20:58 +0200
+Subject: [PATCH] Modifiable Bukkit enums - Remove hard-coded properties -
+ Material - Most properties
+
+Modifies most Material switch-based properties so that they are no longer hard-coded.
+Determining the values of the properties instead relies on an internal implementation
+that matches the already existing checks in org.bukkit.PerMaterialTest.
+
+The property values are also cached after being computed, for performant access.
+
+The following properties are modified:
+* isBlock()
+* isEdible()
+* isRecord()
+* isSolid()
+* isAir()
+* isFlammable()
+* isBurnable()
+* isFuel()
+* isOccluding()
+* hasGravity()
+* isItem()
+* isInteractable()
+* getHardness()
+* getBlastResistance()
+* getSlipperiness()
+* getCraftingRemainingItem()
+* getEquipmentSlot()
 
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index a071700d016e774b530d7221275d101125673846..678c19810e23d18d1f4c00fd56980f56d8466bc9 100644
+index 2da927d14e2139836d8d989b12eeb239feed4ddc..af0e377849ef8c76e5ddac0f9ca4b74433bb9f37 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -4633,1078 +4633,51 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
-         }
-     }
+@@ -112,6 +112,7 @@ import org.bukkit.block.data.type.WallSign;
+ import org.bukkit.inventory.CreativeCategory;
+ import org.bukkit.inventory.EquipmentSlot;
+ import org.bukkit.material.MaterialData;
++import org.fiddlemc.fiddle.material.MaterialDefaultImplementations;
+ import org.jetbrains.annotations.NotNull;
+ import org.jetbrains.annotations.Nullable;
  
-+    private static boolean isBlockIsSet = false; // Fiddle - remove hard-coded Bukkit values - Material - is block
-+
-     /**
-      * Checks if this Material is a placable block
-      *
+@@ -4394,7 +4395,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+     public final Class<?> data;
+     private final boolean legacy;
+     private final NamespacedKey key;
+-    private boolean isBlock; // Paper
+ 
+     private Material(final int id) {
+         this(id, 64);
+@@ -4629,1021 +4629,17 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return true if this material is a block
       */
      public boolean isBlock() {
 -    // Paper start - cache isBlock
-+        // Fiddle start - remove hard-coded Bukkit values - Material - is block
-+        if (!isBlockIsSet) {
-+            for (Material material : values) {
-+                material.isBlock = material.isLegacy() ? material.isBlockLegacy() : Bukkit.getUnsafe().isBlock(material);
-+            }
-+            isBlockIsSet = true;
-+        }
-         return this.isBlock;
+-        return this.isBlock;
++        // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
++        return Bukkit.getUnsafe().isBlock(this);
      }
 -    private boolean isBlock0() {
 -    // Paper end
@@ -1049,30 +1074,29 @@ index a071700d016e774b530d7221275d101125673846..678c19810e23d18d1f4c00fd56980f56
 -                return 0 <= id && id < 256;
 -        }
 +
-+    private boolean isBlockLegacy() {
-+        return 0 <= id && id < 256;
-+        // Fiddle end - remove hard-coded Bukkit values - Material - is block
++    /**
++     * @deprecated Do not use: this method is for internal testing purposes only.
++     */
++    @Deprecated(forRemoval = true)
++    public boolean isBlockLegacy() {
++        return MaterialDefaultImplementations.isBlockLegacy(this);
++        // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
      }
  
-+    private static boolean[] isEdible = null; // Fiddle - remove hard-coded Bukkit values - Material - is edible
-+
      /**
-      * Checks if this Material is edible.
-      *
+@@ -5652,49 +4648,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return true if this Material is edible.
       */
      public boolean isEdible() {
-+        // Fiddle start - remove hard-coded Bukkit values - Material - is edible
-+        if (isEdible == null) {
-+            isEdible = new boolean[length];
-+            for (Material material : values) {
-+                isEdible[material.ordinal()] = material.isLegacy() ? material.isEdibleLegacy() : Bukkit.getUnsafe().isEdible(material);
-+            }
-+        }
-+        return isEdible[this.ordinal()];
++        // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
++        return Bukkit.getUnsafe().isEdible(this);
 +    }
 +
-+    private boolean isEdibleLegacy() {
++    /**
++     * @deprecated Do not use: this method is for internal testing purposes only.
++     */
++    @Deprecated(forRemoval = true)
++    public boolean isEdibleLegacy() {
          switch (this) {
 -            //<editor-fold defaultstate="collapsed" desc="isEdible">
 -            case APPLE:
@@ -1117,11 +1141,11 @@ index a071700d016e774b530d7221275d101125673846..678c19810e23d18d1f4c00fd56980f56
 -            case TROPICAL_FISH:
 -            // ----- Legacy Separator -----
 +            //<editor-fold defaultstate="collapsed" desc="isEdibleLegacy">
-+            // Fiddle end - remove hard-coded Bukkit values - Material - is edible
++            // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
              case LEGACY_BREAD:
              case LEGACY_CARROT_ITEM:
              case LEGACY_BAKED_POTATO:
-@@ -5831,829 +4804,52 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -5821,7 +4786,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      static {
          for (Material material : values()) {
              BY_NAME.put(material.name(), material);
@@ -1129,9 +1153,7 @@ index a071700d016e774b530d7221275d101125673846..678c19810e23d18d1f4c00fd56980f56
          }
      }
  
-+    private static boolean[] isRecord = null; // Fiddle - remove hard-coded Bukkit values - Material - is record
-+
-     /**
+@@ -5829,29 +4793,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material represents a playable music disk.
       */
      public boolean isRecord() {
@@ -1157,42 +1179,38 @@ index a071700d016e774b530d7221275d101125673846..678c19810e23d18d1f4c00fd56980f56
 -                return true;
 -            default:
 -                return id >= LEGACY_GOLD_RECORD.id && id <= LEGACY_RECORD_12.id;
-+        // Fiddle start - remove hard-coded Bukkit values - Material - is record
-+        if (isRecord == null) {
-+            isRecord = new boolean[length];
-+            for (Material material : values) {
-+                isRecord[material.ordinal()] = material.isLegacy() ? material.isRecordLegacy() : Bukkit.getUnsafe().isRecord(material);
-+            }
-         }
-+        return isRecord[this.ordinal()];
+-        }
++        // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
++        return Bukkit.getUnsafe().isRecord(this);
 +    }
-+    
-+    private boolean isRecordLegacy() {
-+        return id >= LEGACY_GOLD_RECORD.id && id <= LEGACY_RECORD_12.id;
-+        // Fiddle end - remove hard-coded Bukkit values - Material - is record
++
++    /**
++     * @deprecated Do not use: this method is for internal testing purposes only.
++     */
++    @Deprecated(forRemoval = true)
++    public boolean isRecordLegacy() {
++        int id = this.getId();
++        return id >= LEGACY_GOLD_RECORD.getId() && id <= LEGACY_RECORD_12.getId();
++        // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
      }
  
-+    private static boolean[] isSolid = null; // Fiddle - remove hard-coded Bukkit values - Material - is solid
-+
      /**
-      * Check if the material is a block and solid (can be built upon)
-      *
+@@ -5860,790 +4813,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material is a block and solid
       */
      public boolean isSolid() {
 -        if (!isBlock() || id == 0) {
 -            return false;
-+        // Fiddle start - remove hard-coded Bukkit values - Material - is solid
-+        if (isSolid == null) {
-+            isSolid = new boolean[length];
-+            for (Material material : values) {
-+                isSolid[material.ordinal()] = material.isLegacy() ? material.isSolidLegacy() : Bukkit.getUnsafe().isSolid(material);
-+            }
-         }
-+        return isSolid[this.ordinal()];
+-        }
++        // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
++        return Bukkit.getUnsafe().isSolid(this);
 +    }
 +
-+    private boolean isSolidLegacy() {
++    /**
++     * @deprecated Do not use: this method is for internal testing purposes only.
++     */
++    @Deprecated(forRemoval = true)
++    public boolean isSolidLegacy() {
          switch (this) {
 -            //<editor-fold defaultstate="collapsed" desc="isSolid">
 -            case ACACIA_DOOR:
@@ -1975,19 +1993,11 @@ index a071700d016e774b530d7221275d101125673846..678c19810e23d18d1f4c00fd56980f56
 -            case YELLOW_WOOL:
 -            // ----- Legacy Separator -----
 +            //<editor-fold defaultstate="collapsed" desc="isSolidLegacy">
-+            // Fiddle end - remove hard-coded Bukkit values - Material - is solid
++            // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
              case LEGACY_STONE:
              case LEGACY_GRASS:
              case LEGACY_DIRT:
-@@ -6860,24 +5056,27 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
-         }
-     }
- 
-+    private static boolean[] isAir = null; // Fiddle - remove hard-coded Bukkit values - Material - is air
-+
-     /**
-      * Check if the material is an air block.
-      *
+@@ -6856,18 +5037,17 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material is an air block.
       */
      public boolean isAir() {
@@ -2002,47 +2012,37 @@ index a071700d016e774b530d7221275d101125673846..678c19810e23d18d1f4c00fd56980f56
 -                return true;
 -            default:
 -                return false;
-+        // Fiddle start - remove hard-coded Bukkit values - Material - is air
-+        if (isAir == null) {
-+            isAir = new boolean[length];
-+            for (Material material : values) {
-+                isAir[material.ordinal()] = material.isLegacy() ? material.isAirLegacy() : Bukkit.getUnsafe().isAir(material);
-+            }
-         }
-+        return isAir[this.ordinal()];
+-        }
++        // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
++        return Bukkit.getUnsafe().isAir(this);
 +    }
 +
-+    private boolean isAirLegacy() {
++    /**
++     * @deprecated Do not use: this method is for internal testing purposes only.
++     */
++    @Deprecated(forRemoval = true)
++    public boolean isAirLegacy() {
 +        return this == LEGACY_AIR;
-+        // Fiddle end - remove hard-coded Bukkit values - Material - is air
++        // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
      }
  
      /**
-@@ -7079,292 +5278,28 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
-         }
-     }
- 
-+    private static boolean[] isFlammable = null; // Fiddle - remove hard-coded Bukkit values - Material - is flammable
-+
-     /**
-      * Check if the material is a block and can catch fire
-      *
+@@ -7076,286 +5256,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material is a block and can catch fire
       */
      public boolean isFlammable() {
 -        if (!isBlock()) {
 -            return false;
-+        // Fiddle start - remove hard-coded Bukkit values - Material - is flammable
-+        if (isFlammable == null) {
-+            isFlammable = new boolean[length];
-+            for (Material material : values) {
-+                isFlammable[material.ordinal()] = material.isLegacy() ? material.isFlammableLegacy() : Bukkit.getUnsafe().isFlammable(material);
-+            }
-         }
-+        return isFlammable[this.ordinal()];
+-        }
++        // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
++        return Bukkit.getUnsafe().isFlammable(this);
 +    }
 +
-+    private boolean isFlammableLegacy() {
++    /**
++     * @deprecated Do not use: this method is for internal testing purposes only.
++     */
++    @Deprecated(forRemoval = true)
++    public boolean isFlammableLegacy() {
          switch (this) {
 -            //<editor-fold defaultstate="collapsed" desc="isFlammable">
 -            case ACACIA_DOOR:
@@ -2321,35 +2321,26 @@ index a071700d016e774b530d7221275d101125673846..678c19810e23d18d1f4c00fd56980f56
 -            case YELLOW_WOOL:
 -            // ----- Legacy Separator -----
 +            //<editor-fold defaultstate="collapsed" desc="isFlammableLegacy">
-+            // Fiddle end - remove hard-coded Bukkit values - Material - is flammable
++            // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
              case LEGACY_WOOD:
              case LEGACY_LOG:
              case LEGACY_LEAVES:
-@@ -7427,192 +5362,28 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
-         }
-     }
- 
-+    private static boolean[] isBurnable = null; // Fiddle - remove hard-coded Bukkit values - Material - is burnable
-+
-     /**
-      * Check if the material is a block and can burn away
-      *
+@@ -7424,186 +5336,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material is a block and can burn away
       */
      public boolean isBurnable() {
 -        if (!isBlock()) {
 -            return false;
-+        // Fiddle start - remove hard-coded Bukkit values - Material - is burnable
-+        if (isBurnable == null) {
-+            isBurnable = new boolean[length];
-+            for (Material material : values) {
-+                isBurnable[material.ordinal()] = material.isLegacy() ? material.isBurnableLegacy() : Bukkit.getUnsafe().isBurnable(material);
-+            }
-         }
-+        return isBurnable[this.ordinal()];
+-        }
++        // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
++        return Bukkit.getUnsafe().isBurnable(this);
 +    }
 +
-+    private boolean isBurnableLegacy() {
++    /**
++     * @deprecated Do not use: this method is for internal testing purposes only.
++     */
++    @Deprecated(forRemoval = true)
++    public boolean isBurnableLegacy() {
          switch (this) {
 -            //<editor-fold defaultstate="collapsed" desc="isBurnable">
 -            case ACACIA_FENCE:
@@ -2528,33 +2519,23 @@ index a071700d016e774b530d7221275d101125673846..678c19810e23d18d1f4c00fd56980f56
 -            case YELLOW_WOOL:
 -            // ----- Legacy Separator -----
 +            //<editor-fold defaultstate="collapsed" desc="isBurnableLegacy">
-+            // Fiddle end - remove hard-coded Bukkit values - Material - is burnable
++            // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
              case LEGACY_WOOD:
              case LEGACY_LOG:
              case LEGACY_LEAVES:
-@@ -7657,263 +5428,28 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
-         }
-     }
- 
-+    private static boolean[] isFuel = null; // Fiddle - remove hard-coded Bukkit values - Material - is fuel
-+
-     /**
-      * Checks if this Material can be used as fuel in a Furnace
-      *
+@@ -7654,257 +5398,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return true if this Material can be used as fuel.
       */
      public boolean isFuel() {
-+        // Fiddle start - remove hard-coded Bukkit values - Material - is fuel
-+        if (isFuel == null) {
-+            isFuel = new boolean[length];
-+            for (Material material : values) {
-+                isFuel[material.ordinal()] = material.isLegacy() ? material.isFuelLegacy() : Bukkit.getUnsafe().isFuel(material);
-+            }
-+        }
-+        return isFuel[this.ordinal()];
++        // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
++        return Bukkit.getUnsafe().isFuel(this);
 +    }
 +
-+    private boolean isFuelLegacy() {
++    /**
++     * @deprecated Do not use: this method is for internal testing purposes only.
++     */
++    @Deprecated(forRemoval = true)
++    public boolean isFuelLegacy() {
          switch (this) {
 -            //<editor-fold defaultstate="collapsed" desc="isFuel">
 -            case ACACIA_BOAT:
@@ -2807,36 +2788,26 @@ index a071700d016e774b530d7221275d101125673846..678c19810e23d18d1f4c00fd56980f56
 -            case YELLOW_WOOL:
 -            // ----- Legacy Separator -----
 +            //<editor-fold defaultstate="collapsed" desc="isFuelLegacy">
-+            // Fiddle end - remove hard-coded Bukkit values - Material - is fuel
++            // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
              case LEGACY_LAVA_BUCKET:
              case LEGACY_COAL_BLOCK:
              case LEGACY_BLAZE_ROD:
-@@ -7984,6 +5520,8 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
-         }
-     }
- 
-+    private static boolean[] isOccluding = null; // Fiddle - remove hard-coded Bukkit values - Material - is occluding
-+
-     /**
-      * Check if the material is a block and occludes light in the lighting engine.
-      * <p>
-@@ -8003,368 +5541,20 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -7995,368 +5500,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material is a block and occludes light
       */
      public boolean isOccluding() {
 -        if (!isBlock()) {
 -            return false;
-+        // Fiddle start - remove hard-coded Bukkit values - Material - is occluding
-+        if (isOccluding == null) {
-+            isOccluding = new boolean[length];
-+            for (Material material : values) {
-+                isOccluding[material.ordinal()] = material.isLegacy() ? material.isOccludingLegacy() : Bukkit.getUnsafe().isOccluding(material);
-+            }
-         }
-+        return isOccluding[this.ordinal()];
+-        }
++        // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
++        return Bukkit.getUnsafe().isOccluding(this);
 +    }
 +
-+    private boolean isOccludingLegacy() {
++    /**
++     * @deprecated Do not use: this method is for internal testing purposes only.
++     */
++    @Deprecated(forRemoval = true)
++    public boolean isOccludingLegacy() {
          switch (this) {
 -            //<editor-fold defaultstate="collapsed" desc="isOccluding">
 -            case ACACIA_LOG:
@@ -3197,33 +3168,26 @@ index a071700d016e774b530d7221275d101125673846..678c19810e23d18d1f4c00fd56980f56
 -            case YELLOW_WOOL:
 -            // ----- Legacy Separator -----
 +            //<editor-fold defaultstate="collapsed" desc="isOccludingLegacy">
-+            // Fiddle end - remove hard-coded Bukkit values - Material - is occluding
++            // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
              case LEGACY_STONE:
              case LEGACY_GRASS:
              case LEGACY_DIRT:
-@@ -8470,39 +5660,26 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
-         }
-     }
- 
-+    private static boolean[] hasGravity = null; // Fiddle - remove hard-coded Bukkit values - Material - has gravity
-+
-     /**
+@@ -8484,41 +5639,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material is affected by gravity.
       */
      public boolean hasGravity() {
 -        if (!isBlock()) {
 -            return false;
-+        // Fiddle start - remove hard-coded Bukkit values - Material - has gravity
-+        if (hasGravity == null) {
-+            hasGravity = new boolean[length];
-+            for (Material material : values) {
-+                hasGravity[material.ordinal()] = material.isLegacy() ? material.hasGravityLegacy() : Bukkit.getUnsafe().hasGravity(material);
-+            }
-         }
-+        return hasGravity[this.ordinal()];
+-        }
++        // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
++        return Bukkit.getUnsafe().hasGravity(this);
 +    }
 +
-+    private boolean hasGravityLegacy() {
++    /**
++     * @deprecated Do not use: this method is for internal testing purposes only.
++     */
++    @Deprecated(forRemoval = true)
++    public boolean hasGravityLegacy() {
          switch (this) {
 -            //<editor-fold defaultstate="collapsed" desc="hasGravity">
 -            case ANVIL:
@@ -3243,42 +3207,29 @@ index a071700d016e774b530d7221275d101125673846..678c19810e23d18d1f4c00fd56980f56
 -            case MAGENTA_CONCRETE_POWDER:
 -            case ORANGE_CONCRETE_POWDER:
 -            case PINK_CONCRETE_POWDER:
+-            case POINTED_DRIPSTONE: // Fiddle - add missing Material values with gravity
 -            case PURPLE_CONCRETE_POWDER:
 -            case RED_CONCRETE_POWDER:
 -            case RED_SAND:
 -            case SAND:
+-            // Fiddle start - add missing Material values with gravity
+-            case SCAFFOLDING:
+-            case SUSPICIOUS_GRAVEL:
+-            case SUSPICIOUS_SAND:
+-            // Fiddle end - add missing Material values with gravity
 -            case WHITE_CONCRETE_POWDER:
 -            case YELLOW_CONCRETE_POWDER:
 -            // ----- Legacy Separator -----
 +            //<editor-fold defaultstate="collapsed" desc="hasGravityLegacy">
-+            // Fiddle end - remove hard-coded Bukkit values - Material - has gravity
++            // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
              case LEGACY_SAND:
              case LEGACY_GRAVEL:
-             case LEGACY_ANVIL:
-@@ -8514,162 +5691,28 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
-         }
-     }
- 
-+    private static boolean[] isItem = null; // Fiddle - remove hard-coded Bukkit values - Material - is item
-+
-     /**
-      * Checks if this Material is an obtainable item.
-      *
+             case LEGACY_DRAGON_EGG: // Fiddle - add missing Material values with gravity
+@@ -8537,213 +5669,17 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return true if this material is an item
       */
      public boolean isItem() {
-+        // Fiddle start - remove hard-coded Bukkit values - Material - is item
-+        if (isItem == null) {
-+            isItem = new boolean[length];
-+            for (Material material : values) {
-+                isItem[material.ordinal()] = material.isLegacy() ? material.isItemLegacy() : Bukkit.getUnsafe().isItem(material);
-+            }
-+        }
-+        return isItem[this.ordinal()];
-+    }
-+
-+    private boolean isItemLegacy() {
-         switch (this) {
+-        switch (this) {
 -            //<editor-fold defaultstate="collapsed" desc="isItem">
 -            case ACACIA_WALL_HANGING_SIGN:
 -            case ACACIA_WALL_SIGN:
@@ -3428,21 +3379,78 @@ index a071700d016e774b530d7221275d101125673846..678c19810e23d18d1f4c00fd56980f56
 -            case YELLOW_WALL_BANNER:
 -            case ZOMBIE_WALL_HEAD:
 -            // ----- Legacy Separator -----
-+            //<editor-fold defaultstate="collapsed" desc="isItemLegacy">
-+            // Fiddle end - remove hard-coded Bukkit values - Material - is item
-             case LEGACY_ACACIA_DOOR:
-             case LEGACY_BED_BLOCK:
-             case LEGACY_BEETROOT_BLOCK:
-@@ -8729,6 +5772,8 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
-         }
+-            case LEGACY_ACACIA_DOOR:
+-            case LEGACY_BED_BLOCK:
+-            case LEGACY_BEETROOT_BLOCK:
+-            case LEGACY_BIRCH_DOOR:
+-            case LEGACY_BREWING_STAND:
+-            case LEGACY_BURNING_FURNACE:
+-            case LEGACY_CAKE_BLOCK:
+-            case LEGACY_CARROT:
+-            case LEGACY_CAULDRON:
+-            case LEGACY_COCOA:
+-            case LEGACY_CROPS:
+-            case LEGACY_DARK_OAK_DOOR:
+-            case LEGACY_DAYLIGHT_DETECTOR_INVERTED:
+-            case LEGACY_DIODE_BLOCK_OFF:
+-            case LEGACY_DIODE_BLOCK_ON:
+-            case LEGACY_DOUBLE_STEP:
+-            case LEGACY_DOUBLE_STONE_SLAB2:
+-            case LEGACY_ENDER_PORTAL:
+-            case LEGACY_END_GATEWAY:
+-            case LEGACY_FIRE:
+-            case LEGACY_FLOWER_POT:
+-            case LEGACY_FROSTED_ICE:
+-            case LEGACY_GLOWING_REDSTONE_ORE:
+-            case LEGACY_IRON_DOOR_BLOCK:
+-            case LEGACY_JUNGLE_DOOR:
+-            case LEGACY_LAVA:
+-            case LEGACY_MELON_STEM:
+-            case LEGACY_NETHER_WARTS:
+-            case LEGACY_PISTON_EXTENSION:
+-            case LEGACY_PISTON_MOVING_PIECE:
+-            case LEGACY_PORTAL:
+-            case LEGACY_POTATO:
+-            case LEGACY_PUMPKIN_STEM:
+-            case LEGACY_PURPUR_DOUBLE_SLAB:
+-            case LEGACY_REDSTONE_COMPARATOR_OFF:
+-            case LEGACY_REDSTONE_COMPARATOR_ON:
+-            case LEGACY_REDSTONE_LAMP_ON:
+-            case LEGACY_REDSTONE_TORCH_OFF:
+-            case LEGACY_REDSTONE_WIRE:
+-            case LEGACY_SIGN_POST:
+-            case LEGACY_SKULL:
+-            case LEGACY_SPRUCE_DOOR:
+-            case LEGACY_STANDING_BANNER:
+-            case LEGACY_STATIONARY_LAVA:
+-            case LEGACY_STATIONARY_WATER:
+-            case LEGACY_SUGAR_CANE_BLOCK:
+-            case LEGACY_TRIPWIRE:
+-            case LEGACY_WALL_BANNER:
+-            case LEGACY_WALL_SIGN:
+-            case LEGACY_WATER:
+-            case LEGACY_WOODEN_DOOR:
+-            case LEGACY_WOOD_DOUBLE_STEP:
+-            //</editor-fold>
+-                return false;
+-            default:
+-                return true;
+-        }
++        // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
++        return Bukkit.getUnsafe().isItem(this);
++    }
++
++    /**
++     * @deprecated Do not use: this method is for internal testing purposes only.
++     */
++    @Deprecated(forRemoval = true)
++    public boolean isItemLegacy() {
++        return MaterialDefaultImplementations.isItemLegacy(this);
++        // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
      }
  
-+    private static boolean[] isInteractable = null; // Fiddle - remove hard-coded Bukkit values - Material - is interactable
-+
      /**
-      * Checks if this Material can be interacted with.
-      *
-@@ -8746,333 +5791,19 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -8763,331 +5699,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return true if this material can be interacted with.
       */
      public boolean isInteractable() {
@@ -3770,26 +3778,16 @@ index a071700d016e774b530d7221275d101125673846..678c19810e23d18d1f4c00fd56980f56
 -                return true;
 -            default:
 -                return false;
-+        // Fiddle start - remove hard-coded Bukkit values - Material - is interactable
-+        if (isInteractable == null) {
-+            isInteractable = new boolean[length];
-+            for (Material material : values) {
-+                isInteractable[material.ordinal()] = Bukkit.getUnsafe().isInteractable(material);
-+            }
-         }
-+        return isInteractable[this.ordinal()];
-+        // Fiddle end - remove hard-coded Bukkit values - Material - is interactable
+-        }
++        return Bukkit.getUnsafe().isInteractable(this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
      }
  
-+    private static float[] hardness = null; // Fiddle - remove hard-coded Bukkit values - Material - block hardness
-+
      /**
-      * Obtains the block's hardness level (also known as "strength").
-      * <br>
-@@ -9084,887 +5815,21 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -9100,886 +5712,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+      * @return the hardness of that material.
       */
      public float getHardness() {
-         Preconditions.checkArgument(isBlock(), "The Material is not a block!");
+-        Preconditions.checkArgument(isBlock(), "The Material is not a block!");
 -        switch (this) {
 -            // <editor-fold defaultstate="collapsed" desc="getBlockHardness">
 -            case BARRIER:
@@ -4668,28 +4666,16 @@ index a071700d016e774b530d7221275d101125673846..678c19810e23d18d1f4c00fd56980f56
 -            default:
 -                return 0F;
 -            // </editor-fold>
-+        // Fiddle start - remove hard-coded Bukkit values - Material - block hardness
-+        if (hardness == null) {
-+            hardness = new float[length];
-+            for (Material material : values) {
-+                if (material.isBlock()) {
-+                    hardness[material.ordinal()] = Bukkit.getUnsafe().getBlockHardness(material);
-+                }
-+            }
-         }
-+        return hardness[this.ordinal()];
-+        // Fiddle end - remove hard-coded Bukkit values - Material - block hardness
+-        }
++        return Bukkit.getUnsafe().getHardness(this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
      }
  
-+    private static float[] blastResistance = null; // Fiddle - remove hard-coded Bukkit values - Material - block blast resistance
-+
      /**
-      * Obtains the blast resistance value (also known as block "durability").
-      * <br>
-@@ -9977,886 +5842,21 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -9993,885 +5726,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+      * @return the blast resistance of that material.
       */
      public float getBlastResistance() {
-         Preconditions.checkArgument(isBlock(), "The Material is not a block!");
+-        Preconditions.checkArgument(isBlock(), "The Material is not a block!");
 -        switch (this) {
 -            // <editor-fold defaultstate="collapsed" desc="getBlastResistance">
 -            case BIG_DRIPLEAF:
@@ -5567,28 +5553,16 @@ index a071700d016e774b530d7221275d101125673846..678c19810e23d18d1f4c00fd56980f56
 -            default:
 -                return 0;
 -            // </editor-fold>
-+        // Fiddle start - remove hard-coded Bukkit values - Material - block blast resistance
-+        if (blastResistance == null) {
-+            blastResistance = new float[length];
-+            for (Material material : values) {
-+                if (material.isBlock()) {
-+                    blastResistance[material.ordinal()] = Bukkit.getUnsafe().getBlockBlastResistance(material);
-+                }
-+            }
-         }
-+        return blastResistance[this.ordinal()];
-+        // Fiddle end - remove hard-coded Bukkit values - Material - block blast resistance
+-        }
++        return Bukkit.getUnsafe().getBlastResistance(this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
      }
  
-+    private static float[] slipperiness = null; // Fiddle - remove hard-coded Bukkit values - Material - block slipperiness
-+
      /**
-      * Returns a value that represents how 'slippery' the block is.
-      *
-@@ -10871,22 +5871,21 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -10887,21 +5742,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+      * @return the slipperiness of this block
       */
      public float getSlipperiness() {
-         Preconditions.checkArgument(isBlock(), "The Material is not a block!");
+-        Preconditions.checkArgument(isBlock(), "The Material is not a block!");
 -        switch (this) {
 -            // <editor-fold defaultstate="collapsed" desc="getSlipperiness">
 -            default:
@@ -5602,28 +5576,16 @@ index a071700d016e774b530d7221275d101125673846..678c19810e23d18d1f4c00fd56980f56
 -            case BLUE_ICE:
 -                return 0.989F;
 -            // </editor-fold>
-+        // Fiddle start - remove hard-coded Bukkit values - Material - block slipperiness
-+        if (slipperiness == null) {
-+            slipperiness = new float[length];
-+            for (Material material : values) {
-+                if (material.isBlock()) {
-+                    slipperiness[material.ordinal()] = Bukkit.getUnsafe().getBlockSlipperiness(material);
-+                }
-+            }
-         }
-+        return slipperiness[this.ordinal()];
-+        // Fiddle end - remove hard-coded Bukkit values - Material - block slipperiness
+-        }
++        return Bukkit.getUnsafe().getSlipperiness(this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
      }
  
-+    private static @Nullable Material[] craftingRemainingItem = null; // Fiddle - remove hard-coded Bukkit values - Material - item crafting remaining item
-+
      /**
-      * Determines the remaining item in a crafting grid after crafting with this
-      * ingredient.
-@@ -10898,21 +5897,21 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -10914,20 +5755,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+      */
      @Nullable
      public Material getCraftingRemainingItem() {
-         Preconditions.checkArgument(isItem(), "The Material is not an item!");
+-        Preconditions.checkArgument(isItem(), "The Material is not an item!");
 -        switch (this) {
 -            // <editor-fold defaultstate="collapsed" desc="getCraftingRemainingItem">
 -            case WATER_BUCKET:
@@ -5636,28 +5598,16 @@ index a071700d016e774b530d7221275d101125673846..678c19810e23d18d1f4c00fd56980f56
 -            default:
 -                return null;
 -            // </editor-fold>
-+        // Fiddle - remove hard-coded Bukkit values - Material - item crafting remaining item
-+        if (craftingRemainingItem == null) {
-+            craftingRemainingItem = new Material[length];
-+            for (Material material : values) {
-+                if (material.isItem()) {
-+                    craftingRemainingItem[material.ordinal()] = Bukkit.getUnsafe().getItemCraftingRemainingItem(material);
-+                }
-+            }
-         }
-+        return craftingRemainingItem[this.ordinal()];
-+        // Fiddle end - remove hard-coded Bukkit values - Material - item crafting remaining item
+-        }
++        return Bukkit.getUnsafe().getCraftingRemainingItem(this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
      }
  
-+    private static @Nullable EquipmentSlot[] equipmentSlot = null; // Fiddle - remove hard-coded Bukkit values - Material - item equipment slot
-+
      /**
-      * Get the best suitable slot for this Material.
-      *
-@@ -10923,52 +5922,17 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -10939,53 +5767,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+      */
      @NotNull
      public EquipmentSlot getEquipmentSlot() {
-         Preconditions.checkArgument(isItem(), "The Material is not an item!");
+-        Preconditions.checkArgument(isItem(), "The Material is not an item!");
 -        switch (this) {
 -            // <editor-fold defaultstate="collapsed" desc="getEquipmentSlot">
 -            case CARVED_PUMPKIN:
@@ -5703,61 +5653,207 @@ index a071700d016e774b530d7221275d101125673846..678c19810e23d18d1f4c00fd56980f56
 -            default:
 -                return EquipmentSlot.HAND;
 -            // </editor-fold>
-+        // Fiddle start - remove hard-coded Bukkit values - Material - item equipment slot
-+        if (equipmentSlot == null) {
-+            equipmentSlot = new EquipmentSlot[length];
-+            for (Material material : values) {
-+                if (material.isItem()) {
-+                    equipmentSlot[material.ordinal()] = Bukkit.getUnsafe().getItemEquipmentSlot(material);
-+                }
-+            }
-         }
-+        return equipmentSlot[this.ordinal()];
-+        // Fiddle end - remove hard-coded Bukkit values - Material - item equipment slot
+-        }
++        return Bukkit.getUnsafe().getEquipmentSlot(this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
      }
  
      /**
 diff --git a/src/main/java/org/bukkit/UnsafeValues.java b/src/main/java/org/bukkit/UnsafeValues.java
-index 008ec1c4f74a926df805095fa99fdc21436fe34a..56a033b29b1b694b4f7bcc274d6c703bed6df464 100644
+index 995e0a05c3b39f0fd76b83143f298c30f8f4cd48..e7f2beda0283a3b8531e4e98bce9644fd1eb360d 100644
 --- a/src/main/java/org/bukkit/UnsafeValues.java
 +++ b/src/main/java/org/bukkit/UnsafeValues.java
-@@ -265,4 +265,39 @@ public interface UnsafeValues {
+@@ -265,4 +265,49 @@ public interface UnsafeValues {
       */
      void setBiomeKey(RegionAccessor accessor, int x, int y, int z, NamespacedKey biomeKey);
      // Paper end
 +
-+    boolean isBlock(Material material); // Fiddle - remove hard-coded Bukkit values - Material - is block
++    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
++    boolean isBlock(Material material);
 +
-+    boolean isEdible(Material material); // Fiddle - remove hard-coded Bukkit values - Material - is edible
++    boolean isEdible(Material material);
 +
-+    boolean isRecord(Material material); // Fiddle - remove hard-coded Bukkit values - Material - is record
++    boolean isRecord(Material material);
 +
-+    boolean isSolid(Material material); // Fiddle - remove hard-coded Bukkit values - Material - is solid
++    boolean isSolid(Material material);
 +
-+    boolean isAir(Material material); // Fiddle - remove hard-coded Bukkit values - Material - is air
++    boolean isAir(Material material);
 +
-+    boolean isFlammable(Material material); // Fiddle - remove hard-coded Bukkit values - Material - is flammable
++    boolean isFlammable(Material material);
 +
-+    boolean isBurnable(Material material); // Fiddle - remove hard-coded Bukkit values - Material - is burnable
++    boolean isBurnable(Material material);
 +
-+    boolean isFuel(Material material); // Fiddle - remove hard-coded Bukkit values - Material - is fuel
++    boolean isFuel(Material material);
 +
-+    boolean isOccluding(Material material); // Fiddle - remove hard-coded Bukkit values - Material - is occluding
++    boolean isOccluding(Material material);
 +
-+    boolean hasGravity(Material material); // Fiddle - remove hard-coded Bukkit values - Material - has gravity
++    boolean hasGravity(Material material);
 +
-+    boolean isItem(Material material); // Fiddle - remove hard-coded Bukkit values - Material - is item
++    boolean isItem(Material material);
 +
-+    boolean isInteractable(Material material); // Fiddle - remove hard-coded Bukkit values - Material - is interactable
++    boolean isInteractable(Material material);
 +
-+    float getBlockHardness(Material blockMaterial); // Fiddle - remove hard-coded Bukkit values - Material - block hardness
++    float getHardness(Material material);
 +
-+    float getBlockBlastResistance(Material blockMaterial); // Fiddle - remove hard-coded Bukkit values - Material - block blast resistance
++    float getBlastResistance(Material material);
 +
-+    float getBlockSlipperiness(Material blockMaterial); // Fiddle - remove hard-coded Bukkit values - Material - block slipperiness
++    float getSlipperiness(Material material);
 +
-+    @Nullable Material getItemCraftingRemainingItem(Material itemMaterial); // Fiddle - remove hard-coded Bukkit values - Material - item crafting remaining item
++    /**
++     * @throws IllegalArgumentException If the given {@code material}
++     * is not an {@linkplain Material#isItem item}.
++     */
++    @Nullable Material getCraftingRemainingItem(Material material);
 +
-+    @NotNull EquipmentSlot getItemEquipmentSlot(Material itemMaterial); // Fiddle - remove hard-coded Bukkit values - Material - item equipment slot
++    /**
++     * @throws IllegalArgumentException If the given {@code material}
++     * is not an {@linkplain Material#isItem item}.
++     */
++    @NotNull EquipmentSlot getEquipmentSlot(Material material);
++    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
 +
+ }
+diff --git a/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java b/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
+index d1ca826aa4081ce7766c5ad705a3e772c2683860..068ff2f4d8511bc4744e569a499df2617fd98e61 100644
+--- a/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
++++ b/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
+@@ -2,6 +2,7 @@
+ 
+ package org.fiddlemc.fiddle.material;
+ 
++import com.google.common.base.Preconditions;
+ import org.bukkit.Material;
+ 
+ /**
+@@ -17,4 +18,85 @@ public final class MaterialDefaultImplementations {
+         throw new RuntimeException();
+     }
+ 
++    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
++    /**
++     * @throws IllegalArgumentException If the given {@code material}
++     * is not {@linkplain Material#isLegacy legacy}.
++     */
++    public static boolean isBlockLegacy(Material material) {
++        Preconditions.checkArgument(material.isLegacy(), "Cannot call isBlockLegacy(Material) for Modern Material");
++        // Based on the original org.bukkit.Material#isBlock
++        int id = material.getId();
++        return 0 <= id && id < 256;
++    }
++
++    /**
++     * @throws IllegalArgumentException If the given {@code material}
++     * is not {@linkplain Material#isLegacy legacy}.
++     */
++    public static boolean isItemLegacy(Material material) {
++        Preconditions.checkArgument(material.isLegacy(), "Cannot call isItemLegacy(Material) for Modern Material");
++        // Based on the original org.bukkit.Material#isItem
++        switch (material) {
++            //<editor-fold defaultstate="collapsed" desc="isItemLegacy">
++            case LEGACY_ACACIA_DOOR:
++            case LEGACY_BED_BLOCK:
++            case LEGACY_BEETROOT_BLOCK:
++            case LEGACY_BIRCH_DOOR:
++            case LEGACY_BREWING_STAND:
++            case LEGACY_BURNING_FURNACE:
++            case LEGACY_CAKE_BLOCK:
++            case LEGACY_CARROT:
++            case LEGACY_CAULDRON:
++            case LEGACY_COCOA:
++            case LEGACY_CROPS:
++            case LEGACY_DARK_OAK_DOOR:
++            case LEGACY_DAYLIGHT_DETECTOR_INVERTED:
++            case LEGACY_DIODE_BLOCK_OFF:
++            case LEGACY_DIODE_BLOCK_ON:
++            case LEGACY_DOUBLE_STEP:
++            case LEGACY_DOUBLE_STONE_SLAB2:
++            case LEGACY_ENDER_PORTAL:
++            case LEGACY_END_GATEWAY:
++            case LEGACY_FIRE:
++            case LEGACY_FLOWER_POT:
++            case LEGACY_FROSTED_ICE:
++            case LEGACY_GLOWING_REDSTONE_ORE:
++            case LEGACY_IRON_DOOR_BLOCK:
++            case LEGACY_JUNGLE_DOOR:
++            case LEGACY_LAVA:
++            case LEGACY_MELON_STEM:
++            case LEGACY_NETHER_WARTS:
++            case LEGACY_PISTON_EXTENSION:
++            case LEGACY_PISTON_MOVING_PIECE:
++            case LEGACY_PORTAL:
++            case LEGACY_POTATO:
++            case LEGACY_PUMPKIN_STEM:
++            case LEGACY_PURPUR_DOUBLE_SLAB:
++            case LEGACY_REDSTONE_COMPARATOR_OFF:
++            case LEGACY_REDSTONE_COMPARATOR_ON:
++            case LEGACY_REDSTONE_LAMP_ON:
++            case LEGACY_REDSTONE_TORCH_OFF:
++            case LEGACY_REDSTONE_WIRE:
++            case LEGACY_SIGN_POST:
++            case LEGACY_SKULL:
++            case LEGACY_SPRUCE_DOOR:
++            case LEGACY_STANDING_BANNER:
++            case LEGACY_STATIONARY_LAVA:
++            case LEGACY_STATIONARY_WATER:
++            case LEGACY_SUGAR_CANE_BLOCK:
++            case LEGACY_TRIPWIRE:
++            case LEGACY_WALL_BANNER:
++            case LEGACY_WALL_SIGN:
++            case LEGACY_WATER:
++            case LEGACY_WOODEN_DOOR:
++            case LEGACY_WOOD_DOUBLE_STEP:
++                //</editor-fold>
++                return false;
++            default:
++                return true;
++        }
++    }
++    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
++
+ }
+diff --git a/src/test/java/org/bukkit/scoreboard/CriteriaTest.java b/src/test/java/org/bukkit/scoreboard/CriteriaTest.java
+index a93f28e2f987a36e2c7e4f7d31506b750bdb222b..7ab5a717eb3a16e99b63efc3828c80b003125e3e 100644
+--- a/src/test/java/org/bukkit/scoreboard/CriteriaTest.java
++++ b/src/test/java/org/bukkit/scoreboard/CriteriaTest.java
+@@ -5,19 +5,37 @@ import org.bukkit.Statistic;
+ import org.bukkit.entity.EntityType;
+ import org.junit.Assert;
+ import org.junit.Test;
++import org.mockito.MockMakers;
++
++import static org.mockito.Mockito.*;
+ 
+ public class CriteriaTest {
+ 
+     @Test
+     public void testStatistic() {
+         io.papermc.paper.testing.TestServer.setup(); // Paper
++        // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
++        var nonBlockEnumValue = mock(Material.class, withSettings().mockMaker(MockMakers.INLINE)); // Used to be Material.DIAMOND_SWORD
++        when(nonBlockEnumValue.isItem()).thenReturn(true);
++        when(nonBlockEnumValue.isBlock()).thenReturn(false);
++        var nonItemEnumValue = mock(Material.class, withSettings().mockMaker(MockMakers.INLINE)); // Used to be Material.WATER
++        when(nonItemEnumValue.isItem()).thenReturn(false);
++        when(nonItemEnumValue.isBlock()).thenReturn(true);
++        var nonEntityButItemEnumValue = mock(Material.class, withSettings().mockMaker(MockMakers.INLINE)); // Used to be Material.AMETHYST_SHARD
++        when(nonEntityButItemEnumValue.isItem()).thenReturn(true);
++        when(nonEntityButItemEnumValue.isBlock()).thenReturn(false);
++        var nonEntityButBlockEnumValue = mock(Material.class, withSettings().mockMaker(MockMakers.INLINE)); // Used to be Material.STONE
++        when(nonEntityButBlockEnumValue.isItem()).thenReturn(true);
++        when(nonEntityButBlockEnumValue.isBlock()).thenReturn(true);
++        var arbitraryMaterialValue = nonEntityButBlockEnumValue; // Used to be Material.STONE
+ 
+-        Assert.assertThrows(IllegalArgumentException.class, () -> Criteria.statistic(Statistic.AVIATE_ONE_CM, Material.STONE)); // Generic statistic with block
++        Assert.assertThrows(IllegalArgumentException.class, () -> Criteria.statistic(Statistic.AVIATE_ONE_CM, arbitraryMaterialValue)); // Generic statistic with block
+         Assert.assertThrows(IllegalArgumentException.class, () -> Criteria.statistic(Statistic.AVIATE_ONE_CM, EntityType.CREEPER)); // Generic statistic with entity type
+ 
+-        Assert.assertThrows(IllegalArgumentException.class, () -> Criteria.statistic(Statistic.ENTITY_KILLED_BY, Material.AMETHYST_SHARD)); // Entity statistic with material
+-        Assert.assertThrows(IllegalArgumentException.class, () -> Criteria.statistic(Statistic.MINE_BLOCK, Material.DIAMOND_PICKAXE)); // Block statistic with item
+-        Assert.assertThrows(IllegalArgumentException.class, () -> Criteria.statistic(Statistic.BREAK_ITEM, Material.WATER)); // Item statistic with block
+-        Assert.assertThrows(IllegalArgumentException.class, () -> Criteria.statistic(Statistic.KILL_ENTITY, Material.STONE)); // Entity statistic with Material
++        Assert.assertThrows(IllegalArgumentException.class, () -> Criteria.statistic(Statistic.ENTITY_KILLED_BY, nonEntityButItemEnumValue)); // Entity statistic with material
++        Assert.assertThrows(IllegalArgumentException.class, () -> Criteria.statistic(Statistic.MINE_BLOCK, nonBlockEnumValue)); // Block statistic with item
++        Assert.assertThrows(IllegalArgumentException.class, () -> Criteria.statistic(Statistic.BREAK_ITEM, nonItemEnumValue)); // Item statistic with block
++        Assert.assertThrows(IllegalArgumentException.class, () -> Criteria.statistic(Statistic.KILL_ENTITY, nonEntityButBlockEnumValue)); // Entity statistic with Material
++        // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
+     }
  }
