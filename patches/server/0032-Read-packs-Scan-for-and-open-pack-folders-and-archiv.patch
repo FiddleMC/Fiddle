@@ -81,7 +81,7 @@ index 4c67e52c685a6d44f4169db8cb974a90e284ff04..a98692c422dfb994cca4ff29c00e24c9
              /*
              IRegistryCustom.Dimension iregistrycustom_dimension = worldstem.registries().compositeAccess();
 diff --git a/src/main/java/org/bukkit/craftbukkit/Main.java b/src/main/java/org/bukkit/craftbukkit/Main.java
-index 717e292040ed7779eb4b6c5fa26665d3df9024e7..e7f95587a78d2d244d065d90857c6da0e2b28fcd 100644
+index daed278d1bcf84ee42749f24e311b22b70015d79..7bf1e22ff2add483d46b851a9e21a267392dc83e 100644
 --- a/src/main/java/org/bukkit/craftbukkit/Main.java
 +++ b/src/main/java/org/bukkit/craftbukkit/Main.java
 @@ -18,6 +18,13 @@ public class Main {

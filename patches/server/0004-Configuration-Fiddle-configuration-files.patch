@@ -871,10 +871,10 @@ index 0000000000000000000000000000000000000000..76adbd0b8bfe9cd5f6dd389263fc6ca7
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/configuration/FiddleWorldConfiguration.java b/src/main/java/org/fiddlemc/fiddle/configuration/FiddleWorldConfiguration.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..b72fd3559a7057c96c02df73ac4ae7ccff9bd32e
+index 0000000000000000000000000000000000000000..ad2b35278ee7ef1460e2a76d2953d3fce72d52d8
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/configuration/FiddleWorldConfiguration.java
-@@ -0,0 +1,40 @@
+@@ -0,0 +1,33 @@
 +// Fiddle - Fiddle configuration - world configuration
 +
 +package org.fiddlemc.fiddle.configuration;
@@ -906,13 +906,6 @@ index 0000000000000000000000000000000000000000..b72fd3559a7057c96c02df73ac4ae7cc
 +
 +    @Setting(Configuration.VERSION_FIELD)
 +    public int version = CURRENT_VERSION;
-+
-+    public PlaceholderPart placeholderPart;
-+    public class PlaceholderPart extends ConfigurationPart {
-+
-+        public int placeholderValue = 0;
-+
-+    }
 +
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/configuration/timingsexport/FiddleConfigurationTimingsExport.java b/src/main/java/org/fiddlemc/fiddle/configuration/timingsexport/FiddleConfigurationTimingsExport.java

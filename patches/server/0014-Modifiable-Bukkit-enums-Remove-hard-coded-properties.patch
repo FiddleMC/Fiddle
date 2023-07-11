@@ -2,24 +2,47 @@ From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
 Date: Mon, 10 Jul 2023 22:05:08 +0200
 Subject: [PATCH] Modifiable Bukkit enums - Remove hard-coded properties -
- Material - Cached MaterialData constructor
+ Material - Key
 
-Modifies the Material properties getData() and getNewData(byte) so that they are no longer computed in Material, but in UnsafeValues.
+Modifies the Material property getKey() so that it is no longer computed in Material, but in UnsafeValues.
 
 The property values are cached after being computed, for performant access.
 
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
-diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-index e011a7de29f6db19dac757dbe8255bee5fbb4a3b..f53d0ee25a913abc6421086885f20f740132c077 100644
---- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-+++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-@@ -14,6 +14,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
- import com.mojang.serialization.Dynamic;
- import java.io.File;
- import java.io.IOException;
-+import java.lang.reflect.Constructor;
+diff --git a/src/test/java/org/fiddlemc/fiddle/material/legacy/PerNonLegacyMaterialTest.java b/src/test/java/org/fiddlemc/fiddle/material/legacy/PerNonLegacyMaterialTest.java
+index 4e7efd1c5c64d0e4df11ceb4314837f86de1d81a..2e3af5beaf505db6ec74cc9dc53adf94e6b99d83 100644
+--- a/src/test/java/org/fiddlemc/fiddle/material/legacy/PerNonLegacyMaterialTest.java
++++ b/src/test/java/org/fiddlemc/fiddle/material/legacy/PerNonLegacyMaterialTest.java
+@@ -3,12 +3,14 @@
+ package org.fiddlemc.fiddle.material.legacy;
+ 
+ import org.bukkit.Material;
++import org.bukkit.NamespacedKey;
+ import org.bukkit.craftbukkit.legacy.CraftLegacy;
+ import org.bukkit.support.AbstractTestingBase;
+ import org.junit.Test;
+ 
  import java.util.Arrays;
- import java.util.Collections;
- import java.util.HashMap;
+ import java.util.function.Predicate;
++import java.util.Locale;
+ 
+ import static org.junit.Assert.assertEquals;
+ 
+@@ -35,6 +37,15 @@ public class PerNonLegacyMaterialTest extends AbstractTestingBase {
+         }
+     }
+ 
++    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - key
++    @Test
++    public void getKey() {
++        for (Material material : getMaterials()) {
++            assertEquals("getKey is correct for " + material, NamespacedKey.minecraft(material.name().toLowerCase(Locale.ROOT)), material.getKey());
++        }
++    }
++    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - key
++
+     // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - max stack size
+     @Test
+     public void getMaxStackSize() {
