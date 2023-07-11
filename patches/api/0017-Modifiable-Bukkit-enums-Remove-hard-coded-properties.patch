@@ -12,10 +12,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 5e15a3e56fb5d975eedcef23e5502d2956146243..030ead91780d368e7cf8456c3eabe1c406d2996f 100644
+index 1d76002b8d5d35f759db1de92f0a6c8c27632268..b1b55857b9c9a0df0bd26044096d6473979d58f4 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -4487,7 +4487,16 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4485,7 +4485,16 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       */
      @Deprecated
      public int getId() {
@@ -34,7 +34,7 @@ index 5e15a3e56fb5d975eedcef23e5502d2956146243..030ead91780d368e7cf8456c3eabe1c4
      }
  
 diff --git a/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java b/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
-index 0cb7b15b5effdb5dd633e560dcdf4c596a0098a4..80b8e3d1f142db42601f32192bf53f90e8bd60ef 100644
+index 05634ed3677b0fad2cf9274457966927e55064f8..e917f1d87b11a380f5dd279fc918685d7b69b99b 100644
 --- a/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
 +++ b/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
 @@ -24,6 +24,483 @@ public final class MaterialDefaultImplementations {
@@ -521,7 +521,7 @@ index 0cb7b15b5effdb5dd633e560dcdf4c596a0098a4..80b8e3d1f142db42601f32192bf53f90
      // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - is legacy
      @Deprecated
      public static final String LEGACY_MATERIAL_PREFIX = "LEGACY_";
-@@ -81,6 +558,16 @@ public final class MaterialDefaultImplementations {
+@@ -90,6 +567,16 @@ public final class MaterialDefaultImplementations {
      }
      // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - is empty
  

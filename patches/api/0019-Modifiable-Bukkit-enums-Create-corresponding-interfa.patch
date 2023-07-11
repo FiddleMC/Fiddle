@@ -13,10 +13,10 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 50a1ddf44c5b9c385efe3161840fef249b6f383d..efdbc27f2599b3a352aeb56e69bbba086e21dc77 100644
+index ac45f5ea97fc1686c7e4d8c6b4f209697131481b..c0ae028ba874510db8e5a5da6ffbc4366927239c 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -112,6 +112,7 @@ import org.bukkit.inventory.CreativeCategory;
+@@ -109,6 +109,7 @@ import org.bukkit.inventory.CreativeCategory;
  import org.bukkit.inventory.EquipmentSlot;
  import org.bukkit.material.MaterialData;
  import org.fiddlemc.fiddle.material.MaterialDefaultImplementations;
@@ -24,7 +24,7 @@ index 50a1ddf44c5b9c385efe3161840fef249b6f383d..efdbc27f2599b3a352aeb56e69bbba08
  import org.jetbrains.annotations.NotNull;
  import org.jetbrains.annotations.Nullable;
  
-@@ -119,7 +120,7 @@ import org.jetbrains.annotations.Nullable;
+@@ -116,7 +117,7 @@ import org.jetbrains.annotations.Nullable;
   * An enum of all material IDs accepted by the official server and client
   */
  @SuppressWarnings({"DeprecatedIsStillUsed", "deprecation"}) // Paper

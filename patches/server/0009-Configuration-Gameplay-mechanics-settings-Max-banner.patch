@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
-Date: Tue, 11 Jul 2023 20:46:24 +0200
+Date: Tue, 11 Jul 2023 16:46:24 +0200
 Subject: [PATCH] Configuration - Gameplay mechanics settings - Max banner
  patterns
 
@@ -101,10 +101,10 @@ index 8353dc836de40d18e07eaffa518399ed5bb2ac69..87af15b0d2e74f0d07d4e6f8331eea6a
                  }
              }
 diff --git a/src/main/java/org/fiddlemc/fiddle/configuration/FiddleWorldConfiguration.java b/src/main/java/org/fiddlemc/fiddle/configuration/FiddleWorldConfiguration.java
-index ad2b35278ee7ef1460e2a76d2953d3fce72d52d8..058fb8deddc79828962f3a44abad4924b10a0781 100644
+index ad2b35278ee7ef1460e2a76d2953d3fce72d52d8..30e7ecdc4f40a93eeb6e1eb4957936027346d2ba 100644
 --- a/src/main/java/org/fiddlemc/fiddle/configuration/FiddleWorldConfiguration.java
 +++ b/src/main/java/org/fiddlemc/fiddle/configuration/FiddleWorldConfiguration.java
-@@ -30,4 +30,35 @@ public class FiddleWorldConfiguration extends ConfigurationPart {
+@@ -30,4 +30,40 @@ public class FiddleWorldConfiguration extends ConfigurationPart {
      @Setting(Configuration.VERSION_FIELD)
      public int version = CURRENT_VERSION;
  
@@ -128,6 +128,11 @@ index ad2b35278ee7ef1460e2a76d2953d3fce72d52d8..058fb8deddc79828962f3a44abad4924
 +             * Adding additional patterns can still be achieved either with a banner pattern, or by selecting
 +             * a shape while a banner with fewer than 6 patterns is in the input slot, and then swapping it out
 +             * with the intended recipient banner.
++             * <br>
++             * In the future, we should probably decide to mark this value as non-experimental (by making it
++             * no longer transient) if it is properly supported with the Fiddle client mod (by including the setting
++             * value in a packet sent to the client) - and simply document that it mostly works, but not smoothly,
++             * without the client mod.
 +             */
 +            public transient int createWithLoom = 6;
 +

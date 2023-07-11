@@ -12,10 +12,18 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 3957ef6ca3dfe00e3f19e6ae1dc75717cf9dac20..908146f83d7c43f1ee91893af8a37356bdaf963d 100644
+index 3957ef6ca3dfe00e3f19e6ae1dc75717cf9dac20..0da834ce38344d854b0e93acd1ed6265c68fe7d4 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -4394,7 +4394,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4,7 +4,6 @@ import com.google.common.base.Preconditions;
+ import com.google.common.collect.Maps;
+ import com.google.common.collect.Multimap;
+ import java.lang.reflect.Constructor;
+-import java.util.Locale;
+ import java.util.Map;
+ import java.util.function.Consumer;
+ import org.bukkit.attribute.Attribute;
+@@ -4394,7 +4393,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      private final short durabilityHardcoded;
      public final Class<?> data;
      private final boolean legacy;
@@ -23,7 +31,7 @@ index 3957ef6ca3dfe00e3f19e6ae1dc75717cf9dac20..908146f83d7c43f1ee91893af8a37356
  
      private Material(final int id) {
          this(id, 64);
-@@ -4422,7 +4421,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4422,7 +4420,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
          this.maxStackHardcoded = stack;
          this.data = data;
          this.legacy = this.name().startsWith(LEGACY_PREFIX);
@@ -31,7 +39,7 @@ index 3957ef6ca3dfe00e3f19e6ae1dc75717cf9dac20..908146f83d7c43f1ee91893af8a37356
          // try to cache the constructor for this material
          try {
              if (MaterialData.class.isAssignableFrom(data)) {
-@@ -4521,8 +4519,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4521,8 +4518,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      @NotNull
      @Override
      public NamespacedKey getKey() {

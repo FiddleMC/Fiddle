@@ -11,18 +11,20 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 030ead91780d368e7cf8456c3eabe1c406d2996f..50a1ddf44c5b9c385efe3161840fef249b6f383d 100644
+index b1b55857b9c9a0df0bd26044096d6473979d58f4..ac45f5ea97fc1686c7e4d8c6b4f209697131481b 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -1,7 +1,6 @@
+@@ -1,9 +1,7 @@
  package org.bukkit;
  
  import com.google.common.base.Preconditions;
 -import com.google.common.collect.Maps;
  import com.google.common.collect.Multimap;
- import java.lang.reflect.Constructor;
- import java.util.Locale;
-@@ -4388,7 +4387,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+-import java.util.Map;
+ import java.util.function.Consumer;
+ import org.bukkit.attribute.Attribute;
+ import org.bukkit.attribute.AttributeModifier;
+@@ -4386,7 +4384,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      public static final String LEGACY_PREFIX = MaterialDefaultImplementations.LEGACY_MATERIAL_PREFIX; // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - is legacy
  
      private final int id;
@@ -30,7 +32,7 @@ index 030ead91780d368e7cf8456c3eabe1c406d2996f..50a1ddf44c5b9c385efe3161840fef24
      private final int maxStackHardcoded;
      private final short durabilityHardcoded;
      public final Class<?> data;
-@@ -4714,7 +4712,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4712,7 +4709,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       */
      @Nullable
      public static Material getMaterial(@NotNull final String name) {
@@ -39,7 +41,7 @@ index 030ead91780d368e7cf8456c3eabe1c406d2996f..50a1ddf44c5b9c385efe3161840fef24
      }
  
      /**
-@@ -4735,16 +4733,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4733,16 +4730,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       */
      @Nullable
      public static Material getMaterial(@NotNull String name, boolean legacyName) {
@@ -57,7 +59,7 @@ index 030ead91780d368e7cf8456c3eabe1c406d2996f..50a1ddf44c5b9c385efe3161840fef24
      }
  
      /**
-@@ -4759,7 +4748,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4757,7 +4745,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       */
      @Nullable
      public static Material matchMaterial(@NotNull final String name) {
@@ -66,7 +68,7 @@ index 030ead91780d368e7cf8456c3eabe1c406d2996f..50a1ddf44c5b9c385efe3161840fef24
      }
  
      /**
-@@ -4776,23 +4765,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4774,23 +4762,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       */
      @Nullable
      public static Material matchMaterial(@NotNull final String name, boolean legacyName) {
@@ -92,7 +94,7 @@ index 030ead91780d368e7cf8456c3eabe1c406d2996f..50a1ddf44c5b9c385efe3161840fef24
  
      /**
 diff --git a/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java b/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
-index 80b8e3d1f142db42601f32192bf53f90e8bd60ef..4ac3363c2fcdca851bdf6eb67bbc1177f2794b86 100644
+index e917f1d87b11a380f5dd279fc918685d7b69b99b..7f99bad6140f600382af858d7cb13577bf5c3c98 100644
 --- a/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
 +++ b/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
 @@ -3,13 +3,17 @@
@@ -113,7 +115,7 @@ index 80b8e3d1f142db42601f32192bf53f90e8bd60ef..4ac3363c2fcdca851bdf6eb67bbc1177
  
  /**
   * This class provides a number of default implementations for {@link Material} that
-@@ -536,6 +540,7 @@ public final class MaterialDefaultImplementations {
+@@ -545,6 +549,7 @@ public final class MaterialDefaultImplementations {
          }
      );
  
@@ -121,7 +123,7 @@ index 80b8e3d1f142db42601f32192bf53f90e8bd60ef..4ac3363c2fcdca851bdf6eb67bbc1177
      private static final CachedMaterialProperty<Class<? extends MaterialData>> materialDataConstructorDeclaringClassCache = new CachedMaterialProperty<>(
          Class[]::new,
          material -> {
-@@ -548,6 +553,20 @@ public final class MaterialDefaultImplementations {
+@@ -557,6 +562,20 @@ public final class MaterialDefaultImplementations {
      );
      // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - cached constructor
  
@@ -142,7 +144,7 @@ index 80b8e3d1f142db42601f32192bf53f90e8bd60ef..4ac3363c2fcdca851bdf6eb67bbc1177
      // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - is empty
      public static boolean isEmpty(Material material) {
          // Based on the original org.bukkit.Material#isEmpty()
-@@ -676,6 +695,53 @@ public final class MaterialDefaultImplementations {
+@@ -685,6 +704,53 @@ public final class MaterialDefaultImplementations {
          return 0 <= id && id < 256;
      }
  
