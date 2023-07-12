@@ -11,10 +11,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 1d76002b8d5d35f759db1de92f0a6c8c27632268..40d6e8837be929772c2ca0003050ed8ce11b90f3 100644
+index 70000507ced5664e7b2e121ef21f3d4f42b32146..4bbd509c07469d7101ac804176db4a2aca4ca54d 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -4618,6 +4618,17 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4619,6 +4619,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
          return MaterialDefaultImplementations.getNewMaterialDataInstance(this, raw); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - cached constructor
      }
  
@@ -24,6 +24,7 @@ index 1d76002b8d5d35f759db1de92f0a6c8c27632268..40d6e8837be929772c2ca0003050ed8c
 +     * @deprecated Do not use: for internal use only.
 +     */
 +    @Deprecated(forRemoval = true)
++    @NotNull
 +    public Class<?> computeData() {
 +        return Bukkit.getUnsafe().computeData(this);
 +    }
@@ -46,10 +47,10 @@ index 340ea9b6ba1d63520e61ce39e5fd3b9350c0e321..b9a237029474c166707fae86a7c32e3d
      boolean isBlock(Material material);
  
 diff --git a/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java b/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
-index e0f5b4646140943cbd2d25d7d369467b616de1ab..dec34361f11e08bb140e7c640ce595200c42c1fa 100644
+index d4a96f7bed6bfb3c0f9ab2d1edcaedf7dae90429..271f3a51bfc2d7cee57f00cba3b3f3de1421f773 100644
 --- a/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
 +++ b/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
-@@ -152,6 +152,73 @@ public final class MaterialDefaultImplementations {
+@@ -148,6 +148,73 @@ public final class MaterialDefaultImplementations {
      }
      // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - durability
  

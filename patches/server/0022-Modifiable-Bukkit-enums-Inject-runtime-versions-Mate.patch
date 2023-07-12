@@ -1,0 +1,220 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Mon, 10 Jul 2023 22:05:08 +0200
+Subject: [PATCH] Modifiable Bukkit enums - Inject runtime versions - Material
+
+License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
+index 57c822d47b1f5d82a32b5ccb29d9ca481e55d351..c1226e5730c3439fa4a93567c721468bfad97b42 100644
+--- a/src/main/java/net/minecraft/server/Main.java
++++ b/src/main/java/net/minecraft/server/Main.java
+@@ -1,5 +1,6 @@
+ package net.minecraft.server;
+ 
++import com.google.common.collect.Streams;
+ import com.mojang.authlib.GameProfile;
+ import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
+ import com.mojang.datafixers.DataFixer;
+@@ -11,12 +12,13 @@ import java.awt.GraphicsEnvironment;
+ import java.io.File;
+ import java.io.IOException;
+ import java.io.UncheckedIOException;
++import java.lang.reflect.Type;
++import java.lang.reflect.WildcardType;
+ import java.net.Proxy;
+ import java.nio.file.Files;
+ import java.nio.file.Path;
+ import java.nio.file.Paths;
+-import java.util.Optional;
+-import java.util.UUID;
++import java.util.*;
+ import java.util.function.BooleanSupplier;
+ import io.papermc.paper.world.ThreadedWorldUpgrader;
+ import joptsimple.NonOptionArgumentSpec;
+@@ -25,6 +27,15 @@ import joptsimple.OptionSet;
+ import joptsimple.OptionSpec;
+ import joptsimple.util.PathConverter;
+ import joptsimple.util.PathProperties;
++import net.bytebuddy.ByteBuddy;
++import net.bytebuddy.description.modifier.Ownership;
++import net.bytebuddy.description.modifier.Visibility;
++import net.bytebuddy.description.type.TypeDescription;
++import net.bytebuddy.dynamic.TargetType;
++import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
++import net.bytebuddy.implementation.MethodDelegation;
++import net.bytebuddy.implementation.bind.annotation.RuntimeType;
++import net.bytebuddy.implementation.bind.annotation.This;
+ import net.minecraft.CrashReport;
+ import net.minecraft.DefaultUncaughtExceptionHandler;
+ import net.minecraft.SharedConstants;
+@@ -32,12 +43,14 @@ import net.minecraft.Util;
+ import net.minecraft.commands.Commands;
+ import net.minecraft.core.HolderLookup;
+ import net.minecraft.core.Registry;
++import net.minecraft.core.registries.BuiltInRegistries;
+ import net.minecraft.core.registries.Registries;
+ import net.minecraft.nbt.NbtOps;
+ import net.minecraft.nbt.Tag;
+ import net.minecraft.network.chat.Component;
+ import net.minecraft.obfuscate.DontObfuscate;
+ import net.minecraft.resources.RegistryOps;
++import net.minecraft.resources.ResourceLocation;
+ import net.minecraft.server.dedicated.DedicatedServer;
+ import net.minecraft.server.dedicated.DedicatedServerProperties;
+ import net.minecraft.server.dedicated.DedicatedServerSettings;
+@@ -63,14 +76,23 @@ import net.minecraft.world.level.storage.LevelStorageSource;
+ import net.minecraft.world.level.storage.LevelSummary;
+ import net.minecraft.world.level.storage.PrimaryLevelData;
+ import net.minecraft.world.level.storage.WorldData;
++import org.bukkit.Material;
+ import org.fiddlemc.fiddle.configuration.FiddleConfigurations;
+ import org.fiddlemc.fiddle.configuration.PermanenceConfirmation;
++import org.fiddlemc.fiddle.material.AbstractMaterial;
++import org.fiddlemc.fiddle.material.MaterialDefaultImplementations;
++import org.fiddlemc.fiddle.material.MaterialLegacyNameChecker;
++import org.fiddlemc.fiddle.material.OrderedEmptyMaterial;
++import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
+ import org.slf4j.Logger;
+ 
+ // CraftBukkit start
+ import com.google.common.base.Charsets;
+ import java.io.InputStreamReader;
+ import java.util.concurrent.atomic.AtomicReference;
++import java.util.function.Predicate;
++
+ import net.minecraft.SharedConstants;
+ import org.bukkit.configuration.file.YamlConfiguration;
+ // CraftBukkit end
+@@ -81,6 +103,54 @@ public class Main {
+ 
+     public Main() {}
+ 
++    // Fiddle start - modifiable Bukkit enums - inject runtime versions - Material
++    /**
++     * A delegation target for the {@link Material#getCraftingRemainingItem} method.
++     */
++    public static class GetCraftingRemainingItemTarget {
++
++        @RuntimeType
++        public static @NotNull Object cast(@This AbstractMaterial thisObject) {
++            return thisObject.getAbstractCraftingRemainingItem();
++        }
++
++    }
++
++    /**
++     * A delegation target for the {@link Material#getMaterial} method.
++     */
++    public static class GetMaterialTarget {
++
++        @RuntimeType
++        public static @Nullable Object defer(@NotNull String name) {
++            return MaterialDefaultImplementations.getMaterial(name);
++        }
++
++        @RuntimeType
++        public static @Nullable Object defer(@NotNull String name, boolean legacyName) {
++            return MaterialDefaultImplementations.getMaterial(name, legacyName);
++        }
++
++    }
++
++    /**
++     * A delegation target for the {@link Material#matchMaterial} method.
++     */
++    public static class MatchMaterialTarget {
++
++        @RuntimeType
++        public static @Nullable Object defer(@NotNull String name) {
++            return MaterialDefaultImplementations.matchMaterial(name);
++        }
++
++        @RuntimeType
++        public static @Nullable Object defer(@NotNull String name, boolean legacyName) {
++            return MaterialDefaultImplementations.matchMaterial(name, legacyName);
++        }
++
++    }
++    // Fiddle end - modifiable Bukkit enums - inject runtime versions - Material
++
+     @DontObfuscate
+     public static void main(final OptionSet optionset) { // CraftBukkit - replaces main(String[] astring)
+         SharedConstants.tryDetectVersion();
+@@ -176,6 +246,74 @@ public class Main {
+             var injectRuntimeClassVersionHelper = new InjectRuntimeClassVersionHelper();
+             // Fiddle end - modifiable Bukkit enums - inject runtime versions - common utilities
+ 
++            // Fiddle start - modifiable Bukkit enums - inject runtime versions - Material
++            // Verify that the class was not loaded yet
++            injectRuntimeClassVersionHelper.verifyClassWasNotLoaded("org.bukkit.Material");
++            // Load the runtime version
++            var vanillaEnumNames = Arrays.stream(OrderedEmptyMaterial.values()).map(OrderedEmptyMaterial::name).toList();
++            List<String> fiddleEnumNames = new ArrayList<>(1);
++            BuiltInRegistries.BLOCK.holders().forEachOrdered(blockHolder -> {
++                var resourceLocation = blockHolder.key().location();
++                var resourceNamespace = resourceLocation.getNamespace();
++                if (/*!blockHolder.value().isAddedByFiddle*/resourceNamespace.equals(ResourceLocation.DEFAULT_NAMESPACE)) { // TODO Use a Block field here
++                    return;
++                }
++                var resourcePath = resourceLocation.getPath();
++                String fiddleEnumName = "FIDDLE_" + resourceNamespace.toUpperCase(Locale.ROOT) + "_" + resourcePath.toUpperCase(Locale.ROOT); // TODO store "FIDDLE_" in some global variable that is also used in backwards compatability mode, matchMaterial, etc.
++                fiddleEnumNames.add(fiddleEnumName);
++            });
++            BuiltInRegistries.ITEM.holders().forEachOrdered(itemHolder -> {
++                var resourceLocation = itemHolder.key().location();
++                var resourceNamespace = resourceLocation.getNamespace();
++                if (/*!itemHolder.value().isAddedByFiddle*/resourceNamespace.equals(ResourceLocation.DEFAULT_NAMESPACE)) { // TODO Use an Item field here
++                    return;
++                }
++                var resourcePath = resourceLocation.getPath();
++                String fiddleEnumName = "FIDDLE_" + resourceNamespace.toUpperCase(Locale.ROOT) + "_" + resourcePath.toUpperCase(Locale.ROOT); // TODO store "FIDDLE_" in some global variable that is also used in backwards compatability mode, matchMaterial, etc.
++                if (!fiddleEnumNames.contains(fiddleEnumName)) {
++                    fiddleEnumNames.add(fiddleEnumName);
++                }
++            });
++            var enumNames = Streams.concat(
++                vanillaEnumNames.stream().filter(Predicate.not(MaterialLegacyNameChecker::isMaterialNameLegacy)),
++                fiddleEnumNames.stream(),
++                vanillaEnumNames.stream().filter(MaterialLegacyNameChecker::isMaterialNameLegacy)
++            ).toList();
++            new ByteBuddy()
++                .makeEnumeration(enumNames)
++                .name("org.bukkit.Material")
++                // Inherit the default implementations in AbstractMaterial
++                .implement(AbstractMaterial.class)
++                // Implement the getCraftingRemainingItem() method which returns the casted return value of getAbstractCraftingRemainingItem()
++                .defineMethod("getCraftingRemainingItem", TargetType.class, Visibility.PUBLIC).intercept(MethodDelegation.to(GetCraftingRemainingItemTarget.class))
++                // Implement static getMaterial(...) and matchMaterial(...) methods that defer to MaterialDefaultImplementations
++                .defineMethod("getMaterial", TargetType.class, Visibility.PUBLIC, Ownership.STATIC).withParameters(String.class).intercept(MethodDelegation.to(GetMaterialTarget.class))
++                .defineMethod("getMaterial", TargetType.class, Visibility.PUBLIC, Ownership.STATIC).withParameters(String.class, Boolean.TYPE).intercept(MethodDelegation.to(GetMaterialTarget.class))
++                .defineMethod("matchMaterial", TargetType.class, Visibility.PUBLIC, Ownership.STATIC).withParameters(String.class).intercept(MethodDelegation.to(MatchMaterialTarget.class))
++                .defineMethod("matchMaterial", TargetType.class, Visibility.PUBLIC, Ownership.STATIC).withParameters(String.class, Boolean.TYPE).intercept(MethodDelegation.to(MatchMaterialTarget.class))
++                // Implement the data field, which will initially be null, and initialized to its actual non-null value as soon as possible (which is, due to its reliance on CraftMagicNumbers#computeData and thereby Bukkit#createBlockData, as soon as the return value of Bukkit#getServer is no longer null)
++                .defineField("data", TypeDescription.Generic.Builder.parameterizedType(Class.class, new WildcardType() {
++
++                    private final Type[] upperBounds = {
++                        Object.class
++                    };
++                    private final Type[] lowerBounds = new Type[0];
++
++                    @Override
++                    public Type[] getUpperBounds() {
++                        return this.upperBounds;
++                    }
++
++                    @Override
++                    public Type[] getLowerBounds() {
++                        return this.lowerBounds;
++                    }
++
++                }).build())
++                .make()
++                .load(ClassLoader.getSystemClassLoader(), ClassLoadingStrategy.Default.INJECTION);
++            // Fiddle end - modifiable Bukkit enums - inject runtime versions - Material
++
+             dedicatedserversettings.forceSave();
+             // Paper start - load config files for access below if needed
+             org.bukkit.configuration.file.YamlConfiguration bukkitConfiguration = io.papermc.paper.configuration.PaperConfigurations.loadLegacyConfigFile((File) optionset.valueOf("bukkit-settings"));

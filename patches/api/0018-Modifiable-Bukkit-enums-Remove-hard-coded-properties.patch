@@ -12,10 +12,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 40d6e8837be929772c2ca0003050ed8ce11b90f3..c053b259dca75d2b6433f09cf19c8e55a47d3f7e 100644
+index 4bbd509c07469d7101ac804176db4a2aca4ca54d..15e9757dcc0abbeb6524a7a6a4cd600e2d325b21 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -4485,7 +4485,16 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4486,7 +4486,16 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       */
      @Deprecated
      public int getId() {
@@ -34,7 +34,7 @@ index 40d6e8837be929772c2ca0003050ed8ce11b90f3..c053b259dca75d2b6433f09cf19c8e55
      }
  
 diff --git a/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java b/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
-index dec34361f11e08bb140e7c640ce595200c42c1fa..67487c9bba1faff2d543cdcb3b415df1514de18e 100644
+index 271f3a51bfc2d7cee57f00cba3b3f3de1421f773..4e429142b5c8c904ba5a48354701bde26044c7bd 100644
 --- a/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
 +++ b/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
 @@ -24,6 +24,483 @@ public final class MaterialDefaultImplementations {
@@ -519,9 +519,9 @@ index dec34361f11e08bb140e7c640ce595200c42c1fa..67487c9bba1faff2d543cdcb3b415df1
 +    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - id
 +
      // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - is legacy
-     @Deprecated
-     public static final String LEGACY_MATERIAL_PREFIX = "LEGACY_";
-@@ -90,6 +567,16 @@ public final class MaterialDefaultImplementations {
+     private static final CachedMaterialBooleanProperty isLegacyCache = new CachedMaterialBooleanProperty(material -> {
+         // Based on the original org.bukkit.Material constructor
+@@ -87,6 +564,16 @@ public final class MaterialDefaultImplementations {
      }
      // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - is empty
  
