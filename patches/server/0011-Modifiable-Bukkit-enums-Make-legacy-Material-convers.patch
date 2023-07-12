@@ -70,7 +70,7 @@ index 471ae4458e7ea7c29d7551b32cec98180fbccd4e..42572f9bf1439b49ff4e9e358a026887
          for (int i = 0; i < items.length; i++) {
              if (items[i] != null && items[i].getType() == material) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemFactory.java b/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemFactory.java
-index 849e93a8a0645de4c3e6ab8047815d78a722d4f6..64682960669c81ef051e4d97755cf95dfc4f391c 100644
+index b4850f4da500771e890247d9ed7f7d027460a718..79e2fc54b998bf005aff92afe68a63b02383508f 100644
 --- a/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemFactory.java
 +++ b/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemFactory.java
 @@ -37,7 +37,7 @@ public final class CraftItemFactory implements ItemFactory {
@@ -92,10 +92,10 @@ index 849e93a8a0645de4c3e6ab8047815d78a722d4f6..64682960669c81ef051e4d97755cf95d
          case AIR:
              return null;
 diff --git a/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemStack.java b/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemStack.java
-index 8657736cdfe2d5d2a1c0851ca54dd26ce17e0a83..6ff2c1399052a5c4e6a775836c308c6e8b208d4f 100644
+index f62ef038af2dfe7525e72c8b8e30a3fa9ce2b451..914120b0fcd6fbe33cdbe0152497846f29e38a86 100644
 --- a/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemStack.java
 +++ b/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemStack.java
-@@ -656,7 +656,7 @@ public final class CraftItemStack extends ItemStack {
+@@ -657,7 +657,7 @@ public final class CraftItemStack extends ItemStack {
          if (this.handle == null || that.handle == null) {
              return false;
          }
