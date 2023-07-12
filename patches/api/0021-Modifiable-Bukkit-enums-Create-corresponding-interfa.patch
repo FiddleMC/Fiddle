@@ -13,7 +13,7 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index ac45f5ea97fc1686c7e4d8c6b4f209697131481b..c0ae028ba874510db8e5a5da6ffbc4366927239c 100644
+index b14a88ea73a6c79e9882929403ac4d05225378f3..03f2145131b9516d2f0096cc14172356807c0a13 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
 @@ -109,6 +109,7 @@ import org.bukkit.inventory.CreativeCategory;

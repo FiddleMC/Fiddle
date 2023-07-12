@@ -10,7 +10,7 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index c0ae028ba874510db8e5a5da6ffbc4366927239c..ae8a9d904700f866b8903284b60743dcbd46ca97 100644
+index 03f2145131b9516d2f0096cc14172356807c0a13..030da98c03ad87f968892bd8284e4bd077fa6898 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
 @@ -1,6 +1,5 @@
@@ -242,8 +242,8 @@ index c0ae028ba874510db8e5a5da6ffbc4366927239c..ae8a9d904700f866b8903284b60743dc
 +        return AbstractMaterial.super.getNewData(raw); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - cached constructor // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
      }
  
-     /**
-@@ -4630,13 +4634,15 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+     // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - data
+@@ -4641,13 +4645,15 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
       *
       * @return true if this material is a block
       */
@@ -260,7 +260,7 @@ index c0ae028ba874510db8e5a5da6ffbc4366927239c..ae8a9d904700f866b8903284b60743dc
       */
      @Deprecated(forRemoval = true)
      public boolean isBlockLegacy() {
-@@ -4649,13 +4655,15 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+@@ -4660,13 +4666,15 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
       *
       * @return true if this Material is edible.
       */
@@ -277,7 +277,7 @@ index c0ae028ba874510db8e5a5da6ffbc4366927239c..ae8a9d904700f866b8903284b60743dc
       */
      @Deprecated(forRemoval = true)
      public boolean isEdibleLegacy() {
-@@ -4710,7 +4718,7 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+@@ -4721,7 +4729,7 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
       */
      @Nullable
      public static Material getMaterial(@NotNull final String name) {
@@ -286,7 +286,7 @@ index c0ae028ba874510db8e5a5da6ffbc4366927239c..ae8a9d904700f866b8903284b60743dc
      }
  
      /**
-@@ -4731,7 +4739,7 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+@@ -4742,7 +4750,7 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
       */
      @Nullable
      public static Material getMaterial(@NotNull String name, boolean legacyName) {
@@ -295,7 +295,7 @@ index c0ae028ba874510db8e5a5da6ffbc4366927239c..ae8a9d904700f866b8903284b60743dc
      }
  
      /**
-@@ -4746,7 +4754,7 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+@@ -4757,7 +4765,7 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
       */
      @Nullable
      public static Material matchMaterial(@NotNull final String name) {
@@ -304,7 +304,7 @@ index c0ae028ba874510db8e5a5da6ffbc4366927239c..ae8a9d904700f866b8903284b60743dc
      }
  
      /**
-@@ -4763,19 +4771,21 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+@@ -4774,19 +4782,21 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
       */
      @Nullable
      public static Material matchMaterial(@NotNull final String name, boolean legacyName) {
@@ -328,7 +328,7 @@ index c0ae028ba874510db8e5a5da6ffbc4366927239c..ae8a9d904700f866b8903284b60743dc
       */
      @Deprecated(forRemoval = true)
      public boolean isRecordLegacy() {
-@@ -4789,13 +4799,15 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+@@ -4800,13 +4810,15 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
       *
       * @return True if this material is a block and solid
       */
@@ -345,7 +345,7 @@ index c0ae028ba874510db8e5a5da6ffbc4366927239c..ae8a9d904700f866b8903284b60743dc
       */
      @Deprecated(forRemoval = true)
      public boolean isSolidLegacy() {
-@@ -5013,13 +5025,15 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+@@ -5024,13 +5036,15 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
       *
       * @return True if this material is an air block.
       */
@@ -362,7 +362,7 @@ index c0ae028ba874510db8e5a5da6ffbc4366927239c..ae8a9d904700f866b8903284b60743dc
       */
      @Deprecated(forRemoval = true)
      public boolean isAirLegacy() {
-@@ -5035,14 +5049,15 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+@@ -5046,14 +5060,15 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
       * linked to the underlying server. Contributions welcome.
       * Because there is no linked implementation, this method returns false for all materials added with Fiddle.<!-- // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - is transparent -->
       */
@@ -380,7 +380,7 @@ index c0ae028ba874510db8e5a5da6ffbc4366927239c..ae8a9d904700f866b8903284b60743dc
       */
      @Deprecated(forRemoval = true)
      public boolean isTransparentLegacy() {
-@@ -5112,13 +5127,15 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+@@ -5123,13 +5138,15 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
       *
       * @return True if this material is a block and can catch fire
       */
@@ -397,7 +397,7 @@ index c0ae028ba874510db8e5a5da6ffbc4366927239c..ae8a9d904700f866b8903284b60743dc
       */
      @Deprecated(forRemoval = true)
      public boolean isFlammableLegacy() {
-@@ -5192,13 +5209,15 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+@@ -5203,13 +5220,15 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
       *
       * @return True if this material is a block and can burn away
       */
@@ -414,7 +414,7 @@ index c0ae028ba874510db8e5a5da6ffbc4366927239c..ae8a9d904700f866b8903284b60743dc
       */
      @Deprecated(forRemoval = true)
      public boolean isBurnableLegacy() {
-@@ -5254,13 +5273,15 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+@@ -5265,13 +5284,15 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
       *
       * @return true if this Material can be used as fuel.
       */
@@ -431,7 +431,7 @@ index c0ae028ba874510db8e5a5da6ffbc4366927239c..ae8a9d904700f866b8903284b60743dc
       */
      @Deprecated(forRemoval = true)
      public boolean isFuelLegacy() {
-@@ -5356,13 +5377,15 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+@@ -5367,13 +5388,15 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
       *
       * @return True if this material is a block and occludes light
       */
@@ -448,7 +448,7 @@ index c0ae028ba874510db8e5a5da6ffbc4366927239c..ae8a9d904700f866b8903284b60743dc
       */
      @Deprecated(forRemoval = true)
      public boolean isOccludingLegacy() {
-@@ -5495,13 +5518,15 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+@@ -5506,13 +5529,15 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
      /**
       * @return True if this material is affected by gravity.
       */
@@ -465,7 +465,7 @@ index c0ae028ba874510db8e5a5da6ffbc4366927239c..ae8a9d904700f866b8903284b60743dc
       */
      @Deprecated(forRemoval = true)
      public boolean hasGravityLegacy() {
-@@ -5525,13 +5550,15 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+@@ -5536,13 +5561,15 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
       *
       * @return true if this material is an item
       */
@@ -482,7 +482,7 @@ index c0ae028ba874510db8e5a5da6ffbc4366927239c..ae8a9d904700f866b8903284b60743dc
       */
      @Deprecated(forRemoval = true)
      public boolean isItemLegacy() {
-@@ -5555,8 +5582,9 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+@@ -5566,8 +5593,9 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
       *
       * @return true if this material can be interacted with.
       */
@@ -493,7 +493,7 @@ index c0ae028ba874510db8e5a5da6ffbc4366927239c..ae8a9d904700f866b8903284b60743dc
      }
  
      /**
-@@ -5568,8 +5596,9 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+@@ -5579,8 +5607,9 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
       *
       * @return the hardness of that material.
       */
@@ -504,7 +504,7 @@ index c0ae028ba874510db8e5a5da6ffbc4366927239c..ae8a9d904700f866b8903284b60743dc
      }
  
      /**
-@@ -5582,8 +5611,9 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+@@ -5593,8 +5622,9 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
       *
       * @return the blast resistance of that material.
       */
@@ -515,7 +515,7 @@ index c0ae028ba874510db8e5a5da6ffbc4366927239c..ae8a9d904700f866b8903284b60743dc
      }
  
      /**
-@@ -5598,8 +5628,9 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+@@ -5609,8 +5639,9 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
       *
       * @return the slipperiness of this block
       */
@@ -526,7 +526,7 @@ index c0ae028ba874510db8e5a5da6ffbc4366927239c..ae8a9d904700f866b8903284b60743dc
      }
  
      /**
-@@ -5610,9 +5641,10 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+@@ -5621,9 +5652,10 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
       *
       * @return the item left behind when crafting, or null if nothing is.
       */
@@ -538,7 +538,7 @@ index c0ae028ba874510db8e5a5da6ffbc4366927239c..ae8a9d904700f866b8903284b60743dc
      }
  
      /**
-@@ -5622,9 +5654,10 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+@@ -5633,9 +5665,10 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
       *
       * @return the best EquipmentSlot for this Material
       */
@@ -550,7 +550,7 @@ index c0ae028ba874510db8e5a5da6ffbc4366927239c..ae8a9d904700f866b8903284b60743dc
      }
  
      /**
-@@ -5640,11 +5673,10 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+@@ -5651,11 +5684,10 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
       * @return the immutable {@link Multimap} with the respective default
       * Attributes and modifiers, or an empty map if no attributes are set.
       */
@@ -564,7 +564,7 @@ index c0ae028ba874510db8e5a5da6ffbc4366927239c..ae8a9d904700f866b8903284b60743dc
      }
  
      /**
-@@ -5652,9 +5684,10 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+@@ -5663,9 +5695,10 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
       *
       * @return the creative category. null if does not belong to a category
       */
@@ -576,7 +576,7 @@ index c0ae028ba874510db8e5a5da6ffbc4366927239c..ae8a9d904700f866b8903284b60743dc
      }
  
      /**
-@@ -5672,13 +5705,8 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+@@ -5683,13 +5716,8 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
       */
      @Override
      @NotNull
@@ -591,7 +591,7 @@ index c0ae028ba874510db8e5a5da6ffbc4366927239c..ae8a9d904700f866b8903284b60743dc
      }
  
      /**
-@@ -5688,9 +5716,10 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+@@ -5699,9 +5727,10 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
       * @return the translation key of the block associated with this material,
       * or null if this material does not have an associated block
       */
@@ -603,7 +603,7 @@ index c0ae028ba874510db8e5a5da6ffbc4366927239c..ae8a9d904700f866b8903284b60743dc
      }
  
      /**
-@@ -5700,9 +5729,10 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+@@ -5711,9 +5740,10 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
       * @return the translation key of the item associated with this material, or
       * null if this material does not have an associated item.
       */
@@ -615,7 +615,7 @@ index c0ae028ba874510db8e5a5da6ffbc4366927239c..ae8a9d904700f866b8903284b60743dc
      }
  
      /**
-@@ -5711,7 +5741,8 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+@@ -5722,7 +5752,8 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
       * @param world the world to check
       * @return true if this material can be used in this World.
       */

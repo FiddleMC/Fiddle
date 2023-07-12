@@ -1,0 +1,200 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Wed, 12 Jul 2023 21:18:53 +0200
+Subject: [PATCH] Modifiable Bukkit enums - Remove hard-coded properties -
+ Material - getMaterial, matchMaterial
+
+Modifies the static Material getters getMaterial(...) and matchMaterial(...)
+so that they are no longer computed in Material, but in UnsafeValues.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
+index c053b259dca75d2b6433f09cf19c8e55a47d3f7e..b14a88ea73a6c79e9882929403ac4d05225378f3 100644
+--- a/src/main/java/org/bukkit/Material.java
++++ b/src/main/java/org/bukkit/Material.java
+@@ -1,9 +1,7 @@
+ package org.bukkit;
+ 
+ import com.google.common.base.Preconditions;
+-import com.google.common.collect.Maps;
+ import com.google.common.collect.Multimap;
+-import java.util.Map;
+ import java.util.function.Consumer;
+ import org.bukkit.attribute.Attribute;
+ import org.bukkit.attribute.AttributeModifier;
+@@ -4386,7 +4384,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+     public static final String LEGACY_PREFIX = MaterialDefaultImplementations.LEGACY_MATERIAL_PREFIX; // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - is legacy
+ 
+     private final int id;
+-    private static final Map<String, Material> BY_NAME = Maps.newHashMap();
+     private final int maxStackHardcoded;
+     private final short durabilityHardcoded;
+     public final Class<?> data;
+@@ -4723,7 +4720,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+      */
+     @Nullable
+     public static Material getMaterial(@NotNull final String name) {
+-        return getMaterial(name, false);
++        return MaterialDefaultImplementations.getMaterial(name); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - getMaterial
+     }
+ 
+     /**
+@@ -4744,16 +4741,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+      */
+     @Nullable
+     public static Material getMaterial(@NotNull String name, boolean legacyName) {
+-        if (legacyName) {
+-            if (!name.startsWith(LEGACY_PREFIX)) {
+-                name = LEGACY_PREFIX + name;
+-            }
+-
+-            Material match = BY_NAME.get(name);
+-            return Bukkit.getUnsafe().fromLegacy(match, false); // Fiddle - modifiable Bukkit enums - Material - make legacy conversion complete
+-        }
+-
+-        return BY_NAME.get(name);
++        return MaterialDefaultImplementations.getMaterial(name, legacyName); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - getMaterial
+     }
+ 
+     /**
+@@ -4768,7 +4756,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+      */
+     @Nullable
+     public static Material matchMaterial(@NotNull final String name) {
+-        return matchMaterial(name, false);
++        return MaterialDefaultImplementations.matchMaterial(name); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - matchMaterial
+     }
+ 
+     /**
+@@ -4785,23 +4773,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+      */
+     @Nullable
+     public static Material matchMaterial(@NotNull final String name, boolean legacyName) {
+-        Preconditions.checkArgument(name != null, "Name cannot be null");
+-
+-        String filtered = name;
+-        if (filtered.startsWith(NamespacedKey.MINECRAFT + ":")) {
+-            filtered = filtered.substring((NamespacedKey.MINECRAFT + ":").length());
+-        }
+-
+-        filtered = filtered.toUpperCase(java.util.Locale.ENGLISH);
+-
+-        filtered = filtered.replaceAll("\\s+", "_").replaceAll("\\W", "");
+-        return getMaterial(filtered, legacyName);
+-    }
+-
+-    static {
+-        for (Material material : values()) {
+-            BY_NAME.put(material.name(), material);
+-        }
++        return MaterialDefaultImplementations.matchMaterial(name, legacyName); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - matchMaterial
+     }
+ 
+     /**
+diff --git a/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java b/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
+index 67487c9bba1faff2d543cdcb3b415df1514de18e..d369bbae2c5015dbfa7ea1046b057ebc7defa9a5 100644
+--- a/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
++++ b/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
+@@ -3,13 +3,17 @@
+ package org.fiddlemc.fiddle.material;
+ 
+ import com.google.common.base.Preconditions;
++import com.google.common.collect.Maps;
++import org.bukkit.Bukkit;
+ import org.bukkit.Material;
+ import org.bukkit.NamespacedKey;
+ import org.bukkit.material.MaterialData;
+ import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
+ 
+ import java.lang.reflect.Constructor;
+ import java.util.Locale;
++import java.util.Map;
+ 
+ /**
+  * This class provides a number of default implementations for {@link Material} that
+@@ -545,6 +549,7 @@ public final class MaterialDefaultImplementations {
+         }
+     );
+ 
++    @SuppressWarnings({"unchecked", "rawtypes"})
+     private static final CachedMaterialProperty<Class<? extends MaterialData>> materialDataConstructorDeclaringClassCache = new CachedMaterialProperty<>(
+         Class[]::new,
+         material -> {
+@@ -557,6 +562,20 @@ public final class MaterialDefaultImplementations {
+     );
+     // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - cached constructor
+ 
++    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - getMaterial
++    private static @Nullable Map<String, Material> cachedMaterialsByName = null;
++
++    private static @NotNull Map<String, Material> getCachedMaterialsByName() {
++        if (cachedMaterialsByName == null) {
++            cachedMaterialsByName = Maps.newHashMap();
++            for (Material material : CachedMaterialProperty.getCachedMaterialValues()) {
++                cachedMaterialsByName.put(material.name(), material);
++            }
++        }
++        return cachedMaterialsByName;
++    }
++    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - getMaterial
++
+     // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - is empty
+     public static boolean isEmpty(Material material) {
+         // Based on the original org.bukkit.Material#isEmpty()
+@@ -752,6 +771,53 @@ public final class MaterialDefaultImplementations {
+         return 0 <= id && id < 256;
+     }
+ 
++    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - getMaterial
++    public static @Nullable Material getMaterial(@NotNull final String name) {
++        return getMaterial(name, false);
++    }
++
++    public static @Nullable Material getMaterial(@NotNull String name, boolean legacyName) {
++        // Based on the original org.bukkit.Material#getMaterial(String, boolean)
++        if (legacyName) {
++            if (!name.startsWith(LEGACY_MATERIAL_PREFIX)) {
++                name = LEGACY_MATERIAL_PREFIX + name;
++            }
++
++            Material match = getCachedMaterialsByName().get(name);
++            return Bukkit.getUnsafe().fromLegacy(match, false); // Fiddle - modifiable Bukkit enums - Material - make legacy conversion complete
++        }
++
++        return getCachedMaterialsByName().get(name);
++    }
++    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - getMaterial
++
++    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - matchMaterial
++    /**
++     * @throws IllegalArgumentException If the given {@code name} is null.
++     */
++    public static @Nullable Material matchMaterial(@NotNull final String name) {
++        return matchMaterial(name, false);
++    }
++
++    /**
++     * @throws IllegalArgumentException If the given {@code name} is null.
++     */
++    public static @Nullable Material matchMaterial(@NotNull final String name, boolean legacyName) {
++        // Based on the original org.bukkit.Material#matchMaterial(String, boolean)
++        Preconditions.checkArgument(name != null, "Name cannot be null");
++
++        String filtered = name;
++        if (filtered.startsWith(NamespacedKey.MINECRAFT + ":")) {
++            filtered = filtered.substring((NamespacedKey.MINECRAFT + ":").length());
++        }
++
++        filtered = filtered.toUpperCase(java.util.Locale.ENGLISH);
++
++        filtered = filtered.replaceAll("\\s+", "_").replaceAll("\\W", "");
++        return getMaterial(filtered, legacyName);
++    }
++    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - matchMaterial
++
+     /**
+      * @throws IllegalArgumentException If the given {@code material}
+      * is not {@linkplain Material#isLegacy legacy}.

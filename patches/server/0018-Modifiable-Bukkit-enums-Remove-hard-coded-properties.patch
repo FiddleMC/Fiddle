@@ -1,0 +1,34 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Mon, 10 Jul 2023 22:05:08 +0200
+Subject: [PATCH] Modifiable Bukkit enums - Remove hard-coded properties -
+ Material - Id
+
+Modifies the Material property getId() so that it is are no longer hard-coded directly.
+Determining the values of the properties however still relies on a hard-coded list, since
+the property is not backed by any implementation that can be used.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/test/java/org/fiddlemc/fiddle/material/legacy/PerLegacyMaterialTest.java b/src/test/java/org/fiddlemc/fiddle/material/legacy/PerLegacyMaterialTest.java
+index d4e8a13fdc9cf77c2da4f8efd50a96fffb3447cb..493e76d4341a87be6dad444d9144b2968e221e55 100644
+--- a/src/test/java/org/fiddlemc/fiddle/material/legacy/PerLegacyMaterialTest.java
++++ b/src/test/java/org/fiddlemc/fiddle/material/legacy/PerLegacyMaterialTest.java
+@@ -36,6 +36,16 @@ public class PerLegacyMaterialTest extends AbstractTestingBase {
+         }
+     }
+ 
++    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - id
++    @Test
++    @SuppressWarnings("deprecation")
++    public void getId() {
++        for (Material material : getMaterials()) {
++            assertEquals("getId equals legacy getId for " + material, material.getIdLegacy(), material.getId());
++        }
++    }
++    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - id
++
+     // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - max stack size
+     @Test
+     public void getMaxStackSize() {

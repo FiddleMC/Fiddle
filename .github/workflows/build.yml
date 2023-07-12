@@ -2,30 +2,41 @@ name: Build Fiddle
 on: [ push ]
 jobs:
   build:
-    runs-on: ubuntu-latest
     # Only run if the last commit does not start with [ci-skip]
     if: ${{ !contains(github.event.commits[0].message, '[ci-skip]') }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: [17]
+      fail-fast: true
     steps:
       - name: Checkout Git repository
         uses: actions/checkout@v3
+
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v3.11.0
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: 'temurin'
+
       - name: Validate Gradle wrapper
         uses: gradle/wrapper-validation-action@v1
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
-      - name: Set up JDK
-        uses: actions/setup-java@v3
-        with:
-          distribution: temurin
-          java-version: 17
+
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-      - name: Configure Git user details
-        run: git config --global user.email "no-reply@github.com" && git config --global user.name "Github Actions"
-      - name: Apply patches
-        run: ./gradlew applyPatches
-      - name: Create Paperclip jar
-        run: ./gradlew createReobfPaperclipJar
-      - name: Upload Paperclip jar
+
+      - name: Apply Patches
+        run: |
+          git config --global user.email "no-reply@github.com"
+          git config --global user.name "Github Actions"
+          ./gradlew applyPatches --stacktrace
+
+      - name: Create Paperclip Jar
+        run: ./gradlew createReobfPaperclipJar --stacktrace
+
+      - name: Upload Paperclip Jar
         uses: actions/upload-artifact@v3
         with:
           name: Fiddle

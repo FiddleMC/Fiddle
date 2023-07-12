@@ -1,0 +1,21 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Wed, 12 Jul 2023 21:29:08 +0200
+Subject: [PATCH] Dev import deobfuscation fixes
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/world/level/block/Blocks.java b/src/main/java/net/minecraft/world/level/block/Blocks.java
+index 877035b6c6593a28f475b9c5bcd7727e3fcdb802..f41e335be934d24080472be9d260f1be7c01614d 100644
+--- a/src/main/java/net/minecraft/world/level/block/Blocks.java
++++ b/src/main/java/net/minecraft/world/level/block/Blocks.java
+@@ -1159,7 +1159,7 @@ public class Blocks {
+     }
+ 
+     private static Boolean ocelotOrParrot(BlockState state, BlockGetter world, BlockPos pos, EntityType<?> type) {
+-        return (boolean)type == EntityType.OCELOT || type == EntityType.PARROT;
++        return type == EntityType.OCELOT || type == EntityType.PARROT; // Fiddle - dev import deobfuscation fixes
+     }
+ 
+     private static BedBlock bed(DyeColor color) {

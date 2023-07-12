@@ -105,7 +105,7 @@ index e7f2beda0283a3b8531e4e98bce9644fd1eb360d..b1fa0a6391f8c99d34c8718a82c7fe50
      boolean isBlock(Material material);
  
 diff --git a/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java b/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
-index 068ff2f4d8511bc4744e569a499df2617fd98e61..31459fd4f90e147fb54bae0ef81335a00df99c88 100644
+index 068ff2f4d8511bc4744e569a499df2617fd98e61..948eda0324709a816803ff979901500250c9f540 100644
 --- a/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
 +++ b/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
 @@ -18,6 +18,51 @@ public final class MaterialDefaultImplementations {
@@ -121,7 +121,7 @@ index 068ff2f4d8511bc4744e569a499df2617fd98e61..31459fd4f90e147fb54bae0ef81335a0
 +     * @throws IllegalArgumentException If the given {@code material} is not {@linkplain Material#isLegacy() legacy}.
 +     */
 +    public static short getMaxDurabilityLegacy(Material material) {
-+        Preconditions.checkArgument(material.isLegacy(), "Cannot getMaxDurabilityLegacy(Material) for Modern Material");
++        Preconditions.checkArgument(material.isLegacy(), "Cannot call getMaxDurabilityLegacy(Material) for Modern Material");
 +        return switch (material) {
 +            //<editor-fold defaultstate="collapsed" desc="getMaxDurabilityLegacy">
 +            case LEGACY_IRON_SPADE, LEGACY_IRON_PICKAXE, LEGACY_IRON_AXE, LEGACY_IRON_SWORD, LEGACY_IRON_HOE -> 250;
