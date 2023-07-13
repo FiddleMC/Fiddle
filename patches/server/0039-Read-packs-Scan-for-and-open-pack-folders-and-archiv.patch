@@ -7,7 +7,7 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index 6378f15a35e31cb38bf58827ae360236ecc3efde..47d4ddef623dbb3434015eb4f7bebe537259e956 100644
+index b69bf8e779385f3560e2eb033bb2b9796d85c9d4..44d5f2d08b077e4e0f1975cdc931e0f12fc7c2bb 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
 @@ -21,8 +21,6 @@ import java.nio.file.Paths;

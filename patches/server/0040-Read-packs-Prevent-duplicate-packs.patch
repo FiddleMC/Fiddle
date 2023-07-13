@@ -7,7 +7,7 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index 47d4ddef623dbb3434015eb4f7bebe537259e956..cacd6f124d05bb885f94ed92097d0a3736c84d36 100644
+index 44d5f2d08b077e4e0f1975cdc931e0f12fc7c2bb..658a1d5d7b23995446b1655dc19a7c8c66ee6d2b 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
 @@ -80,6 +80,7 @@ import org.jetbrains.annotations.NotNull;

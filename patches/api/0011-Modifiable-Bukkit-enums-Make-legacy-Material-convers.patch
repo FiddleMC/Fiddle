@@ -12,7 +12,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 039d8152639b22fbb6af9dfbcc7eb38466ef0f6a..2da927d14e2139836d8d989b12eeb239feed4ddc 100644
+index e95cf6a92d6620d9d80984a1e72c3d40abc926a2..56a31139ab29ff324d61ee72d70d4c6de3ca78de 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
 @@ -5760,6 +5760,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
@@ -33,7 +33,7 @@ index 039d8152639b22fbb6af9dfbcc7eb38466ef0f6a..2da927d14e2139836d8d989b12eeb239
  
          return BY_NAME.get(name);
 diff --git a/src/main/java/org/bukkit/UnsafeValues.java b/src/main/java/org/bukkit/UnsafeValues.java
-index c661eab343ae76488de701630424e2d589f44fc0..995e0a05c3b39f0fd76b83143f298c30f8f4cd48 100644
+index b4f7b23f8bdd2fb3b13c020d6427aaf0bc694537..cb5ffc2277886350f85ab8160ae1be707b2ed6e5 100644
 --- a/src/main/java/org/bukkit/UnsafeValues.java
 +++ b/src/main/java/org/bukkit/UnsafeValues.java
 @@ -38,8 +38,23 @@ public interface UnsafeValues {

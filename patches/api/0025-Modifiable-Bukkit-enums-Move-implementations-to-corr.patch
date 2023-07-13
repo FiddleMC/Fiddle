@@ -10,7 +10,7 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index d2e4d85c512f52a7ff87d5cefa25dde573c6f634..1eb69b6acc6660114fd1f2b1216aed1432797355 100644
+index d2a440a2a6364ecc603b71273b84054018fc784a..e7e47030109356d330d4e2db026620db68ef9548 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
 @@ -1,6 +1,5 @@
@@ -627,7 +627,7 @@ index d2e4d85c512f52a7ff87d5cefa25dde573c6f634..1eb69b6acc6660114fd1f2b1216aed14
      }
  
      /**
-@@ -5727,7 +5756,8 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+@@ -5727,8 +5756,9 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
       * @param world the world to check
       * @return true if this material can be used in this World.
       */
@@ -636,9 +636,43 @@ index d2e4d85c512f52a7ff87d5cefa25dde573c6f634..1eb69b6acc6660114fd1f2b1216aed14
 -        return Bukkit.getDataPackManager().isEnabledByFeature(this, world);
 +        return AbstractMaterial.super.isEnabledByFeature(world); // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
      }
- }
+ 
+     // Fiddle start - load packs - blocks and items - flags for added blocks and items - API
+@@ -5737,8 +5767,9 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+      *
+      * @return Whether this Material is a block added by a Fiddle pack.
+      */
++    @Override // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     public boolean isBlockAddedByFiddle() {
+-        return Bukkit.getUnsafe().isBlockAddedByFiddle(this);
++        return AbstractMaterial.super.isBlockAddedByFiddle(); // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     }
+ 
+     /**
+@@ -5746,8 +5777,9 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+      *
+      * @return Whether this Material is an item added by a Fiddle pack.
+      */
++    @Override // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     public boolean isItemAddedByFiddle() {
+-        return Bukkit.getUnsafe().isItemAddedByFiddle(this);
++        return AbstractMaterial.super.isItemAddedByFiddle(); // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     }
+ 
+     /**
+@@ -5761,8 +5793,9 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+      *
+      * @return Whether this Material is a block or item added by a Fiddle pack.
+      */
++    @Override // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     public boolean isAddedByFiddle() {
+-        return this.isBlockAddedByFiddle() || this.isItemAddedByFiddle();
++        return AbstractMaterial.super.isAddedByFiddle(); // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     }
+     // Fiddle end - load packs - blocks and items - flags for added blocks and items - API
+ 
 diff --git a/src/main/java/org/fiddlemc/fiddle/material/AbstractMaterial.java b/src/main/java/org/fiddlemc/fiddle/material/AbstractMaterial.java
-index c5232856b5537b21751f93d3b5d48c17c3fe9e83..4b0109aa795c352aba2e1cdddaa3f2f17a8830a8 100644
+index c5232856b5537b21751f93d3b5d48c17c3fe9e83..1b2fb6dc9d1258ee2ab130f23e9142a74291f561 100644
 --- a/src/main/java/org/fiddlemc/fiddle/material/AbstractMaterial.java
 +++ b/src/main/java/org/fiddlemc/fiddle/material/AbstractMaterial.java
 @@ -5,7 +5,19 @@ package org.fiddlemc.fiddle.material;
@@ -661,7 +695,7 @@ index c5232856b5537b21751f93d3b5d48c17c3fe9e83..4b0109aa795c352aba2e1cdddaa3f2f1
  
  /**
   * An interface that provides default implementations for most {@link Material} methods.
-@@ -18,4 +30,250 @@ public interface AbstractMaterial extends Keyed, Translatable, net.kyori.adventu
+@@ -18,4 +30,262 @@ public interface AbstractMaterial extends Keyed, Translatable, net.kyori.adventu
  
      @NotNull String name();
  
@@ -908,6 +942,18 @@ index c5232856b5537b21751f93d3b5d48c17c3fe9e83..4b0109aa795c352aba2e1cdddaa3f2f1
 +
 +    default boolean isEnabledByFeature(@NotNull World world) {
 +        return Bukkit.getDataPackManager().isEnabledByFeature((Material) this, world);
++    }
++
++    default boolean isBlockAddedByFiddle() {
++        return Bukkit.getUnsafe().isBlockAddedByFiddle((Material) this); // Fiddle - load packs - blocks - flag for added blocks - API
++    }
++
++    default boolean isItemAddedByFiddle() {
++        return Bukkit.getUnsafe().isItemAddedByFiddle((Material) this); // Fiddle - load packs - items - flag for added items - API
++    }
++
++    default boolean isAddedByFiddle() {
++        return this.isBlockAddedByFiddle() || this.isItemAddedByFiddle(); // Fiddle - load packs - blocks and items - flags for added blocks and items - API
 +    }
 +    // Fiddle end - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
 +

@@ -7,7 +7,7 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index 57c822d47b1f5d82a32b5ccb29d9ca481e55d351..f0dd7a734668ff67aa00c12af979ea7f543b5b43 100644
+index 57c822d47b1f5d82a32b5ccb29d9ca481e55d351..dedba068cbc1aa3098e206af01c704c8d0bfc41e 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
 @@ -1,5 +1,6 @@
@@ -133,7 +133,7 @@ index 57c822d47b1f5d82a32b5ccb29d9ca481e55d351..f0dd7a734668ff67aa00c12af979ea7f
      @DontObfuscate
      public static void main(final OptionSet optionset) { // CraftBukkit - replaces main(String[] astring)
          SharedConstants.tryDetectVersion();
-@@ -176,6 +242,61 @@ public class Main {
+@@ -176,6 +242,60 @@ public class Main {
              var injectRuntimeClassVersionHelper = new InjectRuntimeClassVersionHelper();
              // Fiddle end - modifiable Bukkit enums - inject runtime versions - common utilities
  
@@ -149,7 +149,6 @@ index 57c822d47b1f5d82a32b5ccb29d9ca481e55d351..f0dd7a734668ff67aa00c12af979ea7f
 +                    .filter(holder -> holder.value().isAddedByFiddle)
 +            ).map(holder -> holder.key().location()).distinct().map(resourceLocation -> {
 +                var fiddleEnumName = MaterialNameAndKeyConversion.FIDDLE_ENUM_NAME_PREFIX + resourceLocation.getNamespace().toUpperCase(Locale.ROOT) + "_" + resourceLocation.getPath().toUpperCase(Locale.ROOT);
-+                MaterialNameAndKeyConversion.registerFiddleEnumNameToNamespacedKey(fiddleEnumName, resourceLocation.getNamespace(), resourceLocation.getPath());
 +                return fiddleEnumName;
 +            }).toList();
 +            var enumNames = Streams.concat(

@@ -13,7 +13,7 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index ffb57704fe54edd2640725bfedd07102321c8cd9..d2e4d85c512f52a7ff87d5cefa25dde573c6f634 100644
+index 71706167be9424bb9c9f39be0f5c4a73962ad63d..d2a440a2a6364ecc603b71273b84054018fc784a 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
 @@ -108,6 +108,7 @@ import org.bukkit.block.data.type.WallSign;

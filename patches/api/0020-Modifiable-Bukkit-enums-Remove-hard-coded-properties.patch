@@ -1,540 +1,126 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
-Date: Mon, 10 Jul 2023 22:05:08 +0200
+Date: Wed, 12 Jul 2023 14:34:23 +0200
 Subject: [PATCH] Modifiable Bukkit enums - Remove hard-coded properties -
- Material - Id
+ Material - Data class
 
-Modifies the Material property getId() so that it is are no longer hard-coded directly.
-Determining the values of the properties however still relies on a hard-coded list, since
-the property is not backed by any implementation that can be used.
+Adds a computeData() method to Material.
+This method allows to obtain the desired value of the data field without relying on it being set in the Material constructor.
 
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index c3da51b4f54ac77ae6f7375fbc8ed7b9e25c8da1..e18db6c6e2dcd66ef123b6982ccfeb9f02939ec1 100644
+index 76d4f17e7f1cc0821328d0969f5ef68fe741c883..5997420ab7c7dcb8d3f42ec5b99df24daf71c939 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -4487,7 +4487,16 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
-      */
-     @Deprecated
-     public int getId() {
--        Preconditions.checkArgument(this.isLegacy(), "Cannot get ID of Modern Material"); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - is legacy
-+        // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - id
-+        return MaterialDefaultImplementations.getLegacyId(this);
-+    }
-+
+@@ -4620,6 +4620,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+         return MaterialDefaultImplementations.getNewMaterialDataInstance(this, raw); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - cached constructor
+     }
+ 
++    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - data
 +    /**
-+     * @deprecated Do not use: this method is for internal testing purposes only.
++     * @return The computed value of {@link #data} that this instance should have.
++     * @deprecated Do not use: for internal use only.
 +     */
 +    @Deprecated(forRemoval = true)
-+    public int getIdLegacy() {
-+        // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - id
-         return id;
-     }
++    @NotNull
++    public Class<?> computeData() {
++        return Bukkit.getUnsafe().computeData(this);
++    }
++    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - data
++
+     /**
+      * Checks if this Material is a placable block
+      *
+diff --git a/src/main/java/org/bukkit/UnsafeValues.java b/src/main/java/org/bukkit/UnsafeValues.java
+index 6c816ed5cc29ef24a3f5b82978dbc5e9db8b9d5a..d7723b8f60f282a7d97202308e54b10f5134f96d 100644
+--- a/src/main/java/org/bukkit/UnsafeValues.java
++++ b/src/main/java/org/bukkit/UnsafeValues.java
+@@ -275,6 +275,8 @@ public interface UnsafeValues {
+ 
+     short getMaxDurability(Material material); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - durability
+ 
++    @NotNull Class<?> computeData(Material material); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - data
++
+     // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
+     boolean isBlock(Material material);
  
 diff --git a/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java b/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
-index 9f61d86722754ec6c1f4282878acb549896a05df..31bc7c4bc0b3c5c0042faeab0d001f5573714412 100644
+index b0940e391f0cde49803b0106e4691afc1f95885e..9f61d86722754ec6c1f4282878acb549896a05df 100644
 --- a/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
 +++ b/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
-@@ -24,6 +24,483 @@ public final class MaterialDefaultImplementations {
-         throw new RuntimeException();
+@@ -130,6 +130,73 @@ public final class MaterialDefaultImplementations {
      }
+     // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - durability
  
-+    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - id
-+    private static final CachedMaterialIntProperty legacyIdCache = new CachedMaterialIntProperty(material -> {
-+        if (!material.isLegacy()) {
-+            return 0;
-+        }
-+        // Based on the original LEGACY_ enum values in org.bukkit.Material
-+        return switch (material) {
-+            //<editor-fold defaultstate="collapsed" desc="getLegacyId">
-+            case LEGACY_AIR -> 0;
-+            case LEGACY_STONE -> 1;
-+            case LEGACY_GRASS -> 2;
-+            case LEGACY_DIRT -> 3;
-+            case LEGACY_COBBLESTONE -> 4;
-+            case LEGACY_WOOD -> 5;
-+            case LEGACY_SAPLING -> 6;
-+            case LEGACY_BEDROCK -> 7;
-+            case LEGACY_WATER -> 8;
-+            case LEGACY_STATIONARY_WATER -> 9;
-+            case LEGACY_LAVA -> 10;
-+            case LEGACY_STATIONARY_LAVA -> 11;
-+            case LEGACY_SAND -> 12;
-+            case LEGACY_GRAVEL -> 13;
-+            case LEGACY_GOLD_ORE -> 14;
-+            case LEGACY_IRON_ORE -> 15;
-+            case LEGACY_COAL_ORE -> 16;
-+            case LEGACY_LOG -> 17;
-+            case LEGACY_LEAVES -> 18;
-+            case LEGACY_SPONGE -> 19;
-+            case LEGACY_GLASS -> 20;
-+            case LEGACY_LAPIS_ORE -> 21;
-+            case LEGACY_LAPIS_BLOCK -> 22;
-+            case LEGACY_DISPENSER -> 23;
-+            case LEGACY_SANDSTONE -> 24;
-+            case LEGACY_NOTE_BLOCK -> 25;
-+            case LEGACY_BED_BLOCK -> 26;
-+            case LEGACY_POWERED_RAIL -> 27;
-+            case LEGACY_DETECTOR_RAIL -> 28;
-+            case LEGACY_PISTON_STICKY_BASE -> 29;
-+            case LEGACY_WEB -> 30;
-+            case LEGACY_LONG_GRASS -> 31;
-+            case LEGACY_DEAD_BUSH -> 32;
-+            case LEGACY_PISTON_BASE -> 33;
-+            case LEGACY_PISTON_EXTENSION -> 34;
-+            case LEGACY_WOOL -> 35;
-+            case LEGACY_PISTON_MOVING_PIECE -> 36;
-+            case LEGACY_YELLOW_FLOWER -> 37;
-+            case LEGACY_RED_ROSE -> 38;
-+            case LEGACY_BROWN_MUSHROOM -> 39;
-+            case LEGACY_RED_MUSHROOM -> 40;
-+            case LEGACY_GOLD_BLOCK -> 41;
-+            case LEGACY_IRON_BLOCK -> 42;
-+            case LEGACY_DOUBLE_STEP -> 43;
-+            case LEGACY_STEP -> 44;
-+            case LEGACY_BRICK -> 45;
-+            case LEGACY_TNT -> 46;
-+            case LEGACY_BOOKSHELF -> 47;
-+            case LEGACY_MOSSY_COBBLESTONE -> 48;
-+            case LEGACY_OBSIDIAN -> 49;
-+            case LEGACY_TORCH -> 50;
-+            case LEGACY_FIRE -> 51;
-+            case LEGACY_MOB_SPAWNER -> 52;
-+            case LEGACY_WOOD_STAIRS -> 53;
-+            case LEGACY_CHEST -> 54;
-+            case LEGACY_REDSTONE_WIRE -> 55;
-+            case LEGACY_DIAMOND_ORE -> 56;
-+            case LEGACY_DIAMOND_BLOCK -> 57;
-+            case LEGACY_WORKBENCH -> 58;
-+            case LEGACY_CROPS -> 59;
-+            case LEGACY_SOIL -> 60;
-+            case LEGACY_FURNACE -> 61;
-+            case LEGACY_BURNING_FURNACE -> 62;
-+            case LEGACY_SIGN_POST -> 63;
-+            case LEGACY_WOODEN_DOOR -> 64;
-+            case LEGACY_LADDER -> 65;
-+            case LEGACY_RAILS -> 66;
-+            case LEGACY_COBBLESTONE_STAIRS -> 67;
-+            case LEGACY_WALL_SIGN -> 68;
-+            case LEGACY_LEVER -> 69;
-+            case LEGACY_STONE_PLATE -> 70;
-+            case LEGACY_IRON_DOOR_BLOCK -> 71;
-+            case LEGACY_WOOD_PLATE -> 72;
-+            case LEGACY_REDSTONE_ORE -> 73;
-+            case LEGACY_GLOWING_REDSTONE_ORE -> 74;
-+            case LEGACY_REDSTONE_TORCH_OFF -> 75;
-+            case LEGACY_REDSTONE_TORCH_ON -> 76;
-+            case LEGACY_STONE_BUTTON -> 77;
-+            case LEGACY_SNOW -> 78;
-+            case LEGACY_ICE -> 79;
-+            case LEGACY_SNOW_BLOCK -> 80;
-+            case LEGACY_CACTUS -> 81;
-+            case LEGACY_CLAY -> 82;
-+            case LEGACY_SUGAR_CANE_BLOCK -> 83;
-+            case LEGACY_JUKEBOX -> 84;
-+            case LEGACY_FENCE -> 85;
-+            case LEGACY_PUMPKIN -> 86;
-+            case LEGACY_NETHERRACK -> 87;
-+            case LEGACY_SOUL_SAND -> 88;
-+            case LEGACY_GLOWSTONE -> 89;
-+            case LEGACY_PORTAL -> 90;
-+            case LEGACY_JACK_O_LANTERN -> 91;
-+            case LEGACY_CAKE_BLOCK -> 92;
-+            case LEGACY_DIODE_BLOCK_OFF -> 93;
-+            case LEGACY_DIODE_BLOCK_ON -> 94;
-+            case LEGACY_STAINED_GLASS -> 95;
-+            case LEGACY_TRAP_DOOR -> 96;
-+            case LEGACY_MONSTER_EGGS -> 97;
-+            case LEGACY_SMOOTH_BRICK -> 98;
-+            case LEGACY_HUGE_MUSHROOM_1 -> 99;
-+            case LEGACY_HUGE_MUSHROOM_2 -> 100;
-+            case LEGACY_IRON_FENCE -> 101;
-+            case LEGACY_THIN_GLASS -> 102;
-+            case LEGACY_MELON_BLOCK -> 103;
-+            case LEGACY_PUMPKIN_STEM -> 104;
-+            case LEGACY_MELON_STEM -> 105;
-+            case LEGACY_VINE -> 106;
-+            case LEGACY_FENCE_GATE -> 107;
-+            case LEGACY_BRICK_STAIRS -> 108;
-+            case LEGACY_SMOOTH_STAIRS -> 109;
-+            case LEGACY_MYCEL -> 110;
-+            case LEGACY_WATER_LILY -> 111;
-+            case LEGACY_NETHER_BRICK -> 112;
-+            case LEGACY_NETHER_FENCE -> 113;
-+            case LEGACY_NETHER_BRICK_STAIRS -> 114;
-+            case LEGACY_NETHER_WARTS -> 115;
-+            case LEGACY_ENCHANTMENT_TABLE -> 116;
-+            case LEGACY_BREWING_STAND -> 117;
-+            case LEGACY_CAULDRON -> 118;
-+            case LEGACY_ENDER_PORTAL -> 119;
-+            case LEGACY_ENDER_PORTAL_FRAME -> 120;
-+            case LEGACY_ENDER_STONE -> 121;
-+            case LEGACY_DRAGON_EGG -> 122;
-+            case LEGACY_REDSTONE_LAMP_OFF -> 123;
-+            case LEGACY_REDSTONE_LAMP_ON -> 124;
-+            case LEGACY_WOOD_DOUBLE_STEP -> 125;
-+            case LEGACY_WOOD_STEP -> 126;
-+            case LEGACY_COCOA -> 127;
-+            case LEGACY_SANDSTONE_STAIRS -> 128;
-+            case LEGACY_EMERALD_ORE -> 129;
-+            case LEGACY_ENDER_CHEST -> 130;
-+            case LEGACY_TRIPWIRE_HOOK -> 131;
-+            case LEGACY_TRIPWIRE -> 132;
-+            case LEGACY_EMERALD_BLOCK -> 133;
-+            case LEGACY_SPRUCE_WOOD_STAIRS -> 134;
-+            case LEGACY_BIRCH_WOOD_STAIRS -> 135;
-+            case LEGACY_JUNGLE_WOOD_STAIRS -> 136;
-+            case LEGACY_COMMAND -> 137;
-+            case LEGACY_BEACON -> 138;
-+            case LEGACY_COBBLE_WALL -> 139;
-+            case LEGACY_FLOWER_POT -> 140;
-+            case LEGACY_CARROT -> 141;
-+            case LEGACY_POTATO -> 142;
-+            case LEGACY_WOOD_BUTTON -> 143;
-+            case LEGACY_SKULL -> 144;
-+            case LEGACY_ANVIL -> 145;
-+            case LEGACY_TRAPPED_CHEST -> 146;
-+            case LEGACY_GOLD_PLATE -> 147;
-+            case LEGACY_IRON_PLATE -> 148;
-+            case LEGACY_REDSTONE_COMPARATOR_OFF -> 149;
-+            case LEGACY_REDSTONE_COMPARATOR_ON -> 150;
-+            case LEGACY_DAYLIGHT_DETECTOR -> 151;
-+            case LEGACY_REDSTONE_BLOCK -> 152;
-+            case LEGACY_QUARTZ_ORE -> 153;
-+            case LEGACY_HOPPER -> 154;
-+            case LEGACY_QUARTZ_BLOCK -> 155;
-+            case LEGACY_QUARTZ_STAIRS -> 156;
-+            case LEGACY_ACTIVATOR_RAIL -> 157;
-+            case LEGACY_DROPPER -> 158;
-+            case LEGACY_STAINED_CLAY -> 159;
-+            case LEGACY_STAINED_GLASS_PANE -> 160;
-+            case LEGACY_LEAVES_2 -> 161;
-+            case LEGACY_LOG_2 -> 162;
-+            case LEGACY_ACACIA_STAIRS -> 163;
-+            case LEGACY_DARK_OAK_STAIRS -> 164;
-+            case LEGACY_SLIME_BLOCK -> 165;
-+            case LEGACY_BARRIER -> 166;
-+            case LEGACY_IRON_TRAPDOOR -> 167;
-+            case LEGACY_PRISMARINE -> 168;
-+            case LEGACY_SEA_LANTERN -> 169;
-+            case LEGACY_HAY_BLOCK -> 170;
-+            case LEGACY_CARPET -> 171;
-+            case LEGACY_HARD_CLAY -> 172;
-+            case LEGACY_COAL_BLOCK -> 173;
-+            case LEGACY_PACKED_ICE -> 174;
-+            case LEGACY_DOUBLE_PLANT -> 175;
-+            case LEGACY_STANDING_BANNER -> 176;
-+            case LEGACY_WALL_BANNER -> 177;
-+            case LEGACY_DAYLIGHT_DETECTOR_INVERTED -> 178;
-+            case LEGACY_RED_SANDSTONE -> 179;
-+            case LEGACY_RED_SANDSTONE_STAIRS -> 180;
-+            case LEGACY_DOUBLE_STONE_SLAB2 -> 181;
-+            case LEGACY_STONE_SLAB2 -> 182;
-+            case LEGACY_SPRUCE_FENCE_GATE -> 183;
-+            case LEGACY_BIRCH_FENCE_GATE -> 184;
-+            case LEGACY_JUNGLE_FENCE_GATE -> 185;
-+            case LEGACY_DARK_OAK_FENCE_GATE -> 186;
-+            case LEGACY_ACACIA_FENCE_GATE -> 187;
-+            case LEGACY_SPRUCE_FENCE -> 188;
-+            case LEGACY_BIRCH_FENCE -> 189;
-+            case LEGACY_JUNGLE_FENCE -> 190;
-+            case LEGACY_DARK_OAK_FENCE -> 191;
-+            case LEGACY_ACACIA_FENCE -> 192;
-+            case LEGACY_SPRUCE_DOOR -> 193;
-+            case LEGACY_BIRCH_DOOR -> 194;
-+            case LEGACY_JUNGLE_DOOR -> 195;
-+            case LEGACY_ACACIA_DOOR -> 196;
-+            case LEGACY_DARK_OAK_DOOR -> 197;
-+            case LEGACY_END_ROD -> 198;
-+            case LEGACY_CHORUS_PLANT -> 199;
-+            case LEGACY_CHORUS_FLOWER -> 200;
-+            case LEGACY_PURPUR_BLOCK -> 201;
-+            case LEGACY_PURPUR_PILLAR -> 202;
-+            case LEGACY_PURPUR_STAIRS -> 203;
-+            case LEGACY_PURPUR_DOUBLE_SLAB -> 204;
-+            case LEGACY_PURPUR_SLAB -> 205;
-+            case LEGACY_END_BRICKS -> 206;
-+            case LEGACY_BEETROOT_BLOCK -> 207;
-+            case LEGACY_GRASS_PATH -> 208;
-+            case LEGACY_END_GATEWAY -> 209;
-+            case LEGACY_COMMAND_REPEATING -> 210;
-+            case LEGACY_COMMAND_CHAIN -> 211;
-+            case LEGACY_FROSTED_ICE -> 212;
-+            case LEGACY_MAGMA -> 213;
-+            case LEGACY_NETHER_WART_BLOCK -> 214;
-+            case LEGACY_RED_NETHER_BRICK -> 215;
-+            case LEGACY_BONE_BLOCK -> 216;
-+            case LEGACY_STRUCTURE_VOID -> 217;
-+            case LEGACY_OBSERVER -> 218;
-+            case LEGACY_WHITE_SHULKER_BOX -> 219;
-+            case LEGACY_ORANGE_SHULKER_BOX -> 220;
-+            case LEGACY_MAGENTA_SHULKER_BOX -> 221;
-+            case LEGACY_LIGHT_BLUE_SHULKER_BOX -> 222;
-+            case LEGACY_YELLOW_SHULKER_BOX -> 223;
-+            case LEGACY_LIME_SHULKER_BOX -> 224;
-+            case LEGACY_PINK_SHULKER_BOX -> 225;
-+            case LEGACY_GRAY_SHULKER_BOX -> 226;
-+            case LEGACY_SILVER_SHULKER_BOX -> 227;
-+            case LEGACY_CYAN_SHULKER_BOX -> 228;
-+            case LEGACY_PURPLE_SHULKER_BOX -> 229;
-+            case LEGACY_BLUE_SHULKER_BOX -> 230;
-+            case LEGACY_BROWN_SHULKER_BOX -> 231;
-+            case LEGACY_GREEN_SHULKER_BOX -> 232;
-+            case LEGACY_RED_SHULKER_BOX -> 233;
-+            case LEGACY_BLACK_SHULKER_BOX -> 234;
-+            case LEGACY_WHITE_GLAZED_TERRACOTTA -> 235;
-+            case LEGACY_ORANGE_GLAZED_TERRACOTTA -> 236;
-+            case LEGACY_MAGENTA_GLAZED_TERRACOTTA -> 237;
-+            case LEGACY_LIGHT_BLUE_GLAZED_TERRACOTTA -> 238;
-+            case LEGACY_YELLOW_GLAZED_TERRACOTTA -> 239;
-+            case LEGACY_LIME_GLAZED_TERRACOTTA -> 240;
-+            case LEGACY_PINK_GLAZED_TERRACOTTA -> 241;
-+            case LEGACY_GRAY_GLAZED_TERRACOTTA -> 242;
-+            case LEGACY_SILVER_GLAZED_TERRACOTTA -> 243;
-+            case LEGACY_CYAN_GLAZED_TERRACOTTA -> 244;
-+            case LEGACY_PURPLE_GLAZED_TERRACOTTA -> 245;
-+            case LEGACY_BLUE_GLAZED_TERRACOTTA -> 246;
-+            case LEGACY_BROWN_GLAZED_TERRACOTTA -> 247;
-+            case LEGACY_GREEN_GLAZED_TERRACOTTA -> 248;
-+            case LEGACY_RED_GLAZED_TERRACOTTA -> 249;
-+            case LEGACY_BLACK_GLAZED_TERRACOTTA -> 250;
-+            case LEGACY_CONCRETE -> 251;
-+            case LEGACY_CONCRETE_POWDER -> 252;
-+            case LEGACY_STRUCTURE_BLOCK -> 255;
-+            case LEGACY_IRON_SPADE -> 256;
-+            case LEGACY_IRON_PICKAXE -> 257;
-+            case LEGACY_IRON_AXE -> 258;
-+            case LEGACY_FLINT_AND_STEEL -> 259;
-+            case LEGACY_APPLE -> 260;
-+            case LEGACY_BOW -> 261;
-+            case LEGACY_ARROW -> 262;
-+            case LEGACY_COAL -> 263;
-+            case LEGACY_DIAMOND -> 264;
-+            case LEGACY_IRON_INGOT -> 265;
-+            case LEGACY_GOLD_INGOT -> 266;
-+            case LEGACY_IRON_SWORD -> 267;
-+            case LEGACY_WOOD_SWORD -> 268;
-+            case LEGACY_WOOD_SPADE -> 269;
-+            case LEGACY_WOOD_PICKAXE -> 270;
-+            case LEGACY_WOOD_AXE -> 271;
-+            case LEGACY_STONE_SWORD -> 272;
-+            case LEGACY_STONE_SPADE -> 273;
-+            case LEGACY_STONE_PICKAXE -> 274;
-+            case LEGACY_STONE_AXE -> 275;
-+            case LEGACY_DIAMOND_SWORD -> 276;
-+            case LEGACY_DIAMOND_SPADE -> 277;
-+            case LEGACY_DIAMOND_PICKAXE -> 278;
-+            case LEGACY_DIAMOND_AXE -> 279;
-+            case LEGACY_STICK -> 280;
-+            case LEGACY_BOWL -> 281;
-+            case LEGACY_MUSHROOM_SOUP -> 282;
-+            case LEGACY_GOLD_SWORD -> 283;
-+            case LEGACY_GOLD_SPADE -> 284;
-+            case LEGACY_GOLD_PICKAXE -> 285;
-+            case LEGACY_GOLD_AXE -> 286;
-+            case LEGACY_STRING -> 287;
-+            case LEGACY_FEATHER -> 288;
-+            case LEGACY_SULPHUR -> 289;
-+            case LEGACY_WOOD_HOE -> 290;
-+            case LEGACY_STONE_HOE -> 291;
-+            case LEGACY_IRON_HOE -> 292;
-+            case LEGACY_DIAMOND_HOE -> 293;
-+            case LEGACY_GOLD_HOE -> 294;
-+            case LEGACY_SEEDS -> 295;
-+            case LEGACY_WHEAT -> 296;
-+            case LEGACY_BREAD -> 297;
-+            case LEGACY_LEATHER_HELMET -> 298;
-+            case LEGACY_LEATHER_CHESTPLATE -> 299;
-+            case LEGACY_LEATHER_LEGGINGS -> 300;
-+            case LEGACY_LEATHER_BOOTS -> 301;
-+            case LEGACY_CHAINMAIL_HELMET -> 302;
-+            case LEGACY_CHAINMAIL_CHESTPLATE -> 303;
-+            case LEGACY_CHAINMAIL_LEGGINGS -> 304;
-+            case LEGACY_CHAINMAIL_BOOTS -> 305;
-+            case LEGACY_IRON_HELMET -> 306;
-+            case LEGACY_IRON_CHESTPLATE -> 307;
-+            case LEGACY_IRON_LEGGINGS -> 308;
-+            case LEGACY_IRON_BOOTS -> 309;
-+            case LEGACY_DIAMOND_HELMET -> 310;
-+            case LEGACY_DIAMOND_CHESTPLATE -> 311;
-+            case LEGACY_DIAMOND_LEGGINGS -> 312;
-+            case LEGACY_DIAMOND_BOOTS -> 313;
-+            case LEGACY_GOLD_HELMET -> 314;
-+            case LEGACY_GOLD_CHESTPLATE -> 315;
-+            case LEGACY_GOLD_LEGGINGS -> 316;
-+            case LEGACY_GOLD_BOOTS -> 317;
-+            case LEGACY_FLINT -> 318;
-+            case LEGACY_PORK -> 319;
-+            case LEGACY_GRILLED_PORK -> 320;
-+            case LEGACY_PAINTING -> 321;
-+            case LEGACY_GOLDEN_APPLE -> 322;
-+            case LEGACY_SIGN -> 323;
-+            case LEGACY_WOOD_DOOR -> 324;
-+            case LEGACY_BUCKET -> 325;
-+            case LEGACY_WATER_BUCKET -> 326;
-+            case LEGACY_LAVA_BUCKET -> 327;
-+            case LEGACY_MINECART -> 328;
-+            case LEGACY_SADDLE -> 329;
-+            case LEGACY_IRON_DOOR -> 330;
-+            case LEGACY_REDSTONE -> 331;
-+            case LEGACY_SNOW_BALL -> 332;
-+            case LEGACY_BOAT -> 333;
-+            case LEGACY_LEATHER -> 334;
-+            case LEGACY_MILK_BUCKET -> 335;
-+            case LEGACY_CLAY_BRICK -> 336;
-+            case LEGACY_CLAY_BALL -> 337;
-+            case LEGACY_SUGAR_CANE -> 338;
-+            case LEGACY_PAPER -> 339;
-+            case LEGACY_BOOK -> 340;
-+            case LEGACY_SLIME_BALL -> 341;
-+            case LEGACY_STORAGE_MINECART -> 342;
-+            case LEGACY_POWERED_MINECART -> 343;
-+            case LEGACY_EGG -> 344;
-+            case LEGACY_COMPASS -> 345;
-+            case LEGACY_FISHING_ROD -> 346;
-+            case LEGACY_WATCH -> 347;
-+            case LEGACY_GLOWSTONE_DUST -> 348;
-+            case LEGACY_RAW_FISH -> 349;
-+            case LEGACY_COOKED_FISH -> 350;
-+            case LEGACY_INK_SACK -> 351;
-+            case LEGACY_BONE -> 352;
-+            case LEGACY_SUGAR -> 353;
-+            case LEGACY_CAKE -> 354;
-+            case LEGACY_BED -> 355;
-+            case LEGACY_DIODE -> 356;
-+            case LEGACY_COOKIE -> 357;
-+            case LEGACY_MAP -> 358;
-+            case LEGACY_SHEARS -> 359;
-+            case LEGACY_MELON -> 360;
-+            case LEGACY_PUMPKIN_SEEDS -> 361;
-+            case LEGACY_MELON_SEEDS -> 362;
-+            case LEGACY_RAW_BEEF -> 363;
-+            case LEGACY_COOKED_BEEF -> 364;
-+            case LEGACY_RAW_CHICKEN -> 365;
-+            case LEGACY_COOKED_CHICKEN -> 366;
-+            case LEGACY_ROTTEN_FLESH -> 367;
-+            case LEGACY_ENDER_PEARL -> 368;
-+            case LEGACY_BLAZE_ROD -> 369;
-+            case LEGACY_GHAST_TEAR -> 370;
-+            case LEGACY_GOLD_NUGGET -> 371;
-+            case LEGACY_NETHER_STALK -> 372;
-+            case LEGACY_POTION -> 373;
-+            case LEGACY_GLASS_BOTTLE -> 374;
-+            case LEGACY_SPIDER_EYE -> 375;
-+            case LEGACY_FERMENTED_SPIDER_EYE -> 376;
-+            case LEGACY_BLAZE_POWDER -> 377;
-+            case LEGACY_MAGMA_CREAM -> 378;
-+            case LEGACY_BREWING_STAND_ITEM -> 379;
-+            case LEGACY_CAULDRON_ITEM -> 380;
-+            case LEGACY_EYE_OF_ENDER -> 381;
-+            case LEGACY_SPECKLED_MELON -> 382;
-+            case LEGACY_MONSTER_EGG -> 383;
-+            case LEGACY_EXP_BOTTLE -> 384;
-+            case LEGACY_FIREBALL -> 385;
-+            case LEGACY_BOOK_AND_QUILL -> 386;
-+            case LEGACY_WRITTEN_BOOK -> 387;
-+            case LEGACY_EMERALD -> 388;
-+            case LEGACY_ITEM_FRAME -> 389;
-+            case LEGACY_FLOWER_POT_ITEM -> 390;
-+            case LEGACY_CARROT_ITEM -> 391;
-+            case LEGACY_POTATO_ITEM -> 392;
-+            case LEGACY_BAKED_POTATO -> 393;
-+            case LEGACY_POISONOUS_POTATO -> 394;
-+            case LEGACY_EMPTY_MAP -> 395;
-+            case LEGACY_GOLDEN_CARROT -> 396;
-+            case LEGACY_SKULL_ITEM -> 397;
-+            case LEGACY_CARROT_STICK -> 398;
-+            case LEGACY_NETHER_STAR -> 399;
-+            case LEGACY_PUMPKIN_PIE -> 400;
-+            case LEGACY_FIREWORK -> 401;
-+            case LEGACY_FIREWORK_CHARGE -> 402;
-+            case LEGACY_ENCHANTED_BOOK -> 403;
-+            case LEGACY_REDSTONE_COMPARATOR -> 404;
-+            case LEGACY_NETHER_BRICK_ITEM -> 405;
-+            case LEGACY_QUARTZ -> 406;
-+            case LEGACY_EXPLOSIVE_MINECART -> 407;
-+            case LEGACY_HOPPER_MINECART -> 408;
-+            case LEGACY_PRISMARINE_SHARD -> 409;
-+            case LEGACY_PRISMARINE_CRYSTALS -> 410;
-+            case LEGACY_RABBIT -> 411;
-+            case LEGACY_COOKED_RABBIT -> 412;
-+            case LEGACY_RABBIT_STEW -> 413;
-+            case LEGACY_RABBIT_FOOT -> 414;
-+            case LEGACY_RABBIT_HIDE -> 415;
-+            case LEGACY_ARMOR_STAND -> 416;
-+            case LEGACY_IRON_BARDING -> 417;
-+            case LEGACY_GOLD_BARDING -> 418;
-+            case LEGACY_DIAMOND_BARDING -> 419;
-+            case LEGACY_LEASH -> 420;
-+            case LEGACY_NAME_TAG -> 421;
-+            case LEGACY_COMMAND_MINECART -> 422;
-+            case LEGACY_MUTTON -> 423;
-+            case LEGACY_COOKED_MUTTON -> 424;
-+            case LEGACY_BANNER -> 425;
-+            case LEGACY_END_CRYSTAL -> 426;
-+            case LEGACY_SPRUCE_DOOR_ITEM -> 427;
-+            case LEGACY_BIRCH_DOOR_ITEM -> 428;
-+            case LEGACY_JUNGLE_DOOR_ITEM -> 429;
-+            case LEGACY_ACACIA_DOOR_ITEM -> 430;
-+            case LEGACY_DARK_OAK_DOOR_ITEM -> 431;
-+            case LEGACY_CHORUS_FRUIT -> 432;
-+            case LEGACY_CHORUS_FRUIT_POPPED -> 433;
-+            case LEGACY_BEETROOT -> 434;
-+            case LEGACY_BEETROOT_SEEDS -> 435;
-+            case LEGACY_BEETROOT_SOUP -> 436;
-+            case LEGACY_DRAGONS_BREATH -> 437;
-+            case LEGACY_SPLASH_POTION -> 438;
-+            case LEGACY_SPECTRAL_ARROW -> 439;
-+            case LEGACY_TIPPED_ARROW -> 440;
-+            case LEGACY_LINGERING_POTION -> 441;
-+            case LEGACY_SHIELD -> 442;
-+            case LEGACY_ELYTRA -> 443;
-+            case LEGACY_BOAT_SPRUCE -> 444;
-+            case LEGACY_BOAT_BIRCH -> 445;
-+            case LEGACY_BOAT_JUNGLE -> 446;
-+            case LEGACY_BOAT_ACACIA -> 447;
-+            case LEGACY_BOAT_DARK_OAK -> 448;
-+            case LEGACY_TOTEM -> 449;
-+            case LEGACY_SHULKER_SHELL -> 450;
-+            case LEGACY_IRON_NUGGET -> 452;
-+            case LEGACY_KNOWLEDGE_BOOK -> 453;
-+            case LEGACY_GOLD_RECORD -> 2256;
-+            case LEGACY_GREEN_RECORD -> 2257;
-+            case LEGACY_RECORD_3 -> 2258;
-+            case LEGACY_RECORD_4 -> 2259;
-+            case LEGACY_RECORD_5 -> 2260;
-+            case LEGACY_RECORD_6 -> 2261;
-+            case LEGACY_RECORD_7 -> 2262;
-+            case LEGACY_RECORD_8 -> 2263;
-+            case LEGACY_RECORD_9 -> 2264;
-+            case LEGACY_RECORD_10 -> 2265;
-+            case LEGACY_RECORD_11 -> 2266;
-+            case LEGACY_RECORD_12 -> 2267;
-+            //</editor-fold>
-+            default -> throw new AssertionError("No id known for legacy material: " + material);
-+        };
-+    });
-+    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - id
-+
-     // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - is legacy
-     private static final CachedMaterialBooleanProperty isLegacyCache = new CachedMaterialBooleanProperty(material -> {
-         // Based on the original org.bukkit.Material constructor
-@@ -79,6 +556,16 @@ public final class MaterialDefaultImplementations {
-     }
-     // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - is empty
- 
-+    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - id
++    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - data
 +    /**
 +     * @throws IllegalArgumentException If the given {@code material} is not {@linkplain Material#isLegacy() legacy}.
 +     */
-+    public static int getLegacyId(Material material) {
-+        Preconditions.checkArgument(material.isLegacy(), "Cannot get ID of Modern Material"); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - is legacy
-+        return legacyIdCache.get(material);
++    public static @NotNull Class<?> computeDataLegacy(Material material) {
++        Preconditions.checkArgument(material.isLegacy(), "Cannot call computeDataLegacy(Material) for Modern Material");
++        // Based on the values of the data parameter in the original org.bukkit.Material constructor
++        return switch (material) {
++            case LEGACY_WOOD, LEGACY_WOOD_DOUBLE_STEP -> org.bukkit.material.Wood.class;
++            case LEGACY_SAPLING -> org.bukkit.material.Sapling.class;
++            case LEGACY_LOG, LEGACY_LOG_2 -> org.bukkit.material.Tree.class;
++            case LEGACY_LEAVES, LEGACY_LEAVES_2 -> org.bukkit.material.Leaves.class;
++            case LEGACY_DISPENSER, LEGACY_DROPPER -> org.bukkit.material.Dispenser.class;
++            case LEGACY_SANDSTONE -> org.bukkit.material.Sandstone.class;
++            case LEGACY_BED_BLOCK -> org.bukkit.material.Bed.class;
++            case LEGACY_POWERED_RAIL, LEGACY_ACTIVATOR_RAIL -> org.bukkit.material.PoweredRail.class;
++            case LEGACY_DETECTOR_RAIL -> org.bukkit.material.DetectorRail.class;
++            case LEGACY_PISTON_STICKY_BASE, LEGACY_PISTON_BASE -> org.bukkit.material.PistonBaseMaterial.class;
++            case LEGACY_LONG_GRASS -> org.bukkit.material.LongGrass.class;
++            case LEGACY_PISTON_EXTENSION -> org.bukkit.material.PistonExtensionMaterial.class;
++            case LEGACY_WOOL -> org.bukkit.material.Wool.class;
++            case LEGACY_DOUBLE_STEP, LEGACY_STEP -> org.bukkit.material.Step.class;
++            case LEGACY_TORCH -> org.bukkit.material.Torch.class;
++            case LEGACY_WOOD_STAIRS, LEGACY_COBBLESTONE_STAIRS, LEGACY_BRICK_STAIRS, LEGACY_SMOOTH_STAIRS, LEGACY_NETHER_BRICK_STAIRS, LEGACY_SANDSTONE_STAIRS, LEGACY_SPRUCE_WOOD_STAIRS, LEGACY_BIRCH_WOOD_STAIRS, LEGACY_JUNGLE_WOOD_STAIRS, LEGACY_QUARTZ_STAIRS, LEGACY_ACACIA_STAIRS, LEGACY_DARK_OAK_STAIRS, LEGACY_RED_SANDSTONE_STAIRS, LEGACY_PURPUR_STAIRS -> org.bukkit.material.Stairs.class;
++            case LEGACY_CHEST, LEGACY_TRAPPED_CHEST -> org.bukkit.material.Chest.class;
++            case LEGACY_REDSTONE_WIRE -> org.bukkit.material.RedstoneWire.class;
++            case LEGACY_CROPS, LEGACY_CARROT, LEGACY_POTATO, LEGACY_BEETROOT_BLOCK -> org.bukkit.material.Crops.class;
++            case LEGACY_FURNACE, LEGACY_BURNING_FURNACE -> org.bukkit.material.Furnace.class;
++            case LEGACY_SIGN_POST, LEGACY_WALL_SIGN -> org.bukkit.material.Sign.class;
++            case LEGACY_WOODEN_DOOR, LEGACY_IRON_DOOR_BLOCK, LEGACY_SPRUCE_DOOR, LEGACY_BIRCH_DOOR, LEGACY_JUNGLE_DOOR, LEGACY_ACACIA_DOOR, LEGACY_DARK_OAK_DOOR -> org.bukkit.material.Door.class;
++            case LEGACY_LADDER -> org.bukkit.material.Ladder.class;
++            case LEGACY_RAILS -> org.bukkit.material.Rails.class;
++            case LEGACY_LEVER -> org.bukkit.material.Lever.class;
++            case LEGACY_STONE_PLATE, LEGACY_WOOD_PLATE -> org.bukkit.material.PressurePlate.class;
++            case LEGACY_REDSTONE_TORCH_OFF, LEGACY_REDSTONE_TORCH_ON -> org.bukkit.material.RedstoneTorch.class;
++            case LEGACY_STONE_BUTTON, LEGACY_WOOD_BUTTON -> org.bukkit.material.Button.class;
++            case LEGACY_PUMPKIN, LEGACY_JACK_O_LANTERN -> org.bukkit.material.Pumpkin.class;
++            case LEGACY_CAKE_BLOCK -> org.bukkit.material.Cake.class;
++            case LEGACY_DIODE_BLOCK_OFF, LEGACY_DIODE_BLOCK_ON -> org.bukkit.material.Diode.class;
++            case LEGACY_TRAP_DOOR, LEGACY_IRON_TRAPDOOR -> org.bukkit.material.TrapDoor.class;
++            case LEGACY_MONSTER_EGGS -> org.bukkit.material.MonsterEggs.class;
++            case LEGACY_SMOOTH_BRICK -> org.bukkit.material.SmoothBrick.class;
++            case LEGACY_HUGE_MUSHROOM_1, LEGACY_HUGE_MUSHROOM_2 -> org.bukkit.material.Mushroom.class;
++            case LEGACY_VINE -> org.bukkit.material.Vine.class;
++            case LEGACY_FENCE_GATE, LEGACY_SPRUCE_FENCE_GATE, LEGACY_BIRCH_FENCE_GATE, LEGACY_JUNGLE_FENCE_GATE, LEGACY_DARK_OAK_FENCE_GATE, LEGACY_ACACIA_FENCE_GATE -> org.bukkit.material.Gate.class;
++            case LEGACY_NETHER_WARTS -> org.bukkit.material.NetherWarts.class;
++            case LEGACY_CAULDRON -> org.bukkit.material.Cauldron.class;
++            case LEGACY_WOOD_STEP -> org.bukkit.material.WoodenStep.class;
++            case LEGACY_COCOA -> org.bukkit.material.CocoaPlant.class;
++            case LEGACY_ENDER_CHEST -> org.bukkit.material.EnderChest.class;
++            case LEGACY_TRIPWIRE_HOOK -> org.bukkit.material.TripwireHook.class;
++            case LEGACY_TRIPWIRE -> org.bukkit.material.Tripwire.class;
++            case LEGACY_COMMAND, LEGACY_COMMAND_REPEATING, LEGACY_COMMAND_CHAIN -> org.bukkit.material.Command.class;
++            case LEGACY_FLOWER_POT -> org.bukkit.material.FlowerPot.class;
++            case LEGACY_SKULL -> org.bukkit.material.Skull.class;
++            case LEGACY_REDSTONE_COMPARATOR_OFF, LEGACY_REDSTONE_COMPARATOR_ON -> org.bukkit.material.Comparator.class;
++            case LEGACY_HOPPER -> org.bukkit.material.Hopper.class;
++            case LEGACY_STANDING_BANNER, LEGACY_WALL_BANNER -> org.bukkit.material.Banner.class;
++            case LEGACY_OBSERVER -> org.bukkit.material.Observer.class;
++            case LEGACY_COAL -> org.bukkit.material.Coal.class;
++            case LEGACY_INK_SACK -> org.bukkit.material.Dye.class;
++            case LEGACY_MONSTER_EGG -> org.bukkit.material.SpawnEgg.class;
++            default -> org.bukkit.material.MaterialData.class;
++        };
 +    }
-+    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - id
++    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - data
 +
-     // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - is legacy
-     public static boolean isLegacy(Material material) {
-         return isLegacyCache.get(material);
+     // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - cached constructor
+     private static @NotNull Constructor<? extends MaterialData> getMaterialDataConstructor(Material material) {
+         Preconditions.checkArgument(material.isLegacy(), "Cannot get data class constructor of Modern Material"); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - is legacy
