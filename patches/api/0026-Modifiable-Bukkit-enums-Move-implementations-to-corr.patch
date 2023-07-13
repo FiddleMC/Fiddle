@@ -672,7 +672,7 @@ index d2a440a2a6364ecc603b71273b84054018fc784a..e7e47030109356d330d4e2db026620db
      // Fiddle end - load packs - blocks and items - flags for added blocks and items - API
  
 diff --git a/src/main/java/org/fiddlemc/fiddle/material/AbstractMaterial.java b/src/main/java/org/fiddlemc/fiddle/material/AbstractMaterial.java
-index c5232856b5537b21751f93d3b5d48c17c3fe9e83..1b2fb6dc9d1258ee2ab130f23e9142a74291f561 100644
+index c5232856b5537b21751f93d3b5d48c17c3fe9e83..61b37fe2a8bd54e76130431c82df1cf8b1243da1 100644
 --- a/src/main/java/org/fiddlemc/fiddle/material/AbstractMaterial.java
 +++ b/src/main/java/org/fiddlemc/fiddle/material/AbstractMaterial.java
 @@ -5,7 +5,19 @@ package org.fiddlemc.fiddle.material;
@@ -701,7 +701,7 @@ index c5232856b5537b21751f93d3b5d48c17c3fe9e83..1b2fb6dc9d1258ee2ab130f23e9142a7
  
 +    // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
 +    @Deprecated
-+    String LEGACY_PREFIX = MaterialLegacyNameChecker.LEGACY_MATERIAL_PREFIX;; // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - is legacy
++    String LEGACY_PREFIX = MaterialLegacyNameChecker.LEGACY_MATERIAL_PREFIX; // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - is legacy
 +
 +    default boolean isEmpty() {
 +        return MaterialDefaultImplementations.isEmpty((Material) this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - is empty
