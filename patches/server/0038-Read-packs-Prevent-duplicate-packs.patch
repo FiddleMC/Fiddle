@@ -7,10 +7,10 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index ee687487add22c596c52a0a05098ab78ccfdd691..604b0c8a431093c471563a52c35d39e7133d2b4a 100644
+index 47d4ddef623dbb3434015eb4f7bebe537259e956..cacd6f124d05bb885f94ed92097d0a3736c84d36 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
-@@ -84,6 +84,7 @@ import org.jetbrains.annotations.NotNull;
+@@ -80,6 +80,7 @@ import org.jetbrains.annotations.NotNull;
  import org.jetbrains.annotations.Nullable;
  import org.fiddlemc.fiddle.pack.FiddlePack;
  import org.fiddlemc.fiddle.pack.FiddlePacks;
@@ -18,7 +18,7 @@ index ee687487add22c596c52a0a05098ab78ccfdd691..604b0c8a431093c471563a52c35d39e7
  import org.fiddlemc.fiddle.pack.read.StartupPackLoadPhase;
  import org.fiddlemc.fiddle.pack.read.PackScanner;
  import org.slf4j.Logger;
-@@ -215,6 +216,11 @@ public class Main {
+@@ -211,6 +212,11 @@ public class Main {
              // Fiddle end - confirm Fiddle permanence
  
              PackScanner.scanForAndOpenPacks(optionset); // Fiddle - read packs - scan for packs

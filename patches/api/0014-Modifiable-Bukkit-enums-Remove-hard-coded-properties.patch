@@ -2,97 +2,161 @@ From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
 Date: Mon, 10 Jul 2023 22:05:08 +0200
 Subject: [PATCH] Modifiable Bukkit enums - Remove hard-coded properties -
- Material - Key
+ Material - Max stack size, durability
 
-Modifies the Material property getKey() so that it is no longer computed in Material, but in UnsafeValues.
+Modifies the Material properties getMaxStackSize() and getMaxDurability() so that they are no longer hard-coded.
+Determining the values of the properties instead relies on an internal implementation
+that matches the already existing checks in org.bukkit.PerMaterialTest.
 
-The property values are cached after being computed, for performant access.
+The property values are also cached after being computed, for performant access.
 
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 3957ef6ca3dfe00e3f19e6ae1dc75717cf9dac20..0da834ce38344d854b0e93acd1ed6265c68fe7d4 100644
+index af0e377849ef8c76e5ddac0f9ca4b74433bb9f37..65110c2b563b68987e561855546a43ec22362fb7 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -4,7 +4,6 @@ import com.google.common.base.Preconditions;
- import com.google.common.collect.Maps;
- import com.google.common.collect.Multimap;
- import java.lang.reflect.Constructor;
--import java.util.Locale;
- import java.util.Map;
- import java.util.function.Consumer;
- import org.bukkit.attribute.Attribute;
-@@ -4394,7 +4393,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
-     private final short durabilityHardcoded;
+@@ -4390,8 +4390,8 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+     private final int id;
+     private final Constructor<? extends MaterialData> ctor;
+     private static final Map<String, Material> BY_NAME = Maps.newHashMap();
+-    private final int maxStack;
+-    private final short durability;
++    private final int maxStackHardcoded;
++    private final short durabilityHardcoded;
      public final Class<?> data;
      private final boolean legacy;
--    private final NamespacedKey key;
+     private final NamespacedKey key;
+@@ -4418,8 +4418,8 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
  
-     private Material(final int id) {
-         this(id, 64);
-@@ -4422,7 +4420,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
-         this.maxStackHardcoded = stack;
+     private Material(final int id, final int stack, final int durability, /*@NotNull*/ final Class<?> data) {
+         this.id = id;
+-        this.durability = (short) durability;
+-        this.maxStack = stack;
++        this.durabilityHardcoded = (short) durability;
++        this.maxStackHardcoded = stack;
          this.data = data;
          this.legacy = this.name().startsWith(LEGACY_PREFIX);
--        this.key = NamespacedKey.minecraft(this.name().toLowerCase(Locale.ROOT));
-         // try to cache the constructor for this material
-         try {
-             if (MaterialData.class.isAssignableFrom(data)) {
-@@ -4521,8 +4518,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
-     @NotNull
-     @Override
-     public NamespacedKey getKey() {
--        Preconditions.checkArgument(!legacy, "Cannot get key of Legacy Material");
--        return key;
-+        return MaterialDefaultImplementations.getKey(this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - key
+         this.key = NamespacedKey.minecraft(this.name().toLowerCase(Locale.ROOT));
+@@ -4533,7 +4533,17 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+      * @return Maximum stack size for this material
+      */
+     public int getMaxStackSize() {
+-        return maxStack;
++        // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - max stack size
++        return Bukkit.getUnsafe().getMaxStackSize(this);
++    }
++
++    /**
++     * @deprecated Do not use: this method is for internal testing purposes only.
++     */
++    @Deprecated(forRemoval = true)
++    public int getMaxStackSizeHardcoded() {
++        return this.maxStackHardcoded;
++        // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - max stack size
      }
  
      /**
+@@ -4542,7 +4552,29 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+      * @return Maximum durability for this material
+      */
+     public short getMaxDurability() {
+-        return durability;
++        // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - durability
++        return Bukkit.getUnsafe().getMaxDurability(this);
++    }
++
++    public boolean hasNonZeroMaxDurability() {
++        return MaterialDefaultImplementations.hasNonZeroMaxDurability(this);
++    }
++
++    /**
++     * @deprecated Do not use: this method is for internal testing purposes only.
++     */
++    @Deprecated(forRemoval = true)
++    public short getMaxDurabilityHardcoded() {
++        return durabilityHardcoded;
++    }
++
++    /**
++     * @deprecated Do not use: for internal use only.
++     */
++    @Deprecated(forRemoval = true)
++    public short getMaxDurabilityLegacy() {
++        return MaterialDefaultImplementations.getMaxDurabilityLegacy(this);
++        // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - durability
+     }
+ 
+     /**
+diff --git a/src/main/java/org/bukkit/UnsafeValues.java b/src/main/java/org/bukkit/UnsafeValues.java
+index e7f2beda0283a3b8531e4e98bce9644fd1eb360d..b1fa0a6391f8c99d34c8718a82c7fe50e3a4c2bf 100644
+--- a/src/main/java/org/bukkit/UnsafeValues.java
++++ b/src/main/java/org/bukkit/UnsafeValues.java
+@@ -266,6 +266,10 @@ public interface UnsafeValues {
+     void setBiomeKey(RegionAccessor accessor, int x, int y, int z, NamespacedKey biomeKey);
+     // Paper end
+ 
++    int getMaxStackSize(Material material); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - max stack size
++
++    short getMaxDurability(Material material); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - durability
++
+     // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
+     boolean isBlock(Material material);
+ 
 diff --git a/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java b/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
-index c8d9651619a2c184366f743ccd6bb6e0cd341dc1..8c80cbb6a28b783168be4428d15402ab705bf7a3 100644
+index 068ff2f4d8511bc4744e569a499df2617fd98e61..948eda0324709a816803ff979901500250c9f540 100644
 --- a/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
 +++ b/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
-@@ -4,6 +4,10 @@ package org.fiddlemc.fiddle.material;
- 
- import com.google.common.base.Preconditions;
- import org.bukkit.Material;
-+import org.bukkit.NamespacedKey;
-+import org.jetbrains.annotations.NotNull;
-+
-+import java.util.Locale;
- 
- /**
-  * This class provides a number of default implementations for {@link Material} that
-@@ -18,6 +22,14 @@ public final class MaterialDefaultImplementations {
+@@ -18,6 +18,51 @@ public final class MaterialDefaultImplementations {
          throw new RuntimeException();
      }
  
-+    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - key
-+    private static final CachedMaterialProperty<NamespacedKey> keyCache = new CachedMaterialProperty<>(
-+        NamespacedKey[]::new,
-+        // Based on the original org.bukkit.Material constructor
-+        material -> NamespacedKey.minecraft(material.name().toLowerCase(Locale.ROOT))
-+    );
-+    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - key
-+
-     // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - is empty
-     public static boolean isEmpty(Material material) {
-         // Based on the original org.bukkit.Material#isEmpty()
-@@ -28,6 +40,16 @@ public final class MaterialDefaultImplementations {
-     }
-     // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - is empty
- 
-+    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - key
-+    /**
-+     * @throws IllegalArgumentException If the given {@code material} is {@linkplain Material#isLegacy() legacy}.
-+     */
-+    public static @NotNull NamespacedKey getKey(Material material) {
-+        Preconditions.checkArgument(!material.isLegacy(), "Cannot get key of Legacy Material");
-+        return keyCache.get(material);
++    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - durability
++    public static boolean hasNonZeroMaxDurability(Material material) {
++        return material.getMaxDurability() != 0;
 +    }
-+    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - key
 +
-     // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - durability
-     public static boolean hasNonZeroMaxDurability(Material material) {
-         return material.getMaxDurability() != 0;
++    /**
++     * @throws IllegalArgumentException If the given {@code material} is not {@linkplain Material#isLegacy() legacy}.
++     */
++    public static short getMaxDurabilityLegacy(Material material) {
++        Preconditions.checkArgument(material.isLegacy(), "Cannot call getMaxDurabilityLegacy(Material) for Modern Material");
++        return switch (material) {
++            //<editor-fold defaultstate="collapsed" desc="getMaxDurabilityLegacy">
++            case LEGACY_IRON_SPADE, LEGACY_IRON_PICKAXE, LEGACY_IRON_AXE, LEGACY_IRON_SWORD, LEGACY_IRON_HOE -> 250;
++            case LEGACY_FLINT_AND_STEEL, LEGACY_FISHING_ROD -> 64;
++            case LEGACY_BOW -> 384;
++            case LEGACY_WOOD_SWORD, LEGACY_WOOD_PICKAXE, LEGACY_WOOD_SPADE, LEGACY_WOOD_AXE, LEGACY_WOOD_HOE -> 59;
++            case LEGACY_STONE_SWORD, LEGACY_STONE_SPADE, LEGACY_STONE_PICKAXE, LEGACY_STONE_AXE, LEGACY_STONE_HOE -> 131;
++            case LEGACY_DIAMOND_SWORD, LEGACY_DIAMOND_SPADE, LEGACY_DIAMOND_PICKAXE, LEGACY_DIAMOND_AXE, LEGACY_DIAMOND_HOE -> 1561;
++            case LEGACY_GOLD_SWORD, LEGACY_GOLD_SPADE, LEGACY_GOLD_PICKAXE, LEGACY_GOLD_AXE, LEGACY_GOLD_HOE -> 32;
++            case LEGACY_LEATHER_HELMET -> 55;
++            case LEGACY_LEATHER_CHESTPLATE -> 80;
++            case LEGACY_LEATHER_LEGGINGS -> 75;
++            case LEGACY_LEATHER_BOOTS -> 65;
++            case LEGACY_CHAINMAIL_HELMET, LEGACY_IRON_HELMET -> 165;
++            case LEGACY_CHAINMAIL_CHESTPLATE, LEGACY_IRON_CHESTPLATE -> 240;
++            case LEGACY_CHAINMAIL_LEGGINGS, LEGACY_IRON_LEGGINGS -> 225;
++            case LEGACY_CHAINMAIL_BOOTS, LEGACY_IRON_BOOTS -> 195;
++            case LEGACY_DIAMOND_HELMET -> 363;
++            case LEGACY_DIAMOND_CHESTPLATE -> 528;
++            case LEGACY_DIAMOND_LEGGINGS -> 495;
++            case LEGACY_DIAMOND_BOOTS -> 429;
++            case LEGACY_GOLD_HELMET -> 77;
++            case LEGACY_GOLD_CHESTPLATE -> 112;
++            case LEGACY_GOLD_LEGGINGS -> 105;
++            case LEGACY_GOLD_BOOTS -> 91;
++            case LEGACY_SHEARS -> 238;
++            case LEGACY_CARROT_STICK -> 25;
++            case LEGACY_SHIELD -> 336;
++            case LEGACY_ELYTRA -> 432; // Fiddle - correct legacy elytra durability
++            //</editor-fold>
++            default -> 0;
++        };
++    }
++    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - durability
++
+     // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
+     /**
+      * @throws IllegalArgumentException If the given {@code material}

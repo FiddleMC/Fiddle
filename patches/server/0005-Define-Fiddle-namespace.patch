@@ -1,0 +1,35 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Thu, 13 Jul 2023 18:08:05 +0200
+Subject: [PATCH] Define Fiddle namespace
+
+License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/resources/ResourceLocation.java b/src/main/java/net/minecraft/resources/ResourceLocation.java
+index fa9b84b604659a6b35262fbe5acbee0fdb20a56d..e6d1cf0b566b5b749d2cbf69e942cc6fcf32af7f 100644
+--- a/src/main/java/net/minecraft/resources/ResourceLocation.java
++++ b/src/main/java/net/minecraft/resources/ResourceLocation.java
+@@ -19,6 +19,7 @@ import net.minecraft.ResourceLocationException;
+ import net.minecraft.network.chat.Component;
+ import net.minecraft.util.GsonHelper;
+ import org.apache.commons.lang3.StringUtils;
++import org.bukkit.NamespacedKey;
+ 
+ public class ResourceLocation implements Comparable<ResourceLocation> {
+     public static final Codec<ResourceLocation> CODEC = Codec.STRING.comapFlatMap(ResourceLocation::read, ResourceLocation::toString).stable();
+@@ -26,6 +27,14 @@ public class ResourceLocation implements Comparable<ResourceLocation> {
+     public static final char NAMESPACE_SEPARATOR = ':';
+     public static final String DEFAULT_NAMESPACE = "minecraft";
+     public static final String REALMS_NAMESPACE = "realms";
++    // Fiddle start - define Fiddle namespace
++    /**
++     * The namespace for Fiddle {@link ResourceLocation}s.
++     * This is for {@link ResourceLocation}s that are defined by and belong to Fiddle itself,
++     * not those of packs that are loaded by Fiddle (content in those packs uses its own namespaces).
++     */
++    public static final String FIDDLE_NAMESPACE = NamespacedKey.FIDDLE;
++    // Fiddle end - define Fiddle namespace
+     private final String namespace;
+     private final String path;
+ 

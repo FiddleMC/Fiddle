@@ -7,7 +7,7 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index f053f9cb1cd594b55d153c02a9dfdc675d658558..ee687487add22c596c52a0a05098ab78ccfdd691 100644
+index 6378f15a35e31cb38bf58827ae360236ecc3efde..47d4ddef623dbb3434015eb4f7bebe537259e956 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
 @@ -21,8 +21,6 @@ import java.nio.file.Paths;
@@ -27,8 +27,8 @@ index f053f9cb1cd594b55d153c02a9dfdc675d658558..ee687487add22c596c52a0a05098ab78
  import net.minecraft.SharedConstants;
  import net.minecraft.Util;
  import net.minecraft.commands.Commands;
-@@ -85,7 +82,10 @@ import org.fiddlemc.fiddle.material.MaterialLegacyNameChecker;
- import org.fiddlemc.fiddle.material.OrderedEmptyMaterial;
+@@ -81,7 +78,10 @@ import org.fiddlemc.fiddle.configuration.PermanenceConfirmation;
+ import org.fiddlemc.fiddle.material.*;
  import org.jetbrains.annotations.NotNull;
  import org.jetbrains.annotations.Nullable;
 +import org.fiddlemc.fiddle.pack.FiddlePack;
@@ -38,7 +38,7 @@ index f053f9cb1cd594b55d153c02a9dfdc675d658558..ee687487add22c596c52a0a05098ab78
  import org.slf4j.Logger;
  
  // CraftBukkit start
-@@ -95,6 +95,7 @@ import java.util.concurrent.atomic.AtomicReference;
+@@ -91,6 +91,7 @@ import java.util.concurrent.atomic.AtomicReference;
  import java.util.function.Predicate;
  
  import net.minecraft.SharedConstants;
@@ -46,7 +46,7 @@ index f053f9cb1cd594b55d153c02a9dfdc675d658558..ee687487add22c596c52a0a05098ab78
  import org.bukkit.configuration.file.YamlConfiguration;
  // CraftBukkit end
  
-@@ -213,6 +214,8 @@ public class Main {
+@@ -209,6 +210,8 @@ public class Main {
              }
              // Fiddle end - confirm Fiddle permanence
  
@@ -55,7 +55,7 @@ index f053f9cb1cd594b55d153c02a9dfdc675d658558..ee687487add22c596c52a0a05098ab78
              io.papermc.paper.plugin.PluginInitializerManager.load(optionset); // Paper
              Bootstrap.bootStrap();
              Bootstrap.validate();
-@@ -465,6 +468,15 @@ public class Main {
+@@ -448,6 +451,15 @@ public class Main {
              }
  
              StartupPackLoadPhase.endStartupLoadPhase(); // Fiddle - read packs - startup load phase - end after initial read

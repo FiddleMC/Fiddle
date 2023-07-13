@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
-Date: Wed, 12 Jul 2023 22:14:25 +0200
+Date: Wed, 12 Jul 2023 16:19:44 +0200
 Subject: [PATCH] Modifiable Bukkit enums - Inject runtime versions - Depend on
  ByteBuddy
 

@@ -13,18 +13,18 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index b9fc107939888dd5f2b7df4610cad280f1686400..e11b05813fa878a1324acdb852d6f0b313d0d489 100644
+index ffb57704fe54edd2640725bfedd07102321c8cd9..d2e4d85c512f52a7ff87d5cefa25dde573c6f634 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -110,6 +110,7 @@ import org.bukkit.inventory.EquipmentSlot;
+@@ -108,6 +108,7 @@ import org.bukkit.block.data.type.WallSign;
+ import org.bukkit.inventory.CreativeCategory;
+ import org.bukkit.inventory.EquipmentSlot;
  import org.bukkit.material.MaterialData;
++import org.fiddlemc.fiddle.material.AbstractMaterial;
  import org.fiddlemc.fiddle.material.MaterialDefaultImplementations;
  import org.fiddlemc.fiddle.material.MaterialLegacyNameChecker;
-+import org.fiddlemc.fiddle.material.AbstractMaterial;
- import org.jetbrains.annotations.NotNull;
- import org.jetbrains.annotations.Nullable;
- 
-@@ -117,7 +118,7 @@ import org.jetbrains.annotations.Nullable;
+ import org.fiddlemc.fiddle.material.MaterialNameAndKeyConversion;
+@@ -118,7 +119,7 @@ import org.jetbrains.annotations.Nullable;
   * An enum of all material IDs accepted by the official server and client
   */
  @SuppressWarnings({"DeprecatedIsStillUsed", "deprecation"}) // Paper

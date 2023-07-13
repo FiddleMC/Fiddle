@@ -2,33 +2,24 @@ From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
 Date: Mon, 10 Jul 2023 22:05:08 +0200
 Subject: [PATCH] Modifiable Bukkit enums - Remove hard-coded properties -
- Material - Id
+ Material - Cached MaterialData constructor
 
-Modifies the Material property getId() so that it is are no longer hard-coded directly.
-Determining the values of the properties however still relies on a hard-coded list, since
-the property is not backed by any implementation that can be used.
+Modifies the Material properties getData() and getNewData(byte) so that they are no longer computed in Material, but in UnsafeValues.
+
+The property values are cached after being computed, for performant access.
 
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
-diff --git a/src/test/java/org/fiddlemc/fiddle/material/legacy/PerLegacyMaterialTest.java b/src/test/java/org/fiddlemc/fiddle/material/legacy/PerLegacyMaterialTest.java
-index d4e8a13fdc9cf77c2da4f8efd50a96fffb3447cb..493e76d4341a87be6dad444d9144b2968e221e55 100644
---- a/src/test/java/org/fiddlemc/fiddle/material/legacy/PerLegacyMaterialTest.java
-+++ b/src/test/java/org/fiddlemc/fiddle/material/legacy/PerLegacyMaterialTest.java
-@@ -36,6 +36,16 @@ public class PerLegacyMaterialTest extends AbstractTestingBase {
-         }
-     }
- 
-+    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - id
-+    @Test
-+    @SuppressWarnings("deprecation")
-+    public void getId() {
-+        for (Material material : getMaterials()) {
-+            assertEquals("getId equals legacy getId for " + material, material.getIdLegacy(), material.getId());
-+        }
-+    }
-+    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - id
-+
-     // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - max stack size
-     @Test
-     public void getMaxStackSize() {
+diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
+index aac3da4621d83919308097954c22ffdb2245195d..1030ea3833635cf89c10599494468a706b172053 100644
+--- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
++++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
+@@ -14,6 +14,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
+ import com.mojang.serialization.Dynamic;
+ import java.io.File;
+ import java.io.IOException;
++import java.lang.reflect.Constructor;
+ import java.util.Arrays;
+ import java.util.Collections;
+ import java.util.HashMap;

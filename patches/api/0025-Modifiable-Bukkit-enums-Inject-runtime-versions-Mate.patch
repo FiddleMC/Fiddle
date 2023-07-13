@@ -1,0 +1,93 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Wed, 12 Jul 2023 23:19:48 +0200
+Subject: [PATCH] Modifiable Bukkit enums - Inject runtime versions - Material
+
+License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
+index b243db56756c67cd2c41d7768898d01539f9260a..8a093a5720b79c45f648504b780a286d546d28d3 100644
+--- a/src/main/java/org/bukkit/Bukkit.java
++++ b/src/main/java/org/bukkit/Bukkit.java
+@@ -106,6 +106,20 @@ public final class Bukkit {
+         }
+ 
+         Bukkit.server = server;
++        // Fiddle start - modifiable Bukkit enums - inject runtime versions - Material
++        // Initialize the Material data field values
++        if (server.getUnsafe() != null) { // Only if this is not a dummy server (used in unit tests)
++            try {
++                var dataField = Material.class.getDeclaredField("data");
++                dataField.setAccessible(true);
++                for (Material material : Material.values()) {
++                    dataField.set(material, material.computeData());
++                }
++            } catch (Exception e) {
++                throw new RuntimeException("Failed to initialize Material data field when setting singleton Server", e);
++            }
++        }
++        // Fiddle end - modifiable Bukkit enums - inject runtime versions - Material
+         // Paper start - add git information
+         server.getLogger().info(getVersionMessage());
+     }
+diff --git a/src/main/java/org/fiddlemc/fiddle/material/MaterialNameAndKeyConversion.java b/src/main/java/org/fiddlemc/fiddle/material/MaterialNameAndKeyConversion.java
+index 6a43a90bd4fc533cfc5a738c3b196d72711b171e..b0f1cafd6927a85f5743c6562dfa86179ed37ee3 100644
+--- a/src/main/java/org/fiddlemc/fiddle/material/MaterialNameAndKeyConversion.java
++++ b/src/main/java/org/fiddlemc/fiddle/material/MaterialNameAndKeyConversion.java
+@@ -10,6 +10,7 @@ import org.bukkit.NamespacedKey;
+ import org.jetbrains.annotations.NotNull;
+ import org.jetbrains.annotations.Nullable;
+ 
++import java.util.HashMap;
+ import java.util.Locale;
+ import java.util.Map;
+ 
+@@ -26,12 +27,44 @@ public final class MaterialNameAndKeyConversion {
+         throw new RuntimeException();
+     }
+ 
++    // Fiddle start - modifiable Bukkit enums - inject runtime versions - Material
++    public static final @NotNull String FIDDLE_ENUM_NAME_PREFIX = "FIDDLE_";
++
++    private static @Nullable Map<String, NamespacedKey> fiddleEnumNamesToNamespacedKey = new HashMap<>(0);
++
++    public static void registerFiddleEnumNameToNamespacedKey(@NotNull String enumName, @NotNull String namespace, @NotNull String path) {
++        if (fiddleEnumNamesToNamespacedKey == null) {
++            throw new IllegalStateException("Cannot register Fiddle enum name to namespaced key after the key cache has been filled");
++        }
++        fiddleEnumNamesToNamespacedKey.put(enumName, new NamespacedKey(namespace, path));
++    }
++    // Fiddle end - modifiable Bukkit enums - inject runtime versions - Material
++
+     // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - key
+     private static final CachedMaterialProperty<NamespacedKey> keyCache = new CachedMaterialProperty<>(
+         NamespacedKey[]::new,
+-        // Based on the original org.bukkit.Material constructor
+-        material -> NamespacedKey.minecraft(material.name().toLowerCase(Locale.ROOT))
+-    );
++        // Fiddle start - modifiable Bukkit enums - inject runtime versions - Material
++        material -> {
++            if (fiddleEnumNamesToNamespacedKey != null) {
++                @Nullable NamespacedKey fromFiddleEnumName = fiddleEnumNamesToNamespacedKey.get(material.name());
++                if (fromFiddleEnumName != null) {
++                    return fromFiddleEnumName;
++                }
++            }
++            // Based on the original org.bukkit.Material constructor
++            return NamespacedKey.minecraft(material.name().toLowerCase(Locale.ROOT));
++        }
++    ) {
++
++        @Override
++        protected void initializeIfNecessary(boolean legacy) {
++            super.initializeIfNecessary(legacy);
++            // Clear the registered Fiddle enum names to namespaced keys
++            fiddleEnumNamesToNamespacedKey = null;
++        }
++
++    };
++    // Fiddle end - modifiable Bukkit enums - inject runtime versions - Material
+     // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - key
+ 
+     // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - getMaterial

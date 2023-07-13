@@ -7,7 +7,7 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index 57c822d47b1f5d82a32b5ccb29d9ca481e55d351..c1226e5730c3439fa4a93567c721468bfad97b42 100644
+index 57c822d47b1f5d82a32b5ccb29d9ca481e55d351..f0dd7a734668ff67aa00c12af979ea7f543b5b43 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
 @@ -1,5 +1,6 @@
@@ -49,7 +49,7 @@ index 57c822d47b1f5d82a32b5ccb29d9ca481e55d351..c1226e5730c3439fa4a93567c721468b
  import net.minecraft.CrashReport;
  import net.minecraft.DefaultUncaughtExceptionHandler;
  import net.minecraft.SharedConstants;
-@@ -32,12 +43,14 @@ import net.minecraft.Util;
+@@ -32,6 +43,7 @@ import net.minecraft.Util;
  import net.minecraft.commands.Commands;
  import net.minecraft.core.HolderLookup;
  import net.minecraft.core.Registry;
@@ -57,24 +57,14 @@ index 57c822d47b1f5d82a32b5ccb29d9ca481e55d351..c1226e5730c3439fa4a93567c721468b
  import net.minecraft.core.registries.Registries;
  import net.minecraft.nbt.NbtOps;
  import net.minecraft.nbt.Tag;
- import net.minecraft.network.chat.Component;
- import net.minecraft.obfuscate.DontObfuscate;
- import net.minecraft.resources.RegistryOps;
-+import net.minecraft.resources.ResourceLocation;
- import net.minecraft.server.dedicated.DedicatedServer;
- import net.minecraft.server.dedicated.DedicatedServerProperties;
- import net.minecraft.server.dedicated.DedicatedServerSettings;
-@@ -63,14 +76,23 @@ import net.minecraft.world.level.storage.LevelStorageSource;
+@@ -63,14 +75,20 @@ import net.minecraft.world.level.storage.LevelStorageSource;
  import net.minecraft.world.level.storage.LevelSummary;
  import net.minecraft.world.level.storage.PrimaryLevelData;
  import net.minecraft.world.level.storage.WorldData;
 +import org.bukkit.Material;
  import org.fiddlemc.fiddle.configuration.FiddleConfigurations;
  import org.fiddlemc.fiddle.configuration.PermanenceConfirmation;
-+import org.fiddlemc.fiddle.material.AbstractMaterial;
-+import org.fiddlemc.fiddle.material.MaterialDefaultImplementations;
-+import org.fiddlemc.fiddle.material.MaterialLegacyNameChecker;
-+import org.fiddlemc.fiddle.material.OrderedEmptyMaterial;
++import org.fiddlemc.fiddle.material.*;
 +import org.jetbrains.annotations.NotNull;
 +import org.jetbrains.annotations.Nullable;
  import org.slf4j.Logger;
@@ -88,7 +78,7 @@ index 57c822d47b1f5d82a32b5ccb29d9ca481e55d351..c1226e5730c3439fa4a93567c721468b
  import net.minecraft.SharedConstants;
  import org.bukkit.configuration.file.YamlConfiguration;
  // CraftBukkit end
-@@ -81,6 +103,54 @@ public class Main {
+@@ -81,6 +99,54 @@ public class Main {
  
      public Main() {}
  
@@ -112,12 +102,12 @@ index 57c822d47b1f5d82a32b5ccb29d9ca481e55d351..c1226e5730c3439fa4a93567c721468b
 +
 +        @RuntimeType
 +        public static @Nullable Object defer(@NotNull String name) {
-+            return MaterialDefaultImplementations.getMaterial(name);
++            return AbstractMaterial.getAbstractMaterial(name);
 +        }
 +
 +        @RuntimeType
 +        public static @Nullable Object defer(@NotNull String name, boolean legacyName) {
-+            return MaterialDefaultImplementations.getMaterial(name, legacyName);
++            return AbstractMaterial.getAbstractMaterial(name, legacyName);
 +        }
 +
 +    }
@@ -129,12 +119,12 @@ index 57c822d47b1f5d82a32b5ccb29d9ca481e55d351..c1226e5730c3439fa4a93567c721468b
 +
 +        @RuntimeType
 +        public static @Nullable Object defer(@NotNull String name) {
-+            return MaterialDefaultImplementations.matchMaterial(name);
++            return AbstractMaterial.matchAbstractMaterial(name);
 +        }
 +
 +        @RuntimeType
 +        public static @Nullable Object defer(@NotNull String name, boolean legacyName) {
-+            return MaterialDefaultImplementations.matchMaterial(name, legacyName);
++            return AbstractMaterial.matchAbstractMaterial(name, legacyName);
 +        }
 +
 +    }
@@ -143,7 +133,7 @@ index 57c822d47b1f5d82a32b5ccb29d9ca481e55d351..c1226e5730c3439fa4a93567c721468b
      @DontObfuscate
      public static void main(final OptionSet optionset) { // CraftBukkit - replaces main(String[] astring)
          SharedConstants.tryDetectVersion();
-@@ -176,6 +246,74 @@ public class Main {
+@@ -176,6 +242,61 @@ public class Main {
              var injectRuntimeClassVersionHelper = new InjectRuntimeClassVersionHelper();
              // Fiddle end - modifiable Bukkit enums - inject runtime versions - common utilities
  
@@ -152,29 +142,16 @@ index 57c822d47b1f5d82a32b5ccb29d9ca481e55d351..c1226e5730c3439fa4a93567c721468b
 +            injectRuntimeClassVersionHelper.verifyClassWasNotLoaded("org.bukkit.Material");
 +            // Load the runtime version
 +            var vanillaEnumNames = Arrays.stream(OrderedEmptyMaterial.values()).map(OrderedEmptyMaterial::name).toList();
-+            List<String> fiddleEnumNames = new ArrayList<>(1);
-+            BuiltInRegistries.BLOCK.holders().forEachOrdered(blockHolder -> {
-+                var resourceLocation = blockHolder.key().location();
-+                var resourceNamespace = resourceLocation.getNamespace();
-+                if (/*!blockHolder.value().isAddedByFiddle*/resourceNamespace.equals(ResourceLocation.DEFAULT_NAMESPACE)) { // TODO Use a Block field here
-+                    return;
-+                }
-+                var resourcePath = resourceLocation.getPath();
-+                String fiddleEnumName = "FIDDLE_" + resourceNamespace.toUpperCase(Locale.ROOT) + "_" + resourcePath.toUpperCase(Locale.ROOT); // TODO store "FIDDLE_" in some global variable that is also used in backwards compatability mode, matchMaterial, etc.
-+                fiddleEnumNames.add(fiddleEnumName);
-+            });
-+            BuiltInRegistries.ITEM.holders().forEachOrdered(itemHolder -> {
-+                var resourceLocation = itemHolder.key().location();
-+                var resourceNamespace = resourceLocation.getNamespace();
-+                if (/*!itemHolder.value().isAddedByFiddle*/resourceNamespace.equals(ResourceLocation.DEFAULT_NAMESPACE)) { // TODO Use an Item field here
-+                    return;
-+                }
-+                var resourcePath = resourceLocation.getPath();
-+                String fiddleEnumName = "FIDDLE_" + resourceNamespace.toUpperCase(Locale.ROOT) + "_" + resourcePath.toUpperCase(Locale.ROOT); // TODO store "FIDDLE_" in some global variable that is also used in backwards compatability mode, matchMaterial, etc.
-+                if (!fiddleEnumNames.contains(fiddleEnumName)) {
-+                    fiddleEnumNames.add(fiddleEnumName);
-+                }
-+            });
++            var fiddleEnumNames = Streams.concat(
++                BuiltInRegistries.BLOCK.holders()
++                    .filter(holder -> holder.value().isAddedByFiddle),
++                BuiltInRegistries.ITEM.holders()
++                    .filter(holder -> holder.value().isAddedByFiddle)
++            ).map(holder -> holder.key().location()).distinct().map(resourceLocation -> {
++                var fiddleEnumName = MaterialNameAndKeyConversion.FIDDLE_ENUM_NAME_PREFIX + resourceLocation.getNamespace().toUpperCase(Locale.ROOT) + "_" + resourceLocation.getPath().toUpperCase(Locale.ROOT);
++                MaterialNameAndKeyConversion.registerFiddleEnumNameToNamespacedKey(fiddleEnumName, resourceLocation.getNamespace(), resourceLocation.getPath());
++                return fiddleEnumName;
++            }).toList();
 +            var enumNames = Streams.concat(
 +                vanillaEnumNames.stream().filter(Predicate.not(MaterialLegacyNameChecker::isMaterialNameLegacy)),
 +                fiddleEnumNames.stream(),
@@ -187,7 +164,7 @@ index 57c822d47b1f5d82a32b5ccb29d9ca481e55d351..c1226e5730c3439fa4a93567c721468b
 +                .implement(AbstractMaterial.class)
 +                // Implement the getCraftingRemainingItem() method which returns the casted return value of getAbstractCraftingRemainingItem()
 +                .defineMethod("getCraftingRemainingItem", TargetType.class, Visibility.PUBLIC).intercept(MethodDelegation.to(GetCraftingRemainingItemTarget.class))
-+                // Implement static getMaterial(...) and matchMaterial(...) methods that defer to MaterialDefaultImplementations
++                // Implement static getMaterial(...) and matchMaterial(...) methods which return the casted return value of their respective default implementations in AbstractMaterial
 +                .defineMethod("getMaterial", TargetType.class, Visibility.PUBLIC, Ownership.STATIC).withParameters(String.class).intercept(MethodDelegation.to(GetMaterialTarget.class))
 +                .defineMethod("getMaterial", TargetType.class, Visibility.PUBLIC, Ownership.STATIC).withParameters(String.class, Boolean.TYPE).intercept(MethodDelegation.to(GetMaterialTarget.class))
 +                .defineMethod("matchMaterial", TargetType.class, Visibility.PUBLIC, Ownership.STATIC).withParameters(String.class).intercept(MethodDelegation.to(MatchMaterialTarget.class))

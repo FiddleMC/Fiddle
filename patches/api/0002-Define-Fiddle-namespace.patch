@@ -1,0 +1,27 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Thu, 13 Jul 2023 18:06:17 +0200
+Subject: [PATCH] Define Fiddle namespace
+
+License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/bukkit/NamespacedKey.java b/src/main/java/org/bukkit/NamespacedKey.java
+index 1416918d1924b362a688635823484f16e6adf125..a27186d79b17fe59b5f6651803cae21b17148378 100644
+--- a/src/main/java/org/bukkit/NamespacedKey.java
++++ b/src/main/java/org/bukkit/NamespacedKey.java
+@@ -29,6 +29,14 @@ public final class NamespacedKey implements net.kyori.adventure.key.Key, com.des
+      * compatibility measures.
+      */
+     public static final String BUKKIT = "bukkit";
++    // Fiddle start - define Fiddle namespace
++    /**
++     * The namespace for Fiddle {@link NamespacedKey}s.
++     * This is for {@link NamespacedKey}s that are defined by and belong to Fiddle itself,
++     * not those of packs that are loaded by Fiddle (content in those packs uses its own namespaces).
++     */
++    public static final String FIDDLE = "fiddle";
++    // Fiddle end - define Fiddle namespace
+     //
+     private final String namespace;
+     private final String key;

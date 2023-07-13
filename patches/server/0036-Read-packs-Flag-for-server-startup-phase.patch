@@ -7,18 +7,18 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index c1226e5730c3439fa4a93567c721468bfad97b42..f053f9cb1cd594b55d153c02a9dfdc675d658558 100644
+index f0dd7a734668ff67aa00c12af979ea7f543b5b43..6378f15a35e31cb38bf58827ae360236ecc3efde 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
-@@ -85,6 +85,7 @@ import org.fiddlemc.fiddle.material.MaterialLegacyNameChecker;
- import org.fiddlemc.fiddle.material.OrderedEmptyMaterial;
+@@ -81,6 +81,7 @@ import org.fiddlemc.fiddle.configuration.PermanenceConfirmation;
+ import org.fiddlemc.fiddle.material.*;
  import org.jetbrains.annotations.NotNull;
  import org.jetbrains.annotations.Nullable;
 +import org.fiddlemc.fiddle.pack.read.StartupPackLoadPhase;
  import org.slf4j.Logger;
  
  // CraftBukkit start
-@@ -463,6 +464,8 @@ public class Main {
+@@ -446,6 +447,8 @@ public class Main {
                  return;
              }
  
