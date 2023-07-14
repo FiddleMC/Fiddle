@@ -1,0 +1,101 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Thu, 13 Jul 2023 22:13:27 +0200
+Subject: [PATCH] Read packs - Namespaced key validation
+
+Adds utility methods to validate the namespaced keys used in Fiddle packs.
+
+License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/ContentNamespacedKeyValidation.java b/src/main/java/org/fiddlemc/fiddle/pack/read/ContentNamespacedKeyValidation.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..0795110117e8db2ed8ca86241c39d66807115dc3
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/ContentNamespacedKeyValidation.java
+@@ -0,0 +1,85 @@
++// Fiddle - read packs - namespaced key validation
++
++package org.fiddlemc.fiddle.pack.read;
++
++import net.minecraft.resources.ResourceLocation;
++import org.bukkit.NamespacedKey;
++import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
++
++/**
++ * A utility class for validating whether namespaced keys or parts thereof that are present in
++ * a Fiddle pack (for example, sa derived from the path of a file in a pack) are valid.
++ * The current requirements are:
++ * <ul>
++ *     <li>Both the namespace as well as the path can only have lowercase letters (<code>a-z</code>),
++ *     digits (<code>0-9</code>) and underscores (<code>_</code>)</li>.
++ *     <li>The namespace must be at least 1, and at most {@link #MAX_NAMESPACE_LENGTH} characters long.</li>
++ *     <li>The path must be at least 1, and at most {@link #MAX_PATH_LENGTH} characters long.</li>
++ * </ul>
++ */
++public final class ContentNamespacedKeyValidation {
++
++    private ContentNamespacedKeyValidation() {
++        throw new RuntimeException();
++    }
++
++    /**
++     * The maximum (inclusive) number of characters in a namespace of a namespaced key.
++     * <br>
++     * Note that the sum of this and {@link #MAX_PATH_LENGTH} must be at most 255.
++     */
++    private static final int MAX_NAMESPACE_LENGTH = 90;
++
++    /**
++     * The maximum (inclusive) number of characters in a path of a namespaced key.
++     * <br>
++     * Note that the sum of this and {@link #MAX_NAMESPACE_LENGTH} must be at most 255.
++     */
++    private static final int MAX_PATH_LENGTH = 140;
++
++    public static boolean hasOnlyLowerCaseLettersDigitsAndUnderscores(@NotNull String string) {
++        for (char c : string.toCharArray()) {
++            if (!((c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '_')) {
++                return false;
++            }
++        }
++        return true;
++    }
++
++    public static boolean isValidNamespace(@Nullable String namespace) {
++        return namespace != null && namespace.length() >= 1 && namespace.length() <= MAX_NAMESPACE_LENGTH && hasOnlyLowerCaseLettersDigitsAndUnderscores(namespace);
++    }
++
++    public static boolean isValidPath(@Nullable String path) {
++        return path != null && path.length() >= 1 && path.length() <= MAX_PATH_LENGTH && hasOnlyLowerCaseLettersDigitsAndUnderscores(path);
++    }
++
++    public static boolean isValidPathJSONFilename(@Nullable String pathFilename) {
++        return pathFilename != null && pathFilename.endsWith(".json") && pathFilename.length() > 5 && isValidPath(pathFilename.substring(0, pathFilename.length() - 5));
++    }
++
++    public static boolean isValidResourceLocation(@Nullable ResourceLocation resourceLocation) {
++        return resourceLocation != null && isValidNamespace(resourceLocation.getNamespace()) && isValidPath(resourceLocation.getPath());
++    }
++
++    public static boolean isValidNamespacedKey(@Nullable NamespacedKey namespacedKey) {
++        return namespacedKey != null && isValidNamespace(namespacedKey.getNamespace()) && isValidPath(namespacedKey.getKey());
++    }
++
++    /**
++     * @param allowWithoutNamespace Whether to count the given {@code namespacedKey} as valid if it only consists of a
++     *                              {@linkplain #isValidPath valid path}.
++     */
++    public static boolean isValidNamespacedKeyString(@Nullable String namespacedKey, boolean allowWithoutNamespace) {
++        if (namespacedKey == null) {
++            return false;
++        }
++        int colonIndex = namespacedKey.indexOf(':');
++        if (colonIndex == -1) {
++            return isValidPath(namespacedKey);
++        }
++        return colonIndex > 0 && colonIndex < namespacedKey.length() - 1 && isValidNamespace(namespacedKey.substring(0, colonIndex)) && isValidPath(namespacedKey.substring(colonIndex + 1));
++    }
++
++}

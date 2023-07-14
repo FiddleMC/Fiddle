@@ -7,10 +7,10 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java b/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java
-index 92ee4f5e31a228dcf48084f2bc214f2bee82b9ad..45422c50a172966012e60590aec1894aa77a3ff5 100644
+index 9c81b62b21dd39f075621d88f7ada0f6099dfde8..bb7e68559738383a65125a8a5ab0ba084180c9b1 100644
 --- a/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java
-@@ -51,7 +51,7 @@ public class FiddlePackMeta {
+@@ -52,7 +52,7 @@ public class FiddlePackMeta {
      private static final String resourcePackMetaPackJsonKey = "pack";
      private static final String resourcePackMetaFormatJsonKey = "pack_format";
      private static final String resourcePackMetaDescriptionJsonKey = "description";

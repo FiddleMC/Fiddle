@@ -7,21 +7,22 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java b/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java
-index ff299425ded226ac3610b2aa1017a8ea35b1f660..37dfeea15e81bcf373e9ccabf83ab98d17678929 100644
+index ff299425ded226ac3610b2aa1017a8ea35b1f660..c91aea90596d7a5096d07d7c49f04f650e3b6a23 100644
 --- a/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java
-@@ -3,6 +3,10 @@
+@@ -3,6 +3,11 @@
  package org.fiddlemc.fiddle.pack;
  
  import com.google.gson.JsonElement;
 +import it.unimi.dsi.fastutil.ints.IntArraySet;
 +import it.unimi.dsi.fastutil.ints.IntSet;
++import org.fiddlemc.fiddle.pack.read.ContentNamespacedKeyValidation;
 +import org.fiddlemc.fiddle.pack.read.PackParseException;
 +import org.fiddlemc.fiddle.pack.read.json.NamedJsonElement;
  import org.jetbrains.annotations.Nullable;
  
  import java.util.Objects;
-@@ -15,6 +19,43 @@ import java.util.UUID;
+@@ -15,6 +20,43 @@ import java.util.UUID;
   */
  public class FiddlePackMeta {
  
@@ -65,7 +66,7 @@ index ff299425ded226ac3610b2aa1017a8ea35b1f660..37dfeea15e81bcf373e9ccabf83ab98d
      @SuppressWarnings({"FieldCanBeLocal", "unused"})
      private final int givenFormat;
      public final UUID uuid;
-@@ -102,4 +143,87 @@ public class FiddlePackMeta {
+@@ -102,4 +144,90 @@ public class FiddlePackMeta {
  
      }
  
@@ -106,6 +107,9 @@ index ff299425ded226ac3610b2aa1017a8ea35b1f660..37dfeea15e81bcf373e9ccabf83ab98d
 +        var displayName = Objects.requireNonNull(packJson.getAsString(displayNameJsonKey, true, NamedJsonElement.BlankStringParseResult.THROW_EXCEPTION, displayNameMaxLength));
 +
 +        var technicalName = packJson.getAsString(technicalNameJsonKey, true, NamedJsonElement.BlankStringParseResult.THROW_EXCEPTION, technicalNameMaxLength);
++        if (!ContentNamespacedKeyValidation.hasOnlyLowerCaseLettersDigitsAndUnderscores(technicalName)) {
++            throw new PackParseException("The " + technicalNameJsonKey + " value '" + technicalName + "' is invalid: it can only contain lowercase letters (a-z), digits (0-9) and underscores (_)");
++        }
 +
 +        var version = packJson.getAsStringIfPresent(versionJsonKey, false, NamedJsonElement.BlankStringParseResult.RETURN_NULL, versionMaxLength);
 +

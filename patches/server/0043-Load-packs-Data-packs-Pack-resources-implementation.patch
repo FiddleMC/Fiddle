@@ -20,7 +20,7 @@ index cd723e5f51c587df28335ceb14db8c137dc9c4cb..41c782f14521430f414e631d5ef2be52
      }
  
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java b/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java
-index 37dfeea15e81bcf373e9ccabf83ab98d17678929..92ee4f5e31a228dcf48084f2bc214f2bee82b9ad 100644
+index c91aea90596d7a5096d07d7c49f04f650e3b6a23..9c81b62b21dd39f075621d88f7ada0f6099dfde8 100644
 --- a/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java
 @@ -3,6 +3,7 @@
@@ -30,8 +30,8 @@ index 37dfeea15e81bcf373e9ccabf83ab98d17678929..92ee4f5e31a228dcf48084f2bc214f2b
 +import com.google.gson.JsonObject;
  import it.unimi.dsi.fastutil.ints.IntArraySet;
  import it.unimi.dsi.fastutil.ints.IntSet;
- import org.fiddlemc.fiddle.pack.read.PackParseException;
-@@ -51,9 +52,9 @@ public class FiddlePackMeta {
+ import org.fiddlemc.fiddle.pack.read.ContentNamespacedKeyValidation;
+@@ -52,9 +53,9 @@ public class FiddlePackMeta {
      private static final String resourcePackMetaFormatJsonKey = "pack_format";
      private static final String resourcePackMetaDescriptionJsonKey = "description";
      private static final String dataPackMetaJsonKey = "data_pack_meta";
@@ -43,7 +43,7 @@ index 37dfeea15e81bcf373e9ccabf83ab98d17678929..92ee4f5e31a228dcf48084f2bc214f2b
      // Fiddle end - read packs - parse meta from JSON
  
      @SuppressWarnings({"FieldCanBeLocal", "unused"})
-@@ -135,10 +136,12 @@ public class FiddlePackMeta {
+@@ -136,10 +137,12 @@ public class FiddlePackMeta {
          @SuppressWarnings({"FieldCanBeLocal", "unused"})
          private final int givenFormat;
          public final @Nullable JsonElement description;
@@ -57,7 +57,7 @@ index 37dfeea15e81bcf373e9ccabf83ab98d17678929..92ee4f5e31a228dcf48084f2bc214f2b
          }
  
      }
-@@ -216,7 +219,7 @@ public class FiddlePackMeta {
+@@ -220,7 +223,7 @@ public class FiddlePackMeta {
              if (dataPackDescription != null && dataPackDescription.isJsonNull()) {
                  throw new PackParseException("The value " + (dataPackDescription.name() == null ? "" : "for '" + dataPackDescription.name() + "' ") + "is null, but it must be non-null");
              }
@@ -68,10 +68,10 @@ index 37dfeea15e81bcf373e9ccabf83ab98d17678929..92ee4f5e31a228dcf48084f2bc214f2b
          }
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/data/FiddlePackResources.java b/src/main/java/org/fiddlemc/fiddle/pack/data/FiddlePackResources.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..088d553dce5cc062505417d432e3d26a022b493d
+index 0000000000000000000000000000000000000000..3414398f893cbe8a110b1576e6702a60570a1f67
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/data/FiddlePackResources.java
-@@ -0,0 +1,172 @@
+@@ -0,0 +1,199 @@
 +// Fiddle - load packs - data packs - pack resources
 +
 +package org.fiddlemc.fiddle.pack.data;
@@ -91,6 +91,7 @@ index 0000000000000000000000000000000000000000..088d553dce5cc062505417d432e3d26a
 +import org.fiddlemc.fiddle.pack.files.FiddlePackFilesProvider;
 +import org.fiddlemc.fiddle.pack.files.FileInPack;
 +import org.fiddlemc.fiddle.pack.files.RegularFileInPack;
++import org.fiddlemc.fiddle.pack.read.ContentNamespacedKeyValidation;
 +import org.fiddlemc.fiddle.pack.read.PackParseException;
 +import org.jetbrains.annotations.NotNull;
 +import org.slf4j.Logger;
@@ -125,17 +126,25 @@ index 0000000000000000000000000000000000000000..088d553dce5cc062505417d432e3d26a
 +        return this.getResource(String.join("/", segments));
 +    }
 +
++    /**
++     * Note: this method does not check whether the given {@code id} is
++     * {@linkplain ContentNamespacedKeyValidation#isValidResourceLocation valid}.
++     */
 +    @Override
 +    public @Nullable IoSupplier<InputStream> getResource(@NotNull PackType type, @NotNull ResourceLocation id) {
 +        return this.getResource(FilePackResources.getPathFromLocation(type, id));
 +    }
 +
++    /**
++     * Note: this method does not check whether the given {@code path} represents a
++     * {@linkplain ContentNamespacedKeyValidation#isValidResourceLocation valid} resource location.
++     */
 +    private @Nullable IoSupplier<InputStream> getResource(String path) {
 +        try {
 +            @Nullable RegularFileInPack regularFileInPack = this.getFilesProvider().getRegularFileByPath(path);
 +            return regularFileInPack == null ? null : regularFileInPack.getInputStreamSupplier(false, () -> path);
 +        } catch (PackParseException e) {
-+            throw new RuntimeException("An exception occurred while preparing to read a resource ('" + path + "') in a Fiddle data pack: " + e.getMessage(), e);
++            throw new RuntimeException("An exception occurred while preparing to read a resource ('" + path + "') in a data pack: " + e.getMessage(), e);
 +        }
 +    }
 +
@@ -143,11 +152,17 @@ index 0000000000000000000000000000000000000000..088d553dce5cc062505417d432e3d26a
 +        try {
 +            return this.getFilesProvider().getTopLevelDirectory(type.getDirectory());
 +        } catch (PackParseException e) {
-+            LOGGER.warn("Exception while trying to get the '" + type.getDirectory() + "' folder of Fiddle pack '" + this.getFilesProvider().getLocation() + "': " + e.getMessage(), e);
++            LOGGER.warn("Exception while trying to get the '" + type.getDirectory() + "' folder of pack '" + this.getFilesProvider().getLocation() + "': " + e.getMessage(), e);
 +            return null;
 +        }
 +    }
 +
++    /**
++     * This method will not do anything if the given {@code namespace} is not
++     * {@linkplain ContentNamespacedKeyValidation#isValidNamespace valid}.
++     * Any resources with a path that is not {@linkplain ContentNamespacedKeyValidation#isValidPath valid} will
++     * be skipped.
++     */
 +    @Override
 +    public void listResources(@NotNull PackType type, @NotNull String namespace, @NotNull String prefix, PackResources.@NotNull ResourceOutput consumer) {
 +        @Nullable DirectoryInPack typeDirectory = this.getPackTypeDirectory(type);
@@ -158,6 +173,10 @@ index 0000000000000000000000000000000000000000..088d553dce5cc062505417d432e3d26a
 +        if (namespaceDirectory == null) {
 +            return;
 +        }
++        if (!ContentNamespacedKeyValidation.isValidNamespace(namespace)) {
++            LOGGER.warn("Ignored invalid namespace folder in data pack: {} in {}", type + "/" + namespace, this.getFilesProvider().getLocation());
++            return;
++        }
 +        @Nullable DirectoryInPack prefixDirectory = namespaceDirectory.getTopLevelDirectory(prefix);
 +        if (prefixDirectory == null) {
 +            return;
@@ -166,19 +185,27 @@ index 0000000000000000000000000000000000000000..088d553dce5cc062505417d432e3d26a
 +            prefixDirectory.getNestedRegularFilesWithPathsStream().forEach(nestedRegularFileWithPath -> {
 +                RegularFileInPack nestedRegularFile = nestedRegularFileWithPath.left();
 +                String nestedRegularFilePath = nestedRegularFileWithPath.right();
-+                String resourcePathPart = prefix + "/" + nestedRegularFilePath;
-+                ResourceLocation resourceLocation = ResourceLocation.tryBuild(namespace, resourcePathPart);
-+                if (resourceLocation != null) {
-+                    consumer.accept(resourceLocation, nestedRegularFile.getInputStreamSupplier(false, () -> nestedRegularFilePath));
++                if (!ContentNamespacedKeyValidation.isValidPathJSONFilename(nestedRegularFilePath)) {
++                    LOGGER.warn("Ignored invalid file name in data pack: {} in {}", type + "/" + namespace + "/" + prefix + "/" + nestedRegularFilePath, this.getFilesProvider().getLocation());
 +                } else {
-+                    LOGGER.warn("Invalid path in datapack: {}:{}, ignoring", namespace, resourcePathPart);
++                    String resourcePathPart = prefix + "/" + nestedRegularFilePath;
++                    ResourceLocation resourceLocation = ResourceLocation.tryBuild(namespace, resourcePathPart);
++                    if (resourceLocation != null) {
++                        consumer.accept(resourceLocation, nestedRegularFile.getInputStreamSupplier(false, () -> nestedRegularFilePath));
++                    } else {
++                        LOGGER.warn("Invalid path in data pack: {}:{}, ignoring", type + "/" + namespace + "/" + prefix + "/" + nestedRegularFilePath, resourcePathPart);
++                    }
 +                }
 +            });
 +        } catch (PackParseException e) {
-+            LOGGER.warn("Exception while trying to list the data pack resources in Fiddle pack '" + this.getFilesProvider().getLocation() + "': " + e.getMessage(), e);
++            LOGGER.warn("Exception while trying to list the data pack resources in pack '" + this.getFilesProvider().getLocation() + "': " + e.getMessage(), e);
 +        }
 +    }
 +
++    /**
++     * This method will not return any namespace that are not
++     * {@linkplain ContentNamespacedKeyValidation#isValidNamespace valid}.
++     */
 +    @Override
 +    public @NotNull Set<String> getNamespaces(@NotNull PackType type) {
 +        DirectoryInPack typeDirectory = this.getPackTypeDirectory(type);
@@ -190,13 +217,13 @@ index 0000000000000000000000000000000000000000..088d553dce5cc062505417d432e3d26a
 +            if (fileInTypeDirectory instanceof DirectoryInPack directoryInTypeDirectory && directoryInTypeDirectory.containsAnyNestedRegularFile()) {
 +                try {
 +                    String name = directoryInTypeDirectory.getName();
-+                    if (name.equals(name.toLowerCase(Locale.ROOT))) {
++                    if (ContentNamespacedKeyValidation.isValidNamespace(name)) {
 +                        namespaces.add(name);
 +                    } else {
-+                        LOGGER.warn("Ignored non-lowercase namespace: {} in {}", name, this.getFilesProvider().getLocation());
++                        LOGGER.warn("Ignored invalid namespace folder in data pack: {} in {}", name, this.getFilesProvider().getLocation());
 +                    }
 +                } catch (PackParseException e) {
-+                    LOGGER.warn("Exception while trying to get the name of a namespace folder in " + type.getDirectory() + " folder of Fiddle pack '" + this.getFilesProvider().getLocation() + "': " + e.getMessage(), e);
++                    LOGGER.warn("Exception while trying to get the name of a namespace folder in " + type.getDirectory() + " folder of pack '" + this.getFilesProvider().getLocation() + "': " + e.getMessage(), e);
 +                }
 +            }
 +        }

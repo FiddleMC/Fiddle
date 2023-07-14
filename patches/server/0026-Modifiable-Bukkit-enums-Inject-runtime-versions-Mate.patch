@@ -8,10 +8,10 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index dedba068cbc1aa3098e206af01c704c8d0bfc41e..000895a91a3add8abc8e094745d31f7d847e31f9 100644
+index 1ccb6ba2d4828b3c5c3e461f8c4a8f045baa807e..2d5a42beee8b7002949148b250d1e1a5da17cb77 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
-@@ -254,6 +254,7 @@ public class Main {
+@@ -257,6 +257,7 @@ public class Main {
                      .filter(holder -> holder.value().isAddedByFiddle)
              ).map(holder -> holder.key().location()).distinct().map(resourceLocation -> {
                  var fiddleEnumName = MaterialNameAndKeyConversion.FIDDLE_ENUM_NAME_PREFIX + resourceLocation.getNamespace().toUpperCase(Locale.ROOT) + "_" + resourceLocation.getPath().toUpperCase(Locale.ROOT);

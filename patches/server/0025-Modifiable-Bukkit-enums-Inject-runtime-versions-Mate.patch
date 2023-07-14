@@ -7,7 +7,7 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index 57c822d47b1f5d82a32b5ccb29d9ca481e55d351..dedba068cbc1aa3098e206af01c704c8d0bfc41e 100644
+index 66345be27a2424d9f4ac6c647b7257969dc23d7e..1ccb6ba2d4828b3c5c3e461f8c4a8f045baa807e 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
 @@ -1,5 +1,6 @@
@@ -101,12 +101,12 @@ index 57c822d47b1f5d82a32b5ccb29d9ca481e55d351..dedba068cbc1aa3098e206af01c704c8
 +    public static class GetMaterialTarget {
 +
 +        @RuntimeType
-+        public static @Nullable Object defer(@NotNull String name) {
++        public static @Nullable Object cast(@NotNull String name) {
 +            return AbstractMaterial.getAbstractMaterial(name);
 +        }
 +
 +        @RuntimeType
-+        public static @Nullable Object defer(@NotNull String name, boolean legacyName) {
++        public static @Nullable Object cast(@NotNull String name, boolean legacyName) {
 +            return AbstractMaterial.getAbstractMaterial(name, legacyName);
 +        }
 +
@@ -118,12 +118,12 @@ index 57c822d47b1f5d82a32b5ccb29d9ca481e55d351..dedba068cbc1aa3098e206af01c704c8
 +    public static class MatchMaterialTarget {
 +
 +        @RuntimeType
-+        public static @Nullable Object defer(@NotNull String name) {
++        public static @Nullable Object cast(@NotNull String name) {
 +            return AbstractMaterial.matchAbstractMaterial(name);
 +        }
 +
 +        @RuntimeType
-+        public static @Nullable Object defer(@NotNull String name, boolean legacyName) {
++        public static @Nullable Object cast(@NotNull String name, boolean legacyName) {
 +            return AbstractMaterial.matchAbstractMaterial(name, legacyName);
 +        }
 +
@@ -133,13 +133,15 @@ index 57c822d47b1f5d82a32b5ccb29d9ca481e55d351..dedba068cbc1aa3098e206af01c704c8
      @DontObfuscate
      public static void main(final OptionSet optionset) { // CraftBukkit - replaces main(String[] astring)
          SharedConstants.tryDetectVersion();
-@@ -176,6 +242,60 @@ public class Main {
+@@ -177,6 +243,62 @@ public class Main {
              var injectRuntimeClassVersionHelper = new InjectRuntimeClassVersionHelper();
              // Fiddle end - modifiable Bukkit enums - inject runtime versions - common utilities
  
 +            // Fiddle start - modifiable Bukkit enums - inject runtime versions - Material
 +            // Verify that the class was not loaded yet
-+            injectRuntimeClassVersionHelper.verifyClassWasNotLoaded("org.bukkit.Material");
++            if (injectRuntimeClassVersionHelper.wasClassLoaded("org.bukkit.Material")) {
++                return;
++            }
 +            // Load the runtime version
 +            var vanillaEnumNames = Arrays.stream(OrderedEmptyMaterial.values()).map(OrderedEmptyMaterial::name).toList();
 +            var fiddleEnumNames = Streams.concat(

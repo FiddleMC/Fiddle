@@ -8,7 +8,7 @@
   <h3>
     A Paper server fork that lets you
     <br>
-    add modded blocks and items
+    add custom blocks and items
   </h3>
 
   [![Discord](https://img.shields.io/discord/1091830813240348732?color=5865F2&label=discord&style=for-the-badge)](https://discord.gg/EduvcVmKS7)
@@ -51,7 +51,7 @@
 Fiddle is a Paper server fork that lets you add new blocks and items into Minecraft.
 
 Fiddle:
-* works with existing Bukkit plugins[^1]
+* works with (existing) Bukkit plugins[^1]
 * adds blocks and items into the game in the same way a Minecraft update would
 * works with the vanilla client, both with/without a resource pack, and also offers a client-side mod with extra performance
 * modded blocks and items keep working after Minecraft updates

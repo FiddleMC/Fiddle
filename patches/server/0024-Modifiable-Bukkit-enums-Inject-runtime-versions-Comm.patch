@@ -8,10 +8,10 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index 0031765eb9f50c46f450b02dce456555ca2d513e..57c822d47b1f5d82a32b5ccb29d9ca481e55d351 100644
+index 0031765eb9f50c46f450b02dce456555ca2d513e..66345be27a2424d9f4ac6c647b7257969dc23d7e 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
-@@ -149,6 +149,33 @@ public class Main {
+@@ -149,6 +149,34 @@ public class Main {
              Path path1 = Paths.get("server.properties");
              DedicatedServerSettings dedicatedserversettings = new DedicatedServerSettings(optionset); // CraftBukkit - CLI argument support
  
@@ -20,22 +20,23 @@ index 0031765eb9f50c46f450b02dce456555ca2d513e..57c822d47b1f5d82a32b5ccb29d9ca48
 +            class InjectRuntimeClassVersionHelper {
 +
 +                /**
-+                 * Checks if the given class is loaded, and if it is, exits the server immediately.
++                 * Checks if the given class is loaded, and if it is, prints an error message to the logger.
++                 *
++                 * @return Whether the given class was loaded, or if checking if the given was loaded failed.
 +                 */
-+                void verifyClassWasNotLoaded(String qualifiedClassName) {
++                boolean wasClassLoaded(String qualifiedClassName) {
 +                    try {
 +                        java.lang.reflect.Method findLoadedClassMethod = ClassLoader.class.getDeclaredMethod("findLoadedClass", String.class);
 +                        findLoadedClassMethod.setAccessible(true);
 +                        if (findLoadedClassMethod.invoke(systemClassLoader, qualifiedClassName) != null) {
 +                            LOGGER.error("A Bukkit enum class (" + qualifiedClassName + ") was already loaded before additional values could be added. This may be caused by a plugin using the class before the server started, or an instrumentation agent or class loader runtime flag forcibly loading the class.");
-+                            try { Thread.sleep(100); } catch (Throwable ignored) {} // Ensure the logger is flushed
-+                            System.exit(1);
++                            return true;
 +                        }
 +                    } catch (Exception e) {
 +                        LOGGER.error("Failed to check if Bukkit enum classes were already loaded: please add \"--add-opens=java.base/java.lang=ALL-UNNAMED\" to your server command line, for example \"java -jar server.jar --add-opens=java.base/java.lang=ALL-UNNAMED\"", e);
-+                        try { Thread.sleep(100); } catch (Throwable ignored) {} // Ensure the logger is flushed
-+                        System.exit(1);
++                        return true;
 +                    }
++                    return false;
 +                }
 +
 +            }
