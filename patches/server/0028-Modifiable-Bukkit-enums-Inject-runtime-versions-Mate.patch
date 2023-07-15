@@ -7,7 +7,7 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index 66345be27a2424d9f4ac6c647b7257969dc23d7e..1ccb6ba2d4828b3c5c3e461f8c4a8f045baa807e 100644
+index 66345be27a2424d9f4ac6c647b7257969dc23d7e..49d63ca2b4e0d4e9e03b061ec1efe1224df3d0d5 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
 @@ -1,5 +1,6 @@
@@ -133,7 +133,7 @@ index 66345be27a2424d9f4ac6c647b7257969dc23d7e..1ccb6ba2d4828b3c5c3e461f8c4a8f04
      @DontObfuscate
      public static void main(final OptionSet optionset) { // CraftBukkit - replaces main(String[] astring)
          SharedConstants.tryDetectVersion();
-@@ -177,6 +243,62 @@ public class Main {
+@@ -177,6 +243,63 @@ public class Main {
              var injectRuntimeClassVersionHelper = new InjectRuntimeClassVersionHelper();
              // Fiddle end - modifiable Bukkit enums - inject runtime versions - common utilities
  
@@ -146,16 +146,17 @@ index 66345be27a2424d9f4ac6c647b7257969dc23d7e..1ccb6ba2d4828b3c5c3e461f8c4a8f04
 +            var vanillaEnumNames = Arrays.stream(OrderedEmptyMaterial.values()).map(OrderedEmptyMaterial::name).toList();
 +            var fiddleEnumNames = Streams.concat(
 +                BuiltInRegistries.BLOCK.holders()
-+                    .filter(holder -> holder.value().isAddedByFiddle),
++                    .filter(holder -> holder.value().isAddedByFiddle()),
 +                BuiltInRegistries.ITEM.holders()
-+                    .filter(holder -> holder.value().isAddedByFiddle)
++                    .filter(holder -> holder.value().isAddedByFiddle())
 +            ).map(holder -> holder.key().location()).distinct().map(resourceLocation -> {
-+                var fiddleEnumName = MaterialNameAndKeyConversion.FIDDLE_ENUM_NAME_PREFIX + resourceLocation.getNamespace().toUpperCase(Locale.ROOT) + "_" + resourceLocation.getPath().toUpperCase(Locale.ROOT);
-+                return fiddleEnumName;
++                var fiddleEnumName = FiddleEnumNamePrefix.PREFIX + resourceLocation.getNamespace().toUpperCase(Locale.ROOT) + "_" + resourceLocation.getPath().toUpperCase(Locale.ROOT);
++                return Pair.of(fiddleEnumName, resourceLocation);
 +            }).toList();
++            LOGGER.info("Adding Fiddle enums: " + fiddleEnumNames);
 +            var enumNames = Streams.concat(
 +                vanillaEnumNames.stream().filter(Predicate.not(MaterialLegacyNameChecker::isMaterialNameLegacy)),
-+                fiddleEnumNames.stream(),
++                fiddleEnumNames.stream().map(Pair::getFirst),
 +                vanillaEnumNames.stream().filter(MaterialLegacyNameChecker::isMaterialNameLegacy)
 +            ).toList();
 +            new ByteBuddy()

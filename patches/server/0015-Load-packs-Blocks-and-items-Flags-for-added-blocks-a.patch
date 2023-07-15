@@ -1,0 +1,87 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Thu, 13 Jul 2023 18:52:18 +0200
+Subject: [PATCH] Load packs - Blocks and items - Flags for added blocks and
+ items
+
+License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/world/item/Item.java b/src/main/java/net/minecraft/world/item/Item.java
+index 50ec55615d20449905afbf04f62cfc206e896a73..7c51d81b1dfa237129dd8651a4c1a1573962bb98 100644
+--- a/src/main/java/net/minecraft/world/item/Item.java
++++ b/src/main/java/net/minecraft/world/item/Item.java
+@@ -88,6 +88,14 @@ public class Item implements FeatureElement, ItemLike {
+     private @Nullable String keyInItemRegistryString = null;
+     // Fiddle end - cache registry keys as fields - item
+ 
++    // Fiddle start - load packs - blocks - flag for added items
++    /**
++     * Whether this item was added by Fiddle.
++     * This will be false until set with {@link #setIsAddedByFiddle}.
++     */
++    private boolean isAddedByFiddle = false;
++    // Fiddle end - load packs - blocks - flag for added items
++
+     public static int getId(Item item) {
+         return item == null ? 0 : BuiltInRegistries.ITEM.getId(item);
+     }
+@@ -402,6 +410,19 @@ public class Item implements FeatureElement, ItemLike {
+     }
+     // Fiddle end - cache registry keys as fields - item
+ 
++    // Fiddle start - load packs - blocks - flag for added items
++    public boolean isAddedByFiddle() {
++        return this.isAddedByFiddle;
++    }
++
++    public void setIsAddedByFiddle() {
++        if (this.keyInItemRegistry != null) {
++            throw new IllegalStateException("Items must be marked as added by Fiddle before they are registered");
++        }
++        this.isAddedByFiddle = true;
++    }
++    // Fiddle end - load packs - blocks - flag for added items
++
+     public static class Properties {
+         int maxStackSize = 64;
+         int maxDamage;
+diff --git a/src/main/java/net/minecraft/world/level/block/Block.java b/src/main/java/net/minecraft/world/level/block/Block.java
+index 94443714431f80385c0f1ef7f135a116c9f6eba7..190d900092c95e129cb2b57884d0aaff0049a793 100644
+--- a/src/main/java/net/minecraft/world/level/block/Block.java
++++ b/src/main/java/net/minecraft/world/level/block/Block.java
+@@ -131,6 +131,14 @@ public class Block extends BlockBehaviour implements ItemLike {
+     private @Nullable String keyInBlockRegistryString = null;
+     // Fiddle end - cache registry keys as fields - block
+ 
++    // Fiddle start - load packs - blocks - flag for added blocks
++    /**
++     * Whether this block was added by Fiddle.
++     * This will be false until set with {@link #setIsAddedByFiddle}.
++     */
++    private boolean isAddedByFiddle = false;
++    // Fiddle end - load packs - blocks - flag for added blocks
++
+     private static final int CACHE_SIZE = 2048;
+     private static final ThreadLocal<Object2ByteLinkedOpenHashMap<Block.BlockStatePairKey>> OCCLUSION_CACHE = ThreadLocal.withInitial(() -> {
+         Object2ByteLinkedOpenHashMap<Block.BlockStatePairKey> object2bytelinkedopenhashmap = new Object2ByteLinkedOpenHashMap<Block.BlockStatePairKey>(2048, 0.25F) {
+@@ -607,6 +615,19 @@ public class Block extends BlockBehaviour implements ItemLike {
+     }
+     // Fiddle end - cache registry keys as fields - block
+ 
++    // Fiddle start - load packs - blocks - flag for added blocks
++    public boolean isAddedByFiddle() {
++        return this.isAddedByFiddle;
++    }
++
++    public void setIsAddedByFiddle() {
++        if (this.keyInBlockRegistry != null) {
++            throw new IllegalStateException("Blocks must be marked as added by Fiddle before they are registered");
++        }
++        this.isAddedByFiddle = true;
++    }
++    // Fiddle end - load packs - blocks - flag for added blocks
++
+     // Spigot start
+     public static float range(float min, float value, float max) {
+         if (value < min) {

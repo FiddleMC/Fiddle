@@ -1,0 +1,430 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sat, 15 Jul 2023 20:52:44 +0200
+Subject: [PATCH] Use cached registry key instead of doing lookup - Item
+
+License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/ca/spottedleaf/dataconverter/minecraft/versions/V704.java b/src/main/java/ca/spottedleaf/dataconverter/minecraft/versions/V704.java
+index 3beb53d9dc3be46351fec95afa85bfd712bbb00a..bc0839c3c807c3105ebc6401edb48732c36edd1c 100644
+--- a/src/main/java/ca/spottedleaf/dataconverter/minecraft/versions/V704.java
++++ b/src/main/java/ca/spottedleaf/dataconverter/minecraft/versions/V704.java
+@@ -209,7 +209,7 @@ public final class V704 {
+                 possibleId = null;
+             }
+ 
+-            final String itemName = BuiltInRegistries.ITEM.getKey(item).toString();
++            final String itemName = item.getKeyInItemRegistryString(); // Fiddle - cache registry keys as fields - use instead of lookup - item
+             final String mappedTo = ITEM_ID_TO_TILE_ENTITY_ID.get(itemName);
+             if (mappedTo == null) {
+                 LOGGER.error("Item id " + itemName + " does not contain tile mapping! (V704)");
+diff --git a/src/main/java/net/minecraft/advancements/DisplayInfo.java b/src/main/java/net/minecraft/advancements/DisplayInfo.java
+index 7909ba26bb7a883c74eda1ffd2d3e2bad286bc8b..17ecf751e10da45739d0a742278319ca1346edfc 100644
+--- a/src/main/java/net/minecraft/advancements/DisplayInfo.java
++++ b/src/main/java/net/minecraft/advancements/DisplayInfo.java
+@@ -6,7 +6,6 @@ import com.google.gson.JsonParseException;
+ import com.google.gson.JsonSyntaxException;
+ import com.mojang.brigadier.exceptions.CommandSyntaxException;
+ import javax.annotation.Nullable;
+-import net.minecraft.core.registries.BuiltInRegistries;
+ import net.minecraft.nbt.CompoundTag;
+ import net.minecraft.nbt.TagParser;
+ import net.minecraft.network.FriendlyByteBuf;
+@@ -185,7 +184,7 @@ public class DisplayInfo {
+ 
+     private JsonObject serializeIcon() {
+         JsonObject jsonObject = new JsonObject();
+-        jsonObject.addProperty("item", BuiltInRegistries.ITEM.getKey(this.icon.getItem()).toString());
++        jsonObject.addProperty("item", this.icon.getItem().getKeyInItemRegistryString()); // Fiddle - cache registry keys as fields - use instead of lookup - item
+         if (this.icon.hasTag()) {
+             jsonObject.addProperty("nbt", this.icon.getTag().toString());
+         }
+diff --git a/src/main/java/net/minecraft/advancements/critereon/ItemPredicate.java b/src/main/java/net/minecraft/advancements/critereon/ItemPredicate.java
+index e6960637aafdcd8ad9fa20991d57f9c9c4998036..7fcdc2952fd50dea2ec5acd75930237bdaff450b 100644
+--- a/src/main/java/net/minecraft/advancements/critereon/ItemPredicate.java
++++ b/src/main/java/net/minecraft/advancements/critereon/ItemPredicate.java
+@@ -161,7 +161,7 @@ public class ItemPredicate {
+                 JsonArray jsonArray = new JsonArray();
+ 
+                 for(Item item : this.items) {
+-                    jsonArray.add(BuiltInRegistries.ITEM.getKey(item).toString());
++                    jsonArray.add(item.getKeyInItemRegistryString()); // Fiddle - cache registry keys as fields - use instead of lookup - item
+                 }
+ 
+                 jsonObject.add("items", jsonArray);
+diff --git a/src/main/java/net/minecraft/data/advancements/packs/VanillaHusbandryAdvancements.java b/src/main/java/net/minecraft/data/advancements/packs/VanillaHusbandryAdvancements.java
+index bfe32784c8fc2ca4ebed40b948c48cb9f56885f4..c25f266106335b77901d3ff7a6dafd185f06017e 100644
+--- a/src/main/java/net/minecraft/data/advancements/packs/VanillaHusbandryAdvancements.java
++++ b/src/main/java/net/minecraft/data/advancements/packs/VanillaHusbandryAdvancements.java
+@@ -64,13 +64,13 @@ public class VanillaHusbandryAdvancements implements AdvancementSubProvider {
+         Advancement advancement4 = Advancement.Builder.advancement().parent(advancement).display(Items.LEAD, Component.translatable("advancements.husbandry.tame_an_animal.title"), Component.translatable("advancements.husbandry.tame_an_animal.description"), (ResourceLocation)null, FrameType.TASK, true, true, false).addCriterion("tamed_animal", TameAnimalTrigger.TriggerInstance.tamedAnimal()).save(exporter, "husbandry/tame_an_animal");
+         Advancement advancement5 = addFish(Advancement.Builder.advancement()).parent(advancement).requirements(RequirementsStrategy.OR).display(Items.FISHING_ROD, Component.translatable("advancements.husbandry.fishy_business.title"), Component.translatable("advancements.husbandry.fishy_business.description"), (ResourceLocation)null, FrameType.TASK, true, true, false).save(exporter, "husbandry/fishy_business");
+         Advancement advancement6 = addFishBuckets(Advancement.Builder.advancement()).parent(advancement5).requirements(RequirementsStrategy.OR).display(Items.PUFFERFISH_BUCKET, Component.translatable("advancements.husbandry.tactical_fishing.title"), Component.translatable("advancements.husbandry.tactical_fishing.description"), (ResourceLocation)null, FrameType.TASK, true, true, false).save(exporter, "husbandry/tactical_fishing");
+-        Advancement advancement7 = Advancement.Builder.advancement().parent(advancement6).requirements(RequirementsStrategy.OR).addCriterion(BuiltInRegistries.ITEM.getKey(Items.AXOLOTL_BUCKET).getPath(), FilledBucketTrigger.TriggerInstance.filledBucket(ItemPredicate.Builder.item().of(Items.AXOLOTL_BUCKET).build())).display(Items.AXOLOTL_BUCKET, Component.translatable("advancements.husbandry.axolotl_in_a_bucket.title"), Component.translatable("advancements.husbandry.axolotl_in_a_bucket.description"), (ResourceLocation)null, FrameType.TASK, true, true, false).save(exporter, "husbandry/axolotl_in_a_bucket");
++        Advancement advancement7 = Advancement.Builder.advancement().parent(advancement6).requirements(RequirementsStrategy.OR).addCriterion(Items.AXOLOTL_BUCKET.getKeyInItemRegistry().getPath(), FilledBucketTrigger.TriggerInstance.filledBucket(ItemPredicate.Builder.item().of(Items.AXOLOTL_BUCKET).build())).display(Items.AXOLOTL_BUCKET, Component.translatable("advancements.husbandry.axolotl_in_a_bucket.title"), Component.translatable("advancements.husbandry.axolotl_in_a_bucket.description"), (ResourceLocation)null, FrameType.TASK, true, true, false).save(exporter, "husbandry/axolotl_in_a_bucket"); // Fiddle - cache registry keys as fields - use instead of lookup - item
+         Advancement.Builder.advancement().parent(advancement7).addCriterion("kill_axolotl_target", EffectsChangedTrigger.TriggerInstance.gotEffectsFrom(EntityPredicate.Builder.entity().of(EntityType.AXOLOTL).build())).display(Items.TROPICAL_FISH_BUCKET, Component.translatable("advancements.husbandry.kill_axolotl_target.title"), Component.translatable("advancements.husbandry.kill_axolotl_target.description"), (ResourceLocation)null, FrameType.TASK, true, true, false).save(exporter, "husbandry/kill_axolotl_target");
+         addCatVariants(Advancement.Builder.advancement()).parent(advancement4).display(Items.COD, Component.translatable("advancements.husbandry.complete_catalogue.title"), Component.translatable("advancements.husbandry.complete_catalogue.description"), (ResourceLocation)null, FrameType.CHALLENGE, true, true, false).rewards(AdvancementRewards.Builder.experience(50)).save(exporter, "husbandry/complete_catalogue");
+         Advancement advancement8 = Advancement.Builder.advancement().parent(advancement).addCriterion("safely_harvest_honey", ItemUsedOnLocationTrigger.TriggerInstance.itemUsedOnBlock(LocationPredicate.Builder.location().setBlock(BlockPredicate.Builder.block().of(BlockTags.BEEHIVES).build()).setSmokey(true), ItemPredicate.Builder.item().of(Items.GLASS_BOTTLE))).display(Items.HONEY_BOTTLE, Component.translatable("advancements.husbandry.safely_harvest_honey.title"), Component.translatable("advancements.husbandry.safely_harvest_honey.description"), (ResourceLocation)null, FrameType.TASK, true, true, false).save(exporter, "husbandry/safely_harvest_honey");
+         Advancement advancement9 = Advancement.Builder.advancement().parent(advancement8).display(Items.HONEYCOMB, Component.translatable("advancements.husbandry.wax_on.title"), Component.translatable("advancements.husbandry.wax_on.description"), (ResourceLocation)null, FrameType.TASK, true, true, false).addCriterion("wax_on", ItemUsedOnLocationTrigger.TriggerInstance.itemUsedOnBlock(LocationPredicate.Builder.location().setBlock(BlockPredicate.Builder.block().of(HoneycombItem.WAXABLES.get().keySet()).build()), ItemPredicate.Builder.item().of(Items.HONEYCOMB))).save(exporter, "husbandry/wax_on");
+         Advancement.Builder.advancement().parent(advancement9).display(Items.STONE_AXE, Component.translatable("advancements.husbandry.wax_off.title"), Component.translatable("advancements.husbandry.wax_off.description"), (ResourceLocation)null, FrameType.TASK, true, true, false).addCriterion("wax_off", ItemUsedOnLocationTrigger.TriggerInstance.itemUsedOnBlock(LocationPredicate.Builder.location().setBlock(BlockPredicate.Builder.block().of(HoneycombItem.WAX_OFF_BY_BLOCK.get().keySet()).build()), ItemPredicate.Builder.item().of(WAX_SCRAPING_TOOLS))).save(exporter, "husbandry/wax_off");
+-        Advancement advancement10 = Advancement.Builder.advancement().parent(advancement).addCriterion(BuiltInRegistries.ITEM.getKey(Items.TADPOLE_BUCKET).getPath(), FilledBucketTrigger.TriggerInstance.filledBucket(ItemPredicate.Builder.item().of(Items.TADPOLE_BUCKET).build())).display(Items.TADPOLE_BUCKET, Component.translatable("advancements.husbandry.tadpole_in_a_bucket.title"), Component.translatable("advancements.husbandry.tadpole_in_a_bucket.description"), (ResourceLocation)null, FrameType.TASK, true, true, false).save(exporter, "husbandry/tadpole_in_a_bucket");
++        Advancement advancement10 = Advancement.Builder.advancement().parent(advancement).addCriterion(Items.TADPOLE_BUCKET.getKeyInItemRegistry().getPath(), FilledBucketTrigger.TriggerInstance.filledBucket(ItemPredicate.Builder.item().of(Items.TADPOLE_BUCKET).build())).display(Items.TADPOLE_BUCKET, Component.translatable("advancements.husbandry.tadpole_in_a_bucket.title"), Component.translatable("advancements.husbandry.tadpole_in_a_bucket.description"), (ResourceLocation)null, FrameType.TASK, true, true, false).save(exporter, "husbandry/tadpole_in_a_bucket"); // Fiddle - cache registry keys as fields - use instead of lookup - item
+         Advancement advancement11 = addLeashedFrogVariants(Advancement.Builder.advancement()).parent(advancement10).display(Items.LEAD, Component.translatable("advancements.husbandry.leash_all_frog_variants.title"), Component.translatable("advancements.husbandry.leash_all_frog_variants.description"), (ResourceLocation)null, FrameType.TASK, true, true, false).save(exporter, "husbandry/leash_all_frog_variants");
+         Advancement.Builder.advancement().parent(advancement11).display(Items.VERDANT_FROGLIGHT, Component.translatable("advancements.husbandry.froglights.title"), Component.translatable("advancements.husbandry.froglights.description"), (ResourceLocation)null, FrameType.CHALLENGE, true, true, false).addCriterion("froglights", InventoryChangeTrigger.TriggerInstance.hasItems(Items.OCHRE_FROGLIGHT, Items.PEARLESCENT_FROGLIGHT, Items.VERDANT_FROGLIGHT)).save(exporter, "husbandry/froglights");
+         Advancement.Builder.advancement().parent(advancement).addCriterion("silk_touch_nest", BeeNestDestroyedTrigger.TriggerInstance.destroyedBeeNest(Blocks.BEE_NEST, ItemPredicate.Builder.item().hasEnchantment(new EnchantmentPredicate(Enchantments.SILK_TOUCH, MinMaxBounds.Ints.atLeast(1))), MinMaxBounds.Ints.exactly(3))).display(Blocks.BEE_NEST, Component.translatable("advancements.husbandry.silk_touch_nest.title"), Component.translatable("advancements.husbandry.silk_touch_nest.description"), (ResourceLocation)null, FrameType.TASK, true, true, false).save(exporter, "husbandry/silk_touch_nest");
+@@ -96,7 +96,7 @@ public class VanillaHusbandryAdvancements implements AdvancementSubProvider {
+ 
+     private static Advancement.Builder addFood(Advancement.Builder builder) {
+         for(Item item : EDIBLE_ITEMS) {
+-            builder.addCriterion(BuiltInRegistries.ITEM.getKey(item).getPath(), ConsumeItemTrigger.TriggerInstance.usedItem(item));
++            builder.addCriterion(item.getKeyInItemRegistry().getPath(), ConsumeItemTrigger.TriggerInstance.usedItem(item)); // Fiddle - cache registry keys as fields - use instead of lookup - item
+         }
+ 
+         return builder;
+@@ -114,7 +114,7 @@ public class VanillaHusbandryAdvancements implements AdvancementSubProvider {
+ 
+     private static Advancement.Builder addFishBuckets(Advancement.Builder builder) {
+         for(Item item : FISH_BUCKETS) {
+-            builder.addCriterion(BuiltInRegistries.ITEM.getKey(item).getPath(), FilledBucketTrigger.TriggerInstance.filledBucket(ItemPredicate.Builder.item().of(item).build()));
++            builder.addCriterion(item.getKeyInItemRegistry().getPath(), FilledBucketTrigger.TriggerInstance.filledBucket(ItemPredicate.Builder.item().of(item).build())); // Fiddle - cache registry keys as fields - use instead of lookup - item
+         }
+ 
+         return builder;
+@@ -122,7 +122,7 @@ public class VanillaHusbandryAdvancements implements AdvancementSubProvider {
+ 
+     private static Advancement.Builder addFish(Advancement.Builder builder) {
+         for(Item item : FISH) {
+-            builder.addCriterion(BuiltInRegistries.ITEM.getKey(item).getPath(), FishingRodHookedTrigger.TriggerInstance.fishedItem(ItemPredicate.ANY, EntityPredicate.ANY, ItemPredicate.Builder.item().of(item).build()));
++            builder.addCriterion(item.getKeyInItemRegistry().getPath(), FishingRodHookedTrigger.TriggerInstance.fishedItem(ItemPredicate.ANY, EntityPredicate.ANY, ItemPredicate.Builder.item().of(item).build())); // Fiddle - cache registry keys as fields - use instead of lookup - item
+         }
+ 
+         return builder;
+diff --git a/src/main/java/net/minecraft/data/models/model/ModelLocationUtils.java b/src/main/java/net/minecraft/data/models/model/ModelLocationUtils.java
+index 9348b4d7e6711ae8db5b7f48f3c068baca53f655..6c58ac828f53fa615cf677c8c6e951d7cf01d9a7 100644
+--- a/src/main/java/net/minecraft/data/models/model/ModelLocationUtils.java
++++ b/src/main/java/net/minecraft/data/models/model/ModelLocationUtils.java
+@@ -1,6 +1,5 @@
+ package net.minecraft.data.models.model;
+ 
+-import net.minecraft.core.registries.BuiltInRegistries;
+ import net.minecraft.resources.ResourceLocation;
+ import net.minecraft.world.item.Item;
+ import net.minecraft.world.level.block.Block;
+@@ -29,12 +28,12 @@ public class ModelLocationUtils {
+     }
+ 
+     public static ResourceLocation getModelLocation(Item item) {
+-        ResourceLocation resourceLocation = BuiltInRegistries.ITEM.getKey(item);
++        ResourceLocation resourceLocation = item.getKeyInItemRegistry(); // Fiddle - cache registry keys as fields - use instead of lookup - item
+         return resourceLocation.withPrefix("item/");
+     }
+ 
+     public static ResourceLocation getModelLocation(Item item, String suffix) {
+-        ResourceLocation resourceLocation = BuiltInRegistries.ITEM.getKey(item);
++        ResourceLocation resourceLocation = item.getKeyInItemRegistry(); // Fiddle - cache registry keys as fields - use instead of lookup - item
+         return resourceLocation.withPath((path) -> {
+             return "item/" + path + suffix;
+         });
+diff --git a/src/main/java/net/minecraft/data/models/model/TextureMapping.java b/src/main/java/net/minecraft/data/models/model/TextureMapping.java
+index 4abf4227a928fbcba1e08bbadd30404f4ac47d70..8dae0e2fa1dac20c7be88a0fc6d278df5015f4ca 100644
+--- a/src/main/java/net/minecraft/data/models/model/TextureMapping.java
++++ b/src/main/java/net/minecraft/data/models/model/TextureMapping.java
+@@ -5,7 +5,6 @@ import com.google.common.collect.Sets;
+ import java.util.Map;
+ import java.util.Set;
+ import java.util.stream.Stream;
+-import net.minecraft.core.registries.BuiltInRegistries;
+ import net.minecraft.resources.ResourceLocation;
+ import net.minecraft.world.item.Item;
+ import net.minecraft.world.level.block.Block;
+@@ -306,12 +305,12 @@ public class TextureMapping {
+     }
+ 
+     public static ResourceLocation getItemTexture(Item item) {
+-        ResourceLocation resourceLocation = BuiltInRegistries.ITEM.getKey(item);
++        ResourceLocation resourceLocation = item.getKeyInItemRegistry(); // Fiddle - cache registry keys as fields - use instead of lookup - item
+         return resourceLocation.withPrefix("item/");
+     }
+ 
+     public static ResourceLocation getItemTexture(Item item, String suffix) {
+-        ResourceLocation resourceLocation = BuiltInRegistries.ITEM.getKey(item);
++        ResourceLocation resourceLocation = item.getKeyInItemRegistry(); // Fiddle - cache registry keys as fields - use instead of lookup - item
+         return resourceLocation.withPath((path) -> {
+             return "item/" + path + suffix;
+         });
+diff --git a/src/main/java/net/minecraft/data/recipes/RecipeBuilder.java b/src/main/java/net/minecraft/data/recipes/RecipeBuilder.java
+index a9e767a0b72380bd4e184cf390028a139d91a8ec..fa8bdff5433f3410b31ff40ffcb38259957b9aec 100644
+--- a/src/main/java/net/minecraft/data/recipes/RecipeBuilder.java
++++ b/src/main/java/net/minecraft/data/recipes/RecipeBuilder.java
+@@ -3,7 +3,6 @@ package net.minecraft.data.recipes;
+ import java.util.function.Consumer;
+ import javax.annotation.Nullable;
+ import net.minecraft.advancements.CriterionTriggerInstance;
+-import net.minecraft.core.registries.BuiltInRegistries;
+ import net.minecraft.resources.ResourceLocation;
+ import net.minecraft.world.item.Item;
+ import net.minecraft.world.level.ItemLike;
+@@ -34,6 +33,6 @@ public interface RecipeBuilder {
+     }
+ 
+     static ResourceLocation getDefaultRecipeId(ItemLike item) {
+-        return BuiltInRegistries.ITEM.getKey(item.asItem());
++        return item.asItem().getKeyInItemRegistry(); // Fiddle - cache registry keys as fields - use instead of lookup - item
+     }
+ }
+diff --git a/src/main/java/net/minecraft/data/recipes/RecipeProvider.java b/src/main/java/net/minecraft/data/recipes/RecipeProvider.java
+index 5ee5465a9302c7cd7deedcbcc1e0984cffaddba6..03c53ac8ed2d05d21972fbe58e46c5eae5795506 100644
+--- a/src/main/java/net/minecraft/data/recipes/RecipeProvider.java
++++ b/src/main/java/net/minecraft/data/recipes/RecipeProvider.java
+@@ -18,7 +18,6 @@ import net.minecraft.advancements.critereon.InventoryChangeTrigger;
+ import net.minecraft.advancements.critereon.ItemPredicate;
+ import net.minecraft.advancements.critereon.MinMaxBounds;
+ import net.minecraft.advancements.critereon.StatePropertiesPredicate;
+-import net.minecraft.core.registries.BuiltInRegistries;
+ import net.minecraft.data.BlockFamilies;
+ import net.minecraft.data.BlockFamily;
+ import net.minecraft.data.CachedOutput;
+@@ -428,7 +427,7 @@ public abstract class RecipeProvider implements DataProvider {
+     }
+ 
+     protected static String getItemName(ItemLike item) {
+-        return BuiltInRegistries.ITEM.getKey(item.asItem()).getPath();
++        return item.asItem().getKeyInItemRegistry().getPath(); // Fiddle - cache registry keys as fields - use instead of lookup - item
+     }
+ 
+     protected static String getSimpleRecipeName(ItemLike item) {
+diff --git a/src/main/java/net/minecraft/data/recipes/ShapedRecipeBuilder.java b/src/main/java/net/minecraft/data/recipes/ShapedRecipeBuilder.java
+index 54bcb5b102fe6cfd0848160312214adcac73745f..b22d6cbac241cbced2923e75f659b53c7388a73c 100644
+--- a/src/main/java/net/minecraft/data/recipes/ShapedRecipeBuilder.java
++++ b/src/main/java/net/minecraft/data/recipes/ShapedRecipeBuilder.java
+@@ -15,7 +15,6 @@ import net.minecraft.advancements.AdvancementRewards;
+ import net.minecraft.advancements.CriterionTriggerInstance;
+ import net.minecraft.advancements.RequirementsStrategy;
+ import net.minecraft.advancements.critereon.RecipeUnlockedTrigger;
+-import net.minecraft.core.registries.BuiltInRegistries;
+ import net.minecraft.resources.ResourceLocation;
+ import net.minecraft.tags.TagKey;
+ import net.minecraft.world.item.Item;
+@@ -180,7 +179,7 @@ public class ShapedRecipeBuilder extends CraftingRecipeBuilder implements Recipe
+ 
+             json.add("key", jsonObject);
+             JsonObject jsonObject2 = new JsonObject();
+-            jsonObject2.addProperty("item", BuiltInRegistries.ITEM.getKey(this.result).toString());
++            jsonObject2.addProperty("item", this.result.getKeyInItemRegistryString()); // Fiddle - cache registry keys as fields - use instead of lookup - item
+             if (this.count > 1) {
+                 jsonObject2.addProperty("count", this.count);
+             }
+diff --git a/src/main/java/net/minecraft/data/recipes/ShapelessRecipeBuilder.java b/src/main/java/net/minecraft/data/recipes/ShapelessRecipeBuilder.java
+index 865a28e6ec019373ebf4d17ee574ba26d600bcc0..2111751e1ae13d0e10743f2568d19099f298cab8 100644
+--- a/src/main/java/net/minecraft/data/recipes/ShapelessRecipeBuilder.java
++++ b/src/main/java/net/minecraft/data/recipes/ShapelessRecipeBuilder.java
+@@ -11,7 +11,6 @@ import net.minecraft.advancements.AdvancementRewards;
+ import net.minecraft.advancements.CriterionTriggerInstance;
+ import net.minecraft.advancements.RequirementsStrategy;
+ import net.minecraft.advancements.critereon.RecipeUnlockedTrigger;
+-import net.minecraft.core.registries.BuiltInRegistries;
+ import net.minecraft.resources.ResourceLocation;
+ import net.minecraft.tags.TagKey;
+ import net.minecraft.world.item.Item;
+@@ -136,7 +135,7 @@ public class ShapelessRecipeBuilder extends CraftingRecipeBuilder implements Rec
+ 
+             json.add("ingredients", jsonArray);
+             JsonObject jsonObject = new JsonObject();
+-            jsonObject.addProperty("item", BuiltInRegistries.ITEM.getKey(this.result).toString());
++            jsonObject.addProperty("item", this.result.getKeyInItemRegistryString()); // Fiddle - cache registry keys as fields - use instead of lookup - item
+             if (this.count > 1) {
+                 jsonObject.addProperty("count", this.count);
+             }
+diff --git a/src/main/java/net/minecraft/data/recipes/SimpleCookingRecipeBuilder.java b/src/main/java/net/minecraft/data/recipes/SimpleCookingRecipeBuilder.java
+index 124c2189fa2e5acfedd74436994331d653035432..c3eedf57216abc0f31288b10afceb7456a5c866f 100644
+--- a/src/main/java/net/minecraft/data/recipes/SimpleCookingRecipeBuilder.java
++++ b/src/main/java/net/minecraft/data/recipes/SimpleCookingRecipeBuilder.java
+@@ -8,7 +8,6 @@ import net.minecraft.advancements.AdvancementRewards;
+ import net.minecraft.advancements.CriterionTriggerInstance;
+ import net.minecraft.advancements.RequirementsStrategy;
+ import net.minecraft.advancements.critereon.RecipeUnlockedTrigger;
+-import net.minecraft.core.registries.BuiltInRegistries;
+ import net.minecraft.resources.ResourceLocation;
+ import net.minecraft.world.item.BlockItem;
+ import net.minecraft.world.item.Item;
+@@ -147,7 +146,7 @@ public class SimpleCookingRecipeBuilder implements RecipeBuilder {
+ 
+             json.addProperty("category", this.category.getSerializedName());
+             json.add("ingredient", this.ingredient.toJson());
+-            json.addProperty("result", BuiltInRegistries.ITEM.getKey(this.result).toString());
++            json.addProperty("result", this.result.getKeyInItemRegistryString()); // Fiddle - cache registry keys as fields - use instead of lookup - item
+             json.addProperty("experience", this.experience);
+             json.addProperty("cookingtime", this.cookingTime);
+         }
+diff --git a/src/main/java/net/minecraft/data/recipes/SingleItemRecipeBuilder.java b/src/main/java/net/minecraft/data/recipes/SingleItemRecipeBuilder.java
+index 02be25f1962bbfdb82ec15f036c7a9edad04a73e..9f5c941590842195f4327f80e6774a2d1184b641 100644
+--- a/src/main/java/net/minecraft/data/recipes/SingleItemRecipeBuilder.java
++++ b/src/main/java/net/minecraft/data/recipes/SingleItemRecipeBuilder.java
+@@ -8,7 +8,6 @@ import net.minecraft.advancements.AdvancementRewards;
+ import net.minecraft.advancements.CriterionTriggerInstance;
+ import net.minecraft.advancements.RequirementsStrategy;
+ import net.minecraft.advancements.critereon.RecipeUnlockedTrigger;
+-import net.minecraft.core.registries.BuiltInRegistries;
+ import net.minecraft.resources.ResourceLocation;
+ import net.minecraft.world.item.Item;
+ import net.minecraft.world.item.crafting.Ingredient;
+@@ -99,7 +98,7 @@ public class SingleItemRecipeBuilder implements RecipeBuilder {
+             }
+ 
+             json.add("ingredient", this.ingredient.toJson());
+-            json.addProperty("result", BuiltInRegistries.ITEM.getKey(this.result).toString());
++            json.addProperty("result", this.result.getKeyInItemRegistryString()); // Fiddle - cache registry keys as fields - use instead of lookup - item
+             json.addProperty("count", this.count);
+         }
+ 
+diff --git a/src/main/java/net/minecraft/data/recipes/SmithingTransformRecipeBuilder.java b/src/main/java/net/minecraft/data/recipes/SmithingTransformRecipeBuilder.java
+index 322009a020140571e9e55a165c5210b939274669..b296f09998b8c1d31c20b7bc24e189aa77513752 100644
+--- a/src/main/java/net/minecraft/data/recipes/SmithingTransformRecipeBuilder.java
++++ b/src/main/java/net/minecraft/data/recipes/SmithingTransformRecipeBuilder.java
+@@ -8,7 +8,6 @@ import net.minecraft.advancements.AdvancementRewards;
+ import net.minecraft.advancements.CriterionTriggerInstance;
+ import net.minecraft.advancements.RequirementsStrategy;
+ import net.minecraft.advancements.critereon.RecipeUnlockedTrigger;
+-import net.minecraft.core.registries.BuiltInRegistries;
+ import net.minecraft.resources.ResourceLocation;
+ import net.minecraft.world.item.Item;
+ import net.minecraft.world.item.crafting.Ingredient;
+@@ -64,7 +63,7 @@ public class SmithingTransformRecipeBuilder {
+             json.add("base", this.base.toJson());
+             json.add("addition", this.addition.toJson());
+             JsonObject jsonObject = new JsonObject();
+-            jsonObject.addProperty("item", BuiltInRegistries.ITEM.getKey(this.result).toString());
++            jsonObject.addProperty("item", this.result.getKeyInItemRegistryString()); // Fiddle - cache registry keys as fields - use instead of lookup - item
+             json.add("result", jsonObject);
+         }
+ 
+diff --git a/src/main/java/net/minecraft/network/chat/HoverEvent.java b/src/main/java/net/minecraft/network/chat/HoverEvent.java
+index 3ad05bbab726c59e7b67d9614af4b208d4520cb3..ff30185d58546f7140190275953bfa3da1dd15fa 100644
+--- a/src/main/java/net/minecraft/network/chat/HoverEvent.java
++++ b/src/main/java/net/minecraft/network/chat/HoverEvent.java
+@@ -321,7 +321,7 @@ public class HoverEvent {
+ 
+         private JsonElement serialize() {
+             JsonObject jsonObject = new JsonObject();
+-            jsonObject.addProperty("id", BuiltInRegistries.ITEM.getKey(this.item).toString());
++            jsonObject.addProperty("id", this.item.getKeyInItemRegistryString()); // Fiddle - cache registry keys as fields - use instead of lookup - item
+             if (this.count != 1) {
+                 jsonObject.addProperty("count", this.count);
+             }
+diff --git a/src/main/java/net/minecraft/world/item/Item.java b/src/main/java/net/minecraft/world/item/Item.java
+index eeb4df51d12cf4c3471c83481f44f3738ac8c7f3..50ec55615d20449905afbf04f62cfc206e896a73 100644
+--- a/src/main/java/net/minecraft/world/item/Item.java
++++ b/src/main/java/net/minecraft/world/item/Item.java
+@@ -224,7 +224,7 @@ public class Item implements FeatureElement, ItemLike {
+ 
+     @Override
+     public String toString() {
+-        return BuiltInRegistries.ITEM.getKey(this).getPath();
++        return this.getKeyInItemRegistry().getPath(); // Fiddle - cache registry keys as fields - use instead of lookup - item
+     }
+ 
+     protected String getOrCreateDescriptionId() {
+diff --git a/src/main/java/net/minecraft/world/item/ItemStack.java b/src/main/java/net/minecraft/world/item/ItemStack.java
+index ae9b821d71d2868ba4eb3c73558fdcd6caf264e3..afde40ebb6d735daab1d26a3032e4a102e9d9b69 100644
+--- a/src/main/java/net/minecraft/world/item/ItemStack.java
++++ b/src/main/java/net/minecraft/world/item/ItemStack.java
+@@ -546,7 +546,7 @@ public final class ItemStack {
+     }
+ 
+     public CompoundTag save(CompoundTag nbt) {
+-        ResourceLocation minecraftkey = BuiltInRegistries.ITEM.getKey(this.getItem());
++        ResourceLocation minecraftkey = this.getItem().getKeyInItemRegistry(); // Fiddle - cache registry keys as fields - use instead of lookup - item
+ 
+         nbt.putString("id", minecraftkey == null ? "minecraft:air" : minecraftkey.toString());
+         nbt.putByte("Count", (byte) this.count);
+@@ -1107,7 +1107,7 @@ public final class ItemStack {
+                 list.add(Component.translatable("item.durability", this.getMaxDamage() - this.getDamageValue(), this.getMaxDamage()));
+             }
+ 
+-            list.add(Component.literal(BuiltInRegistries.ITEM.getKey(this.getItem()).toString()).withStyle(ChatFormatting.DARK_GRAY));
++            list.add(Component.literal(this.getItem().getKeyInItemRegistryString()).withStyle(ChatFormatting.DARK_GRAY)); // Fiddle - cache registry keys as fields - use instead of lookup - item
+             if (this.hasTag()) {
+                 list.add(Component.translatable("item.nbt_tags", this.tag.getAllKeys().size()).withStyle(ChatFormatting.DARK_GRAY));
+             }
+diff --git a/src/main/java/net/minecraft/world/item/alchemy/PotionBrewing.java b/src/main/java/net/minecraft/world/item/alchemy/PotionBrewing.java
+index 12d9556a11ac4ef2e7a62fcd2686d868904bc010..0c2094d31a1b2c60ed5e1acf3be7cb2748c76d59 100644
+--- a/src/main/java/net/minecraft/world/item/alchemy/PotionBrewing.java
++++ b/src/main/java/net/minecraft/world/item/alchemy/PotionBrewing.java
+@@ -253,9 +253,9 @@ public class PotionBrewing {
+ 
+     private static void addContainerRecipe(Item input, Item ingredient, Item output) {
+         if (!(input instanceof PotionItem)) {
+-            throw new IllegalArgumentException("Expected a potion, got: " + BuiltInRegistries.ITEM.getKey(input));
++            throw new IllegalArgumentException("Expected a potion, got: " + input.getKeyInItemRegistryString()); // Fiddle - cache registry keys as fields - use instead of lookup - item
+         } else if (!(output instanceof PotionItem)) {
+-            throw new IllegalArgumentException("Expected a potion, got: " + BuiltInRegistries.ITEM.getKey(output));
++            throw new IllegalArgumentException("Expected a potion, got: " + output.getKeyInItemRegistryString()); // Fiddle - cache registry keys as fields - use instead of lookup - item
+         } else {
+             CONTAINER_MIXES.add(new PotionBrewing.Mix<>(input, Ingredient.of(ingredient), output));
+         }
+diff --git a/src/main/java/net/minecraft/world/item/crafting/Ingredient.java b/src/main/java/net/minecraft/world/item/crafting/Ingredient.java
+index cd7ea0c16f9ddcb84b5d7e8a2533e6e84f3879c7..a6e7550f300ebbb55fe6a714ac19c1ed6d5db536 100644
+--- a/src/main/java/net/minecraft/world/item/crafting/Ingredient.java
++++ b/src/main/java/net/minecraft/world/item/crafting/Ingredient.java
+@@ -264,7 +264,7 @@ public final class Ingredient implements Predicate<ItemStack> {
+         public JsonObject serialize() {
+             JsonObject jsonobject = new JsonObject();
+ 
+-            jsonobject.addProperty("item", BuiltInRegistries.ITEM.getKey(this.item.getItem()).toString());
++            jsonobject.addProperty("item", this.item.getItem().getKeyInItemRegistryString()); // Fiddle - cache registry keys as fields - use instead of lookup - item
+             return jsonobject;
+         }
+     }
+diff --git a/src/main/java/net/minecraft/world/level/block/entity/DecoratedPotBlockEntity.java b/src/main/java/net/minecraft/world/level/block/entity/DecoratedPotBlockEntity.java
+index 6f9286db4e5786464fb0b49dc125e1228ab7ae93..d1553a87f1d5dd6800163f3f0173eac698b1a761 100644
+--- a/src/main/java/net/minecraft/world/level/block/entity/DecoratedPotBlockEntity.java
++++ b/src/main/java/net/minecraft/world/level/block/entity/DecoratedPotBlockEntity.java
+@@ -66,7 +66,7 @@ public class DecoratedPotBlockEntity extends BlockEntity {
+         public CompoundTag save(CompoundTag nbt) {
+             ListTag listTag = new ListTag();
+             this.sorted().forEach((sherd) -> {
+-                listTag.add(StringTag.valueOf(BuiltInRegistries.ITEM.getKey(sherd).toString()));
++                listTag.add(StringTag.valueOf(sherd.getKeyInItemRegistryString())); // Fiddle - cache registry keys as fields - use instead of lookup - item
+             });
+             nbt.put("sherds", listTag);
+             return nbt;
+diff --git a/src/main/java/net/minecraft/world/level/storage/loot/entries/LootItem.java b/src/main/java/net/minecraft/world/level/storage/loot/entries/LootItem.java
+index 5b8ec459becfd8cf7c666beeb1f313bff318b108..2a80389ea04f5cac7ea26d3e94ad3d02681ab1bd 100644
+--- a/src/main/java/net/minecraft/world/level/storage/loot/entries/LootItem.java
++++ b/src/main/java/net/minecraft/world/level/storage/loot/entries/LootItem.java
+@@ -42,7 +42,7 @@ public class LootItem extends LootPoolSingletonContainer {
+         @Override
+         public void serializeCustom(JsonObject json, LootItem entry, JsonSerializationContext context) {
+             super.serializeCustom(json, entry, context);
+-            ResourceLocation resourceLocation = BuiltInRegistries.ITEM.getKey(entry.item);
++            ResourceLocation resourceLocation = entry.item.getKeyInItemRegistry(); // Fiddle - cache registry keys as fields - use instead of lookup - item
+             if (resourceLocation == null) {
+                 throw new IllegalArgumentException("Can't serialize unknown item " + entry.item);
+             } else {
+diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
+index 349d1aa6632d2d7d869fc26751f5408e8e200783..7060784fc76b6fc650eedc771a6479d4ef06bcb7 100644
+--- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
++++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
+@@ -157,7 +157,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
+         }
+ 
+         for (Item item : BuiltInRegistries.ITEM) {
+-            ITEM_MATERIAL.put(item, Material.getMaterial(BuiltInRegistries.ITEM.getKey(item).getPath().toUpperCase(Locale.ROOT)));
++            ITEM_MATERIAL.put(item, Material.getMaterial(item.getKeyInItemRegistry().getPath().toUpperCase(Locale.ROOT))); // Fiddle - cache registry keys as fields - use instead of lookup - item
+         }
+ 
+         for (net.minecraft.world.level.material.Fluid fluidType : BuiltInRegistries.FLUID) {
+diff --git a/src/test/java/org/bukkit/MaterialTest.java b/src/test/java/org/bukkit/MaterialTest.java
+index 55e80159d81046ab800057af271b1dfbfa0e2ccf..26015afc2f0b680e6b16a70d2dfe2795ee3fd6d4 100644
+--- a/src/test/java/org/bukkit/MaterialTest.java
++++ b/src/test/java/org/bukkit/MaterialTest.java
+@@ -37,7 +37,7 @@ public class MaterialTest extends AbstractTestingBase {
+             Item item = items.next();
+             if (item == null) continue;
+ 
+-            ResourceLocation id = BuiltInRegistries.ITEM.getKey(item);
++            ResourceLocation id = item.getKeyInItemRegistry(); // Fiddle - cache registry keys as fields - use instead of lookup - item
+             String name = item.getDescriptionId();
+ 
+             Material material = materials.remove(id);

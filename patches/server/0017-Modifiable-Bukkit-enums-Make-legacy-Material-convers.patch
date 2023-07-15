@@ -236,7 +236,7 @@ index c8dde75de231b5fdde88f5bc111c21883d9c3f49..16640f83c14b907b26dff8d5490e8916
  
      public static Material[] modern_values() {
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-index 70c89b87687879369637250bd15e68ed73552060..ea511ae4dd97de22bf98ffadc069d0b0a919a557 100644
+index 91c0234587bed474d6f90489ba2c84dbb48ffc5a..fa5e86263751ba67882eb7a3f2b16b94615f3b8e 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 @@ -195,7 +195,7 @@ public final class CraftMagicNumbers implements UnsafeValues {

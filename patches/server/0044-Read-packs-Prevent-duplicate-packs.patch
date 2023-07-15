@@ -7,7 +7,7 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index 5fca0fa5fb51cfe3c6ee639a3eb2b69e8c11d735..b3c05060ae157841c001f007fb31b6842571b330 100644
+index 4eb10bdf0c9b78d927baff7a5c9788fafab198f9..2faedb84a3aa008ea3c915cdf9766a763df3efb5 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
 @@ -79,6 +79,7 @@ import org.fiddlemc.fiddle.material.*;

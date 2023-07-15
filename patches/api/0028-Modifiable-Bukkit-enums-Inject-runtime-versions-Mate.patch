@@ -113,8 +113,32 @@ index 61b37fe2a8bd54e76130431c82df1cf8b1243da1..7fd344807067e9b660f9d585811784b5
      }
  
      default boolean isRecord() {
+diff --git a/src/main/java/org/fiddlemc/fiddle/material/FiddleEnumNamePrefix.java b/src/main/java/org/fiddlemc/fiddle/material/FiddleEnumNamePrefix.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..cf4a0138cacacc2284a3a0775a1cb4f6ddeb622f
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/material/FiddleEnumNamePrefix.java
+@@ -0,0 +1,18 @@
++// Fiddle - modifiable Bukkit enums - inject runtime versions - Material - name and key conversion
++
++package org.fiddlemc.fiddle.material;
++
++import org.jetbrains.annotations.NotNull;
++
++/**
++ * A utility class solely for holding the {@link #PREFIX} value.
++ */
++public final class FiddleEnumNamePrefix {
++
++    private FiddleEnumNamePrefix() {
++        throw new RuntimeException();
++    }
++
++    public static final @NotNull String PREFIX = "FIDDLE_";
++
++}
 diff --git a/src/main/java/org/fiddlemc/fiddle/material/MaterialNameAndKeyConversion.java b/src/main/java/org/fiddlemc/fiddle/material/MaterialNameAndKeyConversion.java
-index 6a43a90bd4fc533cfc5a738c3b196d72711b171e..96dbd9b6215f9f9527445c3c5d0cfc0a7b87b7a5 100644
+index 6a43a90bd4fc533cfc5a738c3b196d72711b171e..2146330ed09ebcd9489f35b239b15c65b4e0029a 100644
 --- a/src/main/java/org/fiddlemc/fiddle/material/MaterialNameAndKeyConversion.java
 +++ b/src/main/java/org/fiddlemc/fiddle/material/MaterialNameAndKeyConversion.java
 @@ -10,6 +10,7 @@ import org.bukkit.NamespacedKey;
@@ -125,13 +149,11 @@ index 6a43a90bd4fc533cfc5a738c3b196d72711b171e..96dbd9b6215f9f9527445c3c5d0cfc0a
  import java.util.Locale;
  import java.util.Map;
  
-@@ -26,12 +27,44 @@ public final class MaterialNameAndKeyConversion {
+@@ -26,12 +27,42 @@ public final class MaterialNameAndKeyConversion {
          throw new RuntimeException();
      }
  
 +    // Fiddle start - modifiable Bukkit enums - inject runtime versions - Material - name and key conversion
-+    public static final @NotNull String FIDDLE_ENUM_NAME_PREFIX = "FIDDLE_";
-+
 +    private static @Nullable Map<String, NamespacedKey> fiddleEnumNamesToNamespacedKey = new HashMap<>(0);
 +
 +    public static void registerFiddleEnumNameToNamespacedKey(@NotNull String enumName, @NotNull String namespace, @NotNull String path) {
@@ -173,7 +195,7 @@ index 6a43a90bd4fc533cfc5a738c3b196d72711b171e..96dbd9b6215f9f9527445c3c5d0cfc0a
      // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - key
  
      // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - getMaterial
-@@ -48,6 +81,121 @@ public final class MaterialNameAndKeyConversion {
+@@ -48,6 +79,121 @@ public final class MaterialNameAndKeyConversion {
      }
      // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - getMaterial
  
@@ -295,7 +317,7 @@ index 6a43a90bd4fc533cfc5a738c3b196d72711b171e..96dbd9b6215f9f9527445c3c5d0cfc0a
      // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - key
      /**
       * @throws IllegalArgumentException If the given {@code material} is {@linkplain Material#isLegacy() legacy}.
-@@ -80,20 +228,35 @@ public final class MaterialNameAndKeyConversion {
+@@ -80,20 +226,35 @@ public final class MaterialNameAndKeyConversion {
  
      // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - matchMaterial
      /**

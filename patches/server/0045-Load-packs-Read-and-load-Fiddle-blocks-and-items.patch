@@ -1,13 +1,13 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
 Date: Fri, 14 Jul 2023 20:18:27 +0200
-Subject: [PATCH] Load packs - Read and load Fiddle content
+Subject: [PATCH] Load packs - Read and load Fiddle blocks and items
 
 License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index b3c05060ae157841c001f007fb31b6842571b330..da6139bc1407de461600331aa521cc3c78a77d07 100644
+index 2faedb84a3aa008ea3c915cdf9766a763df3efb5..61e78eb9838cad653a281b3e92489ab27dec6049 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
 @@ -76,6 +76,7 @@ import org.bukkit.Material;
@@ -34,7 +34,7 @@ index b3c05060ae157841c001f007fb31b6842571b330..da6139bc1407de461600331aa521cc3c
              io.papermc.paper.plugin.PluginInitializerManager.load(optionset); // Paper
              Bootstrap.bootStrap();
              Bootstrap.validate();
-@@ -458,6 +468,9 @@ public class Main {
+@@ -463,6 +473,9 @@ public class Main {
                  return;
              }
  
@@ -45,7 +45,7 @@ index b3c05060ae157841c001f007fb31b6842571b330..da6139bc1407de461600331aa521cc3c
              // Fiddle start - read packs - close packs after initial read
              for (var pack : FiddlePacks.getPacks()) {
 diff --git a/src/main/java/net/minecraft/world/item/Items.java b/src/main/java/net/minecraft/world/item/Items.java
-index 5f20e075c532f0f1d413242949d1738c0c152bf7..443447a730584534145eb0dbbce264e4a9b3f7e8 100644
+index adbacee02bcd7e922fec6e406e93b2ca8aa7a31f..407846ea65833d5eeab7f7c04f8d30a2e15bf05e 100644
 --- a/src/main/java/net/minecraft/world/item/Items.java
 +++ b/src/main/java/net/minecraft/world/item/Items.java
 @@ -1,5 +1,6 @@
@@ -145,13 +145,31 @@ index f41e335be934d24080472be9d260f1be7c01614d..4418949ac3f8669c9169f7d7c0dbc16f
          for(Block block : BuiltInRegistries.BLOCK) {
              for(BlockState blockState : block.getStateDefinition().getPossibleStates()) {
                  Block.BLOCK_STATE_REGISTRY.add(blockState);
+diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
+index dd90c85f0e1e28b4604470c356e120303efbb697..033fd651364fdf8f196736a9eea53aa85fef5f85 100644
+--- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
++++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
+@@ -309,11 +309,11 @@ public final class CraftMagicNumbers implements UnsafeValues {
+         }
+         // Paper end
+         for (Block block : BuiltInRegistries.BLOCK) {
+-            BLOCK_MATERIAL.put(block, Material.getMaterial(block.getKeyInBlockRegistry().getPath().toUpperCase(Locale.ROOT))); // Fiddle - cache registry keys as fields - use instead of lookup - block
++            BLOCK_MATERIAL.put(block, Material.matchMaterial(block.getKeyInBlockRegistryString())); // Fiddle - cache registry keys as fields - use instead of lookup - block // Fiddle - load packs - blocks - load definitions
+         }
+ 
+         for (Item item : BuiltInRegistries.ITEM) {
+-            ITEM_MATERIAL.put(item, Material.getMaterial(item.getKeyInItemRegistry().getPath().toUpperCase(Locale.ROOT))); // Fiddle - cache registry keys as fields - use instead of lookup - item
++            ITEM_MATERIAL.put(item, Material.matchMaterial(item.getKeyInItemRegistryString())); // Fiddle - cache registry keys as fields - use instead of lookup - item // Fiddle - load packs - items - load definitions
+         }
+ 
+         for (net.minecraft.world.level.material.Fluid fluidType : BuiltInRegistries.FLUID) {
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/fiddlecontent/AbstractFiddleBlockDefinition.java b/src/main/java/org/fiddlemc/fiddle/pack/fiddlecontent/AbstractFiddleBlockDefinition.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..b0c9c63101d87db837fa3cd0f97f799fe8d2d10e
+index 0000000000000000000000000000000000000000..fa557af62d4cd6b7e72e6a2d16a069cb1fa48afd
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/fiddlecontent/AbstractFiddleBlockDefinition.java
-@@ -0,0 +1,31 @@
-+// Fiddle - load packs - blocks - read definitions
+@@ -0,0 +1,33 @@
++// Fiddle - load packs - blocks - definitions
 +
 +package org.fiddlemc.fiddle.pack.fiddlecontent;
 +
@@ -178,17 +196,19 @@ index 0000000000000000000000000000000000000000..b0c9c63101d87db837fa3cd0f97f799f
 +     * @return The registered block.
 +     */
 +    public @NotNull Block register() {
-+        return Blocks.register(this.untypedResourceLocation, this.buildBlock());
++        var block = this.buildBlock();
++        block.setIsAddedByFiddle();
++        return Blocks.register(this.untypedResourceLocation, block);
 +    }
 +
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/fiddlecontent/AbstractFiddleItemDefinition.java b/src/main/java/org/fiddlemc/fiddle/pack/fiddlecontent/AbstractFiddleItemDefinition.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..1c5005b8b965b96632d2d5c1d66df2bed57f692b
+index 0000000000000000000000000000000000000000..fa060b4ec1ee0b31febdcf6bcad2c0f015ae09be
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/fiddlecontent/AbstractFiddleItemDefinition.java
-@@ -0,0 +1,31 @@
-+// Fiddle - load packs - items - read definitions
+@@ -0,0 +1,33 @@
++// Fiddle - load packs - items - definitions
 +
 +package org.fiddlemc.fiddle.pack.fiddlecontent;
 +
@@ -215,17 +235,19 @@ index 0000000000000000000000000000000000000000..1c5005b8b965b96632d2d5c1d66df2be
 +     * @return The registered item.
 +     */
 +    public @NotNull Item register() {
-+        return Items.registerItem(this.untypedResourceLocation.toString(), this.buildItem());
++        var item = this.buildItem();
++        item.setIsAddedByFiddle();
++        return Items.registerItem(this.untypedResourceLocation, item);
 +    }
 +
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/fiddlecontent/FiddleBlockDefinition.java b/src/main/java/org/fiddlemc/fiddle/pack/fiddlecontent/FiddleBlockDefinition.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..94505c6711d387694000701fbb10804660f2743b
+index 0000000000000000000000000000000000000000..68db648075cfa50d1c1a08c477ac585511b7eaac
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/fiddlecontent/FiddleBlockDefinition.java
 @@ -0,0 +1,36 @@
-+// Fiddle - load packs - blocks - read definitions
++// Fiddle - load packs - blocks - definitions
 +
 +package org.fiddlemc.fiddle.pack.fiddlecontent;
 +
@@ -263,11 +285,11 @@ index 0000000000000000000000000000000000000000..94505c6711d387694000701fbb108046
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/fiddlecontent/FiddleBlockItemDefinition.java b/src/main/java/org/fiddlemc/fiddle/pack/fiddlecontent/FiddleBlockItemDefinition.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..b216bff8572398373562d66819ded2e4aa490e41
+index 0000000000000000000000000000000000000000..4f8fecc03c01660676d6905fe30ebcd5ec01ec95
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/fiddlecontent/FiddleBlockItemDefinition.java
-@@ -0,0 +1,45 @@
-+// Fiddle - load packs - items - read definitions
+@@ -0,0 +1,47 @@
++// Fiddle - load packs - items - definitions
 +
 +package org.fiddlemc.fiddle.pack.fiddlecontent;
 +
@@ -308,17 +330,19 @@ index 0000000000000000000000000000000000000000..b216bff8572398373562d66819ded2e4
 +
 +    @Override
 +    public @NotNull Item register() {
-+        return Items.registerBlock(this.buildItem());
++        var item = this.buildItem();
++        item.setIsAddedByFiddle();
++        return Items.registerBlock(item);
 +    }
 +
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/fiddlecontent/FiddleContentDefinition.java b/src/main/java/org/fiddlemc/fiddle/pack/fiddlecontent/FiddleContentDefinition.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..4b036aade9ca5251f984f8f582928af78592121b
+index 0000000000000000000000000000000000000000..952550f83f71f9fdf00c100da8ea23dc39697b4c
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/fiddlecontent/FiddleContentDefinition.java
 @@ -0,0 +1,109 @@
-+// Fiddle - load packs - blocks and items - read definitions
++// Fiddle - load packs - blocks and items - definitions
 +
 +package org.fiddlemc.fiddle.pack.fiddlecontent;
 +
@@ -429,11 +453,11 @@ index 0000000000000000000000000000000000000000..4b036aade9ca5251f984f8f582928af7
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/fiddlecontent/FiddleItemDefinition.java b/src/main/java/org/fiddlemc/fiddle/pack/fiddlecontent/FiddleItemDefinition.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..51eff3075061874663ae58a58c9c472df0a30445
+index 0000000000000000000000000000000000000000..f0510796fae7ad6b1c7f9231f97ad7c6dc09023b
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/fiddlecontent/FiddleItemDefinition.java
 @@ -0,0 +1,33 @@
-+// Fiddle - load packs - items - read definitions
++// Fiddle - load packs - items - definitions
 +
 +package org.fiddlemc.fiddle.pack.fiddlecontent;
 +
@@ -697,11 +721,11 @@ index 0000000000000000000000000000000000000000..e881d633c3d6fcd6b81fc26234cf05da
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/fiddlecontent/ResourceDefinitionType.java b/src/main/java/org/fiddlemc/fiddle/pack/fiddlecontent/ResourceDefinitionType.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..b31e19981753e10ac1ffbd6b84630f0b68d48ccc
+index 0000000000000000000000000000000000000000..cb883a3000ebe45b329574993996a917fc9fd4d6
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/fiddlecontent/ResourceDefinitionType.java
 @@ -0,0 +1,29 @@
-+// Fiddle - load packs - blocks and items - read definitions
++// Fiddle - load packs - blocks and items - definitions
 +
 +package org.fiddlemc.fiddle.pack.fiddlecontent;
 +

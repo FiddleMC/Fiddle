@@ -8,7 +8,7 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-index 90a3f82a2491379318db6382ed8b8f80524dbc0a..70c89b87687879369637250bd15e68ed73552060 100644
+index 7060784fc76b6fc650eedc771a6479d4ef06bcb7..91c0234587bed474d6f90489ba2c84dbb48ffc5a 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 @@ -67,6 +67,7 @@ import org.bukkit.inventory.ItemStack;
@@ -27,7 +27,7 @@ index 90a3f82a2491379318db6382ed8b8f80524dbc0a..70c89b87687879369637250bd15e68ed
 +    @Override
 +    public boolean isBlockAddedByFiddle(@NotNull Material material) {
 +        var block = this.getBlock(material);
-+        return block != null && block.isAddedByFiddle;
++        return block != null && block.isAddedByFiddle();
 +    }
 +    // Fiddle end - load packs - blocks - flag for added blocks - API
 +
@@ -35,7 +35,7 @@ index 90a3f82a2491379318db6382ed8b8f80524dbc0a..70c89b87687879369637250bd15e68ed
 +    @Override
 +    public boolean isItemAddedByFiddle(@NotNull Material material) {
 +        var item = this.getItem(material);
-+        return item != null && item.isAddedByFiddle;
++        return item != null && item.isAddedByFiddle();
 +    }
 +    // Fiddle end - load packs - blocks - flag for added items - API
 +

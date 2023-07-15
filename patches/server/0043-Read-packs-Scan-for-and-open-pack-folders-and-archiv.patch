@@ -7,7 +7,7 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index 2aaf63da17857a1532400fdae7557ff3af8d13c2..5fca0fa5fb51cfe3c6ee639a3eb2b69e8c11d735 100644
+index 5e7525464dd6484f409753e1e1d5346e9d41a8fb..4eb10bdf0c9b78d927baff7a5c9788fafab198f9 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
 @@ -21,8 +21,6 @@ import java.nio.file.Paths;
@@ -54,7 +54,7 @@ index 2aaf63da17857a1532400fdae7557ff3af8d13c2..5fca0fa5fb51cfe3c6ee639a3eb2b69e
              io.papermc.paper.plugin.PluginInitializerManager.load(optionset); // Paper
              Bootstrap.bootStrap();
              Bootstrap.validate();
-@@ -451,6 +453,15 @@ public class Main {
+@@ -456,6 +458,15 @@ public class Main {
              }
  
              StartupPackLoadPhase.endStartupLoadPhase(); // Fiddle - read packs - startup load phase - end after initial read
