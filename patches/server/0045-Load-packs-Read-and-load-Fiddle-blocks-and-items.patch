@@ -492,23 +492,28 @@ index 0000000000000000000000000000000000000000..f0510796fae7ad6b1c7f9231f97ad7c6
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/fiddlecontent/PackFiddleDefinitionLoader.java b/src/main/java/org/fiddlemc/fiddle/pack/fiddlecontent/PackFiddleDefinitionLoader.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..e4a115b547c240d9737da8a6751b747baf46ce80
+index 0000000000000000000000000000000000000000..6f886c203eaf2408260b6acd6795e4d6c1d18084
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/fiddlecontent/PackFiddleDefinitionLoader.java
-@@ -0,0 +1,69 @@
+@@ -0,0 +1,91 @@
 +// Fiddle - load packs - blocks and items - load definitions
 +
 +package org.fiddlemc.fiddle.pack.fiddlecontent;
 +
 +import com.mojang.logging.LogUtils;
++import it.unimi.dsi.fastutil.Pair;
++import net.minecraft.resources.ResourceLocation;
++import org.fiddlemc.fiddle.pack.FiddlePack;
 +import org.fiddlemc.fiddle.pack.FiddlePacks;
 +import org.fiddlemc.fiddle.pack.read.PackParseException;
 +import org.jetbrains.annotations.NotNull;
 +import org.jetbrains.annotations.Nullable;
 +import org.slf4j.Logger;
 +
-+import java.util.ArrayList;
++import java.util.HashMap;
 +import java.util.List;
++import java.util.Map;
++import java.util.concurrent.Callable;
 +
 +/**
 + * A utility class providing functionality to take {@linkplain PackFiddleDefinitionReader already read}
@@ -532,31 +537,48 @@ index 0000000000000000000000000000000000000000..e4a115b547c240d9737da8a6751b747b
 +     */
 +    public static @Nullable List<AbstractFiddleItemDefinition> itemDefinitions;
 +
++    private static <T extends FiddleContentDefinition> void readDefinitionsAndAddToMap(Map<ResourceLocation, Pair<T, FiddlePack>> map, ResourceDefinitionType type, FiddlePack pack, Callable<List<T>> readDefinitions) throws PackParseException {
++        try {
++            for (var definition : readDefinitions.call()) {
++                var existingEntry = map.get(definition.untypedResourceLocation);
++                if (existingEntry != null) {
++                    throw new PackParseException("Two packs both declare the same " + type.resourceLocationPathIdentifier + ": pack '" + existingEntry.second() + "' and pack '" + pack + "' both declare the " + type.resourceLocationPathIdentifier + " '" + definition.untypedResourceLocation + "'");
++                }
++                map.put(definition.untypedResourceLocation, Pair.of(definition, pack));
++            }
++        } catch (Exception e) {
++            throw new PackParseException("Could not read " + type.contentSubNamespaceFolderName + " from a Fiddle pack '" + pack + "'", e);
++        }
++    }
++
 +    /**
 +     * Reads the definitions from packs and performs any needed preparations
 +     * (notably, storing them in memory so they can be used in the corresponding loading actions later).
 +     */
 +    public static void readAndPrepareDefinitions() throws PackParseException {
-+        blockDefinitions = new ArrayList<>();
-+        itemDefinitions = new ArrayList<>();
++        // Create a map from each unique resource location to its corresponding resource and the pack that declared it
++        var untypedResourceLocationToBlockDefinitionAndDeclaringPack = new HashMap<ResourceLocation, Pair<AbstractFiddleBlockDefinition, FiddlePack>>();
++        var untypedResourceLocationToItemDefinitionAndDeclaringPack = new HashMap<ResourceLocation, Pair<AbstractFiddleItemDefinition, FiddlePack>>();
++        // Read the definitions from each pack
 +        for (var pack : FiddlePacks.getPacks()) {
-+            // Read block definitions
-+            try {
-+                blockDefinitions.addAll(PackFiddleDefinitionReader.readBlocks(pack));
-+            } catch (Exception e) {
-+                throw new PackParseException("Could not read blocks from a Fiddle pack '" + pack + "'", e);
-+            }
-+            // Read item definitions
-+            try {
-+                itemDefinitions.addAll(PackFiddleDefinitionReader.readItems(pack));
-+            } catch (Exception e) {
-+                throw new PackParseException("Could not read items from a Fiddle pack '" + pack + "'", e);
-+            }
++            // Read the block definitions
++            readDefinitionsAndAddToMap(
++                untypedResourceLocationToBlockDefinitionAndDeclaringPack,
++                ResourceDefinitionType.BLOCK,
++                pack,
++                () -> PackFiddleDefinitionReader.readBlocks(pack)
++            );
++            // Read the item definitions
++            readDefinitionsAndAddToMap(
++                untypedResourceLocationToItemDefinitionAndDeclaringPack,
++                ResourceDefinitionType.ITEM,
++                pack,
++                () -> PackFiddleDefinitionReader.readItems(pack)
++            );
 +        }
-+        // Order the block definitions in usage
-+        blockDefinitions = FiddleContentDefinition.getSortedTopologicallyByReferences(blockDefinitions);
-+        // Order the item definitions in usage
-+        itemDefinitions = FiddleContentDefinition.getSortedTopologicallyByReferences(itemDefinitions);
++        // Store the definitions, topologically ordered by cross-references
++        blockDefinitions = FiddleContentDefinition.getSortedTopologicallyByReferences(untypedResourceLocationToBlockDefinitionAndDeclaringPack.values().stream().map(Pair::left).toList());
++        itemDefinitions = FiddleContentDefinition.getSortedTopologicallyByReferences(untypedResourceLocationToItemDefinitionAndDeclaringPack.values().stream().map(Pair::left).toList());
 +    }
 +
 +    public static void clearCachedDefinitions() {
@@ -567,10 +589,10 @@ index 0000000000000000000000000000000000000000..e4a115b547c240d9737da8a6751b747b
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/fiddlecontent/PackFiddleDefinitionReader.java b/src/main/java/org/fiddlemc/fiddle/pack/fiddlecontent/PackFiddleDefinitionReader.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..e881d633c3d6fcd6b81fc26234cf05daedf290c3
+index 0000000000000000000000000000000000000000..f492be1f5d4bb595ecb7e6dc269974f6c65c40df
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/fiddlecontent/PackFiddleDefinitionReader.java
-@@ -0,0 +1,148 @@
+@@ -0,0 +1,146 @@
 +// Fiddle - load packs - blocks and items - read definitions
 +
 +package org.fiddlemc.fiddle.pack.fiddlecontent;
@@ -602,8 +624,6 @@ index 0000000000000000000000000000000000000000..e881d633c3d6fcd6b81fc26234cf05da
 +    }
 +
 +    private static final @NotNull String contentFolderName = "content";
-+    private static final @NotNull String blocksFolderName = "blocks";
-+    private static final @NotNull String itemsFolderName = "items";
 +
 +    private static final @NotNull Logger LOGGER = LogUtils.getClassLogger();
 +
@@ -677,7 +697,7 @@ index 0000000000000000000000000000000000000000..e881d633c3d6fcd6b81fc26234cf05da
 +    }
 +
 +    public static @NotNull List<@NotNull AbstractFiddleBlockDefinition> readBlocks(@NotNull FiddlePack pack) throws PackParseException {
-+        var namespacedFolderFiles = getSubNamespacedFolderFilesInContentFolderAsJSON(pack, blocksFolderName);
++        var namespacedFolderFiles = getSubNamespacedFolderFilesInContentFolderAsJSON(pack, ResourceDefinitionType.BLOCK.contentSubNamespaceFolderName);
 +        if (namespacedFolderFiles.isEmpty()) {
 +            return Collections.emptyList();
 +        }
@@ -699,7 +719,7 @@ index 0000000000000000000000000000000000000000..e881d633c3d6fcd6b81fc26234cf05da
 +    }
 +
 +    public static @NotNull List<@NotNull AbstractFiddleItemDefinition> readItems(@NotNull FiddlePack pack) throws PackParseException {
-+        var namespacedFolderFiles = getSubNamespacedFolderFilesInContentFolderAsJSON(pack, itemsFolderName);
++        var namespacedFolderFiles = getSubNamespacedFolderFilesInContentFolderAsJSON(pack, ResourceDefinitionType.ITEM.contentSubNamespaceFolderName);
 +        if (namespacedFolderFiles.isEmpty()) {
 +            return Collections.emptyList();
 +        }
@@ -721,15 +741,17 @@ index 0000000000000000000000000000000000000000..e881d633c3d6fcd6b81fc26234cf05da
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/fiddlecontent/ResourceDefinitionType.java b/src/main/java/org/fiddlemc/fiddle/pack/fiddlecontent/ResourceDefinitionType.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..cb883a3000ebe45b329574993996a917fc9fd4d6
+index 0000000000000000000000000000000000000000..5f89159c38b57b7b8d03d0c3e285c936930fa167
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/fiddlecontent/ResourceDefinitionType.java
-@@ -0,0 +1,29 @@
+@@ -0,0 +1,50 @@
 +// Fiddle - load packs - blocks and items - definitions
 +
 +package org.fiddlemc.fiddle.pack.fiddlecontent;
 +
++import net.minecraft.resources.ResourceLocation;
 +import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
 +
 +/**
 + * The type of content of a {@link ResourceDefinitionType}.
@@ -741,15 +763,34 @@ index 0000000000000000000000000000000000000000..cb883a3000ebe45b329574993996a917
 +    /**
 +     * The type of {@link FiddleBlockDefinition}s.
 +     */
-+    BLOCK("block"),
++    BLOCK("blocks", "block"),
 +    /**
 +     * The type of {@link FiddleItemDefinition}s.
 +     */
-+    ITEM("item");
++    ITEM("items", "item");
 +
++    /**
++     * The name of the folder corresponding to this type of resource,
++     * when it is in a namespace folder inside the <code>content</code> folder in a Fiddle pack.
++     * This is null if this type of resource is not in the <code>content</code> folder.
++     * <br>
++     * For example, for {@link #BLOCK} this is <code>blocks</code>, as block definitions are read from the
++     * <code>&lt;pack root&gt;/content/&lt;namespace&gt;/blocks</code> folder.
++     */
++    public final @Nullable String contentSubNamespaceFolderName;
++
++    /**
++     * The identifier in a typed {@link ResourceLocation} path, that is used as a prefix together with the
++     * <code>/</code> character.
++     * <br>
++     * For example, for {@link #BLOCK} this is <code>block</code>, as a block with the untyped {@link ResourceLocation}
++     * <code>masonry:tuff_bricks</code> would have the typed {@link ResourceLocation}
++     * <code>masonry:block/tuff_bricks</code>.
++     */
 +    public final @NotNull String resourceLocationPathIdentifier;
 +
-+    ResourceDefinitionType(@NotNull String resourceLocationPathIdentifier) {
++    ResourceDefinitionType(@Nullable String contentSubNamespaceFolderName, @NotNull String resourceLocationPathIdentifier) {
++        this.contentSubNamespaceFolderName = contentSubNamespaceFolderName;
 +        this.resourceLocationPathIdentifier = resourceLocationPathIdentifier;
 +    }
 +
