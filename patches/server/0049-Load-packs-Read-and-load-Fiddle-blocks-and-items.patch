@@ -7,10 +7,10 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index 2faedb84a3aa008ea3c915cdf9766a763df3efb5..61e78eb9838cad653a281b3e92489ab27dec6049 100644
+index 269ed505d9375f09b3ad10550ac1790bd3929407..0a46669503131fef418a4cd200061bc4d9c50495 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
-@@ -76,6 +76,7 @@ import org.bukkit.Material;
+@@ -77,6 +77,7 @@ import org.fiddlemc.fiddle.server.FiddleFeatureSupport;
  import org.fiddlemc.fiddle.configuration.FiddleConfigurations;
  import org.fiddlemc.fiddle.configuration.PermanenceConfirmation;
  import org.fiddlemc.fiddle.material.*;
@@ -18,7 +18,7 @@ index 2faedb84a3aa008ea3c915cdf9766a763df3efb5..61e78eb9838cad653a281b3e92489ab2
  import org.jetbrains.annotations.NotNull;
  import org.jetbrains.annotations.Nullable;
  import org.fiddlemc.fiddle.pack.FiddlePacks;
-@@ -217,6 +218,15 @@ public class Main {
+@@ -219,6 +220,15 @@ public class Main {
              }
              // Fiddle end - read packs - prevent duplicate packs
  
@@ -34,7 +34,7 @@ index 2faedb84a3aa008ea3c915cdf9766a763df3efb5..61e78eb9838cad653a281b3e92489ab2
              io.papermc.paper.plugin.PluginInitializerManager.load(optionset); // Paper
              Bootstrap.bootStrap();
              Bootstrap.validate();
-@@ -463,6 +473,9 @@ public class Main {
+@@ -465,6 +475,9 @@ public class Main {
                  return;
              }
  
@@ -45,7 +45,7 @@ index 2faedb84a3aa008ea3c915cdf9766a763df3efb5..61e78eb9838cad653a281b3e92489ab2
              // Fiddle start - read packs - close packs after initial read
              for (var pack : FiddlePacks.getPacks()) {
 diff --git a/src/main/java/net/minecraft/world/item/Items.java b/src/main/java/net/minecraft/world/item/Items.java
-index adbacee02bcd7e922fec6e406e93b2ca8aa7a31f..407846ea65833d5eeab7f7c04f8d30a2e15bf05e 100644
+index adbacee02bcd7e922fec6e406e93b2ca8aa7a31f..58145674bc0878a0c503afd9faae9f12b04cb454 100644
 --- a/src/main/java/net/minecraft/world/item/Items.java
 +++ b/src/main/java/net/minecraft/world/item/Items.java
 @@ -1,5 +1,6 @@
@@ -55,11 +55,12 @@ index adbacee02bcd7e922fec6e406e93b2ca8aa7a31f..407846ea65833d5eeab7f7c04f8d30a2
  import net.minecraft.core.Direction;
  import net.minecraft.core.Registry;
  import net.minecraft.core.registries.BuiltInRegistries;
-@@ -16,8 +17,13 @@ import net.minecraft.world.item.armortrim.TrimPatterns;
+@@ -16,8 +17,14 @@ import net.minecraft.world.item.armortrim.TrimPatterns;
  import net.minecraft.world.level.block.Block;
  import net.minecraft.world.level.block.Blocks;
  import net.minecraft.world.level.material.Fluids;
 +import org.fiddlemc.fiddle.pack.fiddlecontent.PackFiddleDefinitionLoader;
++import org.fiddlemc.fiddle.server.FiddleFeatureSupport;
 +import org.slf4j.Logger;
  
  public class Items {
@@ -69,23 +70,25 @@ index adbacee02bcd7e922fec6e406e93b2ca8aa7a31f..407846ea65833d5eeab7f7c04f8d30a2
      public static final Item AIR = registerBlock(Blocks.AIR, new AirItem(Blocks.AIR, new Item.Properties()));
      public static final Item STONE = registerBlock(Blocks.STONE);
      public static final Item GRANITE = registerBlock(Blocks.GRANITE);
-@@ -1311,4 +1317,14 @@ public class Items {
+@@ -1311,4 +1318,16 @@ public class Items {
  
          return Registry.register(BuiltInRegistries.ITEM, key, item);
      }
 +
 +    // Fiddle start - load packs - items - register
 +    static {
-+        for (var definition : PackFiddleDefinitionLoader.itemDefinitions) {
-+            LOGGER.info("Registering item '" + definition.untypedResourceLocation + "'");
-+            definition.register();
++        if (FiddleFeatureSupport.supportsFiddleFeatures()) {
++            for (var definition : PackFiddleDefinitionLoader.itemDefinitions) {
++                LOGGER.info("Registering item '" + definition.untypedResourceLocation + "'");
++                definition.register();
++            }
 +        }
 +    }
 +    // Fiddle end - load packs - items - register
 +
  }
 diff --git a/src/main/java/net/minecraft/world/level/block/Blocks.java b/src/main/java/net/minecraft/world/level/block/Blocks.java
-index f41e335be934d24080472be9d260f1be7c01614d..4418949ac3f8669c9169f7d7c0dbc16f4fdef98a 100644
+index f41e335be934d24080472be9d260f1be7c01614d..36b4081a2836670c0cf6f7709c2fa85bbad33f72 100644
 --- a/src/main/java/net/minecraft/world/level/block/Blocks.java
 +++ b/src/main/java/net/minecraft/world/level/block/Blocks.java
 @@ -1,6 +1,8 @@
@@ -105,11 +108,12 @@ index f41e335be934d24080472be9d260f1be7c01614d..4418949ac3f8669c9169f7d7c0dbc16f
  import net.minecraft.sounds.SoundEvents;
  import net.minecraft.util.valueproviders.UniformInt;
  import net.minecraft.world.effect.MobEffects;
-@@ -40,8 +43,13 @@ import net.minecraft.world.level.block.state.properties.WoodType;
+@@ -40,8 +43,14 @@ import net.minecraft.world.level.block.state.properties.WoodType;
  import net.minecraft.world.level.material.Fluids;
  import net.minecraft.world.level.material.MapColor;
  import net.minecraft.world.level.material.PushReaction;
 +import org.fiddlemc.fiddle.pack.fiddlecontent.PackFiddleDefinitionLoader;
++import org.fiddlemc.fiddle.server.FiddleFeatureSupport;
 +import org.slf4j.Logger;
  
  public class Blocks {
@@ -119,7 +123,7 @@ index f41e335be934d24080472be9d260f1be7c01614d..4418949ac3f8669c9169f7d7c0dbc16f
      public static final Block AIR = register("air", new AirBlock(BlockBehaviour.Properties.of().replaceable().noCollission().noLootTable().air()));
      public static final Block STONE = register("stone", new Block(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(1.5F, 6.0F)));
      public static final Block GRANITE = register("granite", new Block(BlockBehaviour.Properties.of().mapColor(MapColor.DIRT).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(1.5F, 6.0F)));
-@@ -1251,11 +1259,25 @@ public class Blocks {
+@@ -1251,11 +1260,27 @@ public class Blocks {
          return Registry.register(BuiltInRegistries.BLOCK, id, block);
      }
  
@@ -136,9 +140,11 @@ index f41e335be934d24080472be9d260f1be7c01614d..4418949ac3f8669c9169f7d7c0dbc16f
      static {
 +
 +        // Fiddle start - load packs - blocks - register
-+        for (var definition : PackFiddleDefinitionLoader.blockDefinitions) {
-+            LOGGER.info("Registering block '" + definition.untypedResourceLocation + "'");
-+            definition.register();
++        if (FiddleFeatureSupport.supportsFiddleFeatures()) {
++            for (var definition : PackFiddleDefinitionLoader.blockDefinitions) {
++                LOGGER.info("Registering block '" + definition.untypedResourceLocation + "'");
++                definition.register();
++            }
 +        }
 +        // Fiddle end - load packs - blocks - register
 +

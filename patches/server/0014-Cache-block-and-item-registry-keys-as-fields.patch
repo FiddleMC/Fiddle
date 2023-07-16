@@ -137,3 +137,73 @@ index 9522e646529f3d849471931b4b3c0d133e7fcfc5..5dd932c458298fa5f2160eac00d76302
      // Spigot start
      public static float range(float min, float value, float max) {
          if (value < min) {
+diff --git a/src/test/java/org/fiddlemc/fiddle/block/PerBlockTest.java b/src/test/java/org/fiddlemc/fiddle/block/PerBlockTest.java
+index 4ad77f8ce7b43b5b54d7f7d1f9dfdebdd0ca9d8f..3209419ff3392886b4c39de6d77ce57853e29b8a 100644
+--- a/src/test/java/org/fiddlemc/fiddle/block/PerBlockTest.java
++++ b/src/test/java/org/fiddlemc/fiddle/block/PerBlockTest.java
+@@ -5,6 +5,9 @@ package org.fiddlemc.fiddle.block;
+ import net.minecraft.core.registries.BuiltInRegistries;
+ import net.minecraft.world.level.block.Block;
+ import org.bukkit.support.AbstractTestingBase;
++import org.junit.Test;
++
++import static org.junit.Assert.assertEquals;
+ 
+ public class PerBlockTest extends AbstractTestingBase {
+ 
+@@ -12,4 +15,20 @@ public class PerBlockTest extends AbstractTestingBase {
+         return BuiltInRegistries.BLOCK;
+     }
+ 
++    // Fiddle start - cache registry keys as fields - block
++    @Test
++    public void getKeyInBlockRegistry() {
++        for (Block block : getBlocks()) {
++            assertEquals("getKeyInBlockRegistry equals lookup value for " + block, block.getKeyInBlockRegistry(), BuiltInRegistries.BLOCK.getKey(block));
++        }
++    }
++
++    @Test
++    public void getKeyInBlockRegistryString() {
++        for (Block block : getBlocks()) {
++            assertEquals("getKeyInBlockRegistryString matches getKeyInBlockRegistry for " + block, block.getKeyInBlockRegistryString(), block.getKeyInBlockRegistry().toString());
++        }
++    }
++    // Fiddle end - cache registry keys as fields - block
++
+ }
+diff --git a/src/test/java/org/fiddlemc/fiddle/block/PerItemTest.java b/src/test/java/org/fiddlemc/fiddle/block/PerItemTest.java
+index b6dcad9c6a26bbc2e06259b292f5f914b299c213..3bf5fc5a222f3e355d07948a1392cecd3753e8fd 100644
+--- a/src/test/java/org/fiddlemc/fiddle/block/PerItemTest.java
++++ b/src/test/java/org/fiddlemc/fiddle/block/PerItemTest.java
+@@ -5,6 +5,9 @@ package org.fiddlemc.fiddle.block;
+ import net.minecraft.core.registries.BuiltInRegistries;
+ import net.minecraft.world.item.Item;
+ import org.bukkit.support.AbstractTestingBase;
++import org.junit.Test;
++
++import static org.junit.Assert.assertEquals;
+ 
+ public class PerItemTest extends AbstractTestingBase {
+ 
+@@ -12,4 +15,20 @@ public class PerItemTest extends AbstractTestingBase {
+         return BuiltInRegistries.ITEM;
+     }
+ 
++    // Fiddle start - cache registry keys as fields - item
++    @Test
++    public void getKeyInItemRegistry() {
++        for (Item item : getItems()) {
++            assertEquals("getKeyInItemRegistry equals lookup value for " + item, item.getKeyInItemRegistry(), BuiltInRegistries.ITEM.getKey(item));
++        }
++    }
++
++    @Test
++    public void getKeyInItemRegistryString() {
++        for (Item item : getItems()) {
++            assertEquals("getKeyInItemRegistryString matches getKeyInItemRegistry for " + item, item.getKeyInItemRegistryString(), item.getKeyInItemRegistry().toString());
++        }
++    }
++    // Fiddle end - cache registry keys as fields - item
++
+ }

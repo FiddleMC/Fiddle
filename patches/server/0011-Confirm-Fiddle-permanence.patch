@@ -7,18 +7,18 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index 142a3b3e3280dbede3c78153bf596fd58ff13499..0031765eb9f50c46f450b02dce456555ca2d513e 100644
+index 42263515804d7cf13af69a9043591dcf5b7c6b37..c8b504a84adee11f14cf1dff7ccd1aea654b326e 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
-@@ -64,6 +64,7 @@ import net.minecraft.world.level.storage.LevelSummary;
- import net.minecraft.world.level.storage.PrimaryLevelData;
+@@ -65,6 +65,7 @@ import net.minecraft.world.level.storage.PrimaryLevelData;
  import net.minecraft.world.level.storage.WorldData;
+ import org.fiddlemc.fiddle.server.FiddleFeatureSupport;
  import org.fiddlemc.fiddle.configuration.FiddleConfigurations;
 +import org.fiddlemc.fiddle.configuration.PermanenceConfirmation;
  import org.slf4j.Logger;
  
  // CraftBukkit start
-@@ -134,6 +135,13 @@ public class Main {
+@@ -136,6 +137,13 @@ public class Main {
              fiddleConfigurations.initializeGlobalConfiguration();
              // Fiddle end - Fiddle configuration - load Fiddle global configuration before bootstrap
  

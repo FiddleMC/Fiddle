@@ -8,12 +8,12 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/world/item/Item.java b/src/main/java/net/minecraft/world/item/Item.java
-index 50ec55615d20449905afbf04f62cfc206e896a73..7c51d81b1dfa237129dd8651a4c1a1573962bb98 100644
+index 716bf66e15021fe989193213ad220fe0a9f541b8..ca46c812adbba87263a3fc82a05325fb7d179a6e 100644
 --- a/src/main/java/net/minecraft/world/item/Item.java
 +++ b/src/main/java/net/minecraft/world/item/Item.java
-@@ -88,6 +88,14 @@ public class Item implements FeatureElement, ItemLike {
-     private @Nullable String keyInItemRegistryString = null;
-     // Fiddle end - cache registry keys as fields - item
+@@ -98,6 +98,14 @@ public class Item implements FeatureElement, ItemLike {
+     private int indexInItemRegistry = -1;
+     // Fiddle end - cache registry indices as fields - item
  
 +    // Fiddle start - load packs - blocks - flag for added items
 +    /**
@@ -24,11 +24,11 @@ index 50ec55615d20449905afbf04f62cfc206e896a73..7c51d81b1dfa237129dd8651a4c1a157
 +    // Fiddle end - load packs - blocks - flag for added items
 +
      public static int getId(Item item) {
-         return item == null ? 0 : BuiltInRegistries.ITEM.getId(item);
+         return item == null ? 0 : item.getIndexInItemRegistry(); // Fiddle - cache registry indices as fields - use instead of lookup - item
      }
-@@ -402,6 +410,19 @@ public class Item implements FeatureElement, ItemLike {
+@@ -421,6 +429,19 @@ public class Item implements FeatureElement, ItemLike {
      }
-     // Fiddle end - cache registry keys as fields - item
+     // Fiddle end - cache registry indices as fields - item
  
 +    // Fiddle start - load packs - blocks - flag for added items
 +    public boolean isAddedByFiddle() {
@@ -47,12 +47,12 @@ index 50ec55615d20449905afbf04f62cfc206e896a73..7c51d81b1dfa237129dd8651a4c1a157
          int maxStackSize = 64;
          int maxDamage;
 diff --git a/src/main/java/net/minecraft/world/level/block/Block.java b/src/main/java/net/minecraft/world/level/block/Block.java
-index 94443714431f80385c0f1ef7f135a116c9f6eba7..190d900092c95e129cb2b57884d0aaff0049a793 100644
+index dadc9d42ba2c83e5a0dee860cfc0ba7b5d86625e..fcf2385e1d3414656fed1bb205ba592e5a3932d3 100644
 --- a/src/main/java/net/minecraft/world/level/block/Block.java
 +++ b/src/main/java/net/minecraft/world/level/block/Block.java
-@@ -131,6 +131,14 @@ public class Block extends BlockBehaviour implements ItemLike {
-     private @Nullable String keyInBlockRegistryString = null;
-     // Fiddle end - cache registry keys as fields - block
+@@ -137,6 +137,14 @@ public class Block extends BlockBehaviour implements ItemLike {
+     private int indexInBlockRegistry = -1;
+     // Fiddle end - cache registry indices as fields - block
  
 +    // Fiddle start - load packs - blocks - flag for added blocks
 +    /**
@@ -65,9 +65,9 @@ index 94443714431f80385c0f1ef7f135a116c9f6eba7..190d900092c95e129cb2b57884d0aaff
      private static final int CACHE_SIZE = 2048;
      private static final ThreadLocal<Object2ByteLinkedOpenHashMap<Block.BlockStatePairKey>> OCCLUSION_CACHE = ThreadLocal.withInitial(() -> {
          Object2ByteLinkedOpenHashMap<Block.BlockStatePairKey> object2bytelinkedopenhashmap = new Object2ByteLinkedOpenHashMap<Block.BlockStatePairKey>(2048, 0.25F) {
-@@ -607,6 +615,19 @@ public class Block extends BlockBehaviour implements ItemLike {
+@@ -622,6 +630,19 @@ public class Block extends BlockBehaviour implements ItemLike {
      }
-     // Fiddle end - cache registry keys as fields - block
+     // Fiddle end - cache registry indices as fields - block
  
 +    // Fiddle start - load packs - blocks - flag for added blocks
 +    public boolean isAddedByFiddle() {

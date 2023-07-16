@@ -20,7 +20,7 @@ index cd723e5f51c587df28335ceb14db8c137dc9c4cb..41c782f14521430f414e631d5ef2be52
      }
  
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java b/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java
-index c91aea90596d7a5096d07d7c49f04f650e3b6a23..9c81b62b21dd39f075621d88f7ada0f6099dfde8 100644
+index 5b241daad953545ba583c527d571f998816472c3..82d23e8937f77c78c8902ee51980378f062add49 100644
 --- a/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java
 @@ -3,6 +3,7 @@

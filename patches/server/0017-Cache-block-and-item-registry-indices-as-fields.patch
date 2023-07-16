@@ -1,0 +1,136 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sun, 16 Jul 2023 13:18:52 +0200
+Subject: [PATCH] Cache block and item registry indices as fields
+
+License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/world/item/Item.java b/src/main/java/net/minecraft/world/item/Item.java
+index 50ec55615d20449905afbf04f62cfc206e896a73..3cf9e66e8cd7084c1fcc05dcdfd4c147a968f3ad 100644
+--- a/src/main/java/net/minecraft/world/item/Item.java
++++ b/src/main/java/net/minecraft/world/item/Item.java
+@@ -13,6 +13,7 @@ import net.minecraft.SharedConstants;
+ import net.minecraft.Util;
+ import net.minecraft.core.BlockPos;
+ import net.minecraft.core.Holder;
++import net.minecraft.core.Registry;
+ import net.minecraft.core.registries.BuiltInRegistries;
+ import net.minecraft.nbt.CompoundTag;
+ import net.minecraft.network.chat.Component;
+@@ -88,6 +89,15 @@ public class Item implements FeatureElement, ItemLike {
+     private @Nullable String keyInItemRegistryString = null;
+     // Fiddle end - cache registry keys as fields - item
+ 
++    // Fiddle start - cache registry indices as fields - item
++    /**
++     * The {@linkplain Registry#getId index} at which this item is registered in the
++     * {@link BuiltInRegistries#ITEM item registry}.
++     * This will be -1 until initialized in {@link #getIndexInItemRegistry}.
++     */
++    private int indexInItemRegistry = -1;
++    // Fiddle end - cache registry indices as fields - item
++
+     public static int getId(Item item) {
+         return item == null ? 0 : BuiltInRegistries.ITEM.getId(item);
+     }
+@@ -402,6 +412,15 @@ public class Item implements FeatureElement, ItemLike {
+     }
+     // Fiddle end - cache registry keys as fields - item
+ 
++    // Fiddle start - cache registry indices as fields - item
++    public int getIndexInItemRegistry() {
++        if (this.indexInItemRegistry == -1) {
++            this.indexInItemRegistry = BuiltInRegistries.ITEM.getId(this);
++        }
++        return this.indexInItemRegistry;
++    }
++    // Fiddle end - cache registry indices as fields - item
++
+     public static class Properties {
+         int maxStackSize = 64;
+         int maxDamage;
+diff --git a/src/main/java/net/minecraft/world/level/block/Block.java b/src/main/java/net/minecraft/world/level/block/Block.java
+index 94443714431f80385c0f1ef7f135a116c9f6eba7..dadc9d42ba2c83e5a0dee860cfc0ba7b5d86625e 100644
+--- a/src/main/java/net/minecraft/world/level/block/Block.java
++++ b/src/main/java/net/minecraft/world/level/block/Block.java
+@@ -13,10 +13,7 @@ import java.util.function.Supplier;
+ import javax.annotation.Nullable;
+ import net.minecraft.SharedConstants;
+ import net.minecraft.Util;
+-import net.minecraft.core.BlockPos;
+-import net.minecraft.core.Direction;
+-import net.minecraft.core.Holder;
+-import net.minecraft.core.IdMapper;
++import net.minecraft.core.*;
+ import net.minecraft.core.registries.BuiltInRegistries;
+ import net.minecraft.network.chat.Component;
+ import net.minecraft.network.chat.MutableComponent;
+@@ -131,6 +128,15 @@ public class Block extends BlockBehaviour implements ItemLike {
+     private @Nullable String keyInBlockRegistryString = null;
+     // Fiddle end - cache registry keys as fields - block
+ 
++    // Fiddle start - cache registry indices as fields - block
++    /**
++     * The {@linkplain Registry#getId index} at which this block is registered in the
++     * {@link BuiltInRegistries#BLOCK block registry}.
++     * This will be -1 until initialized in {@link #getIndexInBlockRegistry}.
++     */
++    private int indexInBlockRegistry = -1;
++    // Fiddle end - cache registry indices as fields - block
++
+     private static final int CACHE_SIZE = 2048;
+     private static final ThreadLocal<Object2ByteLinkedOpenHashMap<Block.BlockStatePairKey>> OCCLUSION_CACHE = ThreadLocal.withInitial(() -> {
+         Object2ByteLinkedOpenHashMap<Block.BlockStatePairKey> object2bytelinkedopenhashmap = new Object2ByteLinkedOpenHashMap<Block.BlockStatePairKey>(2048, 0.25F) {
+@@ -607,6 +613,15 @@ public class Block extends BlockBehaviour implements ItemLike {
+     }
+     // Fiddle end - cache registry keys as fields - block
+ 
++    // Fiddle start - cache registry indices as fields - block
++    public int getIndexInBlockRegistry() {
++        if (this.indexInBlockRegistry == -1) {
++            this.indexInBlockRegistry = BuiltInRegistries.BLOCK.getId(this);
++        }
++        return this.indexInBlockRegistry;
++    }
++    // Fiddle end - cache registry indices as fields - block
++
+     // Spigot start
+     public static float range(float min, float value, float max) {
+         if (value < min) {
+diff --git a/src/test/java/org/fiddlemc/fiddle/block/PerBlockTest.java b/src/test/java/org/fiddlemc/fiddle/block/PerBlockTest.java
+index 3209419ff3392886b4c39de6d77ce57853e29b8a..33e7ac9908bb82d73e66634ed0f8f6afe3aa1f1f 100644
+--- a/src/test/java/org/fiddlemc/fiddle/block/PerBlockTest.java
++++ b/src/test/java/org/fiddlemc/fiddle/block/PerBlockTest.java
+@@ -31,4 +31,13 @@ public class PerBlockTest extends AbstractTestingBase {
+     }
+     // Fiddle end - cache registry keys as fields - block
+ 
++    // Fiddle start - cache registry indices as fields - block
++    @Test
++    public void getIndexInBlockRegistry() {
++        for (Block block : getBlocks()) {
++            assertEquals("getIndexInBlockRegistry equals lookup value for " + block, block.getIndexInBlockRegistry(), BuiltInRegistries.BLOCK.getId(block));
++        }
++    }
++    // Fiddle end - cache registry indices as fields - block
++
+ }
+diff --git a/src/test/java/org/fiddlemc/fiddle/block/PerItemTest.java b/src/test/java/org/fiddlemc/fiddle/block/PerItemTest.java
+index 3bf5fc5a222f3e355d07948a1392cecd3753e8fd..4e5c6af82c2d0cc6b69b179216a8cedc55b2b31d 100644
+--- a/src/test/java/org/fiddlemc/fiddle/block/PerItemTest.java
++++ b/src/test/java/org/fiddlemc/fiddle/block/PerItemTest.java
+@@ -31,4 +31,13 @@ public class PerItemTest extends AbstractTestingBase {
+     }
+     // Fiddle end - cache registry keys as fields - item
+ 
++    // Fiddle start - cache registry indices as fields - item
++    @Test
++    public void getIndexInItemRegistry() {
++        for (Item item : getItems()) {
++            assertEquals("getIndexInItemRegistry equals lookup value for " + item, item.getIndexInItemRegistry(), BuiltInRegistries.ITEM.getId(item));
++        }
++    }
++    // Fiddle end - cache registry indices as fields - item
++
+ }

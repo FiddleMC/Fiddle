@@ -7,7 +7,7 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index 5e7525464dd6484f409753e1e1d5346e9d41a8fb..4eb10bdf0c9b78d927baff7a5c9788fafab198f9 100644
+index 8e00b896fd7bb27e70afa3e6824c3873dee596c3..e3220de15ba23643a05be85b31b79e2d9f10d87a 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
 @@ -21,8 +21,6 @@ import java.nio.file.Paths;
@@ -27,7 +27,7 @@ index 5e7525464dd6484f409753e1e1d5346e9d41a8fb..4eb10bdf0c9b78d927baff7a5c9788fa
  import net.minecraft.SharedConstants;
  import net.minecraft.Util;
  import net.minecraft.commands.Commands;
-@@ -81,7 +78,9 @@ import org.fiddlemc.fiddle.configuration.PermanenceConfirmation;
+@@ -82,7 +79,9 @@ import org.fiddlemc.fiddle.configuration.PermanenceConfirmation;
  import org.fiddlemc.fiddle.material.*;
  import org.jetbrains.annotations.NotNull;
  import org.jetbrains.annotations.Nullable;
@@ -37,7 +37,7 @@ index 5e7525464dd6484f409753e1e1d5346e9d41a8fb..4eb10bdf0c9b78d927baff7a5c9788fa
  import org.slf4j.Logger;
  
  // CraftBukkit start
-@@ -91,6 +90,7 @@ import java.util.concurrent.atomic.AtomicReference;
+@@ -92,6 +91,7 @@ import java.util.concurrent.atomic.AtomicReference;
  import java.util.function.Predicate;
  
  import net.minecraft.SharedConstants;
@@ -45,7 +45,7 @@ index 5e7525464dd6484f409753e1e1d5346e9d41a8fb..4eb10bdf0c9b78d927baff7a5c9788fa
  import org.bukkit.configuration.file.YamlConfiguration;
  // CraftBukkit end
  
-@@ -209,6 +209,8 @@ public class Main {
+@@ -211,6 +211,8 @@ public class Main {
              }
              // Fiddle end - confirm Fiddle permanence
  
@@ -54,7 +54,7 @@ index 5e7525464dd6484f409753e1e1d5346e9d41a8fb..4eb10bdf0c9b78d927baff7a5c9788fa
              io.papermc.paper.plugin.PluginInitializerManager.load(optionset); // Paper
              Bootstrap.bootStrap();
              Bootstrap.validate();
-@@ -456,6 +458,15 @@ public class Main {
+@@ -458,6 +460,15 @@ public class Main {
              }
  
              StartupPackLoadPhase.endStartupLoadPhase(); // Fiddle - read packs - startup load phase - end after initial read

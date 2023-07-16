@@ -7,7 +7,7 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java b/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java
-index ff299425ded226ac3610b2aa1017a8ea35b1f660..c91aea90596d7a5096d07d7c49f04f650e3b6a23 100644
+index ff299425ded226ac3610b2aa1017a8ea35b1f660..5b241daad953545ba583c527d571f998816472c3 100644
 --- a/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java
 @@ -3,6 +3,11 @@
@@ -28,8 +28,8 @@ index ff299425ded226ac3610b2aa1017a8ea35b1f660..c91aea90596d7a5096d07d7c49f04f65
  
 +    // Fiddle start - read packs - parse meta from JSON
 +    private static final int maxFormat = 1;
-+    private static final IntSet supportedResourcePackFormats = new IntArraySet(new int[]{13});
-+    private static final IntSet supportedDataPackFormats = new IntArraySet(new int[]{12});
++    private static final IntSet supportedResourcePackFormats = new IntArraySet(new int[]{13, 15});
++    private static final IntSet supportedDataPackFormats = new IntArraySet(new int[]{12, 15});
 +
 +    private static final int displayNameMaxLength = 255;
 +    private static final int technicalNameMaxLength = 191;
