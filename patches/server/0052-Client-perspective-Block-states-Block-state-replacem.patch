@@ -1,0 +1,114 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sun, 16 Jul 2023 19:25:46 +0200
+Subject: [PATCH] Client perspective - Block states - Block state replacement
+ providers
+
+License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/block/BlockStateReplacementProvider.java b/src/main/java/org/fiddlemc/fiddle/packet/block/BlockStateReplacementProvider.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..575b9139229d5b24c5128a2e559bd0e73d5b0b04
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/packet/block/BlockStateReplacementProvider.java
+@@ -0,0 +1,31 @@
++// Fiddle - client perspective - replace block states - replacement provider
++
++package org.fiddlemc.fiddle.packet.block;
++
++import net.minecraft.world.level.block.state.BlockState;
++import org.fiddlemc.fiddle.packet.ClientPerspective;
++import org.jetbrains.annotations.NotNull;
++
++/**
++ * An abstract provider for the {@link BlockState} replacements of a given {@link BlockState},
++ * given the {@linkplain ClientPerspective perspective} of the observing client.
++ */
++public interface BlockStateReplacementProvider {
++
++    /**
++     * Pre-checks whether any replacements for a given block state and perspective will exist.
++     * Implementations of this method may skip most of the checks that {@link #getReplacement} does,
++     * to quickly determine if there are no replacements necessary in a chunk or chunk section at all.
++     * @return True if there are definitely no replacements for the given perspective.
++     * False if it could not be determined for sure that there are no replacements for the given perspective
++     * (i.e. because there in fact will certainly be).
++     */
++    boolean preCheckWhetherDefinitelyHasNoReplacement(@NotNull BlockState original, @NotNull ClientPerspective perspective);
++
++    /**
++     * @return The replacement {@link BlockState} that the client should receive.
++     * This may simply be the {@link BlockState} itself.
++     */
++    @NotNull BlockState getReplacement(@NotNull BlockState original, @NotNull ClientPerspective perspective);
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/block/OnePerCategoryBlockStateReplacementProvider.java b/src/main/java/org/fiddlemc/fiddle/packet/block/OnePerCategoryBlockStateReplacementProvider.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..ba7e0b94668f8b07ea6dcf3eecf21060db19c3b8
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/packet/block/OnePerCategoryBlockStateReplacementProvider.java
+@@ -0,0 +1,62 @@
++// Fiddle - client perspective - replace block states - replacement provider
++
++package org.fiddlemc.fiddle.packet.block;
++
++import net.minecraft.world.level.block.state.BlockState;
++import org.fiddlemc.fiddle.packet.ClientPerspective;
++import org.fiddlemc.fiddle.packet.ClientPerspectiveCategory;
++import org.jetbrains.annotations.NotNull;
++
++import java.util.AbstractMap;
++import java.util.Arrays;
++import java.util.Map;
++import java.util.function.Function;
++
++/**
++ * A {@link BlockStateReplacementProvider} that has one static {@link BlockState}
++ * for each {@link ClientPerspectiveCategory}.
++ */
++public final class OnePerCategoryBlockStateReplacementProvider implements BlockStateReplacementProvider {
++
++    /**
++     * The replacement {@link BlockState}s, indexed by the corresponding {@link ClientPerspectiveCategory#ordinal()}.
++     */
++    private final @NotNull BlockState @NotNull[] replacements;
++
++    public OnePerCategoryBlockStateReplacementProvider(@NotNull BlockState @NotNull[] replacements) {
++        this.replacements = replacements;
++    }
++
++    /**
++     * Convenience constructor.
++     */
++    public OnePerCategoryBlockStateReplacementProvider(@NotNull Function<@NotNull ClientPerspectiveCategory, @NotNull BlockState> replacementFunction) {
++        this(Arrays.stream(ClientPerspectiveCategory.values()).map(replacementFunction).toArray(BlockState[]::new));
++    }
++
++    @Override
++    public boolean preCheckWhetherDefinitelyHasNoReplacement(@NotNull BlockState original, @NotNull ClientPerspective perspective) {
++        return this.replacements[perspective.category.ordinal()] == original;
++    }
++
++    @Override
++    public @NotNull BlockState getReplacement(@NotNull BlockState original, @NotNull ClientPerspective perspective) {
++        return this.replacements[perspective.category.ordinal()];
++    }
++
++    @Override
++    public int hashCode() {
++        return Arrays.hashCode(this.replacements);
++    }
++
++    @Override
++    public boolean equals(Object obj) {
++        return obj instanceof OnePerCategoryBlockStateReplacementProvider provider && Arrays.deepEquals(this.replacements, provider.replacements);
++    }
++
++    @Override
++    public String toString() {
++        return Map.ofEntries(Arrays.stream(ClientPerspectiveCategory.values()).map(category -> new AbstractMap.SimpleEntry<>(category, this.replacements[category.ordinal()])).toList().toArray(Map.Entry[]::new)).toString();
++    }
++
++}

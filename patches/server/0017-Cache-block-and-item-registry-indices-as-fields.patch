@@ -98,6 +98,50 @@ index 94443714431f80385c0f1ef7f135a116c9f6eba7..dadc9d42ba2c83e5a0dee860cfc0ba7b
      // Spigot start
      public static float range(float min, float value, float max) {
          if (value < min) {
+diff --git a/src/main/java/net/minecraft/world/level/block/state/BlockState.java b/src/main/java/net/minecraft/world/level/block/state/BlockState.java
+index a9b0f5950b6f97ea4c2a1075946b92008b62c9d9..664572ad64ed53386a7348b34ec2bac25e9381d5 100644
+--- a/src/main/java/net/minecraft/world/level/block/state/BlockState.java
++++ b/src/main/java/net/minecraft/world/level/block/state/BlockState.java
+@@ -3,6 +3,7 @@ package net.minecraft.world.level.block.state;
+ import com.google.common.collect.ImmutableMap;
+ import com.mojang.serialization.Codec;
+ import com.mojang.serialization.MapCodec;
++import net.minecraft.core.Registry;
+ import net.minecraft.core.registries.BuiltInRegistries;
+ import net.minecraft.world.level.block.Block;
+ import net.minecraft.world.level.block.state.properties.Property;
+@@ -21,6 +22,16 @@ public class BlockState extends BlockBehaviour.BlockStateBase {
+         return this.cachedMaterial;
+     }
+     // Paper end - optimise getType calls
++
++    // Fiddle start - cache registry indices as fields - block state
++    /**
++     * The {@linkplain Registry#getId index} at which this block state is registered in the
++     * {@link Block#BLOCK_STATE_REGISTRY block registry}.
++     * This will be -1 until initialized in {@link #getIndexInBlockStateRegistry}.
++     */
++    private int indexInBlockStateRegistry = -1;
++    // Fiddle end - cache registry indices as fields - block state
++
+     public BlockState(Block block, ImmutableMap<Property<?>, Comparable<?>> propertyMap, MapCodec<BlockState> codec) {
+         super(block, propertyMap, codec);
+     }
+@@ -29,4 +40,14 @@ public class BlockState extends BlockBehaviour.BlockStateBase {
+     protected BlockState asState() {
+         return this;
+     }
++
++    // Fiddle start - cache registry indices as fields - block state
++    public int getIndexInBlockStateRegistry() {
++        if (this.indexInBlockStateRegistry == -1) {
++            this.indexInBlockStateRegistry = Block.BLOCK_STATE_REGISTRY.getId(this);
++        }
++        return this.indexInBlockStateRegistry;
++    }
++    // Fiddle end - cache registry indices as fields - block state
++
+ }
 diff --git a/src/test/java/org/fiddlemc/fiddle/block/PerBlockTest.java b/src/test/java/org/fiddlemc/fiddle/block/PerBlockTest.java
 index 3209419ff3392886b4c39de6d77ce57853e29b8a..33e7ac9908bb82d73e66634ed0f8f6afe3aa1f1f 100644
 --- a/src/test/java/org/fiddlemc/fiddle/block/PerBlockTest.java

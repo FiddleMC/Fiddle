@@ -1,0 +1,142 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sun, 16 Jul 2023 19:24:03 +0200
+Subject: [PATCH] Client perspective - Define client perspectives
+
+License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/ClientPerspective.java b/src/main/java/org/fiddlemc/fiddle/packet/ClientPerspective.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..e958e35fb7ea4f9fe3b057e0348c0cd9bff87ba4
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/packet/ClientPerspective.java
+@@ -0,0 +1,44 @@
++// Fiddle - client perspective - definition
++
++package org.fiddlemc.fiddle.packet;
++
++import org.jetbrains.annotations.NotNull;
++
++/**
++ * This class represents the circumstances under which a client (typically a player) observes the data sent.
++ * <br>
++ * This class may be extended to represent a client perspective within a certain {@link #category} that has
++ * additional fields to specialize the perspective and allow for more refined decisions when translating data.
++ * This class may also be instantiated directly to represent the one and only client perspective that exists
++ * for that perspective's {@link #category}.
++ */
++public class ClientPerspective {
++
++    public final @NotNull ClientPerspectiveCategory category;
++
++    public ClientPerspective(@NotNull ClientPerspectiveCategory category) {
++        this.category = category;
++    }
++
++    @Override
++    public int hashCode() {
++        return this.category.ordinal();
++    }
++
++    @Override
++    public boolean equals(Object obj) {
++        if (this == obj) {
++            return true;
++        }
++        if (obj.getClass() != ClientPerspective.class) {
++            return false;
++        }
++        return this.category == ((ClientPerspective) obj).category;
++    }
++
++    @Override
++    public String toString() {
++        return this.category.name();
++    }
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/ClientPerspectiveCategory.java b/src/main/java/org/fiddlemc/fiddle/packet/ClientPerspectiveCategory.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..e38f887a284e52a5d43e34eb232bfe0b0f8822c5
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/packet/ClientPerspectiveCategory.java
+@@ -0,0 +1,78 @@
++// Fiddle - client perspective - definition
++
++package org.fiddlemc.fiddle.packet;
++
++import net.minecraft.world.entity.Display;
++import org.bukkit.inventory.meta.ItemMeta;
++import org.jetbrains.annotations.NotNull;
++
++/**
++ * This enum represents a category of {@link ClientPerspective}s.
++ * All {@link ClientPerspective}s are divided among these category.
++ * Each category has one or more possible {@link ClientPerspective} instances.
++ * <br>
++ * The division of perspectives into categories allows for optimization in translating data when sending
++ * packets to a client: if the replacement is the same for every {@link ClientPerspective} in a category,
++ * we can store and retrieve the replacement without adding any additional checks.
++ * <br>
++ * An additional level of possible optimization is offered: usually a category has a {@link ClientPerspective}
++ * that occurs far more often than others in the same category. To speed up translating data when there are different
++ * replacements for different {@link ClientPerspective}s in the same category, a {@link #mostLikelyPerspective} must
++ * be identified for each category so that its corresponding replacements can be quickly found during data translation.
++ * <br>
++ * This currently includes 3 categories,
++ * each of which only have one corresponding {@link ClientPerspective} instance.
++ * In the future, additional perspectives may be added, such as perspectives for Bedrock clients joining
++ * through Geyser (or similar), that would be able to receive a corresponding Bedrock behavior/texture pack.
++ * Also, additional {@link ClientPerspective}s per category may be added, for example ones that can
++ * differentiate between different client versions (for example, when using ViaVersion or similar),
++ * per-player configurable settings and values, or even in-game world time (to show blocks differently across seasons
++ * that progress with game time).
++ */
++public enum ClientPerspectiveCategory {
++
++    /**
++     * The category for Java clients that have not accepted the server resource pack,
++     * and also do not have the Fiddle client mod.
++     * <br>
++     * This generally results in data being replaced by the closest or most acceptable vanilla equivalent,
++     * and any additional rendering being done through the use of {@link Display} entities of vanilla blocks and items.
++     */
++    JAVA_DEFAULT,
++
++    /**
++     * The category for Java clients that have accepted the server resource pack,
++     * but do not have the Fiddle client mod.
++     * <br>
++     * This generally results in data being replaced by hosts that are overridden in the resource pack
++     * (such as block states or items with an overriding texture for a specific {@link ItemMeta#getCustomModelData()}),
++     * and any additional rendering being done through the use of various {@link Display} entities,
++     * especially {@link Display.ItemDisplay} entities of items with an overriding texture
++     * for a specific {@link ItemMeta#getCustomModelData()}.
++     */
++    JAVA_WITH_ENABLED_RESOURCE_PACK,
++
++    /**
++     * The category for Java clients that are have the Fiddle client mod.
++     * The client is using the client mod, i.e. they have installed and are able to use
++     * a sufficiently up-to-date version of it.
++     * <br>
++     * This generally results in data being sent as-is, because when joining a Fiddle server, the client receives
++     * the necessary information to from then on interpret the server-side block and item keys directly.
++     */
++    JAVA_WITH_FIDDLE_CLIENT_MOD;
++
++    /**
++     * The {@link ClientPerspective} in this category most likely to occur in practice.
++     * This must always and only be set in the static initialization of this class.
++     */
++    public @NotNull ClientPerspective mostLikelyPerspective;
++
++    static {
++        // Initialize the values of mostLikelyPerspective
++        JAVA_DEFAULT.mostLikelyPerspective = new ClientPerspective(JAVA_DEFAULT);
++        JAVA_WITH_ENABLED_RESOURCE_PACK.mostLikelyPerspective = new ClientPerspective(JAVA_WITH_ENABLED_RESOURCE_PACK);
++        JAVA_WITH_FIDDLE_CLIENT_MOD.mostLikelyPerspective = new ClientPerspective(JAVA_WITH_FIDDLE_CLIENT_MOD);
++    }
++
++}

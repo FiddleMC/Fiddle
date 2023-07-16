@@ -1,0 +1,37 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sun, 16 Jul 2023 19:25:00 +0200
+Subject: [PATCH] Client perspective - Block states - BlockState field for
+ replacements
+
+License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/world/level/block/state/BlockState.java b/src/main/java/net/minecraft/world/level/block/state/BlockState.java
+index 664572ad64ed53386a7348b34ec2bac25e9381d5..618243441b14988cb6f570dd73487a3d82b0c2a4 100644
+--- a/src/main/java/net/minecraft/world/level/block/state/BlockState.java
++++ b/src/main/java/net/minecraft/world/level/block/state/BlockState.java
+@@ -7,6 +7,9 @@ import net.minecraft.core.Registry;
+ import net.minecraft.core.registries.BuiltInRegistries;
+ import net.minecraft.world.level.block.Block;
+ import net.minecraft.world.level.block.state.properties.Property;
++import org.fiddlemc.fiddle.packet.ClientPerspective;
++import org.fiddlemc.fiddle.packet.block.BlockStateReplacementProvider;
++import org.jetbrains.annotations.Nullable;
+ 
+ public class BlockState extends BlockBehaviour.BlockStateBase {
+     public static final Codec<BlockState> CODEC = codec(BuiltInRegistries.BLOCK.byNameCodec(), Block::defaultBlockState).stable();
+@@ -50,4 +53,13 @@ public class BlockState extends BlockBehaviour.BlockStateBase {
+     }
+     // Fiddle end - cache registry indices as fields - block state
+ 
++    // Fiddle start - client perspective - replace block states - BlockState field for replacements
++    /**
++     * The {@linkplain BlockStateReplacementProvider} that provides replacement {@link BlockState}s
++     * for this one, based on the {@linkplain ClientPerspective perspective} of a client.
++     * If null, there exist no replacements for this state, and it is always sent to clients as-is.
++     */
++    public @Nullable BlockStateReplacementProvider replacements = null;
++    // Fiddle end - client perspective - replace block states - BlockState field for replacements
++
+ }

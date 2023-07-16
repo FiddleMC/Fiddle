@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sun, 16 Jul 2023 14:54:08 +0200
+Subject: [PATCH] Use cached registry index instead of doing lookup - Block
+ state
+
+License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/world/level/block/Block.java b/src/main/java/net/minecraft/world/level/block/Block.java
+index dadc9d42ba2c83e5a0dee860cfc0ba7b5d86625e..1e47b5cceb1d15beef07872e19b668a88384cdbe 100644
+--- a/src/main/java/net/minecraft/world/level/block/Block.java
++++ b/src/main/java/net/minecraft/world/level/block/Block.java
+@@ -151,7 +151,7 @@ public class Block extends BlockBehaviour implements ItemLike {
+         if (state == null) {
+             return 0;
+         } else {
+-            int i = Block.BLOCK_STATE_REGISTRY.getId(state);
++            int i = state.getIndexInBlockStateRegistry(); // Fiddle - cache registry indices as fields - use instead of lookup - block state
+ 
+             return i == -1 ? 0 : i;
+         }
