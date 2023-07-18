@@ -1,17 +1,36 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
 Date: Sun, 16 Jul 2023 19:24:28 +0200
-Subject: [PATCH] Client perspective - Determine and store visual
- representations
+Subject: [PATCH] Client perspective - Block state visualization - Determine
+ and store visualizations
 
 License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index 0a46669503131fef418a4cd200061bc4d9c50495..1c63e1087313be59136d2e37a024fbf06d64a335 100644
+index 0a46669503131fef418a4cd200061bc4d9c50495..b2da08d78b06beb78897377684d2e8aa36d6edce 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
-@@ -63,6 +63,7 @@ import net.minecraft.world.flag.FeatureFlags;
+@@ -1,8 +1,6 @@
+ package net.minecraft.server;
+ 
+ import com.google.common.collect.Streams;
+-import com.mojang.authlib.GameProfile;
+-import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
+ import com.mojang.datafixers.DataFixer;
+ import com.mojang.datafixers.util.Pair;
+ import com.mojang.logging.LogUtils;
+@@ -22,9 +20,6 @@ import java.util.*;
+ import java.util.function.BooleanSupplier;
+ import io.papermc.paper.world.ThreadedWorldUpgrader;
+ import joptsimple.OptionSet;
+-import joptsimple.OptionSpec;
+-import joptsimple.util.PathConverter;
+-import joptsimple.util.PathProperties;
+ import net.bytebuddy.ByteBuddy;
+ import net.bytebuddy.description.modifier.Ownership;
+ import net.bytebuddy.description.modifier.Visibility;
+@@ -63,6 +58,7 @@ import net.minecraft.world.flag.FeatureFlags;
  import net.minecraft.world.level.GameRules;
  import net.minecraft.world.level.LevelSettings;
  import net.minecraft.world.level.WorldDataConfiguration;
@@ -19,31 +38,40 @@ index 0a46669503131fef418a4cd200061bc4d9c50495..1c63e1087313be59136d2e37a024fbf0
  import net.minecraft.world.level.dimension.LevelStem;
  import net.minecraft.world.level.levelgen.WorldDimensions;
  import net.minecraft.world.level.levelgen.WorldOptions;
-@@ -73,6 +74,8 @@ import net.minecraft.world.level.storage.LevelSummary;
+@@ -73,6 +69,8 @@ import net.minecraft.world.level.storage.LevelSummary;
  import net.minecraft.world.level.storage.PrimaryLevelData;
  import net.minecraft.world.level.storage.WorldData;
  import org.bukkit.Material;
 +import org.fiddlemc.fiddle.packet.ClientPerspectiveCategory;
-+import org.fiddlemc.fiddle.packet.block.OnePerCategoryBlockStateReplacementProvider;
++import org.fiddlemc.fiddle.packet.block.OnePerCategoryBlockStateVisualizationSetupProvider;
  import org.fiddlemc.fiddle.server.FiddleFeatureSupport;
  import org.fiddlemc.fiddle.configuration.FiddleConfigurations;
  import org.fiddlemc.fiddle.configuration.PermanenceConfirmation;
-@@ -236,6 +239,19 @@ public class Main {
+@@ -92,8 +90,6 @@ import java.io.InputStreamReader;
+ import java.util.concurrent.atomic.AtomicReference;
+ import java.util.function.Predicate;
+ 
+-import net.minecraft.SharedConstants;
+-
+ import org.bukkit.configuration.file.YamlConfiguration;
+ // CraftBukkit end
+ 
+@@ -236,6 +232,19 @@ public class Main {
              Path path1 = Paths.get("server.properties");
              DedicatedServerSettings dedicatedserversettings = new DedicatedServerSettings(optionset); // CraftBukkit - CLI argument support
  
-+            // Fiddle start - client perspective - determine and store visual representations
++            // Fiddle start - client perspective - block state visualization - determine and store visualizations
 +            // TODO This doesn't do anything interesting yet: should be replaced with an actual mechanism that bases this on the resource pack assets
 +            for (var block : BuiltInRegistries.BLOCK) {
 +                if (block.isAddedByFiddle()) {
 +                    for (var blockState : block.getStateDefinition().getPossibleStates()) {
-+                        blockState.replacements = new OnePerCategoryBlockStateReplacementProvider(
++                        blockState.visualizationProviders = new OnePerCategoryBlockStateVisualizationSetupProvider(
 +                            category -> category == ClientPerspectiveCategory.JAVA_WITH_FIDDLE_CLIENT_MOD ? blockState : Blocks.STONE.defaultBlockState()
 +                        );
 +                    }
 +                }
 +            }
-+            // Fiddle end - client perspective - determine and store visual representations
++            // Fiddle end - client perspective - block state visualization - determine and store visualizations
 +
              // Fiddle start - modifiable Bukkit enums - inject runtime versions - common utilities
              ClassLoader systemClassLoader = ClassLoader.getSystemClassLoader();

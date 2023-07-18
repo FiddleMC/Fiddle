@@ -1,0 +1,201 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sun, 16 Jul 2023 19:25:46 +0200
+Subject: [PATCH] Client perspective - Block state visualization - Define
+ providers and setups
+
+License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
+index 6d129fd434ae2a3f6bbda700b1a8a7022f168c19..fe8dbc73b4d0617428dd3619ec2a5c2d5a267553 100644
+--- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
++++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
+@@ -2675,4 +2675,23 @@ public class ServerPlayer extends Player {
+     }
+     // Fiddle end - client perspective - player
+ 
++    // Fiddle start - client perspective - block state visualization - send to player without modifications
++    /**
++     * Sends an update of the {@link BlockState} to this player's client, at the given
++     * {@linkplain BlockPos block coordinates}.
++     * Note that this method is to be called to propagate updates to the player appropriately,
++     * and therefore any packets sent as a result of calling this method are not further checked or modified.
++     *
++     * @param state The resulting {@link BlockState} to send to this player's client.
++     *              This is the {@link BlockState} that is already translated to the desired state to be observed
++     *              by the client, and no further modifications will be applied.
++     */
++    public void sendBlockUpdateWithoutModifications(@NotNull BlockPos position, @NotNull BlockState state) {
++        // Based on org.bukkit.craftbukkit.entity.CraftPlayer#sendBlockChange
++        ClientboundBlockUpdatePacket packet = new ClientboundBlockUpdatePacket(position, state);
++        // TODO mark in packet that no further modifications should be applied
++        this.connection.send(packet);
++    }
++    // Fiddle end - client perspective - block state visualization - send to player without modifications
++
+ }
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/block/BlockStateVisualizationSetup.java b/src/main/java/org/fiddlemc/fiddle/packet/block/BlockStateVisualizationSetup.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..f89dfbcf9b666fb8ce15e98a24f5f4d8a592141f
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/packet/block/BlockStateVisualizationSetup.java
+@@ -0,0 +1,42 @@
++// Fiddle - client perspective - block state visualization - dynamic setup
++
++package org.fiddlemc.fiddle.packet.block;
++
++import net.minecraft.server.level.ServerLevel;
++import net.minecraft.server.level.ServerPlayer;
++import net.minecraft.world.level.block.state.BlockState;
++import org.fiddlemc.fiddle.packet.ClientPerspective;
++import org.jetbrains.annotations.NotNull;
++
++/**
++ * An interface that can provide an implementation to set up the visualization of a {@link BlockState}
++ * for a specific client, as is potentially returned by
++ * {@link BlockStateVisualizationSetupProvider#getVisualization(BlockState, ClientPerspective)}.
++ */
++public interface BlockStateVisualizationSetup {
++
++    /**
++     * Performs the necessary setup of a client observing a block of which the desired visualization
++     * may change, based on dynamic circumstances.
++     * The setup must conform to the requirements set out in the documentation of
++     * {@link BlockStateVisualizationSetupProvider#getVisualization(BlockState, ClientPerspective)}.
++     *
++     * @param level The world of the block.
++     * @param x The x coordinate of the block.
++     * @param y The x coordinate of the block.
++     * @param z The x coordinate of the block.
++     * @param actual The actual state of the block. Note that the actual state of the block is not necessarily its
++     *               physical state if it were retrieved from the world right now: it is the actual state as being
++     *               the state that we wish the client to be able to see as well as possible. The difference lies in
++     *               the fact that this actual state must be derived from the contents of a (potentially hypothetical)
++     *               original packet that would be sent to the client. For example, if a plugin calls
++     *               {@link org.bukkit.entity.Player#sendBlockChange}, this method would be called with the
++     *               {@code actual} state being that passed to the method, not the physical state in the world.
++     * @param player The player of the client that will be observing the block.
++     *
++     * @return The {@link BlockState} to show to the client initially
++     * (based on the current values of the relevant dynamic circumstances).
++     */
++    @NotNull BlockState setUp(@NotNull ServerLevel level, int x, int y, int z, @NotNull BlockState actual, @NotNull ServerPlayer player);
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/block/BlockStateVisualizationSetupProvider.java b/src/main/java/org/fiddlemc/fiddle/packet/block/BlockStateVisualizationSetupProvider.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..712f28efd76bdcd60b299bfb07de2fe178568fa2
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/packet/block/BlockStateVisualizationSetupProvider.java
+@@ -0,0 +1,42 @@
++// Fiddle - client perspective - block state visualization - provider
++
++package org.fiddlemc.fiddle.packet.block;
++
++import net.minecraft.world.level.block.state.BlockState;
++import org.fiddlemc.fiddle.packet.ClientPerspective;
++import org.jetbrains.annotations.NotNull;
++
++/**
++ * An abstract provider for the {@link BlockStateVisualizationSetup} of a given {@link BlockState},
++ * given the {@linkplain ClientPerspective perspective} of the observing client.
++ */
++public interface BlockStateVisualizationSetupProvider {
++
++    /**
++     * Pre-checks whether any visualization for a given block state and perspective,
++     * that does not always return the block state itself, will exist.
++     * Implementations of this method may skip most of the checks that {@link #getVisualization} does,
++     * to quickly determine if there are no replacements necessary in a chunk or chunk section at all.
++     * @return True if there are definitely no replacements for the given perspective.
++     * False if it could not be determined for sure that there are no replacements for the given perspective
++     * (i.e. because there in fact will certainly be).
++     */
++    boolean preCheckWhetherDefinitelyHasNoVisualizationChange(@NotNull BlockState actual, @NotNull ClientPerspective perspective);
++
++    /**
++     * @return A setup for the visualization {@link BlockState} that the client should receive.
++     * The return value is always one of the following two cases:
++     * <ul>
++     *     <li>A {@link BlockStateVisualizationSetup} for visualizations that rely on dynamic
++     *     (as opposed to the static properties in {@link ClientPerspective}) circumstances,
++     *     that can perform a setup operation that subscribes to the necessary events and sends the necessary
++     *     packets to the player in response (where it must subscribe in such a way that all corresponding data in
++     *     memory is deallocated when the block becomes no longer visible to the player).</li>
++     *     <li>A {@link BlockState} that represents the look of the given {@code actual} block state to the client,
++     *     that does not change based on any other dynamic circumstances.
++     *     This can (and is probably most often) be the {@code actual} block state itself.</li>
++     * </ul>
++     */
++    @NotNull Object getVisualization(@NotNull BlockState actual, @NotNull ClientPerspective perspective);
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/block/OnePerCategoryBlockStateVisualizationSetupProvider.java b/src/main/java/org/fiddlemc/fiddle/packet/block/OnePerCategoryBlockStateVisualizationSetupProvider.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..50e81d7a75117ce6c768bb238efa2878993747e9
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/packet/block/OnePerCategoryBlockStateVisualizationSetupProvider.java
+@@ -0,0 +1,62 @@
++// Fiddle - client perspective - block state visualization - provider
++
++package org.fiddlemc.fiddle.packet.block;
++
++import net.minecraft.world.level.block.state.BlockState;
++import org.fiddlemc.fiddle.packet.ClientPerspective;
++import org.fiddlemc.fiddle.packet.ClientPerspectiveCategory;
++import org.jetbrains.annotations.NotNull;
++
++import java.util.AbstractMap;
++import java.util.Arrays;
++import java.util.Map;
++import java.util.function.Function;
++
++/**
++ * A {@link BlockStateVisualizationSetupProvider} that has one static {@link BlockState}
++ * for each {@link ClientPerspectiveCategory}.
++ */
++public final class OnePerCategoryBlockStateVisualizationSetupProvider implements BlockStateVisualizationSetupProvider {
++
++    /**
++     * The replacement {@link BlockState}s, indexed by the corresponding {@link ClientPerspectiveCategory#ordinal()}.
++     */
++    private final @NotNull BlockState @NotNull[] replacements;
++
++    public OnePerCategoryBlockStateVisualizationSetupProvider(@NotNull BlockState @NotNull[] replacements) {
++        this.replacements = replacements;
++    }
++
++    /**
++     * Convenience constructor.
++     */
++    public OnePerCategoryBlockStateVisualizationSetupProvider(@NotNull Function<@NotNull ClientPerspectiveCategory, @NotNull BlockState> replacementFunction) {
++        this(Arrays.stream(ClientPerspectiveCategory.values()).map(replacementFunction).toArray(BlockState[]::new));
++    }
++
++    @Override
++    public boolean preCheckWhetherDefinitelyHasNoVisualizationChange(@NotNull BlockState actual, @NotNull ClientPerspective perspective) {
++        return this.replacements[perspective.category.ordinal()] == actual;
++    }
++
++    @Override
++    public @NotNull BlockState getVisualization(@NotNull BlockState actual, @NotNull ClientPerspective perspective) {
++        return this.replacements[perspective.category.ordinal()];
++    }
++
++    @Override
++    public int hashCode() {
++        return Arrays.hashCode(this.replacements);
++    }
++
++    @Override
++    public boolean equals(Object obj) {
++        return obj instanceof OnePerCategoryBlockStateVisualizationSetupProvider provider && Arrays.deepEquals(this.replacements, provider.replacements);
++    }
++
++    @Override
++    public String toString() {
++        return Map.ofEntries(Arrays.stream(ClientPerspectiveCategory.values()).map(category -> new AbstractMap.SimpleEntry<>(category, this.replacements[category.ordinal()])).toList().toArray(Map.Entry[]::new)).toString();
++    }
++
++}

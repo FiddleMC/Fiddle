@@ -23,31 +23,6 @@ By: Jake Potrebic <jake.m.potrebic@gmail.com>
 As part of: Paper (https://github.com/PaperMC/Paper)
 Licensed under: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 
-diff --git a/src/main/java/co/aikar/timings/TimingsExport.java b/src/main/java/co/aikar/timings/TimingsExport.java
-index a2f71a6d1a9e98133dff6cd0f625da9435a8af14..1d31e9d3c977f4a1506dc03d9a07fe1aef5573b7 100644
---- a/src/main/java/co/aikar/timings/TimingsExport.java
-+++ b/src/main/java/co/aikar/timings/TimingsExport.java
-@@ -242,7 +242,10 @@ public class TimingsExport extends Thread {
-         parent.put("config", createObject(
-             pair("spigot", mapAsJSON(Bukkit.spigot().getSpigotConfig(), null)),
-             pair("bukkit", mapAsJSON(Bukkit.spigot().getBukkitConfig(), null)),
--            pair("paper", mapAsJSON(Bukkit.spigot().getPaperConfig(), null))
-+            // Fiddle start - Fiddle configuration - include in timings
-+            pair("paper", mapAsJSON(Bukkit.spigot().getPaperConfig(), null)),
-+            pair("fiddle", mapAsJSON(Bukkit.spigot().getFiddleConfig(), null))
-+            // Fiddle end - Fiddle configuration - include in timings
-         ));
- 
-         new TimingsExport(listeners, parent, history).start();
-@@ -283,7 +286,7 @@ public class TimingsExport extends Thread {
-         return timingsCost;
-     }
- 
--    private static JSONObject mapAsJSON(ConfigurationSection config, String parentKey) {
-+    public static JSONObject mapAsJSON(ConfigurationSection config, String parentKey) { // Fiddle - Fiddle configuration
- 
-         JSONObject object = new JSONObject();
-         for (String key : config.getKeys(false)) {
 diff --git a/src/main/java/io/papermc/paper/configuration/ConfigurationPart.java b/src/main/java/io/papermc/paper/configuration/ConfigurationPart.java
 index 7a4a7a654fe2516ed894a68f2657344df9d70f4c..aecf60a2c08bb977df2d4a2d10ba399d5150f6ba 100644
 --- a/src/main/java/io/papermc/paper/configuration/ConfigurationPart.java
@@ -906,30 +881,5 @@ index 0000000000000000000000000000000000000000..ad2b35278ee7ef1460e2a76d2953d3fc
 +
 +    @Setting(Configuration.VERSION_FIELD)
 +    public int version = CURRENT_VERSION;
-+
-+}
-diff --git a/src/main/java/org/fiddlemc/fiddle/configuration/timingsexport/FiddleConfigurationTimingsExport.java b/src/main/java/org/fiddlemc/fiddle/configuration/timingsexport/FiddleConfigurationTimingsExport.java
-new file mode 100644
-index 0000000000000000000000000000000000000000..9982f15321344f8efd9ea88bec34a53967c0f9aa
---- /dev/null
-+++ b/src/main/java/org/fiddlemc/fiddle/configuration/timingsexport/FiddleConfigurationTimingsExport.java
-@@ -0,0 +1,19 @@
-+// Fiddle - Fiddle configuration
-+
-+package org.fiddlemc.fiddle.configuration.timingsexport;
-+
-+import co.aikar.timings.TimingsExport;
-+import org.bukkit.Bukkit;
-+import org.jetbrains.annotations.NotNull;
-+import org.json.simple.JSONObject;
-+
-+public final class FiddleConfigurationTimingsExport {
-+
-+    private FiddleConfigurationTimingsExport() {}
-+
-+    public static @NotNull JSONObject get() {
-+        var json = TimingsExport.mapAsJSON(Bukkit.spigot().getFiddleConfig(), null);
-+        return json;
-+    }
 +
 +}

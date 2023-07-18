@@ -1,0 +1,44 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Thu, 13 Jul 2023 19:45:52 +0200
+Subject: [PATCH] Load packs - Blocks and items - Flags for added blocks and
+ items - Bukkit API
+
+License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
+index 7060784fc76b6fc650eedc771a6479d4ef06bcb7..91c0234587bed474d6f90489ba2c84dbb48ffc5a 100644
+--- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
++++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
+@@ -67,6 +67,7 @@ import org.bukkit.inventory.ItemStack;
+ import org.bukkit.material.MaterialData;
+ import org.bukkit.plugin.InvalidPluginException;
+ import org.bukkit.plugin.PluginDescriptionFile;
++import org.jetbrains.annotations.NotNull;
+ 
+ @SuppressWarnings("deprecation")
+ public final class CraftMagicNumbers implements UnsafeValues {
+@@ -624,6 +625,22 @@ public final class CraftMagicNumbers implements UnsafeValues {
+     }
+     // Paper end
+ 
++    // Fiddle start - load packs - blocks - flag for added blocks - API
++    @Override
++    public boolean isBlockAddedByFiddle(@NotNull Material material) {
++        var block = this.getBlock(material);
++        return block != null && block.isAddedByFiddle();
++    }
++    // Fiddle end - load packs - blocks - flag for added blocks - API
++
++    // Fiddle start - load packs - blocks - flag for added items - API
++    @Override
++    public boolean isItemAddedByFiddle(@NotNull Material material) {
++        var item = this.getItem(material);
++        return item != null && item.isAddedByFiddle();
++    }
++    // Fiddle end - load packs - blocks - flag for added items - API
++
+     /**
+      * This helper class represents the different NBT Tags.
+      * <p>
