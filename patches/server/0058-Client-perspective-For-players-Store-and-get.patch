@@ -1,26 +1,31 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
 Date: Tue, 18 Jul 2023 22:19:51 +0200
-Subject: [PATCH] Client perspective - For players - Store
+Subject: [PATCH] Client perspective - For players - Store and get
 
 License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/network/Connection.java b/src/main/java/net/minecraft/network/Connection.java
-index cf20f0983fc25b26cf92b9d3a28746b1909fc56b..280463a21589822d09a04bf024e7239edc38207c 100644
+index 92e3e2eaa14958ac56a22f3730ad69bf659109f1..60b2b798f0faa64f816cc2c600ca304d27535f95 100644
 --- a/src/main/java/net/minecraft/network/Connection.java
 +++ b/src/main/java/net/minecraft/network/Connection.java
-@@ -44,6 +44,7 @@ import net.minecraft.server.RunningOnDifferentThreadException;
+@@ -41,10 +41,12 @@ import net.minecraft.network.protocol.PacketFlow;
+ import net.minecraft.network.protocol.game.ClientboundDisconnectPacket;
+ import net.minecraft.network.protocol.login.ClientboundLoginDisconnectPacket;
+ import net.minecraft.server.RunningOnDifferentThreadException;
++import net.minecraft.server.level.ServerPlayer;
+ import net.minecraft.server.network.ServerGamePacketListenerImpl;
  import net.minecraft.util.LazyLoadedValue;
  import net.minecraft.util.Mth;
  import org.apache.commons.lang3.Validate;
 +import org.fiddlemc.fiddle.packet.ClientPerspective;
+ import org.jetbrains.annotations.NotNull;
  import org.slf4j.Logger;
  import org.slf4j.Marker;
- import org.slf4j.MarkerFactory;
-@@ -851,6 +852,22 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
-         return this.averageSentPackets;
+@@ -881,6 +883,38 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
      }
+     // Fiddle end - client perspective - wait for client information
  
 +    // Fiddle start - client perspective - player - get from connection
 +    /**
@@ -37,6 +42,22 @@ index cf20f0983fc25b26cf92b9d3a28746b1909fc56b..280463a21589822d09a04bf024e7239e
 +        return player.getClientPerspective();
 +    }
 +    // Fiddle start - client perspective - player - get from connection
++
++    // Fiddle start - client perspective - localization - get player locale from connection
++    /**
++     * @return The {@linkplain ServerPlayer#locale locale} of this connection's {@linkplain #getPlayer() player}.
++     * This is null if the player is null.
++     *
++     * @see net.minecraft.server.level.ServerPlayer#locale
++     */
++    public final @Nullable String getPlayerLocale() {
++        var player = this.getPlayer();
++        if (player == null) {
++            return null;
++        }
++        return player.locale;
++    }
++    // Fiddle start - client perspective - localization - get player locale from connection
 +
      private static class PacketHolder {
  

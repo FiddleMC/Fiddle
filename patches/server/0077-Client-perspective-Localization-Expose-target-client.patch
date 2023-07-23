@@ -1,0 +1,251 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sun, 23 Jul 2023 15:20:59 +0200
+Subject: [PATCH] Client perspective - Localization - Expose target client
+ properties - Store connection explicitly in packets that may contain raw JSON
+ text
+
+License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundBlockEntityDataPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundBlockEntityDataPacket.java
+index 3944852921335c78a04a9dc301882ab5b152b1ed..f2bef2f655c0e5ddb9e1a3ee1d18691f64c00224 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundBlockEntityDataPacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundBlockEntityDataPacket.java
+@@ -6,11 +6,11 @@ import net.minecraft.core.BlockPos;
+ import net.minecraft.core.registries.BuiltInRegistries;
+ import net.minecraft.nbt.CompoundTag;
+ import net.minecraft.network.FriendlyByteBuf;
+-import net.minecraft.network.protocol.Packet;
+ import net.minecraft.world.level.block.entity.BlockEntity;
+ import net.minecraft.world.level.block.entity.BlockEntityType;
++import org.fiddlemc.fiddle.packet.PacketWithExplicitTargetClientConnection;
+ 
+-public class ClientboundBlockEntityDataPacket implements Packet<ClientGamePacketListener> {
++public class ClientboundBlockEntityDataPacket extends PacketWithExplicitTargetClientConnection<ClientGamePacketListener> { // Fiddle - client perspective - localization - expose target client properties - store connection explicitly in packets that may contain raw JSON text
+     private final BlockPos pos;
+     private final BlockEntityType<?> type;
+     @Nullable
+@@ -25,12 +25,14 @@ public class ClientboundBlockEntityDataPacket implements Packet<ClientGamePacket
+     }
+ 
+     private ClientboundBlockEntityDataPacket(BlockPos pos, BlockEntityType<?> blockEntityType, CompoundTag nbt) {
++        super(); // Fiddle - client perspective - localization - expose target client properties - store connection explicitly in packets that may contain raw JSON text
+         this.pos = pos;
+         this.type = blockEntityType;
+         this.tag = nbt.isEmpty() ? null : nbt;
+     }
+ 
+     public ClientboundBlockEntityDataPacket(FriendlyByteBuf buf) {
++        super(); // Fiddle - client perspective - localization - expose target client properties - store connection explicitly in packets that may contain raw JSON text
+         this.pos = buf.readBlockPos();
+         this.type = buf.readById(BuiltInRegistries.BLOCK_ENTITY_TYPE);
+         this.tag = buf.readNbt();
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundCommandSuggestionsPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundCommandSuggestionsPacket.java
+index b8c008a311edebe90256bd8482a2402d12ffd0db..23d492b8697b55ecf81a4f3c8156aadb89e6e5c9 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundCommandSuggestionsPacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundCommandSuggestionsPacket.java
+@@ -8,17 +8,20 @@ import net.minecraft.network.FriendlyByteBuf;
+ import net.minecraft.network.chat.Component;
+ import net.minecraft.network.chat.ComponentUtils;
+ import net.minecraft.network.protocol.Packet;
++import org.fiddlemc.fiddle.packet.PacketWithExplicitTargetClientConnection;
+ 
+-public class ClientboundCommandSuggestionsPacket implements Packet<ClientGamePacketListener> {
++public class ClientboundCommandSuggestionsPacket extends PacketWithExplicitTargetClientConnection<ClientGamePacketListener> { // Fiddle - client perspective - localization - expose target client properties - store connection explicitly in packets that may contain raw JSON text
+     private final int id;
+     private final Suggestions suggestions;
+ 
+     public ClientboundCommandSuggestionsPacket(int completionId, Suggestions suggestions) {
++        super(); // Fiddle - client perspective - localization - expose target client properties - store connection explicitly in packets that may contain raw JSON text
+         this.id = completionId;
+         this.suggestions = suggestions;
+     }
+ 
+     public ClientboundCommandSuggestionsPacket(FriendlyByteBuf buf) {
++        super(); // Fiddle - client perspective - localization - expose target client properties - store connection explicitly in packets that may contain raw JSON text
+         this.id = buf.readVarInt();
+         int i = buf.readVarInt();
+         int j = buf.readVarInt();
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundDisconnectPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundDisconnectPacket.java
+index 295654edee57d6cce52d1305e73fe1b63d84d6b6..1181d3944db1a21d3a9baefb00ef15110592edd8 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundDisconnectPacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundDisconnectPacket.java
+@@ -3,15 +3,18 @@ package net.minecraft.network.protocol.game;
+ import net.minecraft.network.FriendlyByteBuf;
+ import net.minecraft.network.chat.Component;
+ import net.minecraft.network.protocol.Packet;
++import org.fiddlemc.fiddle.packet.PacketWithExplicitTargetClientConnection;
+ 
+-public class ClientboundDisconnectPacket implements Packet<ClientGamePacketListener> {
++public class ClientboundDisconnectPacket extends PacketWithExplicitTargetClientConnection<ClientGamePacketListener> { // Fiddle - client perspective - localization - expose target client properties - store connection explicitly in packets that may contain raw JSON text
+     private final Component reason;
+ 
+     public ClientboundDisconnectPacket(Component reason) {
++        super(); // Fiddle - client perspective - localization - expose target client properties - store connection explicitly in packets that may contain raw JSON text
+         this.reason = reason;
+     }
+ 
+     public ClientboundDisconnectPacket(FriendlyByteBuf buf) {
++        super(); // Fiddle - client perspective - localization - expose target client properties - store connection explicitly in packets that may contain raw JSON text
+         this.reason = buf.readComponent();
+     }
+ 
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
+index 978fc83b209ae831ba1d6315cad1adeefe58a98c..613e8b41f6271cae0601facba89246deb7edc238 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
+@@ -7,8 +7,9 @@ import net.minecraft.network.protocol.Packet;
+ import net.minecraft.world.level.ChunkPos;
+ import net.minecraft.world.level.chunk.LevelChunk;
+ import net.minecraft.world.level.lighting.LevelLightEngine;
++import org.fiddlemc.fiddle.packet.PacketWithExplicitTargetClientConnection;
+ 
+-public class ClientboundLevelChunkWithLightPacket implements Packet<ClientGamePacketListener> {
++public class ClientboundLevelChunkWithLightPacket extends PacketWithExplicitTargetClientConnection<ClientGamePacketListener> { // Fiddle - client perspective - localization - expose target client properties - store connection explicitly in packets that may contain raw JSON text
+     private final int x;
+     private final int z;
+     private final ClientboundLevelChunkPacketData chunkData;
+@@ -29,6 +30,7 @@ public class ClientboundLevelChunkWithLightPacket implements Packet<ClientGamePa
+     // Paper start - Anti-Xray - Add chunk packet info
+     @Deprecated @io.papermc.paper.annotation.DoNotUse public ClientboundLevelChunkWithLightPacket(LevelChunk chunk, LevelLightEngine lightProvider, @Nullable BitSet skyBits, @Nullable BitSet blockBits) { this(chunk, lightProvider, skyBits, blockBits, true); }
+     public ClientboundLevelChunkWithLightPacket(LevelChunk chunk, LevelLightEngine lightProvider, @Nullable BitSet skyBits, @Nullable BitSet blockBits, boolean modifyBlocks) {
++        super(); // Fiddle - client perspective - localization - expose target client properties - store connection explicitly in packets that may contain raw JSON text
+         ChunkPos chunkPos = chunk.getPos();
+         this.x = chunkPos.x;
+         this.z = chunkPos.z;
+@@ -40,6 +42,7 @@ public class ClientboundLevelChunkWithLightPacket implements Packet<ClientGamePa
+     }
+ 
+     public ClientboundLevelChunkWithLightPacket(FriendlyByteBuf buf) {
++        super(); // Fiddle - client perspective - localization - expose target client properties - store connection explicitly in packets that may contain raw JSON text
+         this.x = buf.readInt();
+         this.z = buf.readInt();
+         this.chunkData = new ClientboundLevelChunkPacketData(buf, this.x, this.z);
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundOpenScreenPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundOpenScreenPacket.java
+index ffd6111f59c86d3606841d3feac5a3ce6f62e354..7b49e19cfd1037837ead9920935486ef3d2ce262 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundOpenScreenPacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundOpenScreenPacket.java
+@@ -6,19 +6,22 @@ import net.minecraft.network.FriendlyByteBuf;
+ import net.minecraft.network.chat.Component;
+ import net.minecraft.network.protocol.Packet;
+ import net.minecraft.world.inventory.MenuType;
++import org.fiddlemc.fiddle.packet.PacketWithExplicitTargetClientConnection;
+ 
+-public class ClientboundOpenScreenPacket implements Packet<ClientGamePacketListener> {
++public class ClientboundOpenScreenPacket extends PacketWithExplicitTargetClientConnection<ClientGamePacketListener> { // Fiddle - client perspective - localization - expose target client properties - store connection explicitly in packets that may contain raw JSON text
+     private final int containerId;
+     private final MenuType<?> type;
+     private final Component title;
+ 
+     public ClientboundOpenScreenPacket(int syncId, MenuType<?> type, Component name) {
++        super(); // Fiddle - client perspective - localization - expose target client properties - store connection explicitly in packets that may contain raw JSON text
+         this.containerId = syncId;
+         this.type = type;
+         this.title = name;
+     }
+ 
+     public ClientboundOpenScreenPacket(FriendlyByteBuf buf) {
++        super(); // Fiddle - client perspective - localization - expose target client properties - store connection explicitly in packets that may contain raw JSON text
+         this.containerId = buf.readVarInt();
+         this.type = buf.readById(BuiltInRegistries.MENU);
+         this.title = buf.readComponent();
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundSetEntityDataPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundSetEntityDataPacket.java
+index 59f5d44d8ac354d90923013c3648ae179e74c4c0..b51940b818223c579ccca0155e1132efc0039eb1 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundSetEntityDataPacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundSetEntityDataPacket.java
+@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
+ import org.jetbrains.annotations.Nullable;
+ 
+ // Fiddle start - client perspective - item replacements - store connection explicitly in packets that may contain items
+-public class ClientboundSetEntityDataPacket extends PacketWithExplicitTargetClientConnection<ClientGamePacketListener> {
++public class ClientboundSetEntityDataPacket extends PacketWithExplicitTargetClientConnection<ClientGamePacketListener> { // Fiddle - client perspective - localization - expose target client properties - store connection explicitly in packets that may contain raw JSON text
+     private final int id;
+     private final List<SynchedEntityData.DataValue<?>> packedItems;
+     // Fiddle start - client perspective - item replacements - pass context of items in item frames
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundSystemChatPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundSystemChatPacket.java
+index 1387e3597c43fd652f2fc82ca6fc2e83039604e2..6113c186f251920a71b6c510e53a6782398eb2cd 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundSystemChatPacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundSystemChatPacket.java
+@@ -4,9 +4,34 @@ package net.minecraft.network.protocol.game;
+ import net.minecraft.network.FriendlyByteBuf;
+ import net.minecraft.network.chat.Component;
+ import net.minecraft.network.protocol.Packet;
++import org.fiddlemc.fiddle.packet.PacketWithExplicitTargetClientConnection;
+ 
+ // Spigot start
+-public record ClientboundSystemChatPacket(@javax.annotation.Nullable net.kyori.adventure.text.Component adventure$content, @javax.annotation.Nullable String content, boolean overlay) implements Packet<ClientGamePacketListener> { // Paper - Adventure
++// Fiddle start - client perspective - localization - expose target client properties - store connection explicitly in packets that may contain raw JSON text
++public class ClientboundSystemChatPacket extends PacketWithExplicitTargetClientConnection<ClientGamePacketListener> { // Paper - Adventure
++    private final @javax.annotation.Nullable net.kyori.adventure.text.Component adventure$content;
++    private final @javax.annotation.Nullable String content;
++    private final boolean overlay;
++
++    public @javax.annotation.Nullable net.kyori.adventure.text.Component adventure$content() {
++        return this.adventure$content;
++    }
++
++    public @javax.annotation.Nullable String content() {
++        return this.content;
++    }
++
++    public boolean overlay() {
++        return this.overlay;
++    }
++
++    public ClientboundSystemChatPacket(@javax.annotation.Nullable net.kyori.adventure.text.Component adventure$content, @javax.annotation.Nullable String content, boolean overlay) {
++        this.adventure$content = adventure$content;
++        this.content = content;
++        this.overlay = overlay;
++        this.checkHasContent();
++    }
++    // Fiddle end - client perspective - localization - expose target client properties - store connection explicitly in packets that may contain raw JSON text
+ 
+     @io.papermc.paper.annotation.DoNotUse // Paper - No locale context
+     public ClientboundSystemChatPacket(Component content, boolean overlay) {
+@@ -18,7 +43,7 @@ public record ClientboundSystemChatPacket(@javax.annotation.Nullable net.kyori.a
+     }
+     // Spigot end
+     // Paper start
+-    public ClientboundSystemChatPacket {
++    private void checkHasContent() { // Fiddle - client perspective - localization - expose target client properties - store connection explicitly in packets that may contain raw JSON text
+         com.google.common.base.Preconditions.checkArgument(!(adventure$content == null && content == null), "Component adventure$content and String (json) content cannot both be null");
+     }
+ 
+@@ -45,7 +70,7 @@ public record ClientboundSystemChatPacket(@javax.annotation.Nullable net.kyori.a
+         if (this.adventure$content != null) {
+             buf.writeComponent(this.adventure$content);
+         } else if (this.content != null) {
+-        buf.writeUtf(this.content, 262144); // Spigot
++        buf.writeUtf(this.content, 262144, true); // Spigot // Fiddle - client perspective - localization - expose target client properties - store connection explicitly in packets that may contain raw JSON text
+         } else {
+             throw new IllegalArgumentException("Must supply either adventure component or string json content");
+         }
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundTagQueryPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundTagQueryPacket.java
+index e778322664bdd88bc34605f82c90ca7a5994e2f5..c4a0d513c9f9b6f037106cd93503d207871fea12 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundTagQueryPacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundTagQueryPacket.java
+@@ -3,19 +3,21 @@ package net.minecraft.network.protocol.game;
+ import javax.annotation.Nullable;
+ import net.minecraft.nbt.CompoundTag;
+ import net.minecraft.network.FriendlyByteBuf;
+-import net.minecraft.network.protocol.Packet;
++import org.fiddlemc.fiddle.packet.PacketWithExplicitTargetClientConnection;
+ 
+-public class ClientboundTagQueryPacket implements Packet<ClientGamePacketListener> {
++public class ClientboundTagQueryPacket extends PacketWithExplicitTargetClientConnection<ClientGamePacketListener> { // Fiddle - client perspective - localization - expose target client properties - store connection explicitly in packets that may contain raw JSON text
+     private final int transactionId;
+     @Nullable
+     private final CompoundTag tag;
+ 
+     public ClientboundTagQueryPacket(int transactionId, @Nullable CompoundTag nbt) {
++        super(); // Fiddle - client perspective - localization - expose target client properties - store connection explicitly in packets that may contain raw JSON text
+         this.transactionId = transactionId;
+         this.tag = nbt;
+     }
+ 
+     public ClientboundTagQueryPacket(FriendlyByteBuf buf) {
++        super(); // Fiddle - client perspective - localization - expose target client properties - store connection explicitly in packets that may contain raw JSON text
+         this.transactionId = buf.readVarInt();
+         this.tag = buf.readNbt();
+     }

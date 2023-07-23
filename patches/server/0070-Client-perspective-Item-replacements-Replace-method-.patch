@@ -1,0 +1,205 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sat, 22 Jul 2023 20:36:12 +0200
+Subject: [PATCH] Client perspective - Item replacements - Replace method
+ implementation
+
+License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/bukkit/craftbukkit/inventory/CraftMetaItem.java b/src/main/java/org/bukkit/craftbukkit/inventory/CraftMetaItem.java
+index 51bc172de7274db043a3009d0ae815dec2894a6c..4a5a0001d80938e83d54d454f1c3e3e06e51b3b6 100644
+--- a/src/main/java/org/bukkit/craftbukkit/inventory/CraftMetaItem.java
++++ b/src/main/java/org/bukkit/craftbukkit/inventory/CraftMetaItem.java
+@@ -112,9 +112,11 @@ import java.util.Collections;
+  * <li> SerializableMeta.Deserializers deserializer()
+  */
+ @DelegateDeserialization(CraftMetaItem.SerializableMeta.class)
+-class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
++// Fiddle start - client perspective - item replacements - package -> public
++public class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
+ 
+-    static class ItemMetaKey {
++    public static class ItemMetaKey {
++        // Fiddle end - client perspective - item replacements - package -> public
+ 
+         @Retention(RetentionPolicy.SOURCE)
+         @Target(ElementType.FIELD)
+@@ -128,7 +130,7 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
+         }
+ 
+         final String BUKKIT;
+-        final String NBT;
++        public final String NBT; // Fiddle - client perspective - item replacements - package -> public
+ 
+         ItemMetaKey(final String both) {
+             this(both, both);
+@@ -241,12 +243,14 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
+         }
+     }
+ 
+-    static final ItemMetaKey NAME = new ItemMetaKey("Name", "display-name");
++    public static final ItemMetaKey NAME = new ItemMetaKey("Name", "display-name"); // Fiddle - client perspective - item replacements - package -> public
+     static final ItemMetaKey LOCNAME = new ItemMetaKey("LocName", "loc-name");
+     @Specific(Specific.To.NBT)
+-    static final ItemMetaKey DISPLAY = new ItemMetaKey("display");
+-    static final ItemMetaKey LORE = new ItemMetaKey("Lore", "lore");
+-    static final ItemMetaKey CUSTOM_MODEL_DATA = new ItemMetaKey("CustomModelData", "custom-model-data");
++    // Fiddle start - client perspective - item replacements - package -> public
++    public static final ItemMetaKey DISPLAY = new ItemMetaKey("display");
++    public static final ItemMetaKey LORE = new ItemMetaKey("Lore", "lore");
++    public static final ItemMetaKey CUSTOM_MODEL_DATA = new ItemMetaKey("CustomModelData", "custom-model-data");
++    // Fiddle end - client perspective - item replacements - package -> public
+     static final ItemMetaKey ENCHANTMENTS = new ItemMetaKey("Enchantments", "enchants");
+     @Specific(Specific.To.NBT)
+     static final ItemMetaKey ENCHANTMENTS_ID = new ItemMetaKey("id");
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/item/ItemStackInPacketReplacer.java b/src/main/java/org/fiddlemc/fiddle/packet/item/ItemStackInPacketReplacer.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..40b118083f9076b7a4f41a36f932066692c891c8
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/packet/item/ItemStackInPacketReplacer.java
+@@ -0,0 +1,144 @@
++// Fiddle - client perspective - item replacements
++
++package org.fiddlemc.fiddle.packet.item;
++
++import net.minecraft.nbt.Tag;
++import net.minecraft.network.chat.Component;
++import net.minecraft.network.chat.Style;
++import net.minecraft.network.chat.contents.TranslatableContents;
++import net.minecraft.network.protocol.Packet;
++import net.minecraft.world.item.Item;
++import net.minecraft.world.item.ItemStack;
++import org.bukkit.craftbukkit.inventory.CraftMetaItem;
++import org.fiddlemc.fiddle.packet.ClientPerspective;
++import org.fiddlemc.fiddle.packet.ClientPerspectiveCategory;
++import org.fiddlemc.fiddle.packet.locale.ServerSideTranslations;
++import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
++
++/**
++ * A class that statically provides the {@link #replace} functionality
++ * to replace {@link ItemStack}s in outgoing packets.
++ */
++public final class ItemStackInPacketReplacer {
++
++    private ItemStackInPacketReplacer() {
++        throw new RuntimeException();
++    }
++
++    /**
++     * @return A replacement for the given {@link ItemStack},
++     * for the purpose of being included in an outgoing {@link Packet}.
++     * The appropriate replacement depends on the {@linkplain ItemStackInPacketContext context}
++     * and the {@linkplain ClientPerspective target client's perspective}.
++     * The returned value is either:
++     * <ul>
++     *     <li>the given {@code original} {@link ItemStack} instance itself, without any modifications, or</li>
++     *     <li>a different (likely, but not necessarily, specially constructed) {@link ItemStack} instance,</li>
++     * </ul>
++     * i.e. the given {@link ItemStack} is not modified in-place.
++     */
++    public static @NotNull ItemStack replace(@NotNull ItemStack original, @NotNull ItemStackInPacketContext context, @NotNull ClientPerspective clientPerspective, @Nullable String clientLocale) {
++
++        // We assume the client mod understands all items, so no replacement is necessary for clients with that mod
++        if (clientPerspective.category == ClientPerspectiveCategory.JAVA_WITH_FIDDLE_CLIENT_MOD) {
++            return original;
++        }
++
++        // This variable will be initialized when a replacement is actually necessary
++        @Nullable ItemStack replacement = null;
++
++        // First, we change the type and set custom model data if necessary
++        var originalItem = original.getItem();
++        var visualHandleOrProvider = originalItem.visualHandleOrProvider;
++        @Nullable VisualHandle visualHandle;
++        if (visualHandleOrProvider == null) {
++            visualHandle = null;
++        } else if (visualHandleOrProvider instanceof VisualHandle visualHandleOrProviderAsVisualHandle) {
++            visualHandle = visualHandleOrProviderAsVisualHandle;
++        } else {
++            visualHandle = ((VisualHandleProvider) visualHandleOrProvider).getDesiredVisualHandle(original);
++        }
++        if (visualHandle != null) {
++            var replacementItemAndCustomModelData = visualHandle.getReplacementItemAndCustomModelData(clientPerspective, context.typeAndCustomModelDataMapping);
++            if (replacementItemAndCustomModelData != null) {
++                Item existingItem;
++                int existingCustomModelData = 0;
++                {
++                    var itemPlannedToSend = replacement != null ? replacement : original;
++                    existingItem = itemPlannedToSend.getItem();
++                    if (itemPlannedToSend.hasTag()) {
++                        var existingTag = itemPlannedToSend.getTag();
++                        if (existingTag.contains(CraftMetaItem.CUSTOM_MODEL_DATA.NBT, Tag.TAG_INT)) {
++                            existingCustomModelData = existingTag.getInt(CraftMetaItem.CUSTOM_MODEL_DATA.NBT);
++                        }
++                    }
++                }
++                Item newItem = replacementItemAndCustomModelData.left();
++                int newCustomModelData = replacementItemAndCustomModelData.right();
++                if (newItem != existingItem) {
++                    if (replacement == null) {
++                        replacement = original.copy();
++                    }
++                    replacement.setItem(newItem);
++                }
++                if (existingCustomModelData != newCustomModelData) {
++                    if (replacement == null) {
++                        replacement = original.copy();
++                    }
++                    replacement.getOrCreateTag().putInt(CraftMetaItem.CUSTOM_MODEL_DATA.NBT, newCustomModelData);
++                }
++            }
++        }
++
++        if (context.attemptToChangeDisplayName) {
++
++            // Next, we set the right translatable display name for items that need it
++            var originalName = originalItem.getName(original);
++            if (originalName.getContents() instanceof TranslatableContents translatableContents) {
++                String translationKey = translatableContents.getKey();
++                if (ServerSideTranslations.hasTranslatableReplacement(translationKey, clientLocale)) {
++                    // Only if there is not already a custom display name
++                    boolean hasCustomDisplayName = false;
++                    {
++                        var itemPlannedToSend = replacement != null ? replacement : original;
++                        var tag = itemPlannedToSend.getTag();
++                        if (itemPlannedToSend.hasTag()) {
++                            if (tag.contains(CraftMetaItem.DISPLAY.NBT, Tag.TAG_COMPOUND)) {
++                                var display = tag.getCompound(CraftMetaItem.DISPLAY.NBT);
++                                if (display.contains(CraftMetaItem.NAME.NBT, Tag.TAG_STRING)) {
++                                    hasCustomDisplayName = true;
++                                }
++                            }
++                        }
++                    }
++                    if (!hasCustomDisplayName) {
++                        if (replacement == null) {
++                            replacement = original.copy();
++                        }
++                        var tag = replacement.getOrCreateTag();
++                        var display = tag.getCompound(CraftMetaItem.DISPLAY.NBT);
++                        if (!tag.contains(CraftMetaItem.DISPLAY.NBT, Tag.TAG_COMPOUND)) {
++                            tag.put(CraftMetaItem.DISPLAY.NBT, display);
++                        }
++                        display.putString(CraftMetaItem.NAME.NBT, Component.Serializer.toJson(originalName.copy().withStyle(Style.EMPTY.withItalic(false))));
++                    }
++                }
++            }
++
++            // If the intended rarity is not equal to the client-side rarity of the item sent, modify the display name color
++            // This includes the cyan color of the display name if it has (no) enchantments
++            // TODO
++
++        }
++
++        // TODO If a replacement was constructed with a different type, set its durability to the same percentage as the original's durability
++
++        // TODO If a replacement was constructed, store the original item in the NBT if the player is in creative mode
++
++        // Return the replacement if one was constructed, else return the original
++        return replacement != null ? replacement : original;
++
++    }
++
++}

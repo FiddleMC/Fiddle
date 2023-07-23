@@ -37,10 +37,10 @@ index 6d129fd434ae2a3f6bbda700b1a8a7022f168c19..fe8dbc73b4d0617428dd3619ec2a5c2d
  }
 diff --git a/src/main/java/org/fiddlemc/fiddle/packet/block/BlockStateVisualizationSetup.java b/src/main/java/org/fiddlemc/fiddle/packet/block/BlockStateVisualizationSetup.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..f89dfbcf9b666fb8ce15e98a24f5f4d8a592141f
+index 0000000000000000000000000000000000000000..ccc3d75d0464051e14bdb7f040dea3fbde5b3ce8
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/packet/block/BlockStateVisualizationSetup.java
-@@ -0,0 +1,42 @@
+@@ -0,0 +1,56 @@
 +// Fiddle - client perspective - block state visualization - dynamic setup
 +
 +package org.fiddlemc.fiddle.packet.block;
@@ -63,6 +63,20 @@ index 0000000000000000000000000000000000000000..f89dfbcf9b666fb8ce15e98a24f5f4d8
 +     * may change, based on dynamic circumstances.
 +     * The setup must conform to the requirements set out in the documentation of
 +     * {@link BlockStateVisualizationSetupProvider#getVisualization(BlockState, ClientPerspective)}.
++     * <br>
++     * This method is called irrespective of a setup already being completed for the block in the given world
++     * and at the given coordinates: it is called any time a block update is sent to a player.
++     * In other words, if the block has remained visible to the player (i.e. not going out of view distance range),
++     * and this method has already been called a previous time, leading to some setup having been performed for
++     * the {@link BlockState} that was passed at that time, then when something leads to a block state update packet
++     * for that block being sent to the player again (normally a change in the physical state of the block), this
++     * method is called again.
++     * The implementation of this method must perform a setup that makes sure, if necessary,
++     * that an independent listener for a change in block state is registered,
++     * so that the listener can remove any active listeners associated with the old block state,
++     * that will not be relevant anymore for the new block state.
++     * The relevant setup associated with the new block state is then performed due to this method being called
++     * on the {@link BlockStateVisualizationSetup} associated with the new {@link BlockState}.
 +     *
 +     * @param level The world of the block.
 +     * @param x The x coordinate of the block.

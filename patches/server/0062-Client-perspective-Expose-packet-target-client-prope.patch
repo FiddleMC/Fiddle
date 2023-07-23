@@ -1,0 +1,41 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sat, 22 Jul 2023 15:06:25 +0200
+Subject: [PATCH] Client perspective - Expose packet target client properties -
+ Implement for bundle packets
+
+License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/network/protocol/BundlePacket.java b/src/main/java/net/minecraft/network/protocol/BundlePacket.java
+index 0462cbff6eb3366077c1628c0c8a10e99c9fdf90..d02e52fdd7ac6cd13fb0e479251c684e40d82a6a 100644
+--- a/src/main/java/net/minecraft/network/protocol/BundlePacket.java
++++ b/src/main/java/net/minecraft/network/protocol/BundlePacket.java
+@@ -2,11 +2,13 @@ package net.minecraft.network.protocol;
+ 
+ import net.minecraft.network.FriendlyByteBuf;
+ import net.minecraft.network.PacketListener;
++import org.fiddlemc.fiddle.packet.PacketWithExplicitTargetClientConnection;
+ 
+-public abstract class BundlePacket<T extends PacketListener> implements Packet<T> {
++public abstract class BundlePacket<T extends PacketListener> extends PacketWithExplicitTargetClientConnection<T> { // Fiddle - client perspective - packets are modifiable - expose target client properties - bundle
+     protected Iterable<Packet<T>> packets; // Fiddle - client perspective - packets are modifiable - bundle - private -> protected, non-final -> final
+ 
+     protected BundlePacket(Iterable<Packet<T>> packets) {
++        super(); // Fiddle - client perspective - packets are modifiable - expose target client properties - bundle
+         this.packets = packets;
+     }
+ 
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundBundlePacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundBundlePacket.java
+index 346f4fe2568bd4530062b55cf119b8d96f8f8c8f..12e1490c358652532ce40a5bf388bc34501c2e1c 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundBundlePacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundBundlePacket.java
+@@ -44,7 +44,7 @@ public class ClientboundBundlePacket extends BundlePacket<ClientGamePacketListen
+     }
+ 
+     @Override
+-    public @NotNull ClientboundBundlePacket adaptForClient(@NotNull Connection connection) {
++    public @NotNull ClientboundBundlePacket postSetConnectionAdaptForClient(@NotNull Connection connection) { // Fiddle - client perspective - packets are modifiable - expose target client properties - bundle
+         if (!this.mayBeSentToMultipleTargetClients && this.packets instanceof ArrayList<Packet<ClientGamePacketListener>> packetsAsList) {
+             // If this.mayBeSentToMultipleTargetClients os false and the packet iterable is an ArrayList, modify it in-place
+             for (int i = 0; i < packetsAsList.size(); i++) {

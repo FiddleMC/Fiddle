@@ -1,0 +1,169 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sat, 22 Jul 2023 10:42:01 +0200
+Subject: [PATCH] Client perspective - Wait for client information
+
+Ensures that the servers waits for a ServerboundClientInformationPacket
+(which is send by the Notchian client in response to a ClienboundLoginPacket)
+before sending any further packets.
+This guarantees that items in the inventory, entities, blocks, messages and more that are
+sent to the player are updated in accordance with the client settings (such as locale).
+
+License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/network/Connection.java b/src/main/java/net/minecraft/network/Connection.java
+index cf20f0983fc25b26cf92b9d3a28746b1909fc56b..92e3e2eaa14958ac56a22f3730ad69bf659109f1 100644
+--- a/src/main/java/net/minecraft/network/Connection.java
++++ b/src/main/java/net/minecraft/network/Connection.java
+@@ -41,9 +41,11 @@ import net.minecraft.network.protocol.PacketFlow;
+ import net.minecraft.network.protocol.game.ClientboundDisconnectPacket;
+ import net.minecraft.network.protocol.login.ClientboundLoginDisconnectPacket;
+ import net.minecraft.server.RunningOnDifferentThreadException;
++import net.minecraft.server.network.ServerGamePacketListenerImpl;
+ import net.minecraft.util.LazyLoadedValue;
+ import net.minecraft.util.Mth;
+ import org.apache.commons.lang3.Validate;
++import org.jetbrains.annotations.NotNull;
+ import org.slf4j.Logger;
+ import org.slf4j.Marker;
+ import org.slf4j.MarkerFactory;
+@@ -175,6 +177,11 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+     }
+     // Paper end - packet limiter
+ 
++    // Fiddle start - client perspective - wait for client information
++    private boolean receivedResourcePackStatus = false;
++    private boolean receivedClientInformation = false;
++    // Fiddle end - client perspective - wait for client information
++
+     public Connection(PacketFlow side) {
+         this.receiving = side;
+     }
+@@ -851,6 +858,29 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+         return this.averageSentPackets;
+     }
+ 
++    // Fiddle start - client perspective - wait for client information
++    public final void receivedResourcePackStatus(@NotNull ServerGamePacketListenerImpl playerconnection) {
++        if (this.receivedResourcePackStatus) {
++            return;
++        }
++        this.receivedResourcePackStatus = true;
++        playerconnection.server.getPlayerList().placeNewPlayerAfterReceiveResourcePackStatus(playerconnection);
++        if (this.receivedClientInformation) {
++            playerconnection.server.getPlayerList().placeNewPlayerAfterReceiveClientInformation();
++        }
++    }
++
++    public final void receivedClientInformation(@NotNull ServerGamePacketListenerImpl playerconnection) {
++        if (this.receivedClientInformation) {
++            return;
++        }
++        this.receivedClientInformation = true;
++        if (this.receivedResourcePackStatus) {
++            playerconnection.server.getPlayerList().placeNewPlayerAfterReceiveClientInformation();
++        }
++    }
++    // Fiddle end - client perspective - wait for client information
++
+     private static class PacketHolder {
+ 
+         final Packet<?> packet;
+diff --git a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
+index 8e90ffa0d59ed708ab53c1b761a2c2a1a20a1e7b..33fb5a3036d04acdd6c70b843d2681367c83b114 100644
+--- a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
++++ b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
+@@ -256,7 +256,7 @@ public class ServerGamePacketListenerImpl implements ServerPlayerConnection, Tic
+     private static final int TRACKED_MESSAGE_DISCONNECT_THRESHOLD = 4096;
+     private static final Component CHAT_VALIDATION_FAILED = Component.translatable("multiplayer.disconnect.chat_validation_failed");
+     public final Connection connection; // Paper
+-    private final MinecraftServer server;
++    public final MinecraftServer server; // Fiddle - client perspective - wait for client information - private -> public
+     public ServerPlayer player;
+     private int tickCount;
+     private int ackBlockChangesUpTo = -1;
+@@ -2075,7 +2075,7 @@ public class ServerGamePacketListenerImpl implements ServerPlayerConnection, Tic
+         this.cserver.getPluginManager().callEvent(new PlayerResourcePackStatusEvent(this.getCraftPlayer(), packStatus)); // CraftBukkit
+         // Fiddle start - client perspective - send resource pack
+         if (packStatus != PlayerResourcePackStatusEvent.Status.ACCEPTED) { // Do not do anything for ACCEPTED because it just an intermediate status; all the other statuses are final
+-            this.server.getPlayerList().placeNewPlayerAfterReceiveResourcePackStatus(this);
++            this.connection.receivedResourcePackStatus(this); // Fiddle - client perspective - wait for client information
+         }
+         // Fiddle end - client perspective - send resource pack
+         // Paper end
+@@ -3500,6 +3500,7 @@ public class ServerGamePacketListenerImpl implements ServerPlayerConnection, Tic
+         }
+         // Paper end - do not accept invalid information
+         this.player.updateOptions(packet);
++        this.connection.receivedClientInformation(this); // Fiddle - client perspective - wait for client information
+     }
+ 
+     // CraftBukkit start
+diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
+index a8f80ef4b9d0eb9db19ea50155b26fd9df5db152..59b86861fa1a05ec4c8326f0f7d3f45c6326c4a3 100644
+--- a/src/main/java/net/minecraft/server/players/PlayerList.java
++++ b/src/main/java/net/minecraft/server/players/PlayerList.java
+@@ -195,6 +195,15 @@ public abstract class PlayerList {
+     }
+ 
+     public void placeNewPlayerAfterReceiveResourcePackStatus(ServerGamePacketListenerImpl playerconnection) {
++        // Fiddle start - client perspective - wait for client information
++        ServerPlayer finalPlayer;
++        String finalS;
++        CompoundTag finalNbttagcompound;
++        ServerLevel finalWorldserver1;
++        String finalS1;
++        LevelData finalWorlddata;
++        {
++        // Fiddle end - client perspective - wait for client information
+         ServerPlayer player = playerconnection.player;
+         if (player.hasBeenPlacedIntoPlayerList) {
+             return;
+@@ -298,6 +307,30 @@ public abstract class PlayerList {
+ 
+         // Spigot - view distance
+         playerconnection.send(new ClientboundLoginPacket(player.getId(), worlddata.isHardcore(), player.gameMode.getGameModeForPlayer(), player.gameMode.getPreviousGameModeForPlayer(), this.server.levelKeys(), this.synchronizedRegistries, worldserver1.dimensionTypeId(), worldserver1.dimension(), BiomeManager.obfuscateSeed(worldserver1.getSeed()), this.getMaxPlayers(), worldserver1.getWorld().getSendViewDistance(), worldserver1.getWorld().getSimulationDistance(), flag1, !flag, worldserver1.isDebug(), worldserver1.isFlat(), player.getLastDeathLocation(), player.getPortalCooldown())); // Paper - replace old player chunk management
++        // Fiddle start - client perspective - wait for client information
++        finalPlayer = player;
++        finalS = s;
++        finalNbttagcompound = nbttagcompound;
++        finalWorldserver1 = worldserver1;
++        finalS1 = s1;
++        finalWorlddata = worlddata;
++        {
++            net.minecraft.core.Holder<net.minecraft.world.level.biome.Biome> plains = worldserver1.registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.BIOME)
++                .getHolderOrThrow(net.minecraft.world.level.biome.Biomes.PLAINS);
++            player.connection.send(new net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket(
++                new net.minecraft.world.level.chunk.EmptyLevelChunk(worldserver1, player.chunkPosition(), plains),
++                worldserver1.getLightEngine(), null, null, false)
++            );
++        }
++        }
++        this.placeNewPlayerAfterReceiveClientInformation = () -> {
++        var player = finalPlayer;
++        var s = finalS;
++        var nbttagcompound = finalNbttagcompound;
++        var worldserver1 = finalWorldserver1;
++        var s1 = finalS1;
++        var worlddata = finalWorlddata;
++        // Fiddle end - client perspective - wait for client information
+         player.getBukkitEntity().sendSupportedChannels(); // CraftBukkit
+         playerconnection.send(new ClientboundUpdateEnabledFeaturesPacket(FeatureFlags.REGISTRY.toNames(worldserver1.enabledFeatures())));
+         playerconnection.send(new ClientboundCustomPayloadPacket(ClientboundCustomPayloadPacket.BRAND, (new FriendlyByteBuf(Unpooled.buffer())).writeUtf(this.getServer().getServerModName())));
+@@ -425,6 +458,15 @@ public abstract class PlayerList {
+             );
+         }
+         // Paper end
++        // Fiddle start - client perspective - wait for client information
++        };
++    }
++
++    private Runnable placeNewPlayerAfterReceiveClientInformation;
++
++    public void placeNewPlayerAfterReceiveClientInformation() {
++        this.placeNewPlayerAfterReceiveClientInformation.run();
++        // Fiddle end - client perspective - wait for client information
+     }
+     private void mountSavedVehicle(ServerPlayer player, ServerLevel worldserver1, CompoundTag nbttagcompound) {
+         // Paper end

@@ -8,7 +8,7 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
-index a8f80ef4b9d0eb9db19ea50155b26fd9df5db152..385d74ec8917966356dc0f1ac9e72c9a487e25da 100644
+index 59b86861fa1a05ec4c8326f0f7d3f45c6326c4a3..a06505b733f6ff238c135d133b2aee38810247db 100644
 --- a/src/main/java/net/minecraft/server/players/PlayerList.java
 +++ b/src/main/java/net/minecraft/server/players/PlayerList.java
 @@ -101,6 +101,8 @@ import net.minecraft.world.scores.Objective;
@@ -34,7 +34,7 @@ index a8f80ef4b9d0eb9db19ea50155b26fd9df5db152..385d74ec8917966356dc0f1ac9e72c9a
  // CraftBukkit end
  
  public abstract class PlayerList {
-@@ -202,6 +198,7 @@ public abstract class PlayerList {
+@@ -211,6 +207,7 @@ public abstract class PlayerList {
          player.hasBeenPlacedIntoPlayerList = true;
          Connection connection = playerconnection.connection;
          // Fiddle end - client perspective - send resource pack

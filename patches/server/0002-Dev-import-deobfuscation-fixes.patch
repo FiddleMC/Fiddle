@@ -6,6 +6,18 @@ Subject: [PATCH] Dev import deobfuscation fixes
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundUpdateRecipesPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundUpdateRecipesPacket.java
+index a7564a2dfce361a62b14a0bd2a77b122eaaebca3..48c3443788692cf95eca384b166c017ab6e09028 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundUpdateRecipesPacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundUpdateRecipesPacket.java
+@@ -45,6 +45,6 @@ public class ClientboundUpdateRecipesPacket implements Packet<ClientGamePacketLi
+     public static <T extends Recipe<?>> void toNetwork(FriendlyByteBuf buf, T recipe) {
+         buf.writeResourceLocation(BuiltInRegistries.RECIPE_SERIALIZER.getKey(recipe.getSerializer()));
+         buf.writeResourceLocation(recipe.getId());
+-        recipe.getSerializer().toNetwork(buf, recipe);
++        ((net.minecraft.world.item.crafting.RecipeSerializer<T>) recipe.getSerializer()).toNetwork(buf, recipe); // Fiddle - dev import deobfuscation fixes
+     }
+ }
 diff --git a/src/main/java/net/minecraft/world/level/block/Blocks.java b/src/main/java/net/minecraft/world/level/block/Blocks.java
 index 877035b6c6593a28f475b9c5bcd7727e3fcdb802..f41e335be934d24080472be9d260f1be7c01614d 100644
 --- a/src/main/java/net/minecraft/world/level/block/Blocks.java

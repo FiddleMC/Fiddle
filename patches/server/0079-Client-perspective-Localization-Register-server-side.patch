@@ -1,0 +1,40 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sun, 23 Jul 2023 18:25:11 +0200
+Subject: [PATCH] Client perspective - Localization - Register server-side
+ translations
+
+License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
+index f3e896243744a55d4665fde40644e4d929a7f032..7b58c0218f8dbb46d0969cafa9b005f7f7922bd0 100644
+--- a/src/main/java/net/minecraft/server/Main.java
++++ b/src/main/java/net/minecraft/server/Main.java
+@@ -73,6 +73,7 @@ import org.bukkit.Material;
+ import org.fiddlemc.fiddle.packet.ClientPerspectiveCategory;
+ import org.fiddlemc.fiddle.packet.block.OnePerCategoryBlockStateVisualizationSetupProvider;
+ import org.fiddlemc.fiddle.packet.item.VanillaItemOverrideVisualHandle;
++import org.fiddlemc.fiddle.packet.locale.ServerSideTranslations;
+ import org.fiddlemc.fiddle.server.FiddleFeatureSupport;
+ import org.fiddlemc.fiddle.configuration.FiddleConfigurations;
+ import org.fiddlemc.fiddle.configuration.PermanenceConfirmation;
+@@ -234,6 +235,18 @@ public class Main {
+             Path path1 = Paths.get("server.properties");
+             DedicatedServerSettings dedicatedserversettings = new DedicatedServerSettings(optionset); // CraftBukkit - CLI argument support
+ 
++            // Fiddle start - client perspective - localization - register server-side translations
++            // TODO this is not read from the resource packs yet
++            for (var block : BuiltInRegistries.BLOCK) {
++                if (block.isAddedByFiddle()) {
++                    ServerSideTranslations.registerAddedTranslation("en_us", block.getDescriptionId(), "Fiddle " + block.getKeyInBlockRegistry().getPath());
++                    ServerSideTranslations.registerAddedTranslation("en_gb", block.getDescriptionId(), "Fiddle " + block.getKeyInBlockRegistry().getPath() + ", I say");
++                    ServerSideTranslations.registerAddedTranslation("zh_cn", block.getDescriptionId(), "小提琴 " + block.getKeyInBlockRegistry().getPath());
++                }
++            }
++            ServerSideTranslations.registerVanillaTranslationReplacement("en_us", "block.minecraft.bookshelf", "Oak Bookshelf");
++            // Fiddle end - client perspective - localization - register server-side translations
++
+             // Fiddle start - client perspective - block state visualization - determine and store visualizations
+             // TODO This doesn't do anything interesting yet: should be replaced with an actual mechanism that bases this on the resource pack assets
+             for (var block : BuiltInRegistries.BLOCK) {

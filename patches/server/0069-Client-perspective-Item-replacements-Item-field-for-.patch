@@ -1,0 +1,45 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sat, 22 Jul 2023 20:14:25 +0200
+Subject: [PATCH] Client perspective - Item replacements - Item field for
+ visual handle
+
+License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/world/item/Item.java b/src/main/java/net/minecraft/world/item/Item.java
+index ca46c812adbba87263a3fc82a05325fb7d179a6e..55ad80fa233054baf4a9c40136fb1f339775745c 100644
+--- a/src/main/java/net/minecraft/world/item/Item.java
++++ b/src/main/java/net/minecraft/world/item/Item.java
+@@ -50,6 +50,10 @@ import net.minecraft.world.level.block.Block;
+ import net.minecraft.world.level.block.state.BlockState;
+ import net.minecraft.world.phys.BlockHitResult;
+ import net.minecraft.world.phys.Vec3;
++import org.fiddlemc.fiddle.packet.ClientPerspective;
++import org.fiddlemc.fiddle.packet.block.BlockStateVisualizationSetupProvider;
++import org.fiddlemc.fiddle.packet.item.VisualHandle;
++import org.fiddlemc.fiddle.packet.item.VisualHandleProvider;
+ import org.jetbrains.annotations.NotNull;
+ import org.slf4j.Logger;
+ 
+@@ -106,6 +110,20 @@ public class Item implements FeatureElement, ItemLike {
+     private boolean isAddedByFiddle = false;
+     // Fiddle end - load packs - blocks - flag for added items
+ 
++    // Fiddle start - client perspective - item replacements - Item field for visual handle
++    /**
++     * One of the following:
++     * <ul>
++     *     <li>The {@link VisualHandleProvider} that provides the desired {@link VisualHandle}s
++     *     for {@link ItemStack}s of this {@linkplain Item item type}.</li>
++     *     <li>The desired {@link VisualHandle} of this item directly
++     *     (if it is the same for all {@link ItemStack}s of this item type).</li>
++     *     <li>Null if all {@link ItemStack}s of this item type can be sent unmodified to all possible clients.</li>
++     * </ul>
++     */
++    public @org.jetbrains.annotations.Nullable Object visualHandleOrProvider = null;
++    // Fiddle end - client perspective - item replacements - Item field for visual handle
++
+     public static int getId(Item item) {
+         return item == null ? 0 : item.getIndexInItemRegistry(); // Fiddle - cache registry indices as fields - use instead of lookup - item
+     }

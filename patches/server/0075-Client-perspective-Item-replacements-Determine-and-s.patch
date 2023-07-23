@@ -1,0 +1,45 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sun, 23 Jul 2023 12:05:40 +0200
+Subject: [PATCH] Client perspective - Item replacements - Determine and store
+ desired visual handles
+
+License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
+index b2da08d78b06beb78897377684d2e8aa36d6edce..f3e896243744a55d4665fde40644e4d929a7f032 100644
+--- a/src/main/java/net/minecraft/server/Main.java
++++ b/src/main/java/net/minecraft/server/Main.java
+@@ -55,6 +55,7 @@ import net.minecraft.util.profiling.jfr.Environment;
+ import net.minecraft.util.profiling.jfr.JvmProfiler;
+ import net.minecraft.util.worldupdate.WorldUpgrader;
+ import net.minecraft.world.flag.FeatureFlags;
++import net.minecraft.world.item.Items;
+ import net.minecraft.world.level.GameRules;
+ import net.minecraft.world.level.LevelSettings;
+ import net.minecraft.world.level.WorldDataConfiguration;
+@@ -71,6 +72,7 @@ import net.minecraft.world.level.storage.WorldData;
+ import org.bukkit.Material;
+ import org.fiddlemc.fiddle.packet.ClientPerspectiveCategory;
+ import org.fiddlemc.fiddle.packet.block.OnePerCategoryBlockStateVisualizationSetupProvider;
++import org.fiddlemc.fiddle.packet.item.VanillaItemOverrideVisualHandle;
+ import org.fiddlemc.fiddle.server.FiddleFeatureSupport;
+ import org.fiddlemc.fiddle.configuration.FiddleConfigurations;
+ import org.fiddlemc.fiddle.configuration.PermanenceConfirmation;
+@@ -245,6 +247,15 @@ public class Main {
+             }
+             // Fiddle end - client perspective - block state visualization - determine and store visualizations
+ 
++            // Fiddle start - client perspective - item replacements - determine and store desired visual handles
++            // TODO This doesn't do anything interesting yet: should be replaced with an actual mechanism that bases this on the resource pack assets
++            for (var item : BuiltInRegistries.ITEM) {
++                if (item.isAddedByFiddle()) {
++                    item.visualHandleOrProvider = new VanillaItemOverrideVisualHandle(Items.STONE, 0);
++                }
++            }
++            // Fiddle end - client perspective - item replacements - determine and store desired visual handles
++
+             // Fiddle start - modifiable Bukkit enums - inject runtime versions - common utilities
+             ClassLoader systemClassLoader = ClassLoader.getSystemClassLoader();
+             class InjectRuntimeClassVersionHelper {

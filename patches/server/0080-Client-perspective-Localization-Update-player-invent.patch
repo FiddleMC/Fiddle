@@ -1,0 +1,35 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sun, 23 Jul 2023 18:40:48 +0200
+Subject: [PATCH] Client perspective - Localization - Update player inventory
+ after locale change
+
+License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
+index fe8dbc73b4d0617428dd3619ec2a5c2d5a267553..e9b0e336e87f0bc12bdc96c2380f03960756f9c1 100644
+--- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
++++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
+@@ -2040,12 +2040,20 @@ public class ServerPlayer extends Player {
+             PlayerChangedMainHandEvent event = new PlayerChangedMainHandEvent(this.getBukkitEntity(), getMainArm() == HumanoidArm.LEFT ? MainHand.LEFT : MainHand.RIGHT);
+             this.server.server.getPluginManager().callEvent(event);
+         }
+-        if (this.locale == null || !this.locale.equals(packet.language)) { // Paper - check for null
++        // Fiddle start - client perspective - localization - update inventory after locale change
++        boolean localeChanged = this.locale == null || !this.locale.equals(packet.language);
++        if (localeChanged) { // Paper - check for null
++            // Fiddle end - client perspective - localization - update inventory after locale change
+             PlayerLocaleChangeEvent event = new PlayerLocaleChangeEvent(this.getBukkitEntity(), packet.language);
+             this.server.server.getPluginManager().callEvent(event);
+             this.server.server.getPluginManager().callEvent(new com.destroystokyo.paper.event.player.PlayerLocaleChangeEvent(this.getBukkitEntity(), this.locale, packet.language)); // Paper
+         }
+         this.locale = packet.language;
++        // Fiddle start - client perspective - localization - update inventory after locale change
++        if (localeChanged) {
++            this.getBukkitEntity().updateInventory();
++        }
++        // Fiddle end - client perspective - localization - update inventory after locale change
+         // Paper start
+         this.adventure$locale = net.kyori.adventure.translation.Translator.parseLocale(this.locale);
+         this.connection.connection.channel.attr(PaperAdventure.LOCALE_ATTRIBUTE).set(this.adventure$locale);

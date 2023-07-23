@@ -1,0 +1,852 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sun, 23 Jul 2023 14:44:34 +0200
+Subject: [PATCH] Client perspective - Localization - Replace translatables in
+ raw JSON text
+
+License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/nbt/CompoundTag.java b/src/main/java/net/minecraft/nbt/CompoundTag.java
+index 7e94ebe06fc62293e665d6db19e42d947e7eb30f..f44c386133f640eb09781a2c18d08f306ab27f77 100644
+--- a/src/main/java/net/minecraft/nbt/CompoundTag.java
++++ b/src/main/java/net/minecraft/nbt/CompoundTag.java
+@@ -14,9 +14,11 @@ import java.util.Objects;
+ import java.util.Set;
+ import java.util.UUID;
+ import javax.annotation.Nullable;
++
+ import net.minecraft.CrashReport;
+ import net.minecraft.CrashReportCategory;
+ import net.minecraft.ReportedException;
++import org.fiddlemc.fiddle.packet.locale.ClientLocaleState;
+ 
+ public class CompoundTag implements Tag {
+     public static final Codec<CompoundTag> CODEC = Codec.PASSTHROUGH.comapFlatMap((dynamic) -> {
+@@ -135,9 +137,16 @@ public class CompoundTag implements Tag {
+ 
+     @Override
+     public void write(DataOutput output) throws IOException {
++        // Fiddle start - client perspective - localization - replace translatables in raw JSON text
++        this.write(output, null);
++    }
++
++    @Override
++    public void write(DataOutput output, @Nullable ClientLocaleState targetClientLocaleState) throws IOException {
++        // Fiddle end - client perspective - localization - replace translatables in raw JSON text
+         for(String string : this.tags.keySet()) {
+             Tag tag = this.tags.get(string);
+-            writeNamedTag(string, tag, output);
++            writeNamedTag(string, tag, output, targetClientLocaleState); // Fiddle - client perspective - localization - replace translatables in raw JSON text
+         }
+ 
+         output.writeByte(0);
+@@ -492,10 +501,16 @@ public class CompoundTag implements Tag {
+     }
+ 
+     private static void writeNamedTag(String key, Tag element, DataOutput output) throws IOException {
++        // Fiddle start - client perspective - localization - replace translatables in raw JSON text
++        writeNamedTag(key, element, output, null);
++    }
++
++    private static void writeNamedTag(String key, Tag element, DataOutput output, @Nullable ClientLocaleState targetClientLocaleState) throws IOException {
++        // Fiddle end - client perspective - localization - replace translatables in raw JSON text
+         output.writeByte(element.getId());
+         if (element.getId() != 0) {
+             output.writeUTF(key);
+-            element.write(output);
++            element.write(output, targetClientLocaleState); // Fiddle - client perspective - localization - replace translatables in raw JSON text
+         }
+     }
+ 
+diff --git a/src/main/java/net/minecraft/nbt/ListTag.java b/src/main/java/net/minecraft/nbt/ListTag.java
+index b74b77ec2fd45c7a44e4f2696c4f57075c3d4080..6d94741f70cb3969d9fae96b060c74fb17068e9d 100644
+--- a/src/main/java/net/minecraft/nbt/ListTag.java
++++ b/src/main/java/net/minecraft/nbt/ListTag.java
+@@ -2,6 +2,9 @@ package net.minecraft.nbt;
+ 
+ import com.google.common.collect.Iterables;
+ import com.google.common.collect.Lists;
++import org.fiddlemc.fiddle.packet.locale.ClientLocaleState;
++import org.jetbrains.annotations.Nullable;
++
+ import java.io.DataInput;
+ import java.io.DataOutput;
+ import java.io.IOException;
+@@ -117,6 +120,13 @@ public class ListTag extends CollectionTag<Tag> {
+ 
+     @Override
+     public void write(DataOutput output) throws IOException {
++        // Fiddle start - client perspective - localization - replace translatables in raw JSON text
++        this.write(output, null);
++    }
++
++    @Override
++    public void write(DataOutput output, @Nullable ClientLocaleState targetClientLocaleState) throws IOException {
++        // Fiddle end - client perspective - localization - replace translatables in raw JSON text
+         if (this.list.isEmpty()) {
+             this.type = 0;
+         } else {
+@@ -127,7 +137,7 @@ public class ListTag extends CollectionTag<Tag> {
+         output.writeInt(this.list.size());
+ 
+         for(Tag tag : this.list) {
+-            tag.write(output);
++            tag.write(output, targetClientLocaleState); // Fiddle - client perspective - localization - replace translatables in raw JSON text
+         }
+ 
+     }
+diff --git a/src/main/java/net/minecraft/nbt/NbtIo.java b/src/main/java/net/minecraft/nbt/NbtIo.java
+index 8101b9f29824138e549555fa9aff3913e49f1e50..581c4216fb1597d278407204cab967427eb1effc 100644
+--- a/src/main/java/net/minecraft/nbt/NbtIo.java
++++ b/src/main/java/net/minecraft/nbt/NbtIo.java
+@@ -15,10 +15,12 @@ import java.io.OutputStream;
+ import java.util.zip.GZIPInputStream;
+ import java.util.zip.GZIPOutputStream;
+ import javax.annotation.Nullable;
++
+ import net.minecraft.CrashReport;
+ import net.minecraft.CrashReportCategory;
+ import net.minecraft.ReportedException;
+ import net.minecraft.util.FastBufferedInputStream;
++import org.fiddlemc.fiddle.packet.locale.ClientLocaleState;
+ 
+ public class NbtIo {
+ 
+@@ -245,7 +247,13 @@ public class NbtIo {
+     }
+ 
+     public static void write(CompoundTag nbt, DataOutput output) throws IOException {
+-        NbtIo.writeUnnamedTag(nbt, output);
++        // Fiddle start - client perspective - localization - replace translatables in raw JSON text
++        write(nbt, output, null);
++    }
++
++    public static void write(CompoundTag nbt, DataOutput output, @Nullable ClientLocaleState targetClientLocaleState) throws IOException {
++        NbtIo.writeUnnamedTag(nbt, output, targetClientLocaleState);
++        // Fiddle end - client perspective - localization - replace translatables in raw JSON text
+     }
+ 
+     public static void parse(DataInput input, StreamTagVisitor scanner) throws IOException {
+@@ -274,10 +282,16 @@ public class NbtIo {
+     }
+ 
+     public static void writeUnnamedTag(Tag nbt, DataOutput output) throws IOException {
++        // Fiddle start - client perspective - localization - replace translatables in raw JSON text
++        writeUnnamedTag(nbt, output, null);
++    }
++
++    public static void writeUnnamedTag(Tag nbt, DataOutput output, @Nullable ClientLocaleState targetClientLocaleState) throws IOException {
++        // Fiddle end - client perspective - localization - replace translatables in raw JSON text
+         output.writeByte(nbt.getId());
+         if (nbt.getId() != 0) {
+             output.writeUTF("");
+-            nbt.write(output);
++            nbt.write(output, targetClientLocaleState); // Fiddle - client perspective - localization - replace translatables in raw JSON text
+         }
+     }
+ 
+diff --git a/src/main/java/net/minecraft/nbt/StringTag.java b/src/main/java/net/minecraft/nbt/StringTag.java
+index afe6bdb5995cfb9c9e76effc4c159163f9b6e367..5e9a01d831ea7ce1b1f6b3190f968a6c79a9c509 100644
+--- a/src/main/java/net/minecraft/nbt/StringTag.java
++++ b/src/main/java/net/minecraft/nbt/StringTag.java
+@@ -5,7 +5,12 @@ import java.io.DataOutput;
+ import java.io.IOException;
+ import java.io.UTFDataFormatException;
+ import java.util.Objects;
++
+ import net.minecraft.Util;
++import org.fiddlemc.fiddle.packet.locale.ClientLocaleState;
++import org.fiddlemc.fiddle.packet.locale.TranslatableReplacer;
++import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
+ 
+ public class StringTag implements Tag {
+     private static final int SELF_SIZE_IN_BYTES = 36;
+@@ -65,8 +70,25 @@ public class StringTag implements Tag {
+ 
+     @Override
+     public void write(DataOutput output) throws IOException {
++        // Fiddle start - client perspective - localization - replace translatables in raw JSON text
++        this.write(output, null);
++    }
++
++    private static @NotNull String modifyData(@NotNull String data, @Nullable ClientLocaleState targetClientLocaleState) {
++        if (targetClientLocaleState != null && TranslatableReplacer.couldContainTranslatables(data)) {
++            if (targetClientLocaleState.doesNotKnowServerSideTranslations()) {
++                return TranslatableReplacer.replaceTranslatables(data, targetClientLocaleState.getPerspective(), targetClientLocaleState.getLocale());
++            }
++        }
++        return data;
++    }
++
++    @Override
++    public void write(DataOutput output, @Nullable ClientLocaleState targetClientLocaleState) throws IOException {
++        var dataToWrite = modifyData(this.data, targetClientLocaleState);
++        // Fiddle end - client perspective - localization - replace translatables in raw JSON text
+         try {
+-            output.writeUTF(this.data);
++            output.writeUTF(dataToWrite); // Fiddle - client perspective - localization - replace translatables in raw JSON text
+         } catch (UTFDataFormatException var3) {
+             Util.logAndPauseIfInIde("Failed to write NBT String", var3);
+             output.writeUTF("");
+@@ -118,6 +140,13 @@ public class StringTag implements Tag {
+         return this.data;
+     }
+ 
++    // Fiddle start - client perspective - localization - replace translatables in raw JSON text
++    @Override
++    public String getAsString(@Nullable ClientLocaleState targetClientLocaleState) {
++        return modifyData(this.data, targetClientLocaleState);
++    }
++    // Fiddle end - client perspective - localization - replace translatables in raw JSON text
++
+     @Override
+     public void accept(TagVisitor visitor) {
+         visitor.visitString(this);
+diff --git a/src/main/java/net/minecraft/nbt/StringTagVisitor.java b/src/main/java/net/minecraft/nbt/StringTagVisitor.java
+index a687a0f17df30126d53a1e3a669dc6d157c23ed5..f5f995348658e461a6690ea6c81e4d55ff59eec2 100644
+--- a/src/main/java/net/minecraft/nbt/StringTagVisitor.java
++++ b/src/main/java/net/minecraft/nbt/StringTagVisitor.java
+@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
+ 
+ public class StringTagVisitor implements TagVisitor {
+     private static final Pattern SIMPLE_VALUE = Pattern.compile("[A-Za-z0-9._+-]+");
+-    private final StringBuilder builder = new StringBuilder();
++    protected final StringBuilder builder = new StringBuilder(); // Fiddle - client perspective - localization - replace translatables in raw JSON text
+ 
+     public String visit(Tag element) {
+         element.accept(this);
+@@ -106,7 +106,7 @@ public class StringTagVisitor implements TagVisitor {
+                 this.builder.append(',');
+             }
+ 
+-            this.builder.append((new StringTagVisitor()).visit(element.get(i)));
++            this.builder.append((this.createNewSimilarVisitor()).visit(element.get(i))); // Fiddle - client perspective - localization - replace translatables in raw JSON text
+         }
+ 
+         this.builder.append(']');
+@@ -123,7 +123,7 @@ public class StringTagVisitor implements TagVisitor {
+                 this.builder.append(',');
+             }
+ 
+-            this.builder.append(handleEscape(string)).append(':').append((new StringTagVisitor()).visit(compound.get(string)));
++            this.builder.append(handleEscape(string)).append(':').append((this.createNewSimilarVisitor()).visit(compound.get(string))); // Fiddle - client perspective - localization - replace translatables in raw JSON text
+         }
+ 
+         this.builder.append('}');
+@@ -137,4 +137,11 @@ public class StringTagVisitor implements TagVisitor {
+     public void visitEnd(EndTag element) {
+         this.builder.append("END");
+     }
++
++    // Fiddle start - client perspective - localization - replace translatables in raw JSON text
++    protected StringTagVisitor createNewSimilarVisitor() {
++        return new StringTagVisitor();
++    }
++    // Fiddle end - client perspective - localization - replace translatables in raw JSON text
++
+ }
+diff --git a/src/main/java/net/minecraft/nbt/Tag.java b/src/main/java/net/minecraft/nbt/Tag.java
+index 0c3fb39dfff42cc322b82c6da885d39f866aee41..ef54c23b38645c9cc9f6bbd6e4affc3ff5543cea 100644
+--- a/src/main/java/net/minecraft/nbt/Tag.java
++++ b/src/main/java/net/minecraft/nbt/Tag.java
+@@ -1,5 +1,9 @@
+ package net.minecraft.nbt;
+ 
++import org.fiddlemc.fiddle.packet.locale.ClientLocaleState;
++import org.fiddlemc.fiddle.packet.locale.StringTagVisitorWithClientLocaleState;
++import org.jetbrains.annotations.Nullable;
++
+ import java.io.DataOutput;
+ import java.io.IOException;
+ 
+@@ -26,6 +30,12 @@ public interface Tag {
+ 
+     void write(DataOutput output) throws IOException;
+ 
++    // Fiddle start - client perspective - localization - replace translatables in raw JSON text
++    default void write(DataOutput output, @Nullable ClientLocaleState targetClientLocaleState) throws IOException {
++        this.write(output);
++    }
++    // Fiddle end - client perspective - localization - replace translatables in raw JSON text
++
+     @Override
+     String toString();
+ 
+@@ -41,6 +51,12 @@ public interface Tag {
+         return (new StringTagVisitor()).visit(this);
+     }
+ 
++    // Fiddle start - client perspective - localization - replace translatables in raw JSON text
++    default String getAsString(@Nullable ClientLocaleState targetClientLocaleState) {
++        return (new StringTagVisitorWithClientLocaleState(targetClientLocaleState)).visit(this);
++    }
++    // Fiddle end - client perspective - localization - replace translatables in raw JSON text
++
+     void accept(TagVisitor visitor);
+ 
+     StreamTagVisitor.ValueResult accept(StreamTagVisitor visitor);
+diff --git a/src/main/java/net/minecraft/network/FriendlyByteBuf.java b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
+index a83826f6891aa723e3168805c42414e077a688ad..5b845ee6df35601dcf16150080abc5edda90bfef 100644
+--- a/src/main/java/net/minecraft/network/FriendlyByteBuf.java
++++ b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
+@@ -47,10 +47,7 @@ import java.util.List;
+ import java.util.Map;
+ import java.util.Optional;
+ import java.util.UUID;
+-import java.util.function.BiConsumer;
+-import java.util.function.Consumer;
+-import java.util.function.Function;
+-import java.util.function.IntFunction;
++import java.util.function.*;
+ import javax.annotation.Nullable;
+ import net.minecraft.Util;
+ import net.minecraft.core.BlockPos;
+@@ -83,9 +80,10 @@ import net.minecraft.world.level.Level;
+ import net.minecraft.world.phys.BlockHitResult;
+ import net.minecraft.world.phys.Vec3;
+ import org.fiddlemc.fiddle.packet.ClientPerspective;
+-import org.fiddlemc.fiddle.packet.PacketWithExplicitTargetClientPerspective;
+ import org.fiddlemc.fiddle.packet.item.ItemStackInPacketContext;
+ import org.fiddlemc.fiddle.packet.item.ItemStackInPacketReplacer;
++import org.fiddlemc.fiddle.packet.locale.ClientLocaleState;
++import org.fiddlemc.fiddle.packet.locale.TranslatableReplacer;
+ import org.jetbrains.annotations.NotNull;
+ import org.joml.Quaternionf;
+ import org.joml.Vector3f;
+@@ -561,18 +559,37 @@ public class FriendlyByteBuf extends ByteBuf {
+ 
+     // Paper start
+     public FriendlyByteBuf writeComponent(final net.kyori.adventure.text.Component component) {
+-        return this.writeUtf(PaperAdventure.asJsonString(component, this.adventure$locale), 262144);
++        // Fiddle start - client perspective - localization - replace translatables in raw JSON text
++        return writeComponent(component, true);
++    }
++
++    public FriendlyByteBuf writeComponent(final net.kyori.adventure.text.Component component, boolean attemptToReplaceTranslatables) {
++        return this.writeUtf(PaperAdventure.asJsonString(component, this.adventure$locale), 262144, attemptToReplaceTranslatables);
++        // Fiddle end - client perspective - localization - replace translatables in raw JSON text
+     }
+ 
+     @Deprecated
+     public FriendlyByteBuf writeComponent(final net.md_5.bungee.api.chat.BaseComponent[] component) {
+-        return this.writeUtf(net.md_5.bungee.chat.ComponentSerializer.toString(component), 262144);
++        // Fiddle start - client perspective - localization - replace translatables in raw JSON text
++        return this.writeComponent(component, true);
++    }
++
++    @Deprecated
++    public FriendlyByteBuf writeComponent(final net.md_5.bungee.api.chat.BaseComponent[] component, boolean attemptToReplaceTranslatables) {
++        return this.writeUtf(net.md_5.bungee.chat.ComponentSerializer.toString(component), 262144, attemptToReplaceTranslatables);
++        // Fiddle end - client perspective - localization - replace translatables in raw JSON text
+     }
+     // Paper end
+ 
+     public FriendlyByteBuf writeComponent(Component text) {
+         //return this.a(IChatBaseComponent.ChatSerializer.a(ichatbasecomponent), 262144); // Paper - comment
+-        return this.writeUtf(PaperAdventure.asJsonString(text, this.adventure$locale), 262144); // Paper
++        // Fiddle start - client perspective - localization - replace translatables in raw JSON text
++        return this.writeComponent(text, true);
++    }
++
++    public FriendlyByteBuf writeComponent(Component text, boolean attemptToReplaceTranslatables) {
++        return this.writeUtf(PaperAdventure.asJsonString(text, this.adventure$locale), 262144, attemptToReplaceTranslatables); // Paper
++        // Fiddle end - client perspective - localization - replace translatables in raw JSON text
+     }
+ 
+     public <T extends Enum<T>> T readEnum(Class<T> enumClass) {
+@@ -648,11 +665,17 @@ public class FriendlyByteBuf extends ByteBuf {
+     }
+ 
+     public FriendlyByteBuf writeNbt(@Nullable CompoundTag compound) {
++        // Fiddle start - client perspective - localization - replace translatables in raw JSON text
++        return this.writeNbt(compound, ClientLocaleState.forFriendlyByteBuf(this));
++    }
++
++    public FriendlyByteBuf writeNbt(@Nullable CompoundTag compound, @Nullable ClientLocaleState targetClientLocaleState) {
++        // Fiddle end - client perspective - localization - replace translatables in raw JSON text
+         if (compound == null) {
+             this.writeByte(0);
+         } else {
+             try {
+-                NbtIo.write(compound, (DataOutput) (new ByteBufOutputStream(this)));
++                NbtIo.write(compound, (DataOutput) (new ByteBufOutputStream(this)), targetClientLocaleState); // Fiddle - client perspective - localization - pass locale
+             } catch (Exception ioexception) { // CraftBukkit - IOException -> Exception
+                 throw new EncoderException(ioexception);
+             }
+@@ -767,16 +790,36 @@ public class FriendlyByteBuf extends ByteBuf {
+     }
+ 
+     public FriendlyByteBuf writeUtf(String string) {
+-        return this.writeUtf(string, 32767);
++        // Fiddle start - client perspective - localization - replace translatables in raw JSON text
++        return this.writeUtf(string, false);
++    }
++
++    public FriendlyByteBuf writeUtf(String string, boolean attemptToReplaceTranslatables) {
++        return this.writeUtf(string, 32767, attemptToReplaceTranslatables);
++        // Fiddle end - client perspective - localization - replace translatables in raw JSON text
+     }
+ 
+     public FriendlyByteBuf writeUtf(String string, int maxLength) {
++        // Fiddle start - client perspective - localization - replace translatables in raw JSON text
++        return this.writeUtf(string, maxLength, false);
++    }
++
++    public FriendlyByteBuf writeUtf(String string, int maxLength, boolean attemptToReplaceTranslatables) {
++        // Fiddle end - client perspective - localization - replace translatables in raw JSON text
+         if (string.length() > maxLength) {
+             int j = string.length();
+ 
+             throw new EncoderException("String too big (was " + j + " characters, max " + maxLength + ")");
+         } else {
+-            byte[] abyte = string.getBytes(StandardCharsets.UTF_8);
++            // Fiddle start - client perspective - localization - replace translatables in raw JSON text
++            var stringToWrite = string;
++            if (attemptToReplaceTranslatables && TranslatableReplacer.couldContainTranslatables(stringToWrite)) {
++                if (ClientLocaleState.doesNotKnowServerSideTranslations(this.getExplicitTargetClientPerspective())) {
++                    stringToWrite = TranslatableReplacer.replaceTranslatables(stringToWrite, this.getExplicitTargetClientPerspective(), this.getExplicitTargetLocale());
++                }
++            }
++            byte[] abyte = stringToWrite.getBytes(StandardCharsets.UTF_8);
++            // Fiddle end - client perspective - localization - replace translatables in raw JSON text
+             int k = FriendlyByteBuf.getMaxEncodedUtfLength(maxLength);
+ 
+             if (abyte.length > k) {
+diff --git a/src/main/java/net/minecraft/network/chat/Component.java b/src/main/java/net/minecraft/network/chat/Component.java
+index 37fc353c3e59dd5af2fd6c58ac084fb0e6e155d7..3d6b4215c8ef0beb12a38aa0184553242732025b 100644
+--- a/src/main/java/net/minecraft/network/chat/Component.java
++++ b/src/main/java/net/minecraft/network/chat/Component.java
+@@ -94,6 +94,12 @@ public interface Component extends Message, FormattedText, Iterable<Component> {
+         return new MutableComponent(this.getContents(), new ArrayList(this.getSiblings()), this.getStyle());
+     }
+ 
++    // Fiddle start - client perspective - localization - replace translatables in raw JSON text
++    default MutableComponent withContents(ComponentContents contents) {
++        return new MutableComponent(contents, this.getSiblings(), this.getStyle());
++    }
++    // Fiddle end - client perspective - localization - replace translatables in raw JSON text
++
+     FormattedCharSequence getVisualOrderText();
+ 
+     @Override
+diff --git a/src/main/java/net/minecraft/network/chat/HoverEvent.java b/src/main/java/net/minecraft/network/chat/HoverEvent.java
+index ff30185d58546f7140190275953bfa3da1dd15fa..bc272ed59e8ec986f88334d0fda8a024d76f8fd1 100644
+--- a/src/main/java/net/minecraft/network/chat/HoverEvent.java
++++ b/src/main/java/net/minecraft/network/chat/HoverEvent.java
+@@ -10,6 +10,7 @@ import java.util.List;
+ import java.util.Map;
+ import java.util.Objects;
+ import java.util.UUID;
++import java.util.function.BiFunction;
+ import java.util.function.Function;
+ import java.util.stream.Stream;
+ import javax.annotation.Nullable;
+@@ -21,16 +22,25 @@ import net.minecraft.util.GsonHelper;
+ import net.minecraft.world.entity.EntityType;
+ import net.minecraft.world.item.Item;
+ import net.minecraft.world.item.ItemStack;
++import org.fiddlemc.fiddle.packet.locale.ClientLocaleState;
+ import org.slf4j.Logger;
+ 
+ public class HoverEvent {
+     static final Logger LOGGER = LogUtils.getLogger();
+     private final HoverEvent.Action<?> action;
+     private final Object value;
++    private final @Nullable ClientLocaleState targetClientLocaleState; // Fiddle - client perspective - localization - replace translatables in raw JSON text
+ 
+     public <T> HoverEvent(HoverEvent.Action<T> action, T contents) {
++        // Fiddle start - client perspective - localization - replace translatables in raw JSON text
++        this(action, contents, null);
++    }
++
++    public <T> HoverEvent(HoverEvent.Action<T> action, T contents, @Nullable ClientLocaleState targetClientLocaleState) {
++        // Fiddle end - client perspective - localization - replace translatables in raw JSON text
+         this.action = action;
+         this.value = contents;
++        this.targetClientLocaleState = targetClientLocaleState; // Fiddle - client perspective - localization - replace translatables in raw JSON text
+     }
+ 
+     public HoverEvent.Action<?> getAction() {
+@@ -87,26 +97,32 @@ public class HoverEvent {
+     }
+ 
+     public JsonObject serialize() {
++        // Fiddle start - client perspective - localization - replace translatables in raw JSON text
++        return this.serialize(this.targetClientLocaleState);
++    }
++
++    public JsonObject serialize(@Nullable ClientLocaleState targetClientLocaleState) {
++        // Fiddle end - client perspective - localization - replace translatables in raw JSON text
+         JsonObject jsonObject = new JsonObject();
+         jsonObject.addProperty("action", this.action.getName());
+-        jsonObject.add("contents", this.action.serializeArg(this.value));
++        jsonObject.add("contents", this.action.serializeArg(this.value, targetClientLocaleState)); // Fiddle - client perspective - localization - replace translatables in raw JSON text
+         return jsonObject;
+     }
+ 
+     public static class Action<T> {
+-        public static final HoverEvent.Action<Component> SHOW_TEXT = new HoverEvent.Action<>("show_text", true, Component.Serializer::fromJson, Component.Serializer::toJsonTree, Function.identity());
++        public static final HoverEvent.Action<Component> SHOW_TEXT = new HoverEvent.Action<>("show_text", true, Component.Serializer::fromJson, (value, targetClientLocaleState) -> Component.Serializer.toJsonTree(value), Function.identity()); // Fiddle - client perspective - localization - replace translatables in raw JSON text
+         public static final HoverEvent.Action<HoverEvent.ItemStackInfo> SHOW_ITEM = new HoverEvent.Action<>("show_item", true, HoverEvent.ItemStackInfo::create, HoverEvent.ItemStackInfo::serialize, HoverEvent.ItemStackInfo::create);
+-        public static final HoverEvent.Action<HoverEvent.EntityTooltipInfo> SHOW_ENTITY = new HoverEvent.Action<>("show_entity", true, HoverEvent.EntityTooltipInfo::create, HoverEvent.EntityTooltipInfo::serialize, HoverEvent.EntityTooltipInfo::create);
++        public static final HoverEvent.Action<HoverEvent.EntityTooltipInfo> SHOW_ENTITY = new HoverEvent.Action<>("show_entity", true, HoverEvent.EntityTooltipInfo::create, (value, targetClientLocaleState) -> value.serialize(), HoverEvent.EntityTooltipInfo::create); // Fiddle - client perspective - localization - replace translatables in raw JSON text
+         private static final Map<String, HoverEvent.Action<?>> LOOKUP = Stream.of(SHOW_TEXT, SHOW_ITEM, SHOW_ENTITY).collect(ImmutableMap.toImmutableMap(HoverEvent.Action::getName, (action) -> {
+             return action;
+         }));
+         private final String name;
+         private final boolean allowFromServer;
+         private final Function<JsonElement, T> argDeserializer;
+-        private final Function<T, JsonElement> argSerializer;
++        private final BiFunction<T, @org.jetbrains.annotations.Nullable ClientLocaleState, JsonElement> argSerializer; // Fiddle - client perspective - localization - replace translatables in raw JSON text
+         private final Function<Component, T> legacyArgDeserializer;
+ 
+-        public Action(String name, boolean parsable, Function<JsonElement, T> deserializer, Function<T, JsonElement> serializer, Function<Component, T> legacyDeserializer) {
++        public Action(String name, boolean parsable, Function<JsonElement, T> deserializer, BiFunction<T, @org.jetbrains.annotations.Nullable ClientLocaleState, JsonElement> serializer, Function<Component, T> legacyDeserializer) { // Fiddle - client perspective - localization - replace translatables in raw JSON text
+             this.name = name;
+             this.allowFromServer = parsable;
+             this.argDeserializer = deserializer;
+@@ -143,8 +159,10 @@ public class HoverEvent {
+             return object == null ? null : new HoverEvent(this, object);
+         }
+ 
+-        public JsonElement serializeArg(Object contents) {
+-            return this.argSerializer.apply(this.cast(contents));
++        // Fiddle start - client perspective - localization - replace translatables in raw JSON text
++        public JsonElement serializeArg(Object contents, @Nullable ClientLocaleState targetClientLocaleState) {
++            return this.argSerializer.apply(this.cast(contents), targetClientLocaleState);
++            // Fiddle end - client perspective - localization - replace translatables in raw JSON text
+         }
+ 
+         @Override
+@@ -319,7 +337,7 @@ public class HoverEvent {
+             }
+         }
+ 
+-        private JsonElement serialize() {
++        private JsonElement serialize(@Nullable ClientLocaleState targetClientLocaleState) { // Fiddle - client perspective - localization - replace translatables in raw JSON text
+             JsonObject jsonObject = new JsonObject();
+             jsonObject.addProperty("id", this.item.getKeyInItemRegistryString()); // Fiddle - cache registry keys as fields - use instead of lookup - item
+             if (this.count != 1) {
+@@ -327,7 +345,7 @@ public class HoverEvent {
+             }
+ 
+             if (this.tag != null) {
+-                jsonObject.addProperty("tag", this.tag.toString());
++                jsonObject.addProperty("tag", this.tag.getAsString(targetClientLocaleState)); // Fiddle - client perspective - localization - replace translatables in raw JSON text
+             }
+ 
+             return jsonObject;
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/locale/ClientLocaleState.java b/src/main/java/org/fiddlemc/fiddle/packet/locale/ClientLocaleState.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..6cc7f3b7550f6a5d13d8f3d14a0217271cb87504
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/packet/locale/ClientLocaleState.java
+@@ -0,0 +1,117 @@
++// Fiddle - client perspective - localization - replace translatables in raw JSON text
++
++package org.fiddlemc.fiddle.packet.locale;
++
++import net.minecraft.network.FriendlyByteBuf;
++import net.minecraft.server.level.ServerPlayer;
++import org.fiddlemc.fiddle.packet.ClientPerspective;
++import org.fiddlemc.fiddle.packet.ClientPerspectiveCategory;
++import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
++
++import java.lang.ref.WeakReference;
++
++/**
++ * A state indicating how the client interprets localized strings.
++ */
++public interface ClientLocaleState {
++
++    /**
++     * @return Whether the client certainly does not know server-side translations.
++     * This is typically true if the client has not received those translations in some way, e.g.
++     * via a resource pack or a packet interpreted by a client mod.
++     */
++    boolean doesNotKnowServerSideTranslations();
++
++    /**
++     * @return The {@link ClientPerspective} of the client.
++     */
++    @NotNull ClientPerspective getPerspective();
++
++    /**
++     * @return The {@link ServerPlayer#locale} set by this player, or null if not known.
++     */
++    @Nullable String getLocale();
++
++    static ClientLocaleState forFriendlyByteBuf(@NotNull FriendlyByteBuf friendlyByteBuf) {
++        return new ClientLocaleStateForFriendlyByteBuf(friendlyByteBuf);
++    }
++
++    static ClientLocaleState forValues(@NotNull ClientPerspective targetClientPerspective, @Nullable String targetClientLocale) {
++        return new ClientLocaleStateForValues(targetClientPerspective, targetClientLocale);
++    }
++
++    static boolean doesNotKnowServerSideTranslations(@NotNull ClientPerspective targetClientPerspective) {
++        return targetClientPerspective.category == ClientPerspectiveCategory.JAVA_DEFAULT;
++    }
++
++    class ClientLocaleStateForFriendlyByteBuf implements ClientLocaleState {
++
++        private final @NotNull WeakReference<FriendlyByteBuf> friendlyByteBuf;
++        private boolean isNotCached = true;
++        private @Nullable ClientPerspective perspective;
++        private boolean doesNotKnowServerSideTranslations;
++        private @Nullable String locale;
++
++        private ClientLocaleStateForFriendlyByteBuf(@NotNull FriendlyByteBuf friendlyByteBuf) {
++            this.friendlyByteBuf = new WeakReference<>(friendlyByteBuf);
++        }
++
++        private void cacheIfNecessary() {
++            if (this.isNotCached) {
++                this.isNotCached = false;
++                this.perspective = this.friendlyByteBuf.get().getExplicitTargetClientPerspective();
++                this.doesNotKnowServerSideTranslations = ClientLocaleState.doesNotKnowServerSideTranslations(this.perspective);
++                this.locale = this.friendlyByteBuf.get().getExplicitTargetLocale();
++            }
++        }
++
++        @Override
++        public boolean doesNotKnowServerSideTranslations() {
++            this.cacheIfNecessary();
++            return this.doesNotKnowServerSideTranslations;
++        }
++
++        @Override
++        public @NotNull ClientPerspective getPerspective() {
++            this.cacheIfNecessary();
++            return this.perspective;
++        }
++
++        @Override
++        public @Nullable String getLocale() {
++            this.cacheIfNecessary();
++            return this.locale;
++        }
++
++    }
++
++    class ClientLocaleStateForValues implements ClientLocaleState {
++
++        private final @NotNull ClientPerspective perspective;
++        private final boolean doesNotKnowServerSideTranslations;
++        private final @Nullable String locale;
++
++        private ClientLocaleStateForValues(@NotNull ClientPerspective perspective, @Nullable String locale) {
++            this.perspective = perspective;
++            this.doesNotKnowServerSideTranslations = ClientLocaleState.doesNotKnowServerSideTranslations(this.perspective);
++            this.locale = locale;
++        }
++
++        @Override
++        public boolean doesNotKnowServerSideTranslations() {
++            return this.doesNotKnowServerSideTranslations;
++        }
++
++        @Override
++        public @NotNull ClientPerspective getPerspective() {
++            return this.perspective;
++        }
++
++        @Override
++        public @Nullable String getLocale() {
++            return this.locale;
++        }
++    }
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/locale/StringTagVisitorWithClientLocaleState.java b/src/main/java/org/fiddlemc/fiddle/packet/locale/StringTagVisitorWithClientLocaleState.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..aa41a2d05a113361e2476a8744c66be4af4e8166
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/packet/locale/StringTagVisitorWithClientLocaleState.java
+@@ -0,0 +1,30 @@
++// Fiddle - client perspective - localization - replace translatables in raw JSON text
++
++package org.fiddlemc.fiddle.packet.locale;
++
++import net.minecraft.nbt.StringTag;
++import net.minecraft.nbt.StringTagVisitor;
++import org.jetbrains.annotations.Nullable;
++
++/**
++ * A {@link StringTagVisitor} that modifies raw JSON text before appending it.
++ */
++public class StringTagVisitorWithClientLocaleState extends StringTagVisitor {
++
++    private final @Nullable ClientLocaleState targetClientLocaleState;
++
++    public StringTagVisitorWithClientLocaleState(@Nullable ClientLocaleState targetClientLocaleState) {
++        this.targetClientLocaleState = targetClientLocaleState;
++    }
++
++    @Override
++    public void visitString(StringTag element) {
++        this.builder.append(StringTag.quoteAndEscape(element.getAsString(this.targetClientLocaleState)));
++    }
++
++    @Override
++    protected StringTagVisitor createNewSimilarVisitor() {
++        return new StringTagVisitorWithClientLocaleState(this.targetClientLocaleState);
++    }
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/locale/TranslatableReplacer.java b/src/main/java/org/fiddlemc/fiddle/packet/locale/TranslatableReplacer.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..48bd33db9b2b9afd18b50b3289321f7b9d43d0c1
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/packet/locale/TranslatableReplacer.java
+@@ -0,0 +1,147 @@
++// Fiddle - client perspective - localization - replace translatables in raw JSON text
++
++package org.fiddlemc.fiddle.packet.locale;
++
++import net.minecraft.network.chat.Component;
++import net.minecraft.network.chat.HoverEvent;
++import net.minecraft.network.chat.MutableComponent;
++import net.minecraft.network.chat.contents.LiteralContents;
++import net.minecraft.network.chat.contents.TranslatableContents;
++import org.fiddlemc.fiddle.packet.ClientPerspective;
++import org.fiddlemc.fiddle.packet.item.ItemStackInPacketContext;
++import org.fiddlemc.fiddle.packet.item.ItemStackInPacketReplacer;
++import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
++
++import java.util.List;
++
++/**
++ * A utility class providing functionality to replace translatable contents in raw JSON text
++ * for clients that do not know the server-side translations (because they don't have a resource pack or mod
++ * that includes those translations).
++ */
++public final class TranslatableReplacer {
++
++    private TranslatableReplacer() {
++        throw new RuntimeException();
++    }
++
++    /**
++     * @return If false, then the given string can certainly not contain any translatable components.
++     * If true, then it <i>may</i> contain translatable components.
++     */
++    public static boolean couldContainTranslatables(@NotNull String data) {
++        return data.contains("\"translate");
++    }
++
++    public static @NotNull String replaceTranslatables(@NotNull String data, @NotNull ClientPerspective targetClientPerspective, @Nullable String targetClientLocale) {
++        // Check for an occurrence that is sure to occur with translatable components (pre-deserialize optimization)
++        if (couldContainTranslatables(data)) {
++            try {
++                var component = Component.Serializer.fromJson(data);
++                if (component != null) {
++                    var modifiedComponent = replaceTranslatables(component, targetClientPerspective, targetClientLocale);
++                    if (modifiedComponent != component) {
++                        return Component.Serializer.toJson(modifiedComponent);
++                    }
++                }
++            } catch (Exception ignored) {}
++        }
++        return data;
++    }
++
++    public static @NotNull Component replaceTranslatables(@NotNull Component component, @NotNull ClientPerspective targetClientPerspective, @Nullable String targetClientLocale) {
++        MutableComponent modifiedComponent = null;
++
++        // Modify the siblings if necessary
++        var siblings = component.getSiblings();
++        List<Component> modifiedSiblings = null;
++        for (int i = 0; i < siblings.size(); i++) {
++            var sibling = siblings.get(i);
++            var modifiedSibling = replaceTranslatables(sibling, targetClientPerspective, targetClientLocale);
++            if (modifiedSibling != sibling) {
++                if (modifiedComponent == null) {
++                    modifiedComponent = component.copy();
++                    modifiedSiblings = modifiedComponent.getSiblings();
++                }
++                modifiedSiblings.set(i, modifiedSibling);
++            }
++        }
++
++        // Modify the style (specifically, the hover event) if necessary
++        var style = component.getStyle();
++        var hoverEvent = style.getHoverEvent();
++        if (hoverEvent != null) {
++            var hoverAction = hoverEvent.getAction();
++            HoverEvent modifiedHoverEvent = null;
++            if (hoverAction == HoverEvent.Action.SHOW_TEXT) {
++                var showTextValue = hoverEvent.getValue(HoverEvent.Action.SHOW_TEXT);
++                if (showTextValue != null) {
++                    var modifiedShowTextValue = replaceTranslatables(showTextValue, targetClientPerspective, targetClientLocale);
++                    if (modifiedShowTextValue != showTextValue) {
++                        modifiedHoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, modifiedShowTextValue);
++                    }
++                }
++            } else if (hoverAction == HoverEvent.Action.SHOW_ITEM) {
++                var showItemValue = hoverEvent.getValue(HoverEvent.Action.SHOW_ITEM);
++                if (showItemValue != null) {
++                    try {
++                        var showItemItemStack = showItemValue.getItemStack();
++                        var modifiedShowItemItemStack = ItemStackInPacketReplacer.replace(showItemItemStack, ItemStackInPacketContext.DEFAULT, targetClientPerspective, targetClientLocale);
++                        if (modifiedShowItemItemStack != showItemItemStack) {
++                            modifiedHoverEvent = new HoverEvent(HoverEvent.Action.SHOW_ITEM, new HoverEvent.ItemStackInfo(modifiedShowItemItemStack), ClientLocaleState.forValues(targetClientPerspective, targetClientLocale));
++                        }
++                    } catch (Exception ignored) {
++                    }
++                }
++            }
++            if (modifiedHoverEvent != null) {
++                if (modifiedComponent == null) {
++                    modifiedComponent = component.copy();
++                }
++                modifiedComponent.setStyle(style.withHoverEvent(modifiedHoverEvent));
++            }
++        }
++
++        // Modify the contents if necessary
++        var contents = component.getContents();
++        if (contents instanceof TranslatableContents translatableContents) {
++            var arguments = translatableContents.getArgs();
++            @Nullable Object[] modifiedArguments = null;
++            for (int argumentI = 0; argumentI < arguments.length; argumentI++) {
++                var argument = arguments[argumentI];
++                Object modifiedArgument;
++                if (argument instanceof String argumentAsString) {
++                    modifiedArgument = replaceTranslatables(argumentAsString, targetClientPerspective, targetClientLocale);
++                } else if (argument instanceof Component argumentAsComponent) {
++                    modifiedArgument = replaceTranslatables(argumentAsComponent, targetClientPerspective, targetClientLocale);
++                } else {
++                    modifiedArgument = argument;
++                }
++                if (modifiedArgument != argument) {
++                    if (modifiedArguments == null) {
++                        modifiedArguments = new Object[arguments.length];
++                        System.arraycopy(arguments, 0, modifiedArguments, 0, arguments.length);
++                    }
++                    modifiedArguments[argumentI] = modifiedArgument;
++                }
++            }
++            var translatableContentsWithModifiedArguments = modifiedArguments != null ? new TranslatableContents(translatableContents.getKey(), translatableContents.getFallback(), modifiedArguments) : translatableContents;
++            var modifiedContents = ServerSideTranslations.getTranslatableReplacement(translatableContentsWithModifiedArguments, targetClientLocale);
++            if (modifiedContents != contents) {
++                modifiedComponent = (modifiedComponent != null ? modifiedComponent : component).withContents(modifiedContents);
++            }
++        } else if (contents instanceof LiteralContents literalContents) {
++            var text = literalContents.text();
++            var modifiedText = replaceTranslatables(text, targetClientPerspective, targetClientLocale);
++            if (modifiedText != text) {
++                modifiedComponent = (modifiedComponent != null ? modifiedComponent : component).withContents(new LiteralContents(modifiedText));
++            }
++        }
++
++        // Return the modified component if modifications were made, or the original component otherwise
++        return modifiedComponent != null ? modifiedComponent : component;
++
++    }
++
++}
