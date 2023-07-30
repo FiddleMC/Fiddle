@@ -52,16 +52,16 @@ Fiddle is a Paper server fork that lets you add new blocks and items into Minecr
 
 Fiddle:
 * works with (existing) Bukkit plugins[^1]
-* adds blocks and items into the game in the same way a Minecraft update would
-* works with the vanilla client, both with/without a resource pack, and also offers a client-side mod with extra performance
-* modded blocks and items keep working after Minecraft updates
+* adds blocks and items into the game in the same way a Minecraft update would<!--* works with the vanilla client, both with/without a resource pack, and also offers a client-side mod with extra performance--><!--* modded blocks and items keep working after Minecraft updates-->
 * adding new blocks and items is simple using the standard resource and data pack format
-* allows Bukkit plugins to include custom blocks and items when used on a Fiddle server
+* allows Bukkit plugins to add and use custom blocks and items when on a Fiddle server
+
+You are very welcome to help with implementation, testing, sharing knowledge or giving suggestions.
 
 ## Installation
 
 Fiddle is a drop-in replacement for Paper.\
-You can download the latest stable JAR from [releases](https://github.com/FiddleMC/Fiddle/releases) and the latest development JAR from [actions](https://github.com/FiddleMC/Fiddle/actions).
+You can download <!--the latest stable JAR from [releases](https://github.com/FiddleMC/Fiddle/releases) and -->the latest development JAR from [actions](https://github.com/FiddleMC/Fiddle/actions).
 
 After running Fiddle once, you must open `fiddle.txt`, read the warning carefully, and set `modded=true`.
 
@@ -84,24 +84,20 @@ After running Fiddle once, you must open `fiddle.txt`, read the warning carefull
 
 [^1]: Some older plugins have still not updated to use 1.13+ namespaced ids. These plugins can still be used on Fiddle, but require having [backwards compatibility mode](https://github.com/FiddleMC/Fiddle/wiki/Plugin-compatibility#backwards-compatibility) enabled.
 
-## Adding blocks/items
+## Adding/creating blocks/items
 
-Modded blocks and items are defined in a pack (similar to a resource or data pack). 
-You can download packs made by others, or [create your own packs](https://github.com/FiddleMC/Fiddle/wiki/Making-packs) and share them.
-
-A pack is a `.zip` or `.rar` file. Packs can be placed in the `fiddle_packs` folder in the server root.\
+New content to add to the game, like blocks and items, are loaded by Fiddle from packs, similar to resource and data packs.\
+A pack is a `.zip` or `.rar` file. To install a pack, you can place it in the `fiddle_packs` folder in the server root.\
 *Example location:* `fiddle_packs/WillowTrees.zip`
 
-Bukkit plugins can also include custom blocks and items when used on a Fiddle server.
+You can download packs made by others, or [create your own packs](https://github.com/FiddleMC/Fiddle/wiki/Making-packs) and share them.
+
+Bukkit plugins can also add custom blocks and items.
 
 ## Demo
 
-An experimental version of Fiddle is already running on a small community server.
+An experimental version of Fiddle is already running on a small community server.\
 You can join *sucraft.org* and do `/warp Demo` to see it in action yourself.
-
-
-
-You are very welcome to join the project by adding code parts, testing, sharing knowledge or giving suggestions.
 
 ## Goals of the project
 
@@ -130,4 +126,4 @@ Custom blocks and items work fully with Bukkit plugins out of the box.
 This project has been made possible by:
 * the generous donation from <a href="https://github.com/pontaoski">Janet&nbsp;Blackquill</a>
 * the authors and maintainers of the Bukkit, [Spigot](https://www.spigotmc.org/) and [Paper](https://github.com/PaperMC/Paper) projects
-* everyone on GitHub and the [Discord](https://discord.gg/EduvcVmKS7) server who help test Fiddle and provide feedback and suggestions
+* everyone on GitHub and the [Discord](https://discord.gg/EduvcVmKS7) server who helps test Fiddle and provide feedback and suggestions
