@@ -1,0 +1,60 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sat, 29 Jul 2023 15:02:40 +0200
+Subject: [PATCH] Client perspective - Block state visualization - Define
+ perspective for chunk data
+
+License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/block/ClientChunkDataPerspective.java b/src/main/java/org/fiddlemc/fiddle/packet/block/ClientChunkDataPerspective.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..5ffaf39979d0409a93058913a88a053ed40afa88
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/packet/block/ClientChunkDataPerspective.java
+@@ -0,0 +1,45 @@
++// Fiddle - client perspective - block state visualization - define chunk data perspective
++
++package org.fiddlemc.fiddle.packet.block;
++
++import net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData;
++import net.minecraft.server.level.ServerPlayer;
++import org.fiddlemc.fiddle.packet.ClientPerspective;
++import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
++
++import java.util.Objects;
++
++/**
++ * A simple class representing the way that a client observes {@linkplain ClientboundLevelChunkPacketData chunk data}.
++ * This is a combination of a target client's {@linkplain ClientPerspective perspective},
++ * {@linkplain ServerPlayer#locale locale} and whether x-ray is applied to the chunk data.
++ */
++public class ClientChunkDataPerspective {
++
++    public final @NotNull ClientPerspective clientPerspective;
++    public final @Nullable String locale;
++    public final boolean applyAntiXray;
++
++    public ClientChunkDataPerspective(@NotNull ClientPerspective clientPerspective, @Nullable String locale, boolean applyAntiXray) {
++        this.clientPerspective = clientPerspective;
++        this.locale = locale;
++        this.applyAntiXray = applyAntiXray;
++    }
++
++    @Override
++    public int hashCode() {
++        return this.clientPerspective.hashCode() + 17737 * (31 + Objects.hashCode(this.locale)) + 47588381 * (7 + (this.applyAntiXray ? 1 : 0));
++    }
++
++    @Override
++    public boolean equals(Object obj) {
++        return obj instanceof ClientChunkDataPerspective other && other.clientPerspective.equals(this.clientPerspective) && Objects.equals(other.locale, this.locale) && other.applyAntiXray == this.applyAntiXray;
++    }
++
++    @Override
++    public String toString() {
++        return this.getClass().getSimpleName() + "{clientPerspective = " + clientPerspective + ",locale = \"" + locale + "\", applyAntiXray = " + applyAntiXray + "}";
++    }
++
++}

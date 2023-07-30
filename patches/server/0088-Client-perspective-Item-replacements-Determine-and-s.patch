@@ -8,7 +8,7 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index b2da08d78b06beb78897377684d2e8aa36d6edce..f3e896243744a55d4665fde40644e4d929a7f032 100644
+index e40e392cbe91fbf58b4068c8f94600de83ec114c..7b58c0218f8dbb46d0969cafa9b005f7f7922bd0 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
 @@ -55,6 +55,7 @@ import net.minecraft.util.profiling.jfr.Environment;
@@ -24,10 +24,10 @@ index b2da08d78b06beb78897377684d2e8aa36d6edce..f3e896243744a55d4665fde40644e4d9
  import org.fiddlemc.fiddle.packet.ClientPerspectiveCategory;
  import org.fiddlemc.fiddle.packet.block.OnePerCategoryBlockStateVisualizationSetupProvider;
 +import org.fiddlemc.fiddle.packet.item.VanillaItemOverrideVisualHandle;
+ import org.fiddlemc.fiddle.packet.locale.ServerSideTranslations;
  import org.fiddlemc.fiddle.server.FiddleFeatureSupport;
  import org.fiddlemc.fiddle.configuration.FiddleConfigurations;
- import org.fiddlemc.fiddle.configuration.PermanenceConfirmation;
-@@ -245,6 +247,15 @@ public class Main {
+@@ -258,6 +260,15 @@ public class Main {
              }
              // Fiddle end - client perspective - block state visualization - determine and store visualizations
  

@@ -52,7 +52,7 @@ index e1a178e1a4850d65c176c3a3599bb0cb5bd1976c..55f1e0f0c6e56364232da8b52186c0bb
  
          final Packet<?> packet;
 diff --git a/src/main/java/net/minecraft/network/protocol/Packet.java b/src/main/java/net/minecraft/network/protocol/Packet.java
-index c31cdd9ee5e60320d4df1474f11eaa0177bbeffd..09c8628acca6da9a3c32574f42ee907085441513 100644
+index c31cdd9ee5e60320d4df1474f11eaa0177bbeffd..e76551f5b3921f3e72833be43172f5c0fa8416ee 100644
 --- a/src/main/java/net/minecraft/network/protocol/Packet.java
 +++ b/src/main/java/net/minecraft/network/protocol/Packet.java
 @@ -3,8 +3,10 @@ package net.minecraft.network.protocol;
@@ -66,7 +66,7 @@ index c31cdd9ee5e60320d4df1474f11eaa0177bbeffd..09c8628acca6da9a3c32574f42ee9070
  
  public interface Packet<T extends PacketListener> {
      void write(FriendlyByteBuf buf);
-@@ -62,4 +64,40 @@ public interface Packet<T extends PacketListener> {
+@@ -62,4 +64,48 @@ public interface Packet<T extends PacketListener> {
      }
      // Fiddle end - client perspective - packets are modifiable
  
@@ -86,6 +86,14 @@ index c31cdd9ee5e60320d4df1474f11eaa0177bbeffd..09c8628acca6da9a3c32574f42ee9070
 +     */
 +    default @NotNull ClientPerspective getExplicitTargetClientPerspective() throws UnsupportedOperationException {
 +        throw new UnsupportedOperationException("Tried to call getExplicitTargetClientPerspective() on a " + Packet.class.getSimpleName() + " instance of type " + this.getClass().getName() + ", but no overriding implementation is available");
++    }
++
++    /**
++     * @return The same value as {@link #getExplicitTargetClientPerspective()}, except that it returns null
++     * where {@link #getExplicitTargetClientPerspective()} would otherwise throw an exception.
++     */
++    default @Nullable ClientPerspective getExplicitTargetClientPerspectiveOrNull() {
++        return null;
 +    }
 +
 +    /**
@@ -109,10 +117,10 @@ index c31cdd9ee5e60320d4df1474f11eaa0177bbeffd..09c8628acca6da9a3c32574f42ee9070
  }
 diff --git a/src/main/java/org/fiddlemc/fiddle/packet/PacketWithExplicitTargetClientConnection.java b/src/main/java/org/fiddlemc/fiddle/packet/PacketWithExplicitTargetClientConnection.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..6675c5fd83a5a0c52a1626706d28358bb3e4f54d
+index 0000000000000000000000000000000000000000..3ab6f8fabf9abad8e9dcc77fd62ba375b02d0e95
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/packet/PacketWithExplicitTargetClientConnection.java
-@@ -0,0 +1,52 @@
+@@ -0,0 +1,64 @@
 +// Fiddle - client perspective - packets are modifiable - expose target client properties
 +
 +package org.fiddlemc.fiddle.packet;
@@ -157,6 +165,18 @@ index 0000000000000000000000000000000000000000..6675c5fd83a5a0c52a1626706d28358b
 +    @Override
 +    public @NotNull ClientPerspective getExplicitTargetClientPerspective() throws NullPointerException {
 +        return Objects.requireNonNull(this.targetClientConnection.get().getPlayerClientPerspective());
++    }
++
++    @Override
++    public @Nullable ClientPerspective getExplicitTargetClientPerspectiveOrNull() throws NullPointerException {
++        if (this.targetClientConnection == null) {
++            return null;
++        }
++        var actualTargetClientConnection = this.targetClientConnection.get();
++        if (actualTargetClientConnection == null) {
++            return null;
++        }
++        return actualTargetClientConnection.getPlayerClientPerspective();
 +    }
 +
 +    @Override

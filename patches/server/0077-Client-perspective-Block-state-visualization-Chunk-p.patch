@@ -1,0 +1,232 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sat, 29 Jul 2023 15:48:17 +0200
+Subject: [PATCH] Client perspective - Block state visualization - Chunk
+ packets are for one client
+
+License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketBlockController.java b/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketBlockController.java
+index 52d2e2b744f91914802506e52a07161729bbcf3a..45a36b1ab5fd25fde483880ccb6bc2d0e766403d 100644
+--- a/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketBlockController.java
++++ b/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketBlockController.java
+@@ -23,7 +23,7 @@ public class ChunkPacketBlockController {
+         return null;
+     }
+ 
+-    public boolean shouldModify(ServerPlayer player, LevelChunk chunk) {
++    public boolean shouldApplyAntiXray(ServerPlayer player, LevelChunk chunk) { // Fiddle - client perspective - block state visualization - chunk packets are for a specific client - rename shouldModify to shouldApplyAntiXray
+         return false;
+     }
+ 
+diff --git a/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketBlockControllerAntiXray.java b/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketBlockControllerAntiXray.java
+index 42fdce97d99618a53f2e9c51804ff2205b574f69..b7a560dd487bcce9f28c3ee38f081d0cd9088fdb 100644
+--- a/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketBlockControllerAntiXray.java
++++ b/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketBlockControllerAntiXray.java
+@@ -164,7 +164,7 @@ public final class ChunkPacketBlockControllerAntiXray extends ChunkPacketBlockCo
+     }
+ 
+     @Override
+-    public boolean shouldModify(ServerPlayer player, LevelChunk chunk) {
++    public boolean shouldApplyAntiXray(ServerPlayer player, LevelChunk chunk) { // Fiddle - client perspective - block state visualization - chunk packets are for a specific client - rename shouldModify to shouldApplyAntiXray
+         return !usePermission || !player.getBukkitEntity().hasPermission("paper.antixray.bypass");
+     }
+ 
+diff --git a/src/main/java/io/papermc/paper/chunk/system/RegionizedPlayerChunkLoader.java b/src/main/java/io/papermc/paper/chunk/system/RegionizedPlayerChunkLoader.java
+index 924539d4ac50c70178ba220424ffacd6ff277c8b..b1c9cf5028383f8d4a663fdf9c6f4465ebeb453d 100644
+--- a/src/main/java/io/papermc/paper/chunk/system/RegionizedPlayerChunkLoader.java
++++ b/src/main/java/io/papermc/paper/chunk/system/RegionizedPlayerChunkLoader.java
+@@ -482,7 +482,7 @@ public class RegionizedPlayerChunkLoader {
+         private void sendChunk(final int chunkX, final int chunkZ) {
+             if (this.sentChunks.add(CoordinateUtils.getChunkKey(chunkX, chunkZ))) {
+                 this.world.getChunkSource().chunkMap.updateChunkTracking(this.player,
+-                    new ChunkPos(chunkX, chunkZ), new MutableObject<>(), false, true); // unloaded, loaded
++                    new ChunkPos(chunkX, chunkZ), false, true); // unloaded, loaded // Fiddle - client perspective - block state visualization - chunk packets are for a specific client
+                 return;
+             }
+             throw new IllegalStateException();
+@@ -497,7 +497,7 @@ public class RegionizedPlayerChunkLoader {
+ 
+         private void sendUnloadChunkRaw(final int chunkX, final int chunkZ) {
+             this.player.serverLevel().getChunkSource().chunkMap.updateChunkTracking(this.player,
+-                new ChunkPos(chunkX, chunkZ), null, true, false); // unloaded, loaded
++                new ChunkPos(chunkX, chunkZ), true, false); // unloaded, loaded // Fiddle - client perspective - block state visualization - chunk packets are for a specific client
+         }
+ 
+         private final SingleUserAreaMap<PlayerChunkLoaderData> broadcastMap = new SingleUserAreaMap<>(this) {
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
+index 978fc83b209ae831ba1d6315cad1adeefe58a98c..f16c5011e436d69836bf51e838f4fea4e1dca923 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
+@@ -1,14 +1,21 @@
+ package net.minecraft.network.protocol.game;
+ 
++import java.lang.ref.WeakReference;
+ import java.util.BitSet;
+ import javax.annotation.Nullable;
+ import net.minecraft.network.FriendlyByteBuf;
+ import net.minecraft.network.protocol.Packet;
++import net.minecraft.server.level.ServerPlayer;
+ import net.minecraft.world.level.ChunkPos;
+ import net.minecraft.world.level.chunk.LevelChunk;
+ import net.minecraft.world.level.lighting.LevelLightEngine;
++import org.fiddlemc.fiddle.packet.block.ClientChunkDataPerspective;
+ 
+ public class ClientboundLevelChunkWithLightPacket implements Packet<ClientGamePacketListener> {
++    // Fiddle start - client perspective - block state visualization - chunk packets are for a specific client
++    private final WeakReference<ServerPlayer> player;
++    private final ClientChunkDataPerspective clientChunkDataPerspective;
++    // Fiddle end - client perspective - block state visualization - chunk packets are for a specific client
+     private final int x;
+     private final int z;
+     private final ClientboundLevelChunkPacketData chunkData;
+@@ -27,12 +34,15 @@ public class ClientboundLevelChunkWithLightPacket implements Packet<ClientGamePa
+     // Paper end
+ 
+     // Paper start - Anti-Xray - Add chunk packet info
+-    @Deprecated @io.papermc.paper.annotation.DoNotUse public ClientboundLevelChunkWithLightPacket(LevelChunk chunk, LevelLightEngine lightProvider, @Nullable BitSet skyBits, @Nullable BitSet blockBits) { this(chunk, lightProvider, skyBits, blockBits, true); }
+-    public ClientboundLevelChunkWithLightPacket(LevelChunk chunk, LevelLightEngine lightProvider, @Nullable BitSet skyBits, @Nullable BitSet blockBits, boolean modifyBlocks) {
++    // Fiddle start - client perspective - block state visualization - chunk packets are for a specific client
++    public ClientboundLevelChunkWithLightPacket(LevelChunk chunk, LevelLightEngine lightProvider, @Nullable BitSet skyBits, @Nullable BitSet blockBits, ServerPlayer player, boolean applyAntiXray) {
++        this.player = new WeakReference<>(player);
++        this.clientChunkDataPerspective = new ClientChunkDataPerspective(player.getClientPerspective(), player.locale, applyAntiXray);
++        // Fiddle end - client perspective - block state visualization - chunk packets are for a specific client
+         ChunkPos chunkPos = chunk.getPos();
+         this.x = chunkPos.x;
+         this.z = chunkPos.z;
+-        com.destroystokyo.paper.antixray.ChunkPacketInfo<net.minecraft.world.level.block.state.BlockState> chunkPacketInfo = modifyBlocks ? chunk.getLevel().chunkPacketBlockController.getChunkPacketInfo(this, chunk) : null;
++        com.destroystokyo.paper.antixray.ChunkPacketInfo<net.minecraft.world.level.block.state.BlockState> chunkPacketInfo = applyAntiXray ? chunk.getLevel().chunkPacketBlockController.getChunkPacketInfo(this, chunk) : null; // Fiddle - client perspective - block state visualization - chunk packets are for a specific client - rename modifyBlocks to applyAntiXray
+         this.chunkData = new ClientboundLevelChunkPacketData(chunk, chunkPacketInfo);
+         // Paper end
+         this.lightData = new ClientboundLightUpdatePacketData(chunkPos, lightProvider, skyBits, blockBits);
+@@ -40,10 +50,7 @@ public class ClientboundLevelChunkWithLightPacket implements Packet<ClientGamePa
+     }
+ 
+     public ClientboundLevelChunkWithLightPacket(FriendlyByteBuf buf) {
+-        this.x = buf.readInt();
+-        this.z = buf.readInt();
+-        this.chunkData = new ClientboundLevelChunkPacketData(buf, this.x, this.z);
+-        this.lightData = new ClientboundLightUpdatePacketData(buf, this.x, this.z);
++        throw new UnsupportedOperationException(); // Fiddle - client perspective - block state visualization - chunk packets are for a specific client - this constructor is not relevant for the server
+     }
+ 
+     @Override
+diff --git a/src/main/java/net/minecraft/server/level/ChunkMap.java b/src/main/java/net/minecraft/server/level/ChunkMap.java
+index 9209b598d7168b82574e4800056b8b9f84265dd0..5811e76d0dfb8163d93583017d0ba2140bc982b1 100644
+--- a/src/main/java/net/minecraft/server/level/ChunkMap.java
++++ b/src/main/java/net/minecraft/server/level/ChunkMap.java
+@@ -832,7 +832,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+ 
+     }
+ 
+-    public void updateChunkTracking(ServerPlayer player, ChunkPos pos, MutableObject<java.util.Map<Object, ClientboundLevelChunkWithLightPacket>> packet, boolean oldWithinViewDistance, boolean newWithinViewDistance) { // Paper - public // Paper - Anti-Xray - Bypass
++    public void updateChunkTracking(ServerPlayer player, ChunkPos pos, boolean oldWithinViewDistance, boolean newWithinViewDistance) { // Paper - public // Paper - Anti-Xray - Bypass // Fiddle - client perspective - block state visualization - chunk packets are for a specific client
+         io.papermc.paper.util.TickThread.ensureTickThread(this.level, pos, "May not update chunk tracking for chunk async"); // Paper - replace chunk loader system
+         io.papermc.paper.util.TickThread.ensureTickThread(player, "May not update chunk tracking for player async"); // Paper - replace chunk loader system
+         if (player.level() == this.level) {
+@@ -845,7 +845,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+ 
+                     if (chunk != null) {
+                         playerchunk.addPlayer(player); // Paper - replace chunk loader system
+-                        this.playerLoadedChunk(player, packet, chunk);
++                        this.playerLoadedChunk(player, chunk); // Fiddle - client perspective - block state visualization - chunk packets are for a specific client
+                     }
+ 
+                     DebugPackets.sendPoiPacketsForChunk(this.level, pos);
+@@ -1374,15 +1374,12 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+     }
+ 
+     // Paper start - Anti-Xray - Bypass
+-    private void playerLoadedChunk(ServerPlayer player, MutableObject<java.util.Map<Object, ClientboundLevelChunkWithLightPacket>> cachedDataPackets, LevelChunk chunk) {
+-        if (cachedDataPackets.getValue() == null) {
+-            cachedDataPackets.setValue(new java.util.HashMap<>());
+-        }
++    // Fiddle start - client perspective - block state visualization - chunk packets are for a specific client
++    private void playerLoadedChunk(ServerPlayer player, LevelChunk chunk) {
+ 
+-        Boolean shouldModify = chunk.getLevel().chunkPacketBlockController.shouldModify(player, chunk);
+-        player.trackChunk(chunk.getPos(), (Packet) cachedDataPackets.getValue().computeIfAbsent(shouldModify, (s) -> {
+-            return new ClientboundLevelChunkWithLightPacket(chunk, this.lightEngine, (BitSet) null, (BitSet) null, (Boolean) s);
+-        }));
++        Boolean shouldApplyAntiXray = chunk.getLevel().chunkPacketBlockController.shouldApplyAntiXray(player, chunk);
++        player.trackChunk(chunk.getPos(), new ClientboundLevelChunkWithLightPacket(chunk, this.lightEngine, (BitSet) null, (BitSet) null, player, shouldApplyAntiXray));
++        // Fiddle end - client perspective - block state visualization - chunk packets are for a specific client
+         // Paper end
+         DebugPackets.sendPoiPacketsForChunk(this.level, chunk.getPos());
+         // Paper - no longer needed - this was used to account for clients bugging out since they needed a chunk to store entities, but they no longer need a chunk
+diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
+index 6e05afbd39e4be1da345a203773a0864a548c510..a04cfd2072daa924064d598ad611858e23037bda 100644
+--- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
++++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
+@@ -8,6 +8,8 @@ import com.mojang.datafixers.util.Either;
+ import com.mojang.logging.LogUtils;
+ import com.mojang.serialization.DataResult;
+ import com.mojang.serialization.Dynamic;
++
++import java.lang.ref.WeakReference;
+ import java.net.InetSocketAddress;
+ import java.net.SocketAddress;
+ import java.util.Collection;
+@@ -288,6 +290,8 @@ public class ServerPlayer extends Player {
+ 
+     private @Nullable ClientPerspective clientPerspective; // Fiddle - client perspective - player
+ 
++    private @Nullable WeakReference<ServerPlayer> weakReference; // Fiddle - client perspective - block state visualization - chunk packets are for a specific client
++
+     public io.papermc.paper.chunk.system.RegionizedPlayerChunkLoader.ViewDistances getViewDistances() {
+         return this.viewDistances.get();
+     }
+@@ -2704,4 +2708,16 @@ public class ServerPlayer extends Player {
+     }
+     // Fiddle end - client perspective - block state visualization - send to player without modifications
+ 
++    // Fiddle start - client perspective - block state visualization - chunk packets are for a specific client
++    /**
++     * @return A {@link WeakReference} to this {@link ServerPlayer} instance.
++     */
++    public final @NotNull WeakReference<ServerPlayer> getWeakReference() {
++        if (this.weakReference == null) {
++            this.weakReference = new WeakReference<>(this);
++        }
++        return this.weakReference;
++    }
++    // Fiddle end - client perspective - block state visualization - chunk packets are for a specific client
++
+ }
+diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
+index fac99a6fec1c172fd6a75a625a0fd2d660cd97b5..cd8b779d04d9fb7628cc5ca4a3db28d7de409f47 100644
+--- a/src/main/java/net/minecraft/server/players/PlayerList.java
++++ b/src/main/java/net/minecraft/server/players/PlayerList.java
+@@ -443,7 +443,7 @@ public abstract class PlayerList {
+                 .getHolderOrThrow(net.minecraft.world.level.biome.Biomes.PLAINS);
+             player.connection.send(new net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket(
+                 new net.minecraft.world.level.chunk.EmptyLevelChunk(worldserver1, player.chunkPosition(), plains),
+-                worldserver1.getLightEngine(), null, null, false)
++                worldserver1.getLightEngine(), null, null, player, false) // Fiddle - client perspective - block state visualization - chunk packets are for a specific client
+             );
+         }
+         // Paper end
+diff --git a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
+index 550dcb7d595221b221e4710890d8a3cad789fc07..8bace43f7791e05af87d8458283b9be9195ca062 100644
+--- a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
++++ b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
+@@ -515,14 +515,13 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+                 if (playersInRange.isEmpty()) return true; // Paper - rewrite player chunk loader
+ 
+                 // Paper start - Anti-Xray - Bypass
+-                Map<Object, ClientboundLevelChunkWithLightPacket> refreshPackets = new HashMap<>();
+                 for (ServerPlayer player : playersInRange) {
+                     if (player.connection == null) continue;
+ 
+-                    Boolean shouldModify = chunk.getLevel().chunkPacketBlockController.shouldModify(player, chunk);
+-                    player.connection.send(refreshPackets.computeIfAbsent(shouldModify, s -> { // Use connection to prevent creating firing event
+-                        return new ClientboundLevelChunkWithLightPacket(chunk, this.world.getLightEngine(), null, null, (Boolean) s);
+-                    }));
++                    // Fiddle start - client perspective - block state visualization - chunk packets are for a specific client
++                    Boolean applyAntiXray = chunk.getLevel().chunkPacketBlockController.shouldApplyAntiXray(player, chunk);
++                    player.connection.send(new ClientboundLevelChunkWithLightPacket(chunk, this.world.getLightEngine(), null, null, player, applyAntiXray)); // Use connection to prevent creating firing event
++                    // Fiddle end - client perspective - block state visualization - chunk packets are for a specific client
+                     // Paper end
+                 }
+         // Paper - rewrite player chunk loader

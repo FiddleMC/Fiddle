@@ -8,10 +8,10 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index 6d129fd434ae2a3f6bbda700b1a8a7022f168c19..fe8dbc73b4d0617428dd3619ec2a5c2d5a267553 100644
+index b1352ed3c8242916b6395a66ce2e93fea1b6f8bb..6e05afbd39e4be1da345a203773a0864a548c510 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-@@ -2675,4 +2675,23 @@ public class ServerPlayer extends Player {
+@@ -2685,4 +2685,23 @@ public class ServerPlayer extends Player {
      }
      // Fiddle end - client perspective - player
  

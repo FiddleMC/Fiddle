@@ -1,0 +1,168 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sat, 29 Jul 2023 09:40:56 +0200
+Subject: [PATCH] Client perspective - Deep replacements - Define client
+ perspective and settings supplier
+
+License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/ClientPerspectiveAndSettingsSupplier.java b/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/ClientPerspectiveAndSettingsSupplier.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..6483230d8ca0f9e10a0a2f9c15e99b50f1398a13
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/ClientPerspectiveAndSettingsSupplier.java
+@@ -0,0 +1,153 @@
++// Fiddle - client perspective - deep replacements - perspective and settings supplier
++
++package org.fiddlemc.fiddle.packet.deepreplacement;
++
++import net.minecraft.network.FriendlyByteBuf;
++import net.minecraft.server.level.ServerPlayer;
++import org.fiddlemc.fiddle.packet.ClientPerspective;
++import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
++
++import java.lang.ref.WeakReference;
++
++/**
++ * A supplier for a client's {@linkplain ClientPerspective perspective}, and additional dynamic settings,
++ * that may influence deep replacements that need to be applied in packets, such as pre-translating translatables.
++ * <br>
++ * Instances of this interface may be created at times when this information is not available at all, but
++ * at such times, the information is not queried either (i.e. a packet that does not know which client it is being
++ * sent to may pass an instance of this interface to the methods it calls that simply always throws exceptions,
++ * knowing that those methods will not actually call upon the given instance).
++ */
++public interface ClientPerspectiveAndSettingsSupplier {
++
++    /**
++     * @return The {@link ClientPerspective} of the client.
++     * This is always non-null.
++     * This may throw an exception when the client perspective can not be queried (for example because no
++     * client has been associated with the current context, such as a {@link FriendlyByteBuf}).
++     */
++    @NotNull ClientPerspective getPerspective();
++
++    /**
++     * @return The {@link ClientPerspective} of the client.
++     * This is null if and only if the client perspective can not be queried (for example because no
++     * client has been associated with the current context, such as a {@link FriendlyByteBuf}).
++     */
++    @Nullable ClientPerspective getPerspectiveOrNull();
++
++    /**
++     * @return The {@link ServerPlayer#locale} set by the client.
++     * This may be null if the client has no known locale.
++     * This may throw an exception when the locale can not be queried (for example because no
++     * client has been associated with the current context, such as a {@link FriendlyByteBuf}).
++     */
++    @Nullable String getLocale();
++
++    /**
++     * @return A {@link ClientPerspectiveAndSettingsSupplier} that lazily retrieves its values
++     * from the given {@link FriendlyByteBuf}.
++     */
++    static ClientPerspectiveAndSettingsSupplier forFriendlyByteBuf(@NotNull FriendlyByteBuf friendlyByteBuf) {
++        return new ClientPerspectiveAndSettingsSupplierForFriendlyByteBuf(friendlyByteBuf);
++    }
++
++    /**
++     * @return A {@link ClientPerspectiveAndSettingsSupplier} that always provides the given values.
++     */
++    static ClientPerspectiveAndSettingsSupplier forValues(@NotNull ClientPerspective targetClientPerspective, @Nullable String targetClientLocale) {
++        return new ClientPerspectiveAndSettingsSupplierForValues(targetClientPerspective, targetClientLocale);
++    }
++
++    /**
++     * A {@link ClientPerspectiveAndSettingsSupplier} that always throws an {@link UnsupportedOperationException}
++     * when {@link #getPerspective()} or {@link #getLocale()} is called.
++     */
++    ClientPerspectiveAndSettingsSupplier ALWAYS_THROWS_EXCEPTION = new ClientPerspectiveAndSettingsSupplier() {
++
++        @Override
++        public @NotNull ClientPerspective getPerspective() {
++            throw new UnsupportedOperationException("Cannot call #getPerspective() on ClientPerspectiveAndSettingsSupplier.ALWAYS_THROWS_EXCEPTION");
++        }
++
++        @Override
++        public @Nullable ClientPerspective getPerspectiveOrNull() {
++            return null;
++        }
++
++        @Override
++        public @Nullable String getLocale() {
++            throw new UnsupportedOperationException("Cannot call #getLocale() on ClientPerspectiveAndSettingsSupplier.ALWAYS_THROWS_EXCEPTION");
++        }
++
++    };
++
++    class ClientPerspectiveAndSettingsSupplierForFriendlyByteBuf implements ClientPerspectiveAndSettingsSupplier {
++
++        private final @NotNull WeakReference<FriendlyByteBuf> friendlyByteBuf;
++        private boolean isNotCached = true;
++        private @Nullable ClientPerspective perspective;
++        private @Nullable String locale;
++
++        private ClientPerspectiveAndSettingsSupplierForFriendlyByteBuf(@NotNull FriendlyByteBuf friendlyByteBuf) {
++            this.friendlyByteBuf = new WeakReference<>(friendlyByteBuf);
++        }
++
++        private void cacheIfNecessary() {
++            if (this.isNotCached) {
++                this.isNotCached = false;
++                this.perspective = this.friendlyByteBuf.get().getExplicitTargetClientPerspective();
++                this.locale = this.friendlyByteBuf.get().getExplicitTargetLocale();
++            }
++        }
++
++        @Override
++        public @NotNull ClientPerspective getPerspective() {
++            this.cacheIfNecessary();
++            return this.perspective;
++        }
++
++        @Override
++        public @NotNull ClientPerspective getPerspectiveOrNull() {
++            if (this.isNotCached) {
++                return this.friendlyByteBuf.get().getExplicitTargetClientPerspectiveOrNull();
++            }
++            return this.perspective;
++        }
++
++        @Override
++        public @Nullable String getLocale() {
++            this.cacheIfNecessary();
++            return this.locale;
++        }
++
++    }
++
++    class ClientPerspectiveAndSettingsSupplierForValues implements ClientPerspectiveAndSettingsSupplier {
++
++        private final @NotNull ClientPerspective perspective;
++        private final @Nullable String locale;
++
++        private ClientPerspectiveAndSettingsSupplierForValues(@NotNull ClientPerspective perspective, @Nullable String locale) {
++            this.perspective = perspective;
++            this.locale = locale;
++        }
++
++        @Override
++        public @NotNull ClientPerspective getPerspective() {
++            return this.perspective;
++        }
++
++        @Override
++        public @NotNull ClientPerspective getPerspectiveOrNull() {
++            return this.perspective;
++        }
++
++        @Override
++        public @Nullable String getLocale() {
++            return this.locale;
++        }
++
++    }
++
++}

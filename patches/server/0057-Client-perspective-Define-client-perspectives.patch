@@ -8,10 +8,10 @@ Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/fiddlemc/fiddle/packet/ClientPerspective.java b/src/main/java/org/fiddlemc/fiddle/packet/ClientPerspective.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..9d1b80ccf2349d333ea118dd898c47f866a17640
+index 0000000000000000000000000000000000000000..cf87eea90d072d246184b24a4614573164aa1e5a
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/packet/ClientPerspective.java
-@@ -0,0 +1,61 @@
+@@ -0,0 +1,85 @@
 +// Fiddle - client perspective - definition
 +
 +package org.fiddlemc.fiddle.packet;
@@ -42,13 +42,37 @@ index 0000000000000000000000000000000000000000..9d1b80ccf2349d333ea118dd898c47f8
 + * for that perspective's {@link #category}.
 + * <br>
 + * An example of such additional data would be to include the protocol version in the case of Java clients.
++ * <br>
++ * Subclasses of this class must properly implement {@link #hashCode()} and {@link #equals(Object)}.
 + */
 +public class ClientPerspective {
 +
++    /**
++     * The {@linkplain ClientPerspectiveCategory category} of this perspective.
++     */
 +    public final @NotNull ClientPerspectiveCategory category;
 +
-+    public ClientPerspective(@NotNull ClientPerspectiveCategory category) {
++    /**
++     * Whether a client with this perspective is aware of the server-side item and block types.
++     * <br>
++     * This field is only an observable property of a {@link ClientPerspective};
++     * it is not part of the perspective's identifying fields (so is not used in {@link #hashCode} or {@link #equals}).
++     */
++    public final boolean understandsServerSideItemsAndBlocks;
++
++    /**
++     * Whether a client with this perspective is aware of the server-side changes to translations (i.e. values
++     * given in locale files in the resource pack).
++     * <br>
++     * This field is only an observable property of a {@link ClientPerspective};
++     * it is not part of the perspective's identifying fields (so is not used in {@link #hashCode} or {@link #equals}).
++     */
++    public final boolean understandsServerSideTranslations;
++
++    public ClientPerspective(@NotNull ClientPerspectiveCategory category, boolean understandsServerSideItemsAndBlocks, boolean understandsServerSideTranslations) {
 +        this.category = category;
++        this.understandsServerSideItemsAndBlocks = understandsServerSideItemsAndBlocks;
++        this.understandsServerSideTranslations = understandsServerSideTranslations;
 +    }
 +
 +    @Override
@@ -75,7 +99,7 @@ index 0000000000000000000000000000000000000000..9d1b80ccf2349d333ea118dd898c47f8
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/packet/ClientPerspectiveCategory.java b/src/main/java/org/fiddlemc/fiddle/packet/ClientPerspectiveCategory.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..0481162a62138bd3152b571d98c0a225c51e0439
+index 0000000000000000000000000000000000000000..8084a6f08e436f4c1180e76c23fd1fc4a3034bae
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/packet/ClientPerspectiveCategory.java
 @@ -0,0 +1,76 @@
@@ -149,9 +173,9 @@ index 0000000000000000000000000000000000000000..0481162a62138bd3152b571d98c0a225
 +
 +    static {
 +        // Initialize the values of mostLikelyPerspective
-+        JAVA_DEFAULT.mostLikelyPerspective = new ClientPerspective(JAVA_DEFAULT);
-+        JAVA_WITH_ENABLED_RESOURCE_PACK.mostLikelyPerspective = new ClientPerspective(JAVA_WITH_ENABLED_RESOURCE_PACK);
-+        JAVA_WITH_FIDDLE_CLIENT_MOD.mostLikelyPerspective = new ClientPerspective(JAVA_WITH_FIDDLE_CLIENT_MOD);
++        JAVA_DEFAULT.mostLikelyPerspective = new ClientPerspective(JAVA_DEFAULT, false, false);
++        JAVA_WITH_ENABLED_RESOURCE_PACK.mostLikelyPerspective = new ClientPerspective(JAVA_WITH_ENABLED_RESOURCE_PACK, false, true);
++        JAVA_WITH_FIDDLE_CLIENT_MOD.mostLikelyPerspective = new ClientPerspective(JAVA_WITH_FIDDLE_CLIENT_MOD, true, true);
 +    }
 +
 +}

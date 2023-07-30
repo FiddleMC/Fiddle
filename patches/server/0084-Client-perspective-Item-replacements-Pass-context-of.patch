@@ -8,7 +8,7 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundSetEntityDataPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundSetEntityDataPacket.java
-index 90ee2dbf35b5cd6433a02c08f1ac9464d2063fcb..59f5d44d8ac354d90923013c3648ae179e74c4c0 100644
+index b6bba75d8574323e5e0054b7fab8ca4614139c86..060d459c07a5b85c82b597f6cd7d4a8d384a3cf7 100644
 --- a/src/main/java/net/minecraft/network/protocol/game/ClientboundSetEntityDataPacket.java
 +++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundSetEntityDataPacket.java
 @@ -5,16 +5,23 @@ import java.util.List;
@@ -19,7 +19,7 @@ index 90ee2dbf35b5cd6433a02c08f1ac9464d2063fcb..59f5d44d8ac354d90923013c3648ae17
 +import org.jetbrains.annotations.NotNull;
 +import org.jetbrains.annotations.Nullable;
  
- // Fiddle start - client perspective - item replacements - store connection explicitly in packets that may contain items
+ // Fiddle start - client perspective - deep replacements - store connection explicitly in packets that may contain deep replaceables
  public class ClientboundSetEntityDataPacket extends PacketWithExplicitTargetClientConnection<ClientGamePacketListener> {
      private final int id;
      private final List<SynchedEntityData.DataValue<?>> packedItems;

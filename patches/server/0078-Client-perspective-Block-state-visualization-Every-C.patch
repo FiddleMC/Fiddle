@@ -1,0 +1,179 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sat, 29 Jul 2023 16:19:11 +0200
+Subject: [PATCH] Client perspective - Block state visualization - Every
+ ChunkPacketInfo is ChunkPacketInfoAntiXray
+
+License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketBlockController.java b/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketBlockController.java
+index 45a36b1ab5fd25fde483880ccb6bc2d0e766403d..b4b0e7917514aeb51c4784f582ecfb858e46a2f0 100644
+--- a/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketBlockController.java
++++ b/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketBlockController.java
+@@ -27,11 +27,11 @@ public class ChunkPacketBlockController {
+         return false;
+     }
+ 
+-    public ChunkPacketInfo<BlockState> getChunkPacketInfo(ClientboundLevelChunkWithLightPacket chunkPacket, LevelChunk chunk) {
++    public ChunkPacketInfoAntiXray getChunkPacketInfo(ClientboundLevelChunkWithLightPacket chunkPacket, LevelChunk chunk) { // Fiddle - client perspective - block state visualization - every ChunkPacketInfo is ChunkPacketInfoAntiXray
+         return null;
+     }
+ 
+-    public void modifyBlocks(ClientboundLevelChunkWithLightPacket chunkPacket, ChunkPacketInfo<BlockState> chunkPacketInfo) {
++    public void applyAntiXray(ClientboundLevelChunkWithLightPacket chunkPacket, ChunkPacketInfoAntiXray chunkPacketInfo) { // Fiddle - client perspective - block state visualization - every ChunkPacketInfo is ChunkPacketInfoAntiXray
+         chunkPacket.setReady(true);
+     }
+ 
+diff --git a/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketBlockControllerAntiXray.java b/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketBlockControllerAntiXray.java
+index b7a560dd487bcce9f28c3ee38f081d0cd9088fdb..3243d5c0d1d8a4d8abe4dfd2b8e2d79b12977f4f 100644
+--- a/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketBlockControllerAntiXray.java
++++ b/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketBlockControllerAntiXray.java
+@@ -175,15 +175,17 @@ public final class ChunkPacketBlockControllerAntiXray extends ChunkPacketBlockCo
+     }
+ 
+     @Override
+-    public void modifyBlocks(ClientboundLevelChunkWithLightPacket chunkPacket, ChunkPacketInfo<BlockState> chunkPacketInfo) {
+-        if (!(chunkPacketInfo instanceof ChunkPacketInfoAntiXray)) {
++    // Fiddle start - client perspective - block state visualization - every ChunkPacketInfo is ChunkPacketInfoAntiXray
++    public void applyAntiXray(ClientboundLevelChunkWithLightPacket chunkPacket, ChunkPacketInfoAntiXray chunkPacketInfo) {
++        if (chunkPacketInfo == null) {
++            // Fiddle end - client perspective - block state visualization - every ChunkPacketInfo is ChunkPacketInfoAntiXray
+             chunkPacket.setReady(true);
+             return;
+         }
+ 
+         if (!Bukkit.isPrimaryThread()) {
+             // Plugins?
+-            MinecraftServer.getServer().scheduleOnMain(() -> modifyBlocks(chunkPacket, chunkPacketInfo));
++            MinecraftServer.getServer().scheduleOnMain(() -> applyAntiXray(chunkPacket, chunkPacketInfo)); // Fiddle - client perspective - block state visualization - every ChunkPacketInfo is ChunkPacketInfoAntiXray - rename modifyBlocks to applyAntiXray
+             return;
+         }
+ 
+diff --git a/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketInfo.java b/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketInfo.java
+index d98a3f5c54c67a673eb7dc456dd039cd78f9c34d..1c8263d31895612e5e6af945c00d051d2a5cb1e2 100644
+--- a/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketInfo.java
++++ b/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketInfo.java
+@@ -4,7 +4,7 @@ import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
+ import net.minecraft.world.level.chunk.LevelChunk;
+ import net.minecraft.world.level.chunk.Palette;
+ 
+-public class ChunkPacketInfo<T> {
++public sealed class ChunkPacketInfo<T> permits ChunkPacketInfoAntiXray { // Fiddle - client perspective - block state visualization - every ChunkPacketInfo is ChunkPacketInfoAntiXray
+ 
+     private final ClientboundLevelChunkWithLightPacket chunkPacket;
+     private final LevelChunk chunk;
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java
+index 06b862eeeaf105ea9d844d8b21246ae1eaaaa15e..3095ecfc7f6aa95284c7812e52f5fb68d65c9061 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java
+@@ -35,8 +35,7 @@ public class ClientboundLevelChunkPacketData {
+     // Paper end
+ 
+     // Paper start - Anti-Xray - Add chunk packet info
+-    @Deprecated @io.papermc.paper.annotation.DoNotUse public ClientboundLevelChunkPacketData(LevelChunk chunk) { this(chunk, null); }
+-    public ClientboundLevelChunkPacketData(LevelChunk chunk, com.destroystokyo.paper.antixray.ChunkPacketInfo<net.minecraft.world.level.block.state.BlockState> chunkPacketInfo) {
++    public ClientboundLevelChunkPacketData(LevelChunk chunk, @Nullable com.destroystokyo.paper.antixray.ChunkPacketInfoAntiXray chunkPacketInfo) { // Fiddle - client perspective - block state visualization - every ChunkPacketInfo is ChunkPacketInfoAntiXray
+         // Paper end
+         this.heightmaps = new CompoundTag();
+ 
+@@ -115,8 +114,7 @@ public class ClientboundLevelChunkPacketData {
+     }
+ 
+     // Paper start - Anti-Xray - Add chunk packet info
+-    @Deprecated @io.papermc.paper.annotation.DoNotUse public static void extractChunkData(FriendlyByteBuf buf, LevelChunk chunk) { ClientboundLevelChunkPacketData.extractChunkData(buf, chunk, null); }
+-    public static void extractChunkData(FriendlyByteBuf buf, LevelChunk chunk, com.destroystokyo.paper.antixray.ChunkPacketInfo<net.minecraft.world.level.block.state.BlockState> chunkPacketInfo) {
++    public static void extractChunkData(FriendlyByteBuf buf, LevelChunk chunk, @Nullable com.destroystokyo.paper.antixray.ChunkPacketInfoAntiXray chunkPacketInfo) { // Fiddle - client perspective - block state visualization - every ChunkPacketInfo is ChunkPacketInfoAntiXray
+         int chunkSectionIndex = 0;
+ 
+         for(LevelChunkSection levelChunkSection : chunk.getSections()) {
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
+index f16c5011e436d69836bf51e838f4fea4e1dca923..5b5b00beea78bcc27666373cb60bbd42e985dc5a 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
+@@ -42,11 +42,11 @@ public class ClientboundLevelChunkWithLightPacket implements Packet<ClientGamePa
+         ChunkPos chunkPos = chunk.getPos();
+         this.x = chunkPos.x;
+         this.z = chunkPos.z;
+-        com.destroystokyo.paper.antixray.ChunkPacketInfo<net.minecraft.world.level.block.state.BlockState> chunkPacketInfo = applyAntiXray ? chunk.getLevel().chunkPacketBlockController.getChunkPacketInfo(this, chunk) : null; // Fiddle - client perspective - block state visualization - chunk packets are for a specific client - rename modifyBlocks to applyAntiXray
++        var chunkPacketInfo = applyAntiXray ? chunk.getLevel().chunkPacketBlockController.getChunkPacketInfo(this, chunk) : null; // Fiddle - client perspective - block state visualization - chunk packets are for a specific client - rename modifyBlocks to applyAntiXray // Fiddle - client perspective - block state visualization - every ChunkPacketInfo is ChunkPacketInfoAntiXray
+         this.chunkData = new ClientboundLevelChunkPacketData(chunk, chunkPacketInfo);
+         // Paper end
+         this.lightData = new ClientboundLightUpdatePacketData(chunkPos, lightProvider, skyBits, blockBits);
+-        chunk.getLevel().chunkPacketBlockController.modifyBlocks(this, chunkPacketInfo); // Paper - Anti-Xray - Modify blocks
++        chunk.getLevel().chunkPacketBlockController.applyAntiXray(this, chunkPacketInfo); // Paper - Anti-Xray - Modify blocks // Fiddle - client perspective - block state visualization - every ChunkPacketInfo is ChunkPacketInfoAntiXray - rename modifyBlocks to applyAntiXray
+     }
+ 
+     public ClientboundLevelChunkWithLightPacket(FriendlyByteBuf buf) {
+diff --git a/src/main/java/net/minecraft/world/level/chunk/LevelChunkSection.java b/src/main/java/net/minecraft/world/level/chunk/LevelChunkSection.java
+index d4477b0dda6a1ef7bd8323c0d11b636bd071d18e..e838a1013c87b966bdd839074c2cba42fc7511bb 100644
+--- a/src/main/java/net/minecraft/world/level/chunk/LevelChunkSection.java
++++ b/src/main/java/net/minecraft/world/level/chunk/LevelChunkSection.java
+@@ -12,6 +12,7 @@ import net.minecraft.world.level.block.Block;
+ import net.minecraft.world.level.block.Blocks;
+ import net.minecraft.world.level.block.state.BlockState;
+ import net.minecraft.world.level.material.FluidState;
++import org.jetbrains.annotations.Nullable;
+ 
+ public class LevelChunkSection {
+ 
+@@ -282,8 +283,7 @@ public class LevelChunkSection {
+     }
+ 
+     // Paper start - Anti-Xray - Add chunk packet info
+-    @Deprecated @io.papermc.paper.annotation.DoNotUse public void write(FriendlyByteBuf buf) { this.write(buf, null, 0); }
+-    public void write(FriendlyByteBuf buf, com.destroystokyo.paper.antixray.ChunkPacketInfo<BlockState> chunkPacketInfo, int chunkSectionIndex) {
++    public void write(FriendlyByteBuf buf, @Nullable com.destroystokyo.paper.antixray.ChunkPacketInfoAntiXray chunkPacketInfo, int chunkSectionIndex) { // Fiddle - client perspective - block state visualization - every ChunkPacketInfo is ChunkPacketInfoAntiXray
+         buf.writeShort(this.nonEmptyBlockCount);
+         this.states.write(buf, chunkPacketInfo, chunkSectionIndex);
+         this.biomes.write(buf, null, chunkSectionIndex);
+diff --git a/src/main/java/net/minecraft/world/level/chunk/PalettedContainer.java b/src/main/java/net/minecraft/world/level/chunk/PalettedContainer.java
+index 7f5547dc31aa53b2863f4c09f598fa88e7fe2afd..9a738cd49d4b0c30f0a0346ca6b4922f647a16a7 100644
+--- a/src/main/java/net/minecraft/world/level/chunk/PalettedContainer.java
++++ b/src/main/java/net/minecraft/world/level/chunk/PalettedContainer.java
+@@ -238,14 +238,14 @@ public class PalettedContainer<T> implements PaletteResize<T>, PalettedContainer
+     @Override
+     @Deprecated @io.papermc.paper.annotation.DoNotUse public void write(FriendlyByteBuf buf) { this.write(buf, null, 0); }
+     @Override
+-    public synchronized void write(FriendlyByteBuf buf, @Nullable com.destroystokyo.paper.antixray.ChunkPacketInfo<T> chunkPacketInfo, int chunkSectionIndex) { // Paper - synchronize
++    public synchronized void write(FriendlyByteBuf buf, @Nullable com.destroystokyo.paper.antixray.ChunkPacketInfoAntiXray chunkPacketInfo, int chunkSectionIndex) { // Paper - synchronize // Fiddle - client perspective - block state visualization - every ChunkPacketInfo is ChunkPacketInfoAntiXray
+         this.acquire();
+ 
+         try {
+             this.data.write(buf, chunkPacketInfo, chunkSectionIndex);
+ 
+             if (chunkPacketInfo != null) {
+-                chunkPacketInfo.setPresetValues(chunkSectionIndex, this.presetValues);
++                chunkPacketInfo.setPresetValues(chunkSectionIndex, (net.minecraft.world.level.block.state.BlockState[]) this.presetValues); // Fiddle - client perspective - block state visualization - every ChunkPacketInfo is ChunkPacketInfoAntiXray
+             }
+             // Paper end
+         } finally {
+@@ -412,13 +412,13 @@ public class PalettedContainer<T> implements PaletteResize<T>, PalettedContainer
+         }
+ 
+         // Paper start - Anti-Xray - Add chunk packet info
+-        public void write(FriendlyByteBuf buf, @Nullable com.destroystokyo.paper.antixray.ChunkPacketInfo<T> chunkPacketInfo, int chunkSectionIndex) {
++        public void write(FriendlyByteBuf buf, @Nullable com.destroystokyo.paper.antixray.ChunkPacketInfoAntiXray chunkPacketInfo, int chunkSectionIndex) { // Fiddle - client perspective - block state visualization - every ChunkPacketInfo is ChunkPacketInfoAntiXray
+             buf.writeByte(this.storage.getBits());
+             this.palette.write(buf);
+ 
+             if (chunkPacketInfo != null) {
+                 chunkPacketInfo.setBits(chunkSectionIndex, this.configuration.bits());
+-                chunkPacketInfo.setPalette(chunkSectionIndex, this.palette);
++                chunkPacketInfo.setPalette(chunkSectionIndex, (Palette<net.minecraft.world.level.block.state.BlockState>) this.palette); // Fiddle - client perspective - block state visualization - every ChunkPacketInfo is ChunkPacketInfoAntiXray
+                 chunkPacketInfo.setIndex(chunkSectionIndex, buf.writerIndex() + FriendlyByteBuf.getVarIntSize(this.storage.getRaw().length));
+             }
+             // Paper end
+diff --git a/src/main/java/net/minecraft/world/level/chunk/PalettedContainerRO.java b/src/main/java/net/minecraft/world/level/chunk/PalettedContainerRO.java
+index 1dd415c96d17eff8e7555c33d3c52e57f2559fa5..c66ffe525014802145b9cef91fb7a6a29db8b89d 100644
+--- a/src/main/java/net/minecraft/world/level/chunk/PalettedContainerRO.java
++++ b/src/main/java/net/minecraft/world/level/chunk/PalettedContainerRO.java
+@@ -16,7 +16,7 @@ public interface PalettedContainerRO<T> {
+ 
+     // Paper start - Anti-Xray - Add chunk packet info
+     @Deprecated @io.papermc.paper.annotation.DoNotUse void write(FriendlyByteBuf buf);
+-    void write(FriendlyByteBuf buf, @javax.annotation.Nullable com.destroystokyo.paper.antixray.ChunkPacketInfo<T> chunkPacketInfo, int chunkSectionIndex);
++    void write(FriendlyByteBuf buf, @javax.annotation.Nullable com.destroystokyo.paper.antixray.ChunkPacketInfoAntiXray chunkPacketInfo, int chunkSectionIndex); // Fiddle - client perspective - block state visualization - every ChunkPacketInfo is ChunkPacketInfoAntiXray
+     // Paper end
+ 
+     int getSerializedSize();

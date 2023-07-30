@@ -70,6 +70,18 @@ index cf20f0983fc25b26cf92b9d3a28746b1909fc56b..92e3e2eaa14958ac56a22f3730ad69bf
      private static class PacketHolder {
  
          final Packet<?> packet;
+diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
+index 009e3a81a257ccb428926dfeb1f7101fac598502..f29104b8cde286bacb391b74dadd83d086ad6cc9 100644
+--- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
++++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
+@@ -282,6 +282,7 @@ public class ServerPlayer extends Player {
+     public io.papermc.paper.chunk.system.RegionizedPlayerChunkLoader.PlayerChunkLoaderData chunkLoader;
+ 
+     public boolean hasBeenPlacedIntoPlayerList = false; // Fiddle - client perspective - send resource pack
++    public boolean hasFinishedBeingPlacedIntoPlayerList = false; // Fiddle - client perspective - wait for client information
+ 
+     public io.papermc.paper.chunk.system.RegionizedPlayerChunkLoader.ViewDistances getViewDistances() {
+         return this.viewDistances.get();
 diff --git a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 index 8e90ffa0d59ed708ab53c1b761a2c2a1a20a1e7b..33fb5a3036d04acdd6c70b843d2681367c83b114 100644
 --- a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
@@ -101,7 +113,7 @@ index 8e90ffa0d59ed708ab53c1b761a2c2a1a20a1e7b..33fb5a3036d04acdd6c70b843d268136
  
      // CraftBukkit start
 diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
-index a8f80ef4b9d0eb9db19ea50155b26fd9df5db152..59b86861fa1a05ec4c8326f0f7d3f45c6326c4a3 100644
+index a8f80ef4b9d0eb9db19ea50155b26fd9df5db152..820836fda03ab2fe970b3f8881e0d75d4c817b45 100644
 --- a/src/main/java/net/minecraft/server/players/PlayerList.java
 +++ b/src/main/java/net/minecraft/server/players/PlayerList.java
 @@ -195,6 +195,15 @@ public abstract class PlayerList {
@@ -120,7 +132,7 @@ index a8f80ef4b9d0eb9db19ea50155b26fd9df5db152..59b86861fa1a05ec4c8326f0f7d3f45c
          ServerPlayer player = playerconnection.player;
          if (player.hasBeenPlacedIntoPlayerList) {
              return;
-@@ -298,6 +307,30 @@ public abstract class PlayerList {
+@@ -298,6 +307,22 @@ public abstract class PlayerList {
  
          // Spigot - view distance
          playerconnection.send(new ClientboundLoginPacket(player.getId(), worlddata.isHardcore(), player.gameMode.getGameModeForPlayer(), player.gameMode.getPreviousGameModeForPlayer(), this.server.levelKeys(), this.synchronizedRegistries, worldserver1.dimensionTypeId(), worldserver1.dimension(), BiomeManager.obfuscateSeed(worldserver1.getSeed()), this.getMaxPlayers(), worldserver1.getWorld().getSendViewDistance(), worldserver1.getWorld().getSimulationDistance(), flag1, !flag, worldserver1.isDebug(), worldserver1.isFlat(), player.getLastDeathLocation(), player.getPortalCooldown())); // Paper - replace old player chunk management
@@ -131,14 +143,6 @@ index a8f80ef4b9d0eb9db19ea50155b26fd9df5db152..59b86861fa1a05ec4c8326f0f7d3f45c
 +        finalWorldserver1 = worldserver1;
 +        finalS1 = s1;
 +        finalWorlddata = worlddata;
-+        {
-+            net.minecraft.core.Holder<net.minecraft.world.level.biome.Biome> plains = worldserver1.registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.BIOME)
-+                .getHolderOrThrow(net.minecraft.world.level.biome.Biomes.PLAINS);
-+            player.connection.send(new net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket(
-+                new net.minecraft.world.level.chunk.EmptyLevelChunk(worldserver1, player.chunkPosition(), plains),
-+                worldserver1.getLightEngine(), null, null, false)
-+            );
-+        }
 +        }
 +        this.placeNewPlayerAfterReceiveClientInformation = () -> {
 +        var player = finalPlayer;
@@ -151,11 +155,12 @@ index a8f80ef4b9d0eb9db19ea50155b26fd9df5db152..59b86861fa1a05ec4c8326f0f7d3f45c
          player.getBukkitEntity().sendSupportedChannels(); // CraftBukkit
          playerconnection.send(new ClientboundUpdateEnabledFeaturesPacket(FeatureFlags.REGISTRY.toNames(worldserver1.enabledFeatures())));
          playerconnection.send(new ClientboundCustomPayloadPacket(ClientboundCustomPayloadPacket.BRAND, (new FriendlyByteBuf(Unpooled.buffer())).writeUtf(this.getServer().getServerModName())));
-@@ -425,6 +458,15 @@ public abstract class PlayerList {
+@@ -425,6 +450,16 @@ public abstract class PlayerList {
              );
          }
          // Paper end
 +        // Fiddle start - client perspective - wait for client information
++        player.hasFinishedBeingPlacedIntoPlayerList = true;
 +        };
 +    }
 +

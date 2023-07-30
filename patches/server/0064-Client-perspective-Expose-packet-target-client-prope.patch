@@ -8,7 +8,7 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/network/FriendlyByteBuf.java b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
-index 9938bb90bef84cf784f9a1ceb02a1a45aa8b48a1..321aff31e6d19e39fd4d442d9e2b423360c92adf 100644
+index 9938bb90bef84cf784f9a1ceb02a1a45aa8b48a1..5e893afec7fdb18d94392667ae8095c783b464a5 100644
 --- a/src/main/java/net/minecraft/network/FriendlyByteBuf.java
 +++ b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
 @@ -27,6 +27,7 @@ import java.io.DataOutput;
@@ -30,17 +30,16 @@ index 9938bb90bef84cf784f9a1ceb02a1a45aa8b48a1..321aff31e6d19e39fd4d442d9e2b4233
  import net.minecraft.util.Crypt;
  import net.minecraft.util.CryptException;
  import net.minecraft.util.GsonHelper;
-@@ -79,6 +82,9 @@ import net.minecraft.world.level.ChunkPos;
+@@ -79,6 +82,8 @@ import net.minecraft.world.level.ChunkPos;
  import net.minecraft.world.level.Level;
  import net.minecraft.world.phys.BlockHitResult;
  import net.minecraft.world.phys.Vec3;
 +import org.fiddlemc.fiddle.packet.ClientPerspective;
-+import org.fiddlemc.fiddle.packet.PacketWithExplicitTargetClientPerspective;
 +import org.jetbrains.annotations.NotNull;
  import org.joml.Quaternionf;
  import org.joml.Vector3f;
  
-@@ -98,6 +104,13 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -98,6 +103,13 @@ public class FriendlyByteBuf extends ByteBuf {
      private static final int MAX_PUBLIC_KEY_LENGTH = 512;
      private static final Gson GSON = new Gson();
  
@@ -54,7 +53,7 @@ index 9938bb90bef84cf784f9a1ceb02a1a45aa8b48a1..321aff31e6d19e39fd4d442d9e2b4233
      public FriendlyByteBuf(ByteBuf parent) {
          this.source = parent;
      }
-@@ -1676,4 +1689,31 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -1676,4 +1688,46 @@ public class FriendlyByteBuf extends ByteBuf {
              };
          }
      }
@@ -70,6 +69,21 @@ index 9938bb90bef84cf784f9a1ceb02a1a45aa8b48a1..321aff31e6d19e39fd4d442d9e2b4233
 +     */
 +    public @NotNull ClientPerspective getExplicitTargetClientPerspective() throws NullPointerException {
 +        return this.writingPacket.get().getExplicitTargetClientPerspective();
++    }
++
++    /**
++     * @return The same value as {@link #getExplicitTargetClientPerspective()}, except that it returns null
++     * where {@link #getExplicitTargetClientPerspective()} would otherwise throw an exception.
++     */
++    public @Nullable ClientPerspective getExplicitTargetClientPerspectiveOrNull() throws NullPointerException {
++        if (this.writingPacket == null) {
++            return null;
++        }
++        var actualWritingPacket = this.writingPacket.get();
++        if (actualWritingPacket == null) {
++            return null;
++        }
++        return actualWritingPacket.getExplicitTargetClientPerspectiveOrNull();
 +    }
 +
 +    /**

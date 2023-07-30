@@ -8,10 +8,10 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index fe8dbc73b4d0617428dd3619ec2a5c2d5a267553..e9b0e336e87f0bc12bdc96c2380f03960756f9c1 100644
+index f687bb6b8899885f918c309edc4b1fd4c1dca5c9..b1352ed3c8242916b6395a66ce2e93fea1b6f8bb 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-@@ -2040,12 +2040,20 @@ public class ServerPlayer extends Player {
+@@ -2042,12 +2042,20 @@ public class ServerPlayer extends Player {
              PlayerChangedMainHandEvent event = new PlayerChangedMainHandEvent(this.getBukkitEntity(), getMainArm() == HumanoidArm.LEFT ? MainHand.LEFT : MainHand.RIGHT);
              this.server.server.getPluginManager().callEvent(event);
          }
@@ -26,7 +26,7 @@ index fe8dbc73b4d0617428dd3619ec2a5c2d5a267553..e9b0e336e87f0bc12bdc96c2380f0396
          }
          this.locale = packet.language;
 +        // Fiddle start - client perspective - localization - update inventory after locale change
-+        if (localeChanged) {
++        if (localeChanged && this.hasFinishedBeingPlacedIntoPlayerList) {
 +            this.getBukkitEntity().updateInventory();
 +        }
 +        // Fiddle end - client perspective - localization - update inventory after locale change

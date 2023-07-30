@@ -7,18 +7,39 @@ Subject: [PATCH] Client perspective - Localization - Store server-side
 License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacer.java b/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacer.java
+index 176518b57b491e5a1bfafcfaa81af1fd1db16611..5fffbd4be2304164bf1fb2c5039803ba0ca7c16e 100644
+--- a/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacer.java
++++ b/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacer.java
+@@ -11,6 +11,7 @@ import net.minecraft.network.chat.MutableComponent;
+ import net.minecraft.network.chat.contents.TranslatableContents;
+ import net.minecraft.world.item.ItemStack;
+ import org.fiddlemc.fiddle.packet.item.ItemStackInPacketContext;
++import org.fiddlemc.fiddle.packet.locale.ServerSideTranslations;
+ import org.jetbrains.annotations.NotNull;
+ import org.jetbrains.annotations.Nullable;
+ 
+@@ -425,8 +426,7 @@ public final class DeepReplacer {
+     }
+ 
+     private static @NotNull ComponentContents replaceTranslatableContents(@NotNull TranslatableContents value, @Nullable String locale) {
+-        // TODO call implementation
+-        return value;
++        return ServerSideTranslations.replace(value, locale); // Fiddle - client perspective - localization - store server-side translations
+     }
+ 
+ }
 diff --git a/src/main/java/org/fiddlemc/fiddle/packet/locale/ServerSideTranslations.java b/src/main/java/org/fiddlemc/fiddle/packet/locale/ServerSideTranslations.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..817cdf278c1682bd695785b40d5378dd6207f0b3
+index 0000000000000000000000000000000000000000..615a9e4d6337ee14d3183c2f679354709ec08370
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/packet/locale/ServerSideTranslations.java
-@@ -0,0 +1,197 @@
+@@ -0,0 +1,196 @@
 +// Fiddle - client perspective - localization - store server-side translations
 +
 +package org.fiddlemc.fiddle.packet.locale;
 +
 +import net.minecraft.locale.Language;
-+import net.minecraft.network.chat.Component;
 +import net.minecraft.network.chat.ComponentContents;
 +import net.minecraft.network.chat.contents.LiteralContents;
 +import net.minecraft.network.chat.contents.TranslatableContents;
@@ -85,7 +106,7 @@ index 0000000000000000000000000000000000000000..817cdf278c1682bd695785b40d5378dd
 +
 +    /**
 +     * Looks up a key in either {@link #vanillaKeyTranslations} or {@link #addedKeyTranslations},
-+     * in the order as defined by {@link #getTranslatableReplacement}.
++     * in the order as defined by {@link #replace}.
 +     *
 +     * @return The value found, or null if no value was found.
 +     */
@@ -169,7 +190,7 @@ index 0000000000000000000000000000000000000000..817cdf278c1682bd695785b40d5378dd
 +     *     <li>Any translation</li>
 +     * </ul>
 +     */
-+    public static @NotNull ComponentContents getTranslatableReplacement(@NotNull TranslatableContents translatableContents, @Nullable String locale) {
++    public static @NotNull ComponentContents replace(@NotNull TranslatableContents translatableContents, @Nullable String locale) {
 +
 +        String translationKey = translatableContents.getKey();
 +        if (translationKey == null) {
