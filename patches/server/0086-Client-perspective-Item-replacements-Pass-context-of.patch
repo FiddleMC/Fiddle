@@ -1,0 +1,71 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sun, 23 Jul 2023 11:11:53 +0200
+Subject: [PATCH] Client perspective - Item replacements - Pass context of
+ stonecutter recipe results
+
+License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/world/item/crafting/RecipeSerializer.java b/src/main/java/net/minecraft/world/item/crafting/RecipeSerializer.java
+index c65ce69ac0cfdd04b16ce4ecd5b87536d727edd4..14bbd01eb15bb922d1562641cecf95892b8deed1 100644
+--- a/src/main/java/net/minecraft/world/item/crafting/RecipeSerializer.java
++++ b/src/main/java/net/minecraft/world/item/crafting/RecipeSerializer.java
+@@ -26,7 +26,7 @@ public interface RecipeSerializer<T extends Recipe<?>> {
+     RecipeSerializer<BlastingRecipe> BLASTING_RECIPE = register("blasting", new SimpleCookingSerializer<>(BlastingRecipe::new, 100));
+     RecipeSerializer<SmokingRecipe> SMOKING_RECIPE = register("smoking", new SimpleCookingSerializer<>(SmokingRecipe::new, 100));
+     RecipeSerializer<CampfireCookingRecipe> CAMPFIRE_COOKING_RECIPE = register("campfire_cooking", new SimpleCookingSerializer<>(CampfireCookingRecipe::new, 100));
+-    RecipeSerializer<StonecutterRecipe> STONECUTTER = register("stonecutting", new SingleItemRecipe.Serializer<>(StonecutterRecipe::new));
++    RecipeSerializer<StonecutterRecipe> STONECUTTER = register("stonecutting", new StonecutterRecipe.Serializer()); // Fiddle - client perspective - item replacements - pass context of stonecutter recipe results
+     RecipeSerializer<SmithingTransformRecipe> SMITHING_TRANSFORM = register("smithing_transform", new SmithingTransformRecipe.Serializer());
+     RecipeSerializer<SmithingTrimRecipe> SMITHING_TRIM = register("smithing_trim", new SmithingTrimRecipe.Serializer());
+     RecipeSerializer<DecoratedPotRecipe> DECORATED_POT_RECIPE = register("crafting_decorated_pot", new SimpleCraftingRecipeSerializer<>(DecoratedPotRecipe::new));
+diff --git a/src/main/java/net/minecraft/world/item/crafting/StonecutterRecipe.java b/src/main/java/net/minecraft/world/item/crafting/StonecutterRecipe.java
+index 6d5803fcdd0a0b2d106745e9e6b859693b2aade2..51926d7b360eae7780207095da9b5685e36e848e 100644
+--- a/src/main/java/net/minecraft/world/item/crafting/StonecutterRecipe.java
++++ b/src/main/java/net/minecraft/world/item/crafting/StonecutterRecipe.java
+@@ -1,5 +1,6 @@
+ package net.minecraft.world.item.crafting;
+ 
++import net.minecraft.network.FriendlyByteBuf;
+ import net.minecraft.resources.ResourceLocation;
+ import net.minecraft.world.Container;
+ import net.minecraft.world.item.ItemStack;
+@@ -12,6 +13,7 @@ import org.bukkit.craftbukkit.inventory.CraftRecipe;
+ import org.bukkit.craftbukkit.inventory.CraftStonecuttingRecipe;
+ import org.bukkit.craftbukkit.util.CraftNamespacedKey;
+ import org.bukkit.inventory.Recipe;
++import org.fiddlemc.fiddle.packet.item.ItemStackInPacketContext;
+ // CraftBukkit end
+ 
+ public class StonecutterRecipe extends SingleItemRecipe {
+@@ -41,4 +43,29 @@ public class StonecutterRecipe extends SingleItemRecipe {
+         return recipe;
+     }
+     // CraftBukkit end
++
++    // Fiddle start - client perspective - item replacements - pass context of stonecutter recipe results
++    /**
++     * A {@link SingleItemRecipe.Serializer} that writes the {@link #result}
++     * of a stone cutter recipe to a {@link FriendlyByteBuf} with its
++     * {@linkplain ItemStackInPacketContext#STONECUTTER_RECIPE_RESULT distinguishing context}.
++     */
++    public static class Serializer extends SingleItemRecipe.Serializer<StonecutterRecipe> {
++
++        protected Serializer() {
++            super(StonecutterRecipe::new);
++        }
++
++        @Override
++        public void toNetwork(FriendlyByteBuf buf, StonecutterRecipe recipe) {
++            // Based on SingleItemRecipe.Serializer<StonecutterRecipe>#toNetwork
++            buf.writeUtf(recipe.group);
++            recipe.ingredient.toNetwork(buf);
++            // Use the distinguishing context
++            buf.writeItem(recipe.result, ItemStackInPacketContext.STONECUTTER_RECIPE_RESULT);
++        }
++
++    }
++    // Fiddle end - client perspective - item replacements - pass context of stonecutter recipe results
++
+ }

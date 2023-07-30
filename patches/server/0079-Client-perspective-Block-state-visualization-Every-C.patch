@@ -88,10 +88,10 @@ index 06b862eeeaf105ea9d844d8b21246ae1eaaaa15e..3095ecfc7f6aa95284c7812e52f5fb68
  
          for(LevelChunkSection levelChunkSection : chunk.getSections()) {
 diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
-index f16c5011e436d69836bf51e838f4fea4e1dca923..5b5b00beea78bcc27666373cb60bbd42e985dc5a 100644
+index 08ec9fa4f3193642c4debef1fe3d551ec6b9ee15..ddf163db7c23483c3cad8c0b2af459fcfbf460da 100644
 --- a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
 +++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
-@@ -42,11 +42,11 @@ public class ClientboundLevelChunkWithLightPacket implements Packet<ClientGamePa
+@@ -45,11 +45,11 @@ public class ClientboundLevelChunkWithLightPacket implements Packet<ClientGamePa
          ChunkPos chunkPos = chunk.getPos();
          this.x = chunkPos.x;
          this.z = chunkPos.z;

@@ -77,10 +77,10 @@ index 5fffbd4be2304164bf1fb2c5039803ba0ca7c16e..20fde382d7095b546f48e9133a2a46b6
      /**
 diff --git a/src/main/java/org/fiddlemc/fiddle/packet/item/ItemStackInPacketReplacer.java b/src/main/java/org/fiddlemc/fiddle/packet/item/ItemStackInPacketReplacer.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..ff519738508f7f0f936e7076ea71b1bb5c150786
+index 0000000000000000000000000000000000000000..d253bd43680b6ab1650e8ab71ad2983b3bcc10ba
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/packet/item/ItemStackInPacketReplacer.java
-@@ -0,0 +1,162 @@
+@@ -0,0 +1,160 @@
 +// Fiddle - client perspective - item replacements
 +
 +package org.fiddlemc.fiddle.packet.item;
@@ -221,8 +221,6 @@ index 0000000000000000000000000000000000000000..ff519738508f7f0f936e7076ea71b1bb
 +        }
 +
 +        // TODO If a replacement was constructed with a different type, set its durability to the same percentage as the original's durability
-+
-+        // TODO If a replacement was constructed, store the original item in the NBT if the player is in creative mode
 +
 +        // Finally, we perform any additional replacements in the tag as needed
 +        var tag = (replacement != null ? replacement : original).getTag();

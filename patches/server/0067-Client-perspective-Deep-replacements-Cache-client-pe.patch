@@ -8,10 +8,10 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/network/FriendlyByteBuf.java b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
-index 5e893afec7fdb18d94392667ae8095c783b464a5..14dd6e844e9a3062656c41895587c03cc1ad345e 100644
+index 1d015f01908991ee7433896e74be829285311164..6536d84b95d0d4ede52b41b47c68054f793fdaac 100644
 --- a/src/main/java/net/minecraft/network/FriendlyByteBuf.java
 +++ b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
-@@ -83,6 +83,7 @@ import net.minecraft.world.level.Level;
+@@ -85,6 +85,7 @@ import net.minecraft.world.level.Level;
  import net.minecraft.world.phys.BlockHitResult;
  import net.minecraft.world.phys.Vec3;
  import org.fiddlemc.fiddle.packet.ClientPerspective;
@@ -19,7 +19,7 @@ index 5e893afec7fdb18d94392667ae8095c783b464a5..14dd6e844e9a3062656c41895587c03c
  import org.jetbrains.annotations.NotNull;
  import org.joml.Quaternionf;
  import org.joml.Vector3f;
-@@ -110,6 +111,8 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -112,6 +113,8 @@ public class FriendlyByteBuf extends ByteBuf {
      public @Nullable WeakReference<@NotNull Packet<?>> writingPacket;
      // Fiddle end - client perspective - packets are modifiable - store explicit perspective and locale - FriendlyByteBuf
  
@@ -28,7 +28,7 @@ index 5e893afec7fdb18d94392667ae8095c783b464a5..14dd6e844e9a3062656c41895587c03c
      public FriendlyByteBuf(ByteBuf parent) {
          this.source = parent;
      }
-@@ -1730,4 +1733,13 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -1744,4 +1747,13 @@ public class FriendlyByteBuf extends ByteBuf {
      }
      // Fiddle end - client perspective - packets are modifiable - expose target client properties - can be used by FriendlyByteBuf
  

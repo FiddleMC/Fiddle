@@ -8,7 +8,7 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/network/FriendlyByteBuf.java b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
-index 9938bb90bef84cf784f9a1ceb02a1a45aa8b48a1..5e893afec7fdb18d94392667ae8095c783b464a5 100644
+index 9938bb90bef84cf784f9a1ceb02a1a45aa8b48a1..1d015f01908991ee7433896e74be829285311164 100644
 --- a/src/main/java/net/minecraft/network/FriendlyByteBuf.java
 +++ b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
 @@ -27,6 +27,7 @@ import java.io.DataOutput;
@@ -19,7 +19,7 @@ index 9938bb90bef84cf784f9a1ceb02a1a45aa8b48a1..5e893afec7fdb18d94392667ae8095c7
  import java.nio.ByteBuffer;
  import java.nio.ByteOrder;
  import java.nio.channels.FileChannel;
-@@ -67,8 +68,10 @@ import net.minecraft.nbt.NbtIo;
+@@ -67,8 +68,11 @@ import net.minecraft.nbt.NbtIo;
  import net.minecraft.nbt.Tag;
  import net.minecraft.network.chat.Component;
  import net.minecraft.network.chat.MutableComponent;
@@ -27,10 +27,15 @@ index 9938bb90bef84cf784f9a1ceb02a1a45aa8b48a1..5e893afec7fdb18d94392667ae8095c7
  import net.minecraft.resources.ResourceKey;
  import net.minecraft.resources.ResourceLocation;
 +import net.minecraft.server.level.ServerPlayer;
++import net.minecraft.server.level.ServerPlayerGameMode;
  import net.minecraft.util.Crypt;
  import net.minecraft.util.CryptException;
  import net.minecraft.util.GsonHelper;
-@@ -79,6 +82,8 @@ import net.minecraft.world.level.ChunkPos;
+@@ -76,9 +80,12 @@ import net.minecraft.util.Mth;
+ import net.minecraft.world.item.Item;
+ import net.minecraft.world.item.ItemStack;
+ import net.minecraft.world.level.ChunkPos;
++import net.minecraft.world.level.GameType;
  import net.minecraft.world.level.Level;
  import net.minecraft.world.phys.BlockHitResult;
  import net.minecraft.world.phys.Vec3;
@@ -39,7 +44,7 @@ index 9938bb90bef84cf784f9a1ceb02a1a45aa8b48a1..5e893afec7fdb18d94392667ae8095c7
  import org.joml.Quaternionf;
  import org.joml.Vector3f;
  
-@@ -98,6 +103,13 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -98,6 +105,13 @@ public class FriendlyByteBuf extends ByteBuf {
      private static final int MAX_PUBLIC_KEY_LENGTH = 512;
      private static final Gson GSON = new Gson();
  
@@ -53,7 +58,7 @@ index 9938bb90bef84cf784f9a1ceb02a1a45aa8b48a1..5e893afec7fdb18d94392667ae8095c7
      public FriendlyByteBuf(ByteBuf parent) {
          this.source = parent;
      }
-@@ -1676,4 +1688,46 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -1676,4 +1690,58 @@ public class FriendlyByteBuf extends ByteBuf {
              };
          }
      }
@@ -96,6 +101,18 @@ index 9938bb90bef84cf784f9a1ceb02a1a45aa8b48a1..5e893afec7fdb18d94392667ae8095c7
 +     */
 +    public @Nullable String getExplicitTargetLocale() throws NullPointerException {
 +        return this.writingPacket.get().getExplicitTargetLocale();
++    }
++
++    /**
++     * @return The explicit {@linkplain ServerPlayerGameMode#getGameModeForPlayer() game mode} of the target player
++     * of a packet that is writing its contents to this {@link FriendlyByteBuf}.
++     * This method always return a non-null value or throws an exception, and it must never actually throw
++     * such an exception (if there is a possibility of an exception being thrown,
++     * the method should not be called at all), similarly to
++     * {@link Packet#getExplicitTargetClientPerspective()}.
++     */
++    public @NotNull GameType getExplicitTargetGameMode() throws NullPointerException {
++        return this.writingPacket.get().getExplicitTargetGameMode();
 +    }
 +    // Fiddle end - client perspective - packets are modifiable - expose target client properties - can be used by FriendlyByteBuf
 +

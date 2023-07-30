@@ -52,10 +52,10 @@ index 3243d5c0d1d8a4d8abe4dfd2b8e2d79b12977f4f..86688cae00ba8d4d40cecec363760087
  
      private void obfuscateLayer(int y, BitStorageReader bitStorageReader, BitStorageWriter bitStorageWriter, boolean[] solid, boolean[] obfuscate, int[] presetBlockStateBits, boolean[][] current, boolean[][] next, boolean[][] nextNext, LevelChunkSection[] nearbyChunkSections, IntSupplier random) {
 diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
-index 5b5b00beea78bcc27666373cb60bbd42e985dc5a..405fbbc2ff52ee4a26b95f49728d7abbba56ffa9 100644
+index ddf163db7c23483c3cad8c0b2af459fcfbf460da..65357ea834cf907b35903a53c81b589a5434ed1e 100644
 --- a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
 +++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
-@@ -28,11 +28,17 @@ public class ClientboundLevelChunkWithLightPacket implements Packet<ClientGamePa
+@@ -31,11 +31,17 @@ public class ClientboundLevelChunkWithLightPacket implements Packet<ClientGamePa
          return this.ready;
      }
  

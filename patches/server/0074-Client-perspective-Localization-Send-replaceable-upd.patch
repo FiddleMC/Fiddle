@@ -1,14 +1,14 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
 Date: Sun, 23 Jul 2023 18:40:48 +0200
-Subject: [PATCH] Client perspective - Localization - Update player inventory
+Subject: [PATCH] Client perspective - Localization - Send replaceable updates
  after locale change
 
 License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index f687bb6b8899885f918c309edc4b1fd4c1dca5c9..b1352ed3c8242916b6395a66ce2e93fea1b6f8bb 100644
+index fea2a32d452133bea967f3ee1eb4bce385e80527..baf1b1749212a15d1e21d2f9f1a45b9730fdc3d8 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
 @@ -2042,12 +2042,20 @@ public class ServerPlayer extends Player {
@@ -16,20 +16,20 @@ index f687bb6b8899885f918c309edc4b1fd4c1dca5c9..b1352ed3c8242916b6395a66ce2e93fe
              this.server.server.getPluginManager().callEvent(event);
          }
 -        if (this.locale == null || !this.locale.equals(packet.language)) { // Paper - check for null
-+        // Fiddle start - client perspective - localization - update inventory after locale change
++        // Fiddle start - client perspective - localization - send update packets for replaceables after locale change
 +        boolean localeChanged = this.locale == null || !this.locale.equals(packet.language);
 +        if (localeChanged) { // Paper - check for null
-+            // Fiddle end - client perspective - localization - update inventory after locale change
++            // Fiddle end - client perspective - localization - send update packets for replaceables after locale change
              PlayerLocaleChangeEvent event = new PlayerLocaleChangeEvent(this.getBukkitEntity(), packet.language);
              this.server.server.getPluginManager().callEvent(event);
              this.server.server.getPluginManager().callEvent(new com.destroystokyo.paper.event.player.PlayerLocaleChangeEvent(this.getBukkitEntity(), this.locale, packet.language)); // Paper
          }
          this.locale = packet.language;
-+        // Fiddle start - client perspective - localization - update inventory after locale change
++        // Fiddle start - client perspective - localization - send update packets for replaceables after locale change
 +        if (localeChanged && this.hasFinishedBeingPlacedIntoPlayerList) {
-+            this.getBukkitEntity().updateInventory();
++            this.sendUpdatesForDeepReplaceableContent(true, true);
 +        }
-+        // Fiddle end - client perspective - localization - update inventory after locale change
++        // Fiddle end - client perspective - localization - send update packets for replaceables after locale change
          // Paper start
          this.adventure$locale = net.kyori.adventure.translation.Translator.parseLocale(this.locale);
          this.connection.connection.channel.attr(PaperAdventure.LOCALE_ATTRIBUTE).set(this.adventure$locale);

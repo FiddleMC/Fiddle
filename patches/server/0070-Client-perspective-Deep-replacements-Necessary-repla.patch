@@ -86,10 +86,10 @@ index 58c84e6745dcd73560bb47afd85e57f998b99a19..4696086d8db031874aaf6702e6fa57f3
          try {
              output.writeUTF(this.data);
 diff --git a/src/main/java/net/minecraft/network/FriendlyByteBuf.java b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
-index e7fdb36ce71ca6ac9bd0acd5c290284be37cea41..2c9cf84979e5a240d95954d0806eb2d50a29d5fe 100644
+index c5aa578d984f5350b850012c25e5a62124cc8207..5f2873fe70f8813ffff832067bcba1df70698757 100644
 --- a/src/main/java/net/minecraft/network/FriendlyByteBuf.java
 +++ b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
-@@ -85,6 +85,7 @@ import net.minecraft.world.phys.Vec3;
+@@ -87,6 +87,7 @@ import net.minecraft.world.phys.Vec3;
  import org.fiddlemc.fiddle.packet.ClientPerspective;
  import org.fiddlemc.fiddle.packet.deepreplacement.ClientPerspectiveAndSettingsSupplier;
  import org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope;
@@ -97,7 +97,7 @@ index e7fdb36ce71ca6ac9bd0acd5c290284be37cea41..2c9cf84979e5a240d95954d0806eb2d5
  import org.fiddlemc.fiddle.packet.item.ItemStackInPacketContext;
  import org.jetbrains.annotations.NotNull;
  import org.joml.Quaternionf;
-@@ -605,6 +606,12 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -607,6 +608,12 @@ public class FriendlyByteBuf extends ByteBuf {
      }
  
      public FriendlyByteBuf writeComponent(Component text, @NotNull ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, @NotNull DeepReplacementScope replacementScope) {
@@ -110,7 +110,7 @@ index e7fdb36ce71ca6ac9bd0acd5c290284be37cea41..2c9cf84979e5a240d95954d0806eb2d5
          // Fiddle end - client perspective - deep replacements - pass scope - to FriendlyByteBuf#writeComponent(net.minecraft.network.chat.Component)
          //return this.a(IChatBaseComponent.ChatSerializer.a(ichatbasecomponent), 262144); // Paper - comment
          return this.writeUtf(PaperAdventure.asJsonString(text, this.adventure$locale), 262144, true, false, clientPerspectiveAndSettings, replacementScope); // Paper // Fiddle - client perspective - deep replacements - pass scope - to FriendlyByteBuf#writeComponent(net.minecraft.network.chat.Component)
-@@ -762,6 +769,12 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -764,6 +771,12 @@ public class FriendlyByteBuf extends ByteBuf {
          if (stack.isEmpty() || stack.getItem() == null) { // CraftBukkit - NPE fix itemstack.getItem()
              this.writeBoolean(false);
          } else {
@@ -123,7 +123,7 @@ index e7fdb36ce71ca6ac9bd0acd5c290284be37cea41..2c9cf84979e5a240d95954d0806eb2d5
              this.writeBoolean(true);
              Item item = stack.getItem();
  
-@@ -850,6 +863,26 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -852,6 +865,26 @@ public class FriendlyByteBuf extends ByteBuf {
      }
  
      public FriendlyByteBuf writeUtf(String string, int maxLength, boolean canBeRawJsonText, boolean canBeSNBT, @NotNull ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, @NotNull DeepReplacementScope replacementScope) {

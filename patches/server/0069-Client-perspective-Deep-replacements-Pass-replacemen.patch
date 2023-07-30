@@ -194,10 +194,10 @@ index 0c3fb39dfff42cc322b82c6da885d39f866aee41..775641e0caa21a5eca1ce404fc99b2bf
      String toString();
  
 diff --git a/src/main/java/net/minecraft/network/FriendlyByteBuf.java b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
-index 14dd6e844e9a3062656c41895587c03cc1ad345e..e7fdb36ce71ca6ac9bd0acd5c290284be37cea41 100644
+index 6536d84b95d0d4ede52b41b47c68054f793fdaac..c5aa578d984f5350b850012c25e5a62124cc8207 100644
 --- a/src/main/java/net/minecraft/network/FriendlyByteBuf.java
 +++ b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
-@@ -84,6 +84,8 @@ import net.minecraft.world.phys.BlockHitResult;
+@@ -86,6 +86,8 @@ import net.minecraft.world.phys.BlockHitResult;
  import net.minecraft.world.phys.Vec3;
  import org.fiddlemc.fiddle.packet.ClientPerspective;
  import org.fiddlemc.fiddle.packet.deepreplacement.ClientPerspectiveAndSettingsSupplier;
@@ -206,7 +206,7 @@ index 14dd6e844e9a3062656c41895587c03cc1ad345e..e7fdb36ce71ca6ac9bd0acd5c290284b
  import org.jetbrains.annotations.NotNull;
  import org.joml.Quaternionf;
  import org.joml.Vector3f;
-@@ -561,18 +563,51 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -563,18 +565,51 @@ public class FriendlyByteBuf extends ByteBuf {
  
      // Paper start
      public FriendlyByteBuf writeComponent(final net.kyori.adventure.text.Component component) {
@@ -261,7 +261,7 @@ index 14dd6e844e9a3062656c41895587c03cc1ad345e..e7fdb36ce71ca6ac9bd0acd5c290284b
      }
  
      public <T extends Enum<T>> T readEnum(Class<T> enumClass) {
-@@ -648,11 +683,22 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -650,11 +685,22 @@ public class FriendlyByteBuf extends ByteBuf {
      }
  
      public FriendlyByteBuf writeNbt(@Nullable CompoundTag compound) {
@@ -285,7 +285,7 @@ index 14dd6e844e9a3062656c41895587c03cc1ad345e..e7fdb36ce71ca6ac9bd0acd5c290284b
              } catch (Exception ioexception) { // CraftBukkit - IOException -> Exception
                  throw new EncoderException(ioexception);
              }
-@@ -690,6 +736,29 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -692,6 +738,29 @@ public class FriendlyByteBuf extends ByteBuf {
      }
  
      public FriendlyByteBuf writeItem(ItemStack stack) {
@@ -315,7 +315,7 @@ index 14dd6e844e9a3062656c41895587c03cc1ad345e..e7fdb36ce71ca6ac9bd0acd5c290284b
          if (stack.isEmpty() || stack.getItem() == null) { // CraftBukkit - NPE fix itemstack.getItem()
              this.writeBoolean(false);
          } else {
-@@ -708,7 +777,7 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -710,7 +779,7 @@ public class FriendlyByteBuf extends ByteBuf {
                  nbttagcompound = stack.getTag();
              }
  
@@ -324,7 +324,7 @@ index 14dd6e844e9a3062656c41895587c03cc1ad345e..e7fdb36ce71ca6ac9bd0acd5c290284b
          }
  
          return this;
-@@ -763,6 +832,25 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -765,6 +834,25 @@ public class FriendlyByteBuf extends ByteBuf {
      }
  
      public FriendlyByteBuf writeUtf(String string, int maxLength) {
@@ -350,7 +350,7 @@ index 14dd6e844e9a3062656c41895587c03cc1ad345e..e7fdb36ce71ca6ac9bd0acd5c290284b
          if (string.length() > maxLength) {
              int j = string.length();
  
-@@ -790,7 +878,7 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -792,7 +880,7 @@ public class FriendlyByteBuf extends ByteBuf {
      }
  
      public FriendlyByteBuf writeResourceLocation(ResourceLocation id) {
@@ -359,7 +359,7 @@ index 14dd6e844e9a3062656c41895587c03cc1ad345e..e7fdb36ce71ca6ac9bd0acd5c290284b
          return this;
      }
  
-@@ -896,7 +984,7 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -898,7 +986,7 @@ public class FriendlyByteBuf extends ByteBuf {
  
      public void writeGameProfile(GameProfile gameProfile) {
          this.writeUUID(gameProfile.getId());
@@ -368,7 +368,7 @@ index 14dd6e844e9a3062656c41895587c03cc1ad345e..e7fdb36ce71ca6ac9bd0acd5c290284b
          this.writeGameProfileProperties(gameProfile.getProperties());
      }
  
-@@ -929,11 +1017,13 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -931,11 +1019,13 @@ public class FriendlyByteBuf extends ByteBuf {
      }
  
      public void writeProperty(Property property) {
@@ -385,7 +385,7 @@ index 14dd6e844e9a3062656c41895587c03cc1ad345e..e7fdb36ce71ca6ac9bd0acd5c290284b
          } else {
              this.writeBoolean(false);
          }
-@@ -1742,4 +1832,15 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -1756,4 +1846,15 @@ public class FriendlyByteBuf extends ByteBuf {
      }
      // Fiddle end - client perspective - deep replacements - perspective and settings supplier - cache in FriendlyByteBuf
  

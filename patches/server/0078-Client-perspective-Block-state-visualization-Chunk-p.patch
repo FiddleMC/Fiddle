@@ -56,10 +56,10 @@ index 924539d4ac50c70178ba220424ffacd6ff277c8b..b1c9cf5028383f8d4a663fdf9c6f4465
  
          private final SingleUserAreaMap<PlayerChunkLoaderData> broadcastMap = new SingleUserAreaMap<>(this) {
 diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
-index 978fc83b209ae831ba1d6315cad1adeefe58a98c..f16c5011e436d69836bf51e838f4fea4e1dca923 100644
+index 978fc83b209ae831ba1d6315cad1adeefe58a98c..08ec9fa4f3193642c4debef1fe3d551ec6b9ee15 100644
 --- a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
 +++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
-@@ -1,14 +1,21 @@
+@@ -1,14 +1,24 @@
  package net.minecraft.network.protocol.game;
  
 +import java.lang.ref.WeakReference;
@@ -69,9 +69,12 @@ index 978fc83b209ae831ba1d6315cad1adeefe58a98c..f16c5011e436d69836bf51e838f4fea4
  import net.minecraft.network.protocol.Packet;
 +import net.minecraft.server.level.ServerPlayer;
  import net.minecraft.world.level.ChunkPos;
++import net.minecraft.world.level.GameType;
  import net.minecraft.world.level.chunk.LevelChunk;
  import net.minecraft.world.level.lighting.LevelLightEngine;
++import org.fiddlemc.fiddle.packet.ClientPerspective;
 +import org.fiddlemc.fiddle.packet.block.ClientChunkDataPerspective;
++import org.jetbrains.annotations.NotNull;
  
  public class ClientboundLevelChunkWithLightPacket implements Packet<ClientGamePacketListener> {
 +    // Fiddle start - client perspective - block state visualization - chunk packets are for a specific client
@@ -81,7 +84,7 @@ index 978fc83b209ae831ba1d6315cad1adeefe58a98c..f16c5011e436d69836bf51e838f4fea4
      private final int x;
      private final int z;
      private final ClientboundLevelChunkPacketData chunkData;
-@@ -27,12 +34,15 @@ public class ClientboundLevelChunkWithLightPacket implements Packet<ClientGamePa
+@@ -27,12 +37,15 @@ public class ClientboundLevelChunkWithLightPacket implements Packet<ClientGamePa
      // Paper end
  
      // Paper start - Anti-Xray - Add chunk packet info
@@ -100,7 +103,7 @@ index 978fc83b209ae831ba1d6315cad1adeefe58a98c..f16c5011e436d69836bf51e838f4fea4
          this.chunkData = new ClientboundLevelChunkPacketData(chunk, chunkPacketInfo);
          // Paper end
          this.lightData = new ClientboundLightUpdatePacketData(chunkPos, lightProvider, skyBits, blockBits);
-@@ -40,10 +50,7 @@ public class ClientboundLevelChunkWithLightPacket implements Packet<ClientGamePa
+@@ -40,10 +53,7 @@ public class ClientboundLevelChunkWithLightPacket implements Packet<ClientGamePa
      }
  
      public ClientboundLevelChunkWithLightPacket(FriendlyByteBuf buf) {
@@ -112,6 +115,38 @@ index 978fc83b209ae831ba1d6315cad1adeefe58a98c..f16c5011e436d69836bf51e838f4fea4
      }
  
      @Override
+@@ -81,4 +91,31 @@ public class ClientboundLevelChunkWithLightPacket implements Packet<ClientGamePa
+         return this.chunkData.getExtraPackets();
+     }
+     // Paper end
++
++    // Fiddle start - client perspective - block state visualization - chunk packets are for a specific client
++    @Override
++    public @NotNull ClientPerspective getExplicitTargetClientPerspective() {
++        return this.player.get().getClientPerspective();
++    }
++
++    @Override
++    public @org.jetbrains.annotations.Nullable ClientPerspective getExplicitTargetClientPerspectiveOrNull() {
++        var actualPlayer = this.player.get();
++        if (actualPlayer == null) {
++            return null;
++        }
++        return actualPlayer.getClientPerspective();
++    }
++
++    @Override
++    public @org.jetbrains.annotations.Nullable String getExplicitTargetLocale() {
++        return this.player.get().locale;
++    }
++
++    @Override
++    public @NotNull GameType getExplicitTargetGameMode() {
++        return this.player.get().gameMode.getGameModeForPlayer();
++    }
++    // Fiddle end - client perspective - block state visualization - chunk packets are for a specific client
++
+ }
 diff --git a/src/main/java/net/minecraft/server/level/ChunkMap.java b/src/main/java/net/minecraft/server/level/ChunkMap.java
 index 9209b598d7168b82574e4800056b8b9f84265dd0..5811e76d0dfb8163d93583017d0ba2140bc982b1 100644
 --- a/src/main/java/net/minecraft/server/level/ChunkMap.java
@@ -156,7 +191,7 @@ index 9209b598d7168b82574e4800056b8b9f84265dd0..5811e76d0dfb8163d93583017d0ba214
          DebugPackets.sendPoiPacketsForChunk(this.level, chunk.getPos());
          // Paper - no longer needed - this was used to account for clients bugging out since they needed a chunk to store entities, but they no longer need a chunk
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index 6e05afbd39e4be1da345a203773a0864a548c510..a04cfd2072daa924064d598ad611858e23037bda 100644
+index 2cb2ceb0d4b68a0710635e6c60cc31c4837b003d..906805ea87f0949a4796b8fdfe460c426f9a97a5 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
 @@ -8,6 +8,8 @@ import com.mojang.datafixers.util.Either;
@@ -177,7 +212,7 @@ index 6e05afbd39e4be1da345a203773a0864a548c510..a04cfd2072daa924064d598ad611858e
      public io.papermc.paper.chunk.system.RegionizedPlayerChunkLoader.ViewDistances getViewDistances() {
          return this.viewDistances.get();
      }
-@@ -2704,4 +2708,16 @@ public class ServerPlayer extends Player {
+@@ -2732,4 +2736,16 @@ public class ServerPlayer extends Player {
      }
      // Fiddle end - client perspective - block state visualization - send to player without modifications
  

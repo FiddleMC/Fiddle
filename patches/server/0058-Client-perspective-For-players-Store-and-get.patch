@@ -7,23 +7,25 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/network/Connection.java b/src/main/java/net/minecraft/network/Connection.java
-index 92e3e2eaa14958ac56a22f3730ad69bf659109f1..60b2b798f0faa64f816cc2c600ca304d27535f95 100644
+index 92e3e2eaa14958ac56a22f3730ad69bf659109f1..68fcd73f89ba8917b5852ac72ce62ba44c6116a2 100644
 --- a/src/main/java/net/minecraft/network/Connection.java
 +++ b/src/main/java/net/minecraft/network/Connection.java
-@@ -41,10 +41,12 @@ import net.minecraft.network.protocol.PacketFlow;
+@@ -41,10 +41,14 @@ import net.minecraft.network.protocol.PacketFlow;
  import net.minecraft.network.protocol.game.ClientboundDisconnectPacket;
  import net.minecraft.network.protocol.login.ClientboundLoginDisconnectPacket;
  import net.minecraft.server.RunningOnDifferentThreadException;
 +import net.minecraft.server.level.ServerPlayer;
++import net.minecraft.server.level.ServerPlayerGameMode;
  import net.minecraft.server.network.ServerGamePacketListenerImpl;
  import net.minecraft.util.LazyLoadedValue;
  import net.minecraft.util.Mth;
++import net.minecraft.world.level.GameType;
  import org.apache.commons.lang3.Validate;
 +import org.fiddlemc.fiddle.packet.ClientPerspective;
  import org.jetbrains.annotations.NotNull;
  import org.slf4j.Logger;
  import org.slf4j.Marker;
-@@ -881,6 +883,38 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+@@ -881,6 +885,59 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
      }
      // Fiddle end - client perspective - wait for client information
  
@@ -32,7 +34,7 @@ index 92e3e2eaa14958ac56a22f3730ad69bf659109f1..60b2b798f0faa64f816cc2c600ca304d
 +     * @return The {@link ClientPerspective} of this connection's {@linkplain #getPlayer() player}.
 +     * This is null if the player is null.
 +     *
-+     * @see net.minecraft.server.level.ServerPlayer#getClientPerspective
++     * @see ServerPlayer#getClientPerspective
 +     */
 +    public final @Nullable ClientPerspective getPlayerClientPerspective() {
 +        var player = this.getPlayer();
@@ -41,14 +43,14 @@ index 92e3e2eaa14958ac56a22f3730ad69bf659109f1..60b2b798f0faa64f816cc2c600ca304d
 +        }
 +        return player.getClientPerspective();
 +    }
-+    // Fiddle start - client perspective - player - get from connection
++    // Fiddle end - client perspective - player - get from connection
 +
 +    // Fiddle start - client perspective - localization - get player locale from connection
 +    /**
 +     * @return The {@linkplain ServerPlayer#locale locale} of this connection's {@linkplain #getPlayer() player}.
 +     * This is null if the player is null.
 +     *
-+     * @see net.minecraft.server.level.ServerPlayer#locale
++     * @see ServerPlayer#locale
 +     */
 +    public final @Nullable String getPlayerLocale() {
 +        var player = this.getPlayer();
@@ -57,7 +59,28 @@ index 92e3e2eaa14958ac56a22f3730ad69bf659109f1..60b2b798f0faa64f816cc2c600ca304d
 +        }
 +        return player.locale;
 +    }
-+    // Fiddle start - client perspective - localization - get player locale from connection
++    // Fiddle end - client perspective - localization - get player locale from connection
++
++    // Fiddle start - client perspective - item replacements - store original in NBT - get player game mode from connection
++    /**
++     * @return The {@linkplain ServerPlayerGameMode#getGameModeForPlayer() game mode}
++     * of this connection's {@linkplain #getPlayer() player}.
++     * This is null if the player is null or if their {@link ServerPlayer#gameMode} is null.
++     *
++     * @see ServerPlayerGameMode#getGameModeForPlayer()
++     */
++    public final @Nullable GameType getPlayerGameMode() {
++        var player = this.getPlayer();
++        if (player == null) {
++            return null;
++        }
++        var gameMode = player.gameMode;
++        if (gameMode == null) {
++            return null;
++        }
++        return gameMode.getGameModeForPlayer();
++    }
++    // Fiddle end - client perspective - item replacements - store original in NBT - get player game mode from connection
 +
      private static class PacketHolder {
  
