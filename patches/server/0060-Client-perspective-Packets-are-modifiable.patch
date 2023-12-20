@@ -9,35 +9,59 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/network/Connection.java b/src/main/java/net/minecraft/network/Connection.java
-index 68fcd73f89ba8917b5852ac72ce62ba44c6116a2..fa6b27da46c98f9a51f4bcf05af2dcd2301e8fa5 100644
+index 68fcd73f89ba8917b5852ac72ce62ba44c6116a2..b508e064ceea897deae7501e71ef991346b0ac87 100644
 --- a/src/main/java/net/minecraft/network/Connection.java
 +++ b/src/main/java/net/minecraft/network/Connection.java
-@@ -445,20 +445,22 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
-             this.channel.config().setAutoRead(false);
-         }
+@@ -390,6 +390,7 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+     }
  
-+        var adaptedPacket = packet.adaptForClient(this); // Fiddle - client perspective - packets are modifiable
-+
-         if (this.channel.eventLoop().inEventLoop()) {
--            this.doSendPacket(packet, callbacks, enumprotocol, enumprotocol1, flush); // Paper
-+            this.doSendPacket(adaptedPacket, callbacks, enumprotocol, enumprotocol1, flush); // Paper // Fiddle - client perspective - packets are modifiable
-         } else {
-             // Paper start - optimise packets that are not flushed
-             // note: since the type is not dynamic here, we need to actually copy the old executor code
-             // into two branches. On conflict, just re-copy - no changes were made inside the executor code.
-             if (!flush) {
-                 io.netty.util.concurrent.AbstractEventExecutor.LazyRunnable run = () -> {
--                    this.doSendPacket(packet, callbacks, enumprotocol, enumprotocol1, flush); // Paper - add flush parameter
-+                    this.doSendPacket(adaptedPacket, callbacks, enumprotocol, enumprotocol1, flush); // Paper - add flush parameter // Fiddle - client perspective - packets are modifiable
-                 };
-                 this.channel.eventLoop().execute(run);
-             } else { // Paper end - optimise packets that are not flushed
-             this.channel.eventLoop().execute(() -> {
--                this.doSendPacket(packet, callbacks, enumprotocol, enumprotocol1, flush); // Paper - add flush parameter // Paper - diff on change
-+                this.doSendPacket(adaptedPacket, callbacks, enumprotocol, enumprotocol1, flush); // Paper - add flush parameter // Paper - diff on change // Fiddle - client perspective - packets are modifiable
-             });
-             } // Paper
+     public void send(Packet<?> packet, @Nullable PacketSendListener callbacks) {
++        packet = packet.adaptForClient(this); // Fiddle - client perspective - packets are modifiable - adapt packet before sending
+         // Paper start - handle oversized packets better
+         boolean connected = this.isConnected();
+         if (!connected && !preparing) {
+@@ -400,7 +401,7 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+             io.papermc.paper.util.MCUtil.isMainThread() && packet.isReady() && this.queue.isEmpty() &&
+             (packet.getExtraPackets() == null || packet.getExtraPackets().isEmpty())
+         ))) {
+-            this.sendPacket(packet, callbacks, null); // Paper
++            this.sendPacket(packet, callbacks, null, true); // Paper // Fiddle - client perspective - packets are modifiable - adapt packet before sending
+             return;
          }
+         // write the packets to the queue, then flush - antixray hooks there already
+@@ -424,10 +425,22 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+     }
+ 
+     private void sendPacket(Packet<?> packet, @Nullable PacketSendListener callbacks) {
++        // Fiddle start - client perspective - packets are modifiable - adapt packet before sending
++        this.sendPacket(packet, callbacks, false);
++    }
++
++    private void sendPacket(Packet<?> packet, @Nullable PacketSendListener callbacks, boolean alreadyAdapted) {
++        // Fiddle end - client perspective - packets are modifiable - adapt packet before sending
+         // Paper start - add flush parameter
+-        this.sendPacket(packet, callbacks, Boolean.TRUE);
++        this.sendPacket(packet, callbacks, Boolean.TRUE, alreadyAdapted); // Fiddle - client perspective - packets are modifiable - adapt packet before sending
+     }
+     private void sendPacket(Packet<?> packet, @Nullable PacketSendListener callbacks, Boolean flushConditional) {
++        // Fiddle start - client perspective - packets are modifiable - adapt packet before sending
++        this.sendPacket(packet, callbacks, flushConditional, false);
++    }
++    private void sendPacket(Packet<?> originalPacket, @Nullable PacketSendListener callbacks, Boolean flushConditional, boolean alreadyAdapted) {
++        var packet = alreadyAdapted ? originalPacket : originalPacket.adaptForClient(this);
++        // Fiddle end - client perspective - packets are modifiable - adapt packet before sending
+         this.packetWrites.getAndIncrement(); // must be befeore using canFlush
+         boolean effectiveFlush = flushConditional == null ? this.canFlush : flushConditional.booleanValue();
+         final boolean flush = effectiveFlush || packet instanceof net.minecraft.network.protocol.game.ClientboundKeepAlivePacket || packet instanceof ClientboundDisconnectPacket; // no delay for certain packets
+@@ -572,7 +585,7 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+             } else {
+                 iterator.remove();
+                 if (queued.tryMarkConsumed()) { // Paper - try to mark isConsumed flag for de-duplicating packet
+-                    this.sendPacket(packet, queued.listener, (!iterator.hasNext() && (needsFlush || this.canFlush)) ? Boolean.TRUE : Boolean.FALSE); // Paper - make only one flush call per sendPacketQueue() call
++                    this.sendPacket(packet, queued.listener, (!iterator.hasNext() && (needsFlush || this.canFlush)) ? Boolean.TRUE : Boolean.FALSE, true); // Paper - make only one flush call per sendPacketQueue() call // Fiddle - client perspective - packets are modifiable - adapt packet before sending
+                     hasWrotePacket = true; // Paper - make only one flush call per sendPacketQueue() call
+                 }
+             }
 diff --git a/src/main/java/net/minecraft/network/protocol/BundlePacket.java b/src/main/java/net/minecraft/network/protocol/BundlePacket.java
 index ba1763d6d399f282e34aa51a4d40a4e6a0eefcbb..0462cbff6eb3366077c1628c0c8a10e99c9fdf90 100644
 --- a/src/main/java/net/minecraft/network/protocol/BundlePacket.java

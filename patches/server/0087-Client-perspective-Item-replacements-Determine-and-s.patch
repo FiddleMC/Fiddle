@@ -8,10 +8,10 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index e40e392cbe91fbf58b4068c8f94600de83ec114c..7b58c0218f8dbb46d0969cafa9b005f7f7922bd0 100644
+index f5a2c2dede0ce27db7e514f7c20264fa7256f4ce..3d07c01174e85743265cddb4a6556e270511de26 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
-@@ -55,6 +55,7 @@ import net.minecraft.util.profiling.jfr.Environment;
+@@ -60,6 +60,7 @@ import net.minecraft.util.profiling.jfr.Environment;
  import net.minecraft.util.profiling.jfr.JvmProfiler;
  import net.minecraft.util.worldupdate.WorldUpgrader;
  import net.minecraft.world.flag.FeatureFlags;
@@ -19,17 +19,18 @@ index e40e392cbe91fbf58b4068c8f94600de83ec114c..7b58c0218f8dbb46d0969cafa9b005f7
  import net.minecraft.world.level.GameRules;
  import net.minecraft.world.level.LevelSettings;
  import net.minecraft.world.level.WorldDataConfiguration;
-@@ -71,6 +72,7 @@ import net.minecraft.world.level.storage.WorldData;
+@@ -73,6 +74,8 @@ import net.minecraft.world.level.storage.LevelSummary;
+ import net.minecraft.world.level.storage.PrimaryLevelData;
+ import net.minecraft.world.level.storage.WorldData;
  import org.bukkit.Material;
- import org.fiddlemc.fiddle.packet.ClientPerspectiveCategory;
- import org.fiddlemc.fiddle.packet.block.OnePerCategoryBlockStateVisualizationSetupProvider;
++import org.fiddlemc.fiddle.packet.ClientPerspectiveCategory;
 +import org.fiddlemc.fiddle.packet.item.VanillaItemOverrideVisualHandle;
  import org.fiddlemc.fiddle.packet.locale.ServerSideTranslations;
  import org.fiddlemc.fiddle.server.FiddleFeatureSupport;
  import org.fiddlemc.fiddle.configuration.FiddleConfigurations;
-@@ -258,6 +260,15 @@ public class Main {
-             }
-             // Fiddle end - client perspective - block state visualization - determine and store visualizations
+@@ -249,6 +252,15 @@ public class Main {
+             ServerSideTranslations.registerVanillaTranslationReplacement("en_us", "block.minecraft.bookshelf", "Oak Bookshelf");
+             // Fiddle end - client perspective - localization - register server-side translations
  
 +            // Fiddle start - client perspective - item replacements - determine and store desired visual handles
 +            // TODO This doesn't do anything interesting yet: should be replaced with an actual mechanism that bases this on the resource pack assets

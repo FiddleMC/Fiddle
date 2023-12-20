@@ -11,7 +11,7 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/network/Connection.java b/src/main/java/net/minecraft/network/Connection.java
-index fa6b27da46c98f9a51f4bcf05af2dcd2301e8fa5..cff3cab14e386c4578ad0b716d7467b8c25ce70e 100644
+index b508e064ceea897deae7501e71ef991346b0ac87..ac8d5e9a38e4821bd146d10296f70741c47e466e 100644
 --- a/src/main/java/net/minecraft/network/Connection.java
 +++ b/src/main/java/net/minecraft/network/Connection.java
 @@ -26,6 +26,8 @@ import io.netty.channel.socket.nio.NioSocketChannel;
@@ -32,7 +32,7 @@ index fa6b27da46c98f9a51f4bcf05af2dcd2301e8fa5..cff3cab14e386c4578ad0b716d7467b8
      public Connection(PacketFlow side) {
          this.receiving = side;
      }
-@@ -940,6 +944,18 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+@@ -951,6 +955,18 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
      }
      // Fiddle end - client perspective - item replacements - store original in NBT - get player game mode from connection
  
