@@ -22,6 +22,177 @@ Licensed (except for image files) under: GPL-3.0 (https://www.gnu.org/licenses/g
 
 Gale - https://galemc.org
 
+diff --git a/LGPL.txt b/LGPL.txt
+deleted file mode 100644
+index 65c5ca88a67c30becee01c5a8816d964b03862f9..0000000000000000000000000000000000000000
+--- a/LGPL.txt
++++ /dev/null
+@@ -1,165 +0,0 @@
+-                   GNU LESSER GENERAL PUBLIC LICENSE
+-                       Version 3, 29 June 2007
+-
+- Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>
+- Everyone is permitted to copy and distribute verbatim copies
+- of this license document, but changing it is not allowed.
+-
+-
+-  This version of the GNU Lesser General Public License incorporates
+-the terms and conditions of version 3 of the GNU General Public
+-License, supplemented by the additional permissions listed below.
+-
+-  0. Additional Definitions.
+-
+-  As used herein, "this License" refers to version 3 of the GNU Lesser
+-General Public License, and the "GNU GPL" refers to version 3 of the GNU
+-General Public License.
+-
+-  "The Library" refers to a covered work governed by this License,
+-other than an Application or a Combined Work as defined below.
+-
+-  An "Application" is any work that makes use of an interface provided
+-by the Library, but which is not otherwise based on the Library.
+-Defining a subclass of a class defined by the Library is deemed a mode
+-of using an interface provided by the Library.
+-
+-  A "Combined Work" is a work produced by combining or linking an
+-Application with the Library.  The particular version of the Library
+-with which the Combined Work was made is also called the "Linked
+-Version".
+-
+-  The "Minimal Corresponding Source" for a Combined Work means the
+-Corresponding Source for the Combined Work, excluding any source code
+-for portions of the Combined Work that, considered in isolation, are
+-based on the Application, and not on the Linked Version.
+-
+-  The "Corresponding Application Code" for a Combined Work means the
+-object code and/or source code for the Application, including any data
+-and utility programs needed for reproducing the Combined Work from the
+-Application, but excluding the System Libraries of the Combined Work.
+-
+-  1. Exception to Section 3 of the GNU GPL.
+-
+-  You may convey a covered work under sections 3 and 4 of this License
+-without being bound by section 3 of the GNU GPL.
+-
+-  2. Conveying Modified Versions.
+-
+-  If you modify a copy of the Library, and, in your modifications, a
+-facility refers to a function or data to be supplied by an Application
+-that uses the facility (other than as an argument passed when the
+-facility is invoked), then you may convey a copy of the modified
+-version:
+-
+-   a) under this License, provided that you make a good faith effort to
+-   ensure that, in the event an Application does not supply the
+-   function or data, the facility still operates, and performs
+-   whatever part of its purpose remains meaningful, or
+-
+-   b) under the GNU GPL, with none of the additional permissions of
+-   this License applicable to that copy.
+-
+-  3. Object Code Incorporating Material from Library Header Files.
+-
+-  The object code form of an Application may incorporate material from
+-a header file that is part of the Library.  You may convey such object
+-code under terms of your choice, provided that, if the incorporated
+-material is not limited to numerical parameters, data structure
+-layouts and accessors, or small macros, inline functions and templates
+-(ten or fewer lines in length), you do both of the following:
+-
+-   a) Give prominent notice with each copy of the object code that the
+-   Library is used in it and that the Library and its use are
+-   covered by this License.
+-
+-   b) Accompany the object code with a copy of the GNU GPL and this license
+-   document.
+-
+-  4. Combined Works.
+-
+-  You may convey a Combined Work under terms of your choice that,
+-taken together, effectively do not restrict modification of the
+-portions of the Library contained in the Combined Work and reverse
+-engineering for debugging such modifications, if you also do each of
+-the following:
+-
+-   a) Give prominent notice with each copy of the Combined Work that
+-   the Library is used in it and that the Library and its use are
+-   covered by this License.
+-
+-   b) Accompany the Combined Work with a copy of the GNU GPL and this license
+-   document.
+-
+-   c) For a Combined Work that displays copyright notices during
+-   execution, include the copyright notice for the Library among
+-   these notices, as well as a reference directing the user to the
+-   copies of the GNU GPL and this license document.
+-
+-   d) Do one of the following:
+-
+-       0) Convey the Minimal Corresponding Source under the terms of this
+-       License, and the Corresponding Application Code in a form
+-       suitable for, and under terms that permit, the user to
+-       recombine or relink the Application with a modified version of
+-       the Linked Version to produce a modified Combined Work, in the
+-       manner specified by section 6 of the GNU GPL for conveying
+-       Corresponding Source.
+-
+-       1) Use a suitable shared library mechanism for linking with the
+-       Library.  A suitable mechanism is one that (a) uses at run time
+-       a copy of the Library already present on the user's computer
+-       system, and (b) will operate properly with a modified version
+-       of the Library that is interface-compatible with the Linked
+-       Version.
+-
+-   e) Provide Installation Information, but only if you would otherwise
+-   be required to provide such information under section 6 of the
+-   GNU GPL, and only to the extent that such information is
+-   necessary to install and execute a modified version of the
+-   Combined Work produced by recombining or relinking the
+-   Application with a modified version of the Linked Version. (If
+-   you use option 4d0, the Installation Information must accompany
+-   the Minimal Corresponding Source and Corresponding Application
+-   Code. If you use option 4d1, you must provide the Installation
+-   Information in the manner specified by section 6 of the GNU GPL
+-   for conveying Corresponding Source.)
+-
+-  5. Combined Libraries.
+-
+-  You may place library facilities that are a work based on the
+-Library side by side in a single library together with other library
+-facilities that are not Applications and are not covered by this
+-License, and convey such a combined library under terms of your
+-choice, if you do both of the following:
+-
+-   a) Accompany the combined library with a copy of the same work based
+-   on the Library, uncombined with any other library facilities,
+-   conveyed under the terms of this License.
+-
+-   b) Give prominent notice with the combined library that part of it
+-   is a work based on the Library, and explaining where to find the
+-   accompanying uncombined form of the same work.
+-
+-  6. Revised Versions of the GNU Lesser General Public License.
+-
+-  The Free Software Foundation may publish revised and/or new versions
+-of the GNU Lesser General Public License from time to time. Such new
+-versions will be similar in spirit to the present version, but may
+-differ in detail to address new problems or concerns.
+-
+-  Each version is given a distinguishing version number. If the
+-Library as you received it specifies that a certain numbered version
+-of the GNU Lesser General Public License "or any later version"
+-applies to it, you have the option of following the terms and
+-conditions either of that published version or of any later version
+-published by the Free Software Foundation. If the Library as you
+-received it does not specify a version number of the GNU Lesser
+-General Public License, you may choose any version of the GNU Lesser
+-General Public License ever published by the Free Software Foundation.
+-
+-  If the Library as you received it specifies that a proxy can decide
+-whether future versions of the GNU Lesser General Public License shall
+-apply, that proxy's public statement of acceptance of any version is
+-permanent authorization for you to choose that version for the
+-Library.
 diff --git a/build.gradle.kts b/build.gradle.kts
 index 4073145e01b34ec31ce16e5a75f4634a6c192e99..97d35399f7e598c2dc1ebf08448075969385d3a8 100644
 --- a/build.gradle.kts
@@ -35,99 +206,6 @@ index 4073145e01b34ec31ce16e5a75f4634a6c192e99..97d35399f7e598c2dc1ebf0844807596
              "Implementation-Vendor" to date, // Paper
              "Specification-Title" to "Bukkit",
              "Specification-Version" to project.version,
-diff --git a/license/FPL-1.0.txt b/license/FPL-1.0.txt
-new file mode 100644
-index 0000000000000000000000000000000000000000..5217f52bf08e479525ab4af9af20869da33c26ed
---- /dev/null
-+++ b/license/FPL-1.0.txt
-@@ -0,0 +1,86 @@
-+Below is the Fiddle Public License Agreement 1.0 (FPL-1.0),
-+which applies only to parts of Fiddle that are specifically and
-+explicitly released under FPL-1.0.
-+
-+                FIDDLE PUBLIC LICENSE AGREEMENT
-+                    Version 1.0, 29 May 2023
-+
-+ Copyright (C) 2023 Martijn Muijsers
-+ Everyone is permitted to copy and distribute verbatim copies
-+ of this license document, but changing it is not allowed.
-+
-+  For pre-existing (typically as part of the Minecraft, Bukkit,
-+CraftBukkit, Spigot or Paper source code) files patched with Fiddle
-+patches by the Paperweight patch system, any patch hunks that apply to
-+those files are licensed under the GNU General Public License, version 3
-+(GPL-3.0).
-+
-+  Similarly, any components (such as patch hunks, source files or
-+included libraries) in a composite product (such as a repository of
-+source code or a jar release file) that is released under this license
-+(going forward, to be understood as the Fiddle Public License Agreement
-+1.0) as a whole, and which are individually licensed under MIT, GPL-3.0
-+or as part of an official Minecraft product (such as the Minecraft server
-+source code, which is restrictively licensed as per Microsoft's terms),
-+and which are not part of the modificiations made by Fiddle or any
-+derivative thereof, are not subject to the further conditions of this
-+license, but are instead licensed under their respective original
-+licenses.
-+
-+  For files newly created with Fiddle patches (such as Java source code
-+files to merge resource packs), any patch hunks that apply to those files
-+are licensed subject to GPL-3.0 with the alterations that follow in this
-+license.
-+
-+1. Share-alike
-+
-+  Where the GPL-3.0 license would require releasing something (whether
-+pertaining to source code, binaries or otherwise) under a license that
-+conforms to some particular requirements, such as GPL-3.0, the
-+requirement instead becomes to release under this license.
-+
-+2. Paywalled content must pay-it-forward
-+
-+  You may not use Fiddle or a derivative thereof to provide a service to
-+users, where some features are only available for payment, or more easily
-+accessible after some payment than otherwise, except if you clearly
-+credit Fiddle and the authors and contributors to the corresponding
-+features and their assets, and where possible, pass a fair part (as would
-+be considered fair by the community of the receiving parties, or in the
-+form of a set amount or ratio as chosen by the author of the features) of
-+the revenue on to those parties.
-+  As an example, if you install a free pack that adds content, but only
-+allow donators to use some parts of that content, then you must donate
-+a fair part of the donations to that pack's authors and Fiddle.
-+
-+3. Prohibition on re-selling the server jar
-+
-+  Fiddle or derivatives thereof, including any resulting server jar, do
-+not require having their source code shared just for running them as a
-+Minecraft server, similar to GPL-3.0.
-+  This means, that as a server owner, you may make additional custom
-+modifications to the Fiddle source code, and use the resulting server jar
-+as your Minecraft server.
-+
-+  However, distribution of Fiddle or derivatives thereof, including
-+any resulting server jar, is not allowed to be conditional, whether
-+financial or otherwise, to any extent.
-+  For example, as a server host you are not allowed to place any
-+conditions on server owners to use Fiddle or a derivative, compared to
-+the corresponding upstream or an alternative (such as Paper or Fabric) or
-+provide any cheaper or less conditional package at all that does not
-+support Fiddle, but supports an upstream or alternative thereof.
-+  Providing access to the functionality of Fiddle or derivatives thereof
-+in any way, whether directly or indirectly, that is not directed at an
-+end user Minecraft client, is considered distribution.
-+  Additionally, any such distribution of a Fiddle derivative that is not
-+directed at an end user Minecraft client requires the full source code of
-+the additional modifications in the modified version (as defined by
-+GPL-3.0) to be pre-emptively, publicly (specifically, as a public
-+repository on GitHub) released under the Fiddle Public License Agreement
-+1.0, and a reference to that release must be clearly displayed to all
-+intermediate users (such as server owners) and end users (such as
-+Minecraft clients).
-+  For example, distributing a derivative of Fiddle that contains
-+performance enhancements requires the full source code for the
-+modifications to be pre-emptively, publicly released.
-\ No newline at end of file
 diff --git a/LICENCE.txt b/license/GPL-3.0.txt
 similarity index 98%
 rename from LICENCE.txt
@@ -170,20 +248,6 @@ index 94a9ed024d3859793618152ea559a168bbcbb5e2..2d5b975212128baa0b84f9ec723491f5
  Public License instead of this License.  But first, please read
 -<http://www.gnu.org/philosophy/why-not-lgpl.html>.
 +<https://www.gnu.org/licenses/why-not-lgpl.html>.
-diff --git a/LGPL.txt b/license/LGPL-3.0.txt
-similarity index 97%
-rename from LGPL.txt
-rename to license/LGPL-3.0.txt
-index 65c5ca88a67c30becee01c5a8816d964b03862f9..0d0f2ad656e123e3c9e289706363f93b7c9edda3 100644
---- a/LGPL.txt
-+++ b/license/LGPL-3.0.txt
-@@ -1,3 +1,6 @@
-+Below is the GNU Lesser General Public License, version 3 (LGPL-3.0),
-+which applies only to parts of Fiddle that are specifically and explicitly released under LGPL-3.0.
-+
-                    GNU LESSER GENERAL PUBLIC LICENSE
-                        Version 3, 29 June 2007
- 
 diff --git a/license/MIT.txt b/license/MIT.txt
 new file mode 100644
 index 0000000000000000000000000000000000000000..4cd1c5d76394f8f7f99005563a75b4275decae41
