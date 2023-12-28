@@ -315,43 +315,6 @@ index 550dcb7d595221b221e4710890d8a3cad789fc07..d16853e748f8c187c525210df5ccee66
                      // Paper end
                  }
          // Paper - rewrite player chunk loader
-diff --git a/src/main/java/org/fiddlemc/fiddle/packet/PacketWithVersionPerClientPerspective.java b/src/main/java/org/fiddlemc/fiddle/packet/PacketWithVersionPerClientPerspective.java
-index e4117ad506ebe69c134c3fdb69179b6387b5b0cc..ec769a7a76cf3fa06333ddcf59b675fca3d1c863 100644
---- a/src/main/java/org/fiddlemc/fiddle/packet/PacketWithVersionPerClientPerspective.java
-+++ b/src/main/java/org/fiddlemc/fiddle/packet/PacketWithVersionPerClientPerspective.java
-@@ -26,7 +26,7 @@ public abstract class PacketWithVersionPerClientPerspective<T extends PacketList
-      * <br>
-      * This is null if and only if this instance is an original packet.
-      */
--    private @Nullable ClientPerspective clientPerspective;
-+    protected @Nullable ClientPerspective clientPerspective;
- 
-     /**
-      * A map of the {@link ClientPerspective}-specific versions of this packet.
-@@ -34,18 +34,21 @@ public abstract class PacketWithVersionPerClientPerspective<T extends PacketList
-      * This is null when this instance is not an original packet, or if this instance is an original packet
-      * but no {@link ClientPerspective}-specific versions have been created yet.
-      */
--    private @Nullable Map<@NotNull ClientPerspective, @NotNull PacketWithVersionPerClientPerspective<T>> specificVersions;
-+    protected @Nullable Map<@NotNull ClientPerspective, @NotNull PacketWithVersionPerClientPerspective<T>> specificVersions;
- 
-     /**
-      * The original {@link Packet} of this packet.
-      * <br>
-      * This is null if and only if this instance is an original packet.
-      */
--    private @Nullable PacketWithVersionPerClientPerspective<T> original;
-+    protected @Nullable PacketWithVersionPerClientPerspective<T> original;
- 
-     /**
-      * @return A newly constructed {@link Packet} instance, representing the same content as this packet,
-      * but modified to match the given {@link ClientPerspective}.
-+     * Some contents referenced by the returned packet may be the exact same instances as referenced by this packet,
-+     * for example, if a large byte array is unchanged between this packet and the modified one, the modified packet's
-+     * corresponding field can have the same byte array instance as value.
-      * <br>
-      * {@link #clientPerspective} and {@link #original} do not have to be set before returning.
-      */
 diff --git a/src/main/java/org/fiddlemc/fiddle/packet/block/ClientboundLevelChunkWithLightPacketForClient.java b/src/main/java/org/fiddlemc/fiddle/packet/block/ClientboundLevelChunkWithLightPacketForClient.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..200ca1bd3e9db6e3270d8738f042b74b3b160db2
