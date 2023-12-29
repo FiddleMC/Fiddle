@@ -3,6 +3,8 @@ From: Martijn Muijsers <martijnmuijsers@live.nl>
 Date: Tue, 18 Jul 2023 20:11:18 +0200
 Subject: [PATCH] Configuration - Include in timings export
 
+Adds the content of the Fiddle configuration files to timings exports, just like the Bukkit, Spigot and Paper configurations.
+
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 

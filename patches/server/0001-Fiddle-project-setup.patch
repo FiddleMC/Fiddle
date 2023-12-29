@@ -3,6 +3,11 @@ From: Martijn Muijsers <martijnmuijsers@live.nl>
 Date: Thu, 24 Nov 2022 21:26:57 +0100
 Subject: [PATCH] Fiddle project setup
 
+Sets up the `fiddle-server` module build file correctly:
+* Remove Paper inter-module dependencies
+* Create a constant for the `fiddle-api` module name and depend on it
+* Re-add dependency on Paper MojangAPI (but externally this time)
+
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 

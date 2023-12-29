@@ -3,6 +3,8 @@ From: Martijn Muijsers <martijnmuijsers@live.nl>
 Date: Wed, 12 Jul 2023 21:29:08 +0200
 Subject: [PATCH] Dev import deobfuscation fixes
 
+Contains all fixes to source code files after decompilation (that are then to be modified by Fiddle but not Paper), needed to make them function as intended again after re-compilation.
+
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 

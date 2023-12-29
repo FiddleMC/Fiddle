@@ -3,6 +3,8 @@ From: Martijn Muijsers <martijnmuijsers@live.nl>
 Date: Thu, 1 Jun 2023 19:30:16 +0200
 Subject: [PATCH] Configuration - Get with Bukkit API
 
+Provides an implementation for `Server.getFiddleConfig()`, which is defined in the "Configuration - Get with Bukkit API" patch in the `fiddle-api` module.
+
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 

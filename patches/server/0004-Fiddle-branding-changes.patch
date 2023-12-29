@@ -6,6 +6,12 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
+* Replaces the branding of the server from "Paper" to "Fiddle" wherever relevant and/or appropriate.
+* Replaces Paper icon with the Fiddle icon.
+* Version lookups (such as done by `/version`) will check for updates to the Fiddle repository instead of Paper.
+* Removes the unused LGPL-3.0 license file.
+* Adds license files for GPL-3.0 and MIT.
+
 No license is given for images and license text files.
 Images are copyright (©) FiddleMC and its contributors, all rights reserved.
 License text files are copyright (©) their respective authors.

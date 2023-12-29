@@ -3,6 +3,13 @@ From: Martijn Muijsers <martijnmuijsers@live.nl>
 Date: Wed, 23 Nov 2022 21:05:47 +0100
 Subject: [PATCH] Configuration - Fiddle configuration files
 
+Adds Fiddle configuration files, analogous to Paper:
+* `config/fiddle-global.yml`
+* `config/fiddle-world-defaults.yml`
+* a `fiddle-world.yml` in each world folder
+
+After this patch, the configuration files do not contain any settings yet; those will be added by subsequent patches.
+
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 

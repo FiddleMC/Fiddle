@@ -3,7 +3,10 @@ From: Martijn Muijsers <martijnmuijsers@live.nl>
 Date: Thu, 13 Jul 2023 18:08:05 +0200
 Subject: [PATCH] Define Fiddle namespace
 
-License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
+Adds a constant for the Fiddle namespace (for namespaced keys starting with `fiddle:`).
+Its value is based on `NamespacedKey.FIDDLE`, which is defined in the "Define Fiddle namespace" patch in the `fiddle-api` module.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/resources/ResourceLocation.java b/src/main/java/net/minecraft/resources/ResourceLocation.java
