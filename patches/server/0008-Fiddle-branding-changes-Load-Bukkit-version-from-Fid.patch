@@ -1,0 +1,33 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Fri, 29 Dec 2023 12:18:18 +0100
+Subject: [PATCH] Fiddle branding changes - Load Bukkit version from Fiddle
+ `pom.properties`
+
+Looks up the Bukkit version that Fiddle was compiled against in the `pom.properties` for Fiddle, rather than that for Paper.
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+This patch is based on the following patch:
+"Gale branding changes"
+By: Martijn Muijsers <martijnmuijsers@live.nl>
+As part of: Gale (https://github.com/GaleMC/Gale)
+Licensed (except for image files) under: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+
+* Gale description *
+
+Gale - https://galemc.org
+
+diff --git a/src/main/java/org/bukkit/craftbukkit/util/Versioning.java b/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
+index 774556a62eb240da42e84db4502e2ed43495be17..1c09bc8e3df5eed8d3182d38a5c6ea73054dc381 100644
+--- a/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
++++ b/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
+@@ -11,7 +11,7 @@ public final class Versioning {
+     public static String getBukkitVersion() {
+         String result = "Unknown-Version";
+ 
+-        InputStream stream = Bukkit.class.getClassLoader().getResourceAsStream("META-INF/maven/io.papermc.paper/paper-api/pom.properties");
++        InputStream stream = Bukkit.class.getClassLoader().getResourceAsStream("META-INF/maven/org.fiddlemc.fiddle/fiddle-api/pom.properties"); // Fiddle - branding changes - look up Bukkit version in Fiddle pom.properties
+         Properties properties = new Properties();
+ 
+         if (stream != null) {

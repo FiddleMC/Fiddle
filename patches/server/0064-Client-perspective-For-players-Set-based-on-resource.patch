@@ -8,7 +8,7 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
-index 59b86861fa1a05ec4c8326f0f7d3f45c6326c4a3..a06505b733f6ff238c135d133b2aee38810247db 100644
+index 820836fda03ab2fe970b3f8881e0d75d4c817b45..fac99a6fec1c172fd6a75a625a0fd2d660cd97b5 100644
 --- a/src/main/java/net/minecraft/server/players/PlayerList.java
 +++ b/src/main/java/net/minecraft/server/players/PlayerList.java
 @@ -101,6 +101,8 @@ import net.minecraft.world.scores.Objective;

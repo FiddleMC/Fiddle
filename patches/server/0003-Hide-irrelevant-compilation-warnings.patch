@@ -6,6 +6,8 @@ Subject: [PATCH] Hide irrelevant compilation warnings
 Hides some compilation warnings.
 This is done because Paper code contains many instances that trigger these warnings, leading to them filling the terminal every time it is compiled, and making it harder to find errors among the wall of text.
 
+This patch has an analogous patch in `fiddle-api` with the same name.
+
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 

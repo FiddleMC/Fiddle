@@ -1,0 +1,39 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Fri, 29 Dec 2023 12:56:43 +0100
+Subject: [PATCH] Fiddle branding changes - License - Package into jar
+
+Adds `LICENSE.txt` to built jar files.
+
+This patch has a parallel patch with the same purpose and name in `fiddle-server`.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+This patch is based on the following patch:
+"Gale branding changes"
+By: Martijn Muijsers <martijnmuijsers@live.nl>
+As part of: Gale (https://github.com/GaleMC/Gale)
+Licensed (except for image files) under: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+
+* Gale description *
+
+Gale - https://galemc.org
+
+diff --git a/build.gradle.kts b/build.gradle.kts
+index ec61477602f659c821519de7ef51b6e9b41e0f64..856f1ec771c9c7e60de7ae65269170dd30e527e2 100644
+--- a/build.gradle.kts
++++ b/build.gradle.kts
+@@ -107,6 +107,12 @@ tasks.jar {
+             "Automatic-Module-Name" to "org.bukkit"
+         )
+     }
++
++    // Fiddle start - branding changes - license - package into jar
++    from("${project.projectDir}/LICENSE.txt") {
++        into("")
++    }
++    // Fiddle end - branding changes - license - package into jar
+ }
+ 
+ tasks.withType<Javadoc> {

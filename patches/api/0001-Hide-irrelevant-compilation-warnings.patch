@@ -1,7 +1,12 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
-Date: Tue, 29 Nov 2022 01:15:55 +0100
+Date: Fri, 29 Dec 2023 13:03:42 +0100
 Subject: [PATCH] Hide irrelevant compilation warnings
+
+Hides some compilation warnings.
+This is done because Paper code contains many instances that trigger these warnings, leading to them filling the terminal every time it is compiled, and making it harder to find errors among the wall of text.
+
+This patch has an analogous patch in `fiddle-server` with the same name.
 
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
@@ -18,7 +23,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Gale - https://galemc.org
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 149f9088fe806467656e8b1c4157df60fda69ba7..53ac9109124589d464d11e1517b742a4cf6665e9 100644
+index 149f9088fe806467656e8b1c4157df60fda69ba7..41c9fbdb1e86deb47545659fc7222056f616bea7 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -89,6 +89,15 @@ val generateApiVersioningFile by tasks.registering {
@@ -37,12 +42,3 @@ index 149f9088fe806467656e8b1c4157df60fda69ba7..53ac9109124589d464d11e1517b742a4
  tasks.jar {
      from(generateApiVersioningFile.map { it.outputs.files.singleFile }) {
          into("META-INF/maven/${project.group}/${project.name}")
-@@ -141,6 +150,8 @@ tasks.withType<Javadoc> {
-             into("build/docs/javadoc")
-         }
-     }
-+
-+    options.addStringOption("Xdoclint:none", "-quiet") // Fiddle - Gale - hide irrelevant compilation warnings
- }
- 
- // Paper start

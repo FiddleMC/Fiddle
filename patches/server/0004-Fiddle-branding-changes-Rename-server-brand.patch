@@ -1,0 +1,164 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Fri, 29 Dec 2023 12:11:55 +0100
+Subject: [PATCH] Fiddle branding changes - Rename server brand
+
+Replaces the branding of the server from "Paper" to "Fiddle" wherever relevant and/or appropriate.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+This patch is based on the following patch:
+"Gale branding changes"
+By: Martijn Muijsers <martijnmuijsers@live.nl>
+As part of: Gale (https://github.com/GaleMC/Gale)
+Licensed (except for image files) under: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+
+* Gale description *
+
+Gale - https://galemc.org
+
+diff --git a/build.gradle.kts b/build.gradle.kts
+index 4073145e01b34ec31ce16e5a75f4634a6c192e99..f4e6c46c85850d16153f348e00534cef426c36b4 100644
+--- a/build.gradle.kts
++++ b/build.gradle.kts
+@@ -90,7 +90,7 @@ tasks.jar {
+         attributes(
+             "Main-Class" to "org.bukkit.craftbukkit.Main",
+             "Implementation-Title" to "CraftBukkit",
+-            "Implementation-Version" to "git-Paper-$implementationVersion",
++            "Implementation-Version" to "git-Fiddle-$implementationVersion", // Fiddle - branding changes - rename server brand
+             "Implementation-Vendor" to date, // Paper
+             "Specification-Title" to "Bukkit",
+             "Specification-Version" to project.version,
+diff --git a/src/main/java/com/destroystokyo/paper/console/PaperConsole.java b/src/main/java/com/destroystokyo/paper/console/PaperConsole.java
+index c5d5648f4ca603ef2b1df723b58f9caf4dd3c722..67027b528f12874b37138d149c859c49ce7e1724 100644
+--- a/src/main/java/com/destroystokyo/paper/console/PaperConsole.java
++++ b/src/main/java/com/destroystokyo/paper/console/PaperConsole.java
+@@ -17,7 +17,7 @@ public final class PaperConsole extends SimpleTerminalConsole {
+     @Override
+     protected LineReader buildReader(LineReaderBuilder builder) {
+         builder
+-                .appName("Paper")
++                .appName("Fiddle") // Fiddle - branding changes - rename server brand
+                 .variable(LineReader.HISTORY_FILE, java.nio.file.Paths.get(".console_history"))
+                 .completer(new ConsoleCommandCompleter(this.server))
+                 .option(LineReader.Option.COMPLETE_IN_WORD, true);
+diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
+index 3238cbcba567b1242c77e41f6b6f19a8d157fb4e..a63427a119b0e45d83c723cc9e51883f641e1bd1 100644
+--- a/src/main/java/net/minecraft/server/MinecraftServer.java
++++ b/src/main/java/net/minecraft/server/MinecraftServer.java
+@@ -921,7 +921,13 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+         shutdownThread = Thread.currentThread();
+         org.spigotmc.WatchdogThread.doStop(); // Paper
+         if (!isSameThread()) {
+-            MinecraftServer.LOGGER.info("Stopping main thread (Ignore any thread death message you see! - DO NOT REPORT THREAD DEATH TO PAPER)");
++            // Fiddle start - branding changes - rename server brand - error messages
++            /*
++            We do not want people to report thread issues to Paper,
++            but we do want people to report thread issues to Fiddle.
++             */
++            MinecraftServer.LOGGER.info("Stopping main thread (Ignore any thread death message you see! - DO NOT REPORT THREAD DEATH TO PAPER - If you think this is a Fiddle bug, please report it at https://github.com/FiddleMC/Fiddle/issues )");
++            // Fiddle end - branding changes - rename server brand - error messages
+             while (this.getRunningThread().isAlive()) {
+                 this.getRunningThread().stop();
+                 try {
+@@ -1693,7 +1699,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+ 
+     @DontObfuscate
+     public String getServerModName() {
+-        return "Paper"; // Paper - Paper > // Spigot - Spigot > // CraftBukkit - cb > vanilla!
++        return "Fiddle"; // Fiddle - branding changes - rename server brand - Fiddle > // Paper - Paper > // Spigot - Spigot > // CraftBukkit - cb > vanilla!
+     }
+ 
+     public SystemReport fillSystemReport(SystemReport details) {
+diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
+index a05c1bc8874ef5e380544a6a344c848e37da49c4..0d72b60d2a69c1e6da512bd4f447682bec6ab06f 100644
+--- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
++++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
+@@ -264,7 +264,7 @@ import javax.annotation.Nullable; // Paper
+ import javax.annotation.Nonnull; // Paper
+ 
+ public final class CraftServer implements Server {
+-    private final String serverName = "Paper"; // Paper
++    private final String serverName = "Fiddle"; // Paper // Fiddle - branding changes - rename server brand
+     private final String serverVersion;
+     private final String bukkitVersion = Versioning.getBukkitVersion();
+     private final Logger logger = Logger.getLogger("Minecraft");
+diff --git a/src/main/java/org/bukkit/craftbukkit/scheduler/CraftScheduler.java b/src/main/java/org/bukkit/craftbukkit/scheduler/CraftScheduler.java
+index d7ce4971d9271dbeff4adb9d852e4e7bdf60bf03..78db923735044534003dff89b82341ede99b6c26 100644
+--- a/src/main/java/org/bukkit/craftbukkit/scheduler/CraftScheduler.java
++++ b/src/main/java/org/bukkit/craftbukkit/scheduler/CraftScheduler.java
+@@ -501,7 +501,7 @@ public class CraftScheduler implements BukkitScheduler {
+                 this.parsePending();
+             } else {
+                 // this.debugTail = this.debugTail.setNext(new CraftAsyncDebugger(currentTick + CraftScheduler.RECENT_TICKS, task.getOwner(), task.getTaskClass())); // Paper
+-                task.getOwner().getLogger().log(Level.SEVERE, "Unexpected Async Task in the Sync Scheduler. Report this to Paper"); // Paper
++                task.getOwner().getLogger().log(Level.SEVERE, "Unexpected Async Task in the Sync Scheduler. Report this to Fiddle"); // Paper // Fiddle - branding changes - rename server brand - error messages
+                 // We don't need to parse pending
+                 // (async tasks must live with race-conditions if they attempt to cancel between these few lines of code)
+             }
+diff --git a/src/main/java/org/spigotmc/WatchdogThread.java b/src/main/java/org/spigotmc/WatchdogThread.java
+index 98fba0288be9ed2cb18ffba5cf81148157dd4fcf..7149d588ae45ae6697fa4f0bf0c67c582504e92a 100644
+--- a/src/main/java/org/spigotmc/WatchdogThread.java
++++ b/src/main/java/org/spigotmc/WatchdogThread.java
+@@ -155,14 +155,20 @@ public final class WatchdogThread extends io.papermc.paper.util.TickThread // Pa
+                 if (isLongTimeout) {
+                 // Paper end
+                 log.log( Level.SEVERE, "------------------------------" );
+-                log.log( Level.SEVERE, "The server has stopped responding! This is (probably) not a Paper bug." ); // Paper
++                // Fiddle start - branding changes - rename server brand - error messages
++                /*
++                We do not want people to report thread issues to Paper,
++                but we do want people to report thread issues to Fiddle.
++                 */
++                log.log( Level.SEVERE, "The server has stopped responding! This is (probably) not a Paper bug. This could be a Fiddle bug." ); // Paper
++                // Fiddle end - branding changes - rename server brand - error messages
+                 log.log( Level.SEVERE, "If you see a plugin in the Server thread dump below, then please report it to that author" );
+                 log.log( Level.SEVERE, "\t *Especially* if it looks like HTTP or MySQL operations are occurring" );
+                 log.log( Level.SEVERE, "If you see a world save or edit, then it means you did far more than your server can handle at once" );
+                 log.log( Level.SEVERE, "\t If this is the case, consider increasing timeout-time in spigot.yml but note that this will replace the crash with LARGE lag spikes" );
+-                log.log( Level.SEVERE, "If you are unsure or still think this is a Paper bug, please report this to https://github.com/PaperMC/Paper/issues" );
++                log.log( Level.SEVERE, "If you are unsure or think this is a Fiddle bug, please report this to https://github.com/FiddleMC/Fiddle/issues - and if you think this is a Paper bug, please report this to https://github.com/PaperMC/Paper/issues" ); // Fiddle - branding changes - rename server brand - error messages
+                 log.log( Level.SEVERE, "Be sure to include ALL relevant console errors and Minecraft crash reports" );
+-                log.log( Level.SEVERE, "Paper version: " + Bukkit.getServer().getVersion() );
++                log.log( Level.SEVERE, "Fiddle version: " + Bukkit.getServer().getVersion() ); // Fiddle - branding changes - rename server brand - error messages
+                 //
+                 if ( net.minecraft.world.level.Level.lastPhysicsProblem != null )
+                 {
+@@ -185,12 +191,18 @@ public final class WatchdogThread extends io.papermc.paper.util.TickThread // Pa
+                 // Paper end
+                 } else
+                 {
+-                    log.log(Level.SEVERE, "--- DO NOT REPORT THIS TO PAPER - THIS IS NOT A BUG OR A CRASH  - " + Bukkit.getServer().getVersion() + " ---");
++                    // Fiddle start - branding changes - rename server brand - error messages
++                    /*
++                    We do not want people to report thread issues to Paper,
++                    but we do want people to report thread issues to Fiddle.
++                     */
++                    log.log(Level.SEVERE, "--- DO NOT REPORT THIS TO PAPER - If you think this is a Fiddle bug, please report it at https://github.com/FiddleMC/Fiddle/issues - THIS IS NOT A PAPER BUG OR CRASH - " + Bukkit.getServer().getVersion() + " ---");
++                    // Fiddle end - branding changes - rename server brand - error messages
+                     log.log(Level.SEVERE, "The server has not responded for " + (currentTime - lastTick) / 1000 + " seconds! Creating thread dump");
+                 }
+                 // Paper end - Different message for short timeout
+                 log.log( Level.SEVERE, "------------------------------" );
+-                log.log( Level.SEVERE, "Server thread dump (Look for plugins here before reporting to Paper!):" ); // Paper
++                log.log( Level.SEVERE, "Server thread dump (Look for plugins here before reporting to Fiddle!):" ); // Paper // Fiddle - branding changes
+                 io.papermc.paper.chunk.system.scheduling.ChunkTaskScheduler.dumpAllChunkLoadInfo(isLongTimeout); // Paper // Paper - rewrite chunk system
+                 this.dumpTickingInfo(); // Paper - log detailed tick information
+                 WatchdogThread.dumpThread( ManagementFactory.getThreadMXBean().getThreadInfo( MinecraftServer.getServer().serverThread.getId(), Integer.MAX_VALUE ), log );
+@@ -206,7 +218,13 @@ public final class WatchdogThread extends io.papermc.paper.util.TickThread // Pa
+                     WatchdogThread.dumpThread( thread, log );
+                 }
+                 } else {
+-                    log.log(Level.SEVERE, "--- DO NOT REPORT THIS TO PAPER - THIS IS NOT A BUG OR A CRASH ---");
++                    // Fiddle start - branding changes
++                    /*
++                    We do not want people to report thread issues to Paper,
++                    but we do want people to report thread issues to Fiddle.
++                     */
++                    log.log(Level.SEVERE, "--- DO NOT REPORT THIS TO PAPER - If you think this is a Fiddle bug, please report it at https://github.com/FiddleMC/Fiddle/issues - THIS IS NOT A PAPER BUG OR CRASH ---");
++                    // Fiddle end - branding changes
+                 }
+ 
+                 log.log( Level.SEVERE, "------------------------------" );

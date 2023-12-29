@@ -82,6 +82,44 @@ paperweight {
 //    extraPatchDir.set(layout.projectDirectory.dir("patches/unapplied/server"))
 //}
 
+// Fiddle start - branding changes - license - package into jar
+for (classifier in arrayOf("mojmap", "reobf")) {
+    // Based on io.papermc.paperweight.taskcontainers.BundlerJarTasks
+    tasks.named("create${classifier.capitalized()}PaperclipJar") {
+        doLast {
+
+            // Based on io.papermc.paperweight.taskcontainers.BundlerJarTasks
+            val jarName = listOfNotNull(
+                project.name,
+                "paperclip",
+                project.version,
+                classifier
+            ).joinToString("-") + ".jar"
+
+            // Based on io.papermc.paperweight.taskcontainers.BundlerJarTasks
+            val zipFile = layout.buildDirectory.file("libs/$jarName").path
+
+            val rootDir = io.papermc.paperweight.util.findOutputDir(zipFile)
+
+            try {
+                io.papermc.paperweight.util.unzip(zipFile, rootDir)
+
+                val licenseFileName = "LICENSE.txt"
+                project(":fiddle-server").projectDir.resolve(licenseFileName).copyTo(rootDir.resolve(licenseFileName).toFile())
+
+                io.papermc.paperweight.util.ensureDeleted(zipFile)
+
+                io.papermc.paperweight.util.zip(rootDir, zipFile)
+            } finally {
+                @OptIn(kotlin.io.path.ExperimentalPathApi::class)
+                rootDir.deleteRecursively()
+            }
+
+        }
+    }
+}
+// Fiddle end - branding changes - license - package into jar
+
 // Fiddle start - extend jar manifest
 val extendedManifestElements: List<Pair<String, String>> = listOf(
     "Add-Opens" to "java.base/java.lang" // Fiddle - modifiable Bukkit enums - inject runtime versions - add module opens to server jar

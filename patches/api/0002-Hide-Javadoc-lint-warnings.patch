@@ -1,0 +1,35 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Fri, 29 Dec 2023 13:05:45 +0100
+Subject: [PATCH] Hide Javadoc lint warnings
+
+Hides lint warnings printed when Javadocs are generated.
+This is done because Paper code contains many instances that trigger these warnings, leading to them filling the terminal every time Javadocs are generated.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+This patch is based on the following patch:
+"Hide irrelevant compilation warnings"
+By: Martijn Muijsers <martijnmuijsers@live.nl>
+As part of: Gale (https://github.com/GaleMC/Gale)
+Licensed under: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+
+* Gale description *
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Gale - https://galemc.org
+
+diff --git a/build.gradle.kts b/build.gradle.kts
+index 41c9fbdb1e86deb47545659fc7222056f616bea7..ec61477602f659c821519de7ef51b6e9b41e0f64 100644
+--- a/build.gradle.kts
++++ b/build.gradle.kts
+@@ -150,6 +150,8 @@ tasks.withType<Javadoc> {
+             into("build/docs/javadoc")
+         }
+     }
++
++    options.addStringOption("Xdoclint:none", "-quiet") // Fiddle - Gale - hide Javadoc lint warnings
+ }
+ 
+ // Paper start

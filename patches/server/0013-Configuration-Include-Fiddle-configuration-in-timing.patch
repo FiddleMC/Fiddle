@@ -1,7 +1,8 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
 Date: Tue, 18 Jul 2023 20:11:18 +0200
-Subject: [PATCH] Configuration - Include in timings export
+Subject: [PATCH] Configuration - Include Fiddle configuration in timings
+ export
 
 Adds the content of the Fiddle configuration files to timings exports, just like the Bukkit, Spigot and Paper configurations.
 

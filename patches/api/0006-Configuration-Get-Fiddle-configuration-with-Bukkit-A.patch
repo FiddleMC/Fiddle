@@ -1,9 +1,12 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
 Date: Wed, 23 Nov 2022 21:03:04 +0100
-Subject: [PATCH] Configuration - Get with Bukkit API
+Subject: [PATCH] Configuration - Get Fiddle configuration with Bukkit API
 
-License: MIT (https://opensource.org/licenses/MIT)
+Allows getting the Fiddle configuration using the Bukkit API.
+This is done by providing the abstract method `Server.getFiddleConfig()`, which is implemented in the "Configuration - Get Fiddle configuration with Bukkit API" patch in the `fiddle-server` module.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 This patch is based on the following patch:

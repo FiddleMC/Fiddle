@@ -1,9 +1,10 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
 Date: Thu, 1 Jun 2023 19:30:16 +0200
-Subject: [PATCH] Configuration - Get with Bukkit API
+Subject: [PATCH] Configuration - Get Fiddle configuration with Bukkit API
 
-Provides an implementation for `Server.getFiddleConfig()`, which is defined in the "Configuration - Get with Bukkit API" patch in the `fiddle-api` module.
+Allows getting the Fiddle configuration using the Bukkit API.
+This is done by implementing `Server.getFiddleConfig()`, which is defined in the "Get Fiddle configuration with Bukkit API" patch in the `fiddle-api` module, in `CraftServer`.
 
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
@@ -26,7 +27,7 @@ As part of: Paper (https://github.com/PaperMC/Paper)
 Licensed under: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 30793d299e0abd41a9d47a5524ce113c8a4825a7..8647018a0647a2e43a0c7a17b20c2becf2e70b70 100644
+index 48592fe72678f2e4121b5b11cc6d30ae146c19fa..cb68dc486da8519b410859ace508dcf9e3adda5e 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 @@ -2865,6 +2865,14 @@ public final class CraftServer implements Server {
