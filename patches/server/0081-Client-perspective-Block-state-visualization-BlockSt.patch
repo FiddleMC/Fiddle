@@ -2,13 +2,17 @@ From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
 Date: Sun, 16 Jul 2023 19:25:00 +0200
 Subject: [PATCH] Client perspective - Block state visualization - BlockState
- field for providers
+ field for visualization setupper
 
-License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
+Adds a field in `BlockState` to hold the visualization setupper for that state.
+
+Does not implement anything that sets or gets this value.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/world/level/block/state/BlockState.java b/src/main/java/net/minecraft/world/level/block/state/BlockState.java
-index 664572ad64ed53386a7348b34ec2bac25e9381d5..eddfcfc44416b7d9c42d3110b809e2c859bd9e93 100644
+index 664572ad64ed53386a7348b34ec2bac25e9381d5..cbb89bdc8065249426a3ac4962765a4eeacf1e6d 100644
 --- a/src/main/java/net/minecraft/world/level/block/state/BlockState.java
 +++ b/src/main/java/net/minecraft/world/level/block/state/BlockState.java
 @@ -7,6 +7,9 @@ import net.minecraft.core.Registry;
@@ -25,13 +29,13 @@ index 664572ad64ed53386a7348b34ec2bac25e9381d5..eddfcfc44416b7d9c42d3110b809e2c8
      }
      // Fiddle end - cache registry indices as fields - block state
  
-+    // Fiddle start - client perspective - block state visualization - BlockState field for providers
++    // Fiddle start - client perspective - block state visualization - BlockState field for visualization setupper
 +    /**
-+     * The {@linkplain BlockStateVisualizationSetupProvider} that provides replacement {@link BlockState}s
-+     * for this one, based on the {@linkplain ClientPerspective perspective} of a client.
++     * The {@linkplain org.fiddlemc.fiddle.packet.block.BlockStateVisualizationSetupper}
++     * that can set up the visualizations for this {@link BlockState}.
 +     * If null, there exist no replacements for this state, and it is always sent to clients as-is.
 +     */
-+    public @Nullable BlockStateVisualizationSetupProvider visualizationProviders = null;
-+    // Fiddle end - client perspective - block state visualization - BlockState field for providers
++    public @Nullable org.fiddlemc.fiddle.packet.block.BlockStateVisualizationSetupper visualizationSetupper = null;
++    // Fiddle end - client perspective - block state visualization - BlockState field for visualization setupper
 +
  }

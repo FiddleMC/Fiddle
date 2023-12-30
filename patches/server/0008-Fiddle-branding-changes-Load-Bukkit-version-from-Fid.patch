@@ -2,7 +2,7 @@ From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
 Date: Fri, 29 Dec 2023 12:18:18 +0100
 Subject: [PATCH] Fiddle branding changes - Load Bukkit version from Fiddle
- `pom.properties`
+ pom.properties
 
 Looks up the Bukkit version that Fiddle was compiled against in the `pom.properties` for Fiddle, rather than that for Paper.
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
