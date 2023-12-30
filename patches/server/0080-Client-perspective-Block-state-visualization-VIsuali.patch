@@ -1,0 +1,64 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sat, 30 Dec 2023 17:11:58 +0100
+Subject: [PATCH] Client perspective - Block state visualization -
+ VIsualization setup bypass for visualization changes
+
+* Adds a flag to `ClientboundBlockUpdatePacket` to mark packets meant to send visualization changes to the client (as opposed to a change of the block type itself)
+* Adds a convenience method to `ServerPlayer` to send such packets
+
+Does not implement any sending of such packets: this will be done by the processes that maintain visualizations and require doing this.
+Does not implement this bypass of the visualization setup: it will be implemented as part of the implementation that calls the setup.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
+index baf1b1749212a15d1e21d2f9f1a45b9730fdc3d8..e1c682bfc09f328091ee6732386eaccbc01aac51 100644
+--- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
++++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
+@@ -2713,4 +2713,29 @@ public class ServerPlayer extends Player {
+     }
+     // Fiddle end - client perspective - deep replacements - send updates
+ 
++    // Fiddle start - client perspective - block state visualization - ability to send visualization changes
++    /**
++     * Sends an update of the {@link BlockState} to this player's client, at the given
++     * {@linkplain BlockPos block coordinates}.
++     * <p>
++     *     This method is solely intended to send block updates to the player that are done to change
++     *     the observed visualization of a block on the client.
++     * </p>
++     * <p>
++     *     As such, this update will not be further subjected to any modification, such as anti-x-ray,
++     *     and will bypass the
++     *     {@linkplain org.fiddlemc.fiddle.packet.block.BlockStateVisualizationSetupper block state visualization setup}
++     *     that regular block update go through.
++     * </p>
++     *
++     * @param state The resulting {@link BlockState} to send to this player's client.
++     */
++    public void sendVisualizationChangeBlockUpdate(@NotNull BlockPos position, @NotNull BlockState state) {
++        // Based on org.bukkit.craftbukkit.entity.CraftPlayer#sendBlockChange
++        ClientboundBlockUpdatePacket packet = new ClientboundBlockUpdatePacket(position, state);
++        packet.isVisualizationChange = true;
++        this.connection.send(packet);
++    }
++    // Fiddle end - client perspective - block state visualization - ability to send visualization changes
++
+ }
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/block/BlockStateVisualizationSetupper.java b/src/main/java/org/fiddlemc/fiddle/packet/block/BlockStateVisualizationSetupper.java
+index 7e0a6066d3ed0b3b786876fcd0f1257f23695f25..f4a2686a77e790d5b0d8d02f10b39e6fb0ab14be 100644
+--- a/src/main/java/org/fiddlemc/fiddle/packet/block/BlockStateVisualizationSetupper.java
++++ b/src/main/java/org/fiddlemc/fiddle/packet/block/BlockStateVisualizationSetupper.java
+@@ -73,7 +73,9 @@ public interface BlockStateVisualizationSetupper {
+      *     When needed to be able to dynamically update the visualization based on changing circumstances,
+      *     the implementation of this method must perform a setup that makes sure that some process listening for
+      *     a change in those circumstances sends a block change to the player without invoking any visualization setup
+-     *     again.
++     *     again: by sending {@link ClientboundBlockUpdatePacket} with the
++     *     {@link ClientboundBlockUpdatePacket#isVisualizationChange} flag set to true,
++     *     which can be done with {@link ServerPlayer#sendVisualizationChangeBlockUpdate}.
+      *     <br>
+      *     Additionally, the implementation of this method must make sure to properly clean up any listeners
+      *     for a change in circumstances that may already exist for this particular client and block location
