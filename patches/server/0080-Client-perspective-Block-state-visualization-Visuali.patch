@@ -2,7 +2,7 @@ From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
 Date: Sat, 30 Dec 2023 17:11:58 +0100
 Subject: [PATCH] Client perspective - Block state visualization -
- VIsualization setup bypass for visualization changes
+ Visualization setup bypass for visualization changes
 
 * Adds a flag to `ClientboundBlockUpdatePacket` to mark packets meant to send visualization changes to the client (as opposed to a change of the block type itself)
 * Adds a convenience method to `ServerPlayer` to send such packets
@@ -13,6 +13,30 @@ Does not implement this bypass of the visualization setup: it will be implemente
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundBlockUpdatePacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundBlockUpdatePacket.java
+index 7b4947aa2cdd7f359184689bf348560bde1016dd..b1ad8bea989510bedfdf6674362336e1fcdfc66a 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundBlockUpdatePacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundBlockUpdatePacket.java
+@@ -11,6 +11,19 @@ public class ClientboundBlockUpdatePacket implements Packet<ClientGamePacketList
+     private final BlockPos pos;
+     public final BlockState blockState;
+ 
++    // Fiddle start - client perspective - block state visualization - ability to send visualization changes
++    /**
++     * A flag for whether this packet is a desired visualization change of a block that has stayed the same,
++     * rather than to indicate an actual block change.
++     * <p>
++     *     This is initially false, and set to true only in
++     *     {@link net.minecraft.server.level.ServerPlayer#sendVisualizationChangeBlockUpdate}.
++     *     It should not be set from anywhere else: the convenience method above should be used instead.
++     * </p>
++     */
++    public boolean isVisualizationChange = false;
++    // Fiddle end - client perspective - block state visualization - ability to send visualization changes
++
+     public ClientboundBlockUpdatePacket(BlockPos pos, BlockState state) {
+         this.pos = pos;
+         this.blockState = state;
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
 index baf1b1749212a15d1e21d2f9f1a45b9730fdc3d8..e1c682bfc09f328091ee6732386eaccbc01aac51 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java

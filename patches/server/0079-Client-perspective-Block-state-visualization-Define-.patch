@@ -1,10 +1,11 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
 Date: Sat, 30 Dec 2023 17:08:17 +0100
-Subject: [PATCH] Client perspective - Block state visualization - Define setup
+Subject: [PATCH] Client perspective - Block state visualization - Define
+ visualization setup
 
 * Adds an interface for a setupper that can set up a block state visualization for a block state sent to a player
-* Adds a basic implementation of that interface, that visualizes a block state as a potentially different block state based on the client perspective
+* Adds a basic implementation of that interface, that visualizes a block state as a potentially different block state based on the client perspective category
 
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
@@ -135,11 +136,11 @@ index 0000000000000000000000000000000000000000..7e0a6066d3ed0b3b786876fcd0f1257f
 +    );
 +
 +}
-diff --git a/src/main/java/org/fiddlemc/fiddle/packet/block/OnePerCategoryBlockStateVisualizationSetupProvider.java b/src/main/java/org/fiddlemc/fiddle/packet/block/OnePerCategoryBlockStateVisualizationSetupProvider.java
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/block/OnePerCategoryBlockStateVisualizationSetupper.java b/src/main/java/org/fiddlemc/fiddle/packet/block/OnePerCategoryBlockStateVisualizationSetupper.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..4740b559460d915bf4d810f4511e6b2a9cae5a23
+index 0000000000000000000000000000000000000000..38dc9cb04ad7cd8956c257e3a7c5812c9077f2fc
 --- /dev/null
-+++ b/src/main/java/org/fiddlemc/fiddle/packet/block/OnePerCategoryBlockStateVisualizationSetupProvider.java
++++ b/src/main/java/org/fiddlemc/fiddle/packet/block/OnePerCategoryBlockStateVisualizationSetupper.java
 @@ -0,0 +1,80 @@
 +// Fiddle - client perspective - block state visualization - setupper - basic implementations
 +
@@ -161,21 +162,21 @@ index 0000000000000000000000000000000000000000..4740b559460d915bf4d810f4511e6b2a
 + * A {@link BlockStateVisualizationSetupper} that has one static {@link BlockState}
 + * for each {@link ClientPerspectiveCategory}.
 + */
-+public final class OnePerCategoryBlockStateVisualizationSetupProvider implements BlockStateVisualizationSetupper {
++public final class OnePerCategoryBlockStateVisualizationSetupper implements BlockStateVisualizationSetupper {
 +
 +    /**
 +     * The replacement {@link BlockState}s, indexed by the corresponding {@link ClientPerspectiveCategory#ordinal()}.
 +     */
 +    private final @NotNull BlockState @NotNull[] replacements;
 +
-+    public OnePerCategoryBlockStateVisualizationSetupProvider(@NotNull BlockState @NotNull[] replacements) {
++    public OnePerCategoryBlockStateVisualizationSetupper(@NotNull BlockState @NotNull[] replacements) {
 +        this.replacements = replacements;
 +    }
 +
 +    /**
 +     * Convenience constructor.
 +     */
-+    public OnePerCategoryBlockStateVisualizationSetupProvider(@NotNull Function<@NotNull ClientPerspectiveCategory, @NotNull BlockState> replacementFunction) {
++    public OnePerCategoryBlockStateVisualizationSetupper(@NotNull Function<@NotNull ClientPerspectiveCategory, @NotNull BlockState> replacementFunction) {
 +        this(Arrays.stream(ClientPerspectiveCategory.values()).map(replacementFunction).toArray(BlockState[]::new));
 +    }
 +
@@ -212,7 +213,7 @@ index 0000000000000000000000000000000000000000..4740b559460d915bf4d810f4511e6b2a
 +
 +    @Override
 +    public boolean equals(Object obj) {
-+        return obj instanceof OnePerCategoryBlockStateVisualizationSetupProvider provider && Arrays.deepEquals(this.replacements, provider.replacements);
++        return obj instanceof OnePerCategoryBlockStateVisualizationSetupper setupper && Arrays.deepEquals(this.replacements, setupper.replacements);
 +    }
 +
 +    @Override
