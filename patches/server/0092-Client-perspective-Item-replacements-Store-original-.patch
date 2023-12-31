@@ -38,7 +38,7 @@ index 5f2873fe70f8813ffff832067bcba1df70698757..a80bf45e03414694f07edce8cf4da4ba
              if (false && itemstack.getTag() != null) { // Paper - This is no longer needed with raw NBT being handled in metadata
                  CraftItemStack.setItemMeta(itemstack, CraftItemStack.getItemMeta(itemstack));
 diff --git a/src/main/java/org/fiddlemc/fiddle/packet/item/ItemStackInPacketReplacer.java b/src/main/java/org/fiddlemc/fiddle/packet/item/ItemStackInPacketReplacer.java
-index d253bd43680b6ab1650e8ab71ad2983b3bcc10ba..991cdd399cc635fdfca7e16e7998d47429bf6a4f 100644
+index 1b6f4076d9094e978f868c06e64993c1e308a1ff..7cdddbefc8cdab3cf0a1487e2a2f173a1fdc6880 100644
 --- a/src/main/java/org/fiddlemc/fiddle/packet/item/ItemStackInPacketReplacer.java
 +++ b/src/main/java/org/fiddlemc/fiddle/packet/item/ItemStackInPacketReplacer.java
 @@ -10,6 +10,7 @@ import net.minecraft.network.chat.contents.TranslatableContents;

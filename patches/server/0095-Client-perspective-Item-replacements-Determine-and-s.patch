@@ -8,7 +8,7 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index f5a2c2dede0ce27db7e514f7c20264fa7256f4ce..3d07c01174e85743265cddb4a6556e270511de26 100644
+index f5a2c2dede0ce27db7e514f7c20264fa7256f4ce..c55aeb261e462de8285f0d47c27ce12eee36f0d1 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
 @@ -60,6 +60,7 @@ import net.minecraft.util.profiling.jfr.Environment;
@@ -19,16 +19,15 @@ index f5a2c2dede0ce27db7e514f7c20264fa7256f4ce..3d07c01174e85743265cddb4a6556e27
  import net.minecraft.world.level.GameRules;
  import net.minecraft.world.level.LevelSettings;
  import net.minecraft.world.level.WorldDataConfiguration;
-@@ -73,6 +74,8 @@ import net.minecraft.world.level.storage.LevelSummary;
+@@ -73,6 +74,7 @@ import net.minecraft.world.level.storage.LevelSummary;
  import net.minecraft.world.level.storage.PrimaryLevelData;
  import net.minecraft.world.level.storage.WorldData;
  import org.bukkit.Material;
 +import org.fiddlemc.fiddle.packet.ClientPerspectiveCategory;
-+import org.fiddlemc.fiddle.packet.item.VanillaItemOverrideVisualHandle;
  import org.fiddlemc.fiddle.packet.locale.ServerSideTranslations;
  import org.fiddlemc.fiddle.server.FiddleFeatureSupport;
  import org.fiddlemc.fiddle.configuration.FiddleConfigurations;
-@@ -249,6 +252,15 @@ public class Main {
+@@ -249,6 +251,15 @@ public class Main {
              ServerSideTranslations.registerVanillaTranslationReplacement("en_us", "block.minecraft.bookshelf", "Oak Bookshelf");
              // Fiddle end - client perspective - localization - register server-side translations
  
@@ -36,7 +35,7 @@ index f5a2c2dede0ce27db7e514f7c20264fa7256f4ce..3d07c01174e85743265cddb4a6556e27
 +            // TODO This doesn't do anything interesting yet: should be replaced with an actual mechanism that bases this on the resource pack assets
 +            for (var item : BuiltInRegistries.ITEM) {
 +                if (item.isAddedByFiddle()) {
-+                    item.visualHandleOrProvider = new VanillaItemOverrideVisualHandle(Items.STONE, 0);
++                    item.visualHandleOrProvider = new org.fiddlemc.fiddle.packet.item.VanillaItemOverrideItemVisualHandle(Items.STONE, 0);
 +                }
 +            }
 +            // Fiddle end - client perspective - item replacements - determine and store desired visual handles

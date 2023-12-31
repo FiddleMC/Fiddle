@@ -77,7 +77,7 @@ index 5fffbd4be2304164bf1fb2c5039803ba0ca7c16e..20fde382d7095b546f48e9133a2a46b6
      /**
 diff --git a/src/main/java/org/fiddlemc/fiddle/packet/item/ItemStackInPacketReplacer.java b/src/main/java/org/fiddlemc/fiddle/packet/item/ItemStackInPacketReplacer.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..d253bd43680b6ab1650e8ab71ad2983b3bcc10ba
+index 0000000000000000000000000000000000000000..1b6f4076d9094e978f868c06e64993c1e308a1ff
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/packet/item/ItemStackInPacketReplacer.java
 @@ -0,0 +1,160 @@
@@ -137,13 +137,13 @@ index 0000000000000000000000000000000000000000..d253bd43680b6ab1650e8ab71ad2983b
 +        // First, we change the type and set custom model data if necessary
 +        var originalItem = original.getItem();
 +        var visualHandleOrProvider = originalItem.visualHandleOrProvider;
-+        @Nullable VisualHandle visualHandle;
++        @Nullable ItemVisualHandle visualHandle;
 +        if (visualHandleOrProvider == null) {
 +            visualHandle = null;
-+        } else if (visualHandleOrProvider instanceof VisualHandle visualHandleOrProviderAsVisualHandle) {
++        } else if (visualHandleOrProvider instanceof ItemVisualHandle visualHandleOrProviderAsVisualHandle) {
 +            visualHandle = visualHandleOrProviderAsVisualHandle;
 +        } else {
-+            visualHandle = ((VisualHandleProvider) visualHandleOrProvider).getDesiredVisualHandle(original);
++            visualHandle = ((ItemVisualHandleProvider) visualHandleOrProvider).getDesiredVisualHandle(original);
 +        }
 +        if (visualHandle != null) {
 +            var replacementItemAndCustomModelData = visualHandle.getReplacementItemAndCustomModelData(clientPerspectiveAndSettings.getPerspective(), context.typeAndCustomModelDataMapping);
