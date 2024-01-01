@@ -137,10 +137,10 @@ index c31cdd9ee5e60320d4df1474f11eaa0177bbeffd..0368ff21eb65804d97b24b06e58f5465
  }
 diff --git a/src/main/java/org/fiddlemc/fiddle/packet/PacketWithExplicitTargetClientConnection.java b/src/main/java/org/fiddlemc/fiddle/packet/PacketWithExplicitTargetClientConnection.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..cd9e1f7df9460dcda070d4530c5e2c4e856c0750
+index 0000000000000000000000000000000000000000..d3f1db6cf065805b5387560b3c8582a043cf02c8
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/packet/PacketWithExplicitTargetClientConnection.java
-@@ -0,0 +1,70 @@
+@@ -0,0 +1,74 @@
 +// Fiddle - client perspective - packets are modifiable - expose target client properties
 +
 +package org.fiddlemc.fiddle.packet;
@@ -181,6 +181,10 @@ index 0000000000000000000000000000000000000000..cd9e1f7df9460dcda070d4530c5e2c4e
 +    public final @NotNull Packet<T> adaptForClient(@NotNull Connection connection) {
 +        this.targetClientConnection = connection.getWeakReference();
 +        return this.postSetConnectionAdaptForClient(connection);
++    }
++
++    public @NotNull Connection getExplicitTargetClientConnection() throws NullPointerException {
++        return Objects.requireNonNull(this.targetClientConnection.get());
 +    }
 +
 +    @Override

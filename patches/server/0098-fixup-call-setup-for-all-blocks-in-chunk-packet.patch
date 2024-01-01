@@ -1,0 +1,16 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Mon, 1 Jan 2024 20:32:13 +0100
+Subject: [PATCH] fixup call setup for all blocks in chunk packet
+
+
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/block/SetUpVisualizationForChunkPacket.java b/src/main/java/org/fiddlemc/fiddle/packet/block/SetUpVisualizationForChunkPacket.java
+index e2e9be99f12f8c84dd621a4b635511a3b5d4c516..ddc258ed4c8a384bf7f072ed2576b169ee833910 100644
+--- a/src/main/java/org/fiddlemc/fiddle/packet/block/SetUpVisualizationForChunkPacket.java
++++ b/src/main/java/org/fiddlemc/fiddle/packet/block/SetUpVisualizationForChunkPacket.java
+@@ -1,4 +1,4 @@
+-// Fiddle end - client perspective - block state visualization - apply to chunk packets - setup call implementation
++// Fiddle end - client perspective - block state visualization - apply to chunk packets - call setup for all blocks in chunk packet
+ 
+ package org.fiddlemc.fiddle.packet.block;
+ 
