@@ -1,0 +1,47 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Mon, 1 Jan 2024 19:07:41 +0100
+Subject: [PATCH] Client perspective - Block state visualization - Apply to
+ chunk packets - Call setup for all blocks in chunk packet
+
+Provides the implementation to call the visualization setups for all blocks in a chunk packet being sent to a client.
+This does not add any invocations of this implementation yet: that is added in the "Client perspective - Block state visualization - Apply to chunk packets - Visualization step after anti-x-ray" patch.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/block/SetUpVisualizationForChunkPacket.java b/src/main/java/org/fiddlemc/fiddle/packet/block/SetUpVisualizationForChunkPacket.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..ddc258ed4c8a384bf7f072ed2576b169ee833910
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/packet/block/SetUpVisualizationForChunkPacket.java
+@@ -0,0 +1,29 @@
++// Fiddle end - client perspective - block state visualization - apply to chunk packets - call setup for all blocks in chunk packet
++
++package org.fiddlemc.fiddle.packet.block;
++
++import net.minecraft.network.Connection;
++import net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData;
++import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
++import net.minecraft.world.item.ItemStack;
++import org.fiddlemc.fiddle.packet.ClientPerspective;
++import org.jetbrains.annotations.NotNull;
++
++/**
++ * A class that statically provides the {@link #setUpAndModifyBuffer} functionality.
++ */
++public final class SetUpVisualizationForChunkPacket {
++
++    private SetUpVisualizationForChunkPacket() {
++        throw new RuntimeException();
++    }
++
++    /**
++     * Sets up the visualization for the given chunk packet.
++     */
++    public static void setUpAndModifyBuffer(@NotNull ClientboundLevelChunkWithLightPacket packet) {
++        var targetConnection = packet.getExplicitTargetClientConnection();
++        var chunkData = packet.getChunkData();
++    }
++
++}

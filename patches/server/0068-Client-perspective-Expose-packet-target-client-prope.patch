@@ -1,140 +1,217 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
-Date: Sat, 22 Jul 2023 16:12:39 +0200
+Date: Sat, 22 Jul 2023 14:40:10 +0200
 Subject: [PATCH] Client perspective - Expose packet target client properties -
- Can be used by FriendlyByteBuf
+ Abstract base implementation
+
+Adds an abstract base for Packet implementations that can explicitly provide
+the perspective and locale of the client they are poised to be sent to.
 
 License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
-diff --git a/src/main/java/net/minecraft/network/FriendlyByteBuf.java b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
-index 9938bb90bef84cf784f9a1ceb02a1a45aa8b48a1..1d015f01908991ee7433896e74be829285311164 100644
---- a/src/main/java/net/minecraft/network/FriendlyByteBuf.java
-+++ b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
-@@ -27,6 +27,7 @@ import java.io.DataOutput;
- import java.io.IOException;
- import java.io.InputStream;
- import java.io.OutputStream;
+diff --git a/src/main/java/net/minecraft/network/Connection.java b/src/main/java/net/minecraft/network/Connection.java
+index b508e064ceea897deae7501e71ef991346b0ac87..ac8d5e9a38e4821bd146d10296f70741c47e466e 100644
+--- a/src/main/java/net/minecraft/network/Connection.java
++++ b/src/main/java/net/minecraft/network/Connection.java
+@@ -26,6 +26,8 @@ import io.netty.channel.socket.nio.NioSocketChannel;
+ import io.netty.handler.timeout.ReadTimeoutHandler;
+ import io.netty.handler.timeout.TimeoutException;
+ import io.netty.util.AttributeKey;
++
 +import java.lang.ref.WeakReference;
- import java.nio.ByteBuffer;
- import java.nio.ByteOrder;
- import java.nio.channels.FileChannel;
-@@ -67,8 +68,11 @@ import net.minecraft.nbt.NbtIo;
- import net.minecraft.nbt.Tag;
- import net.minecraft.network.chat.Component;
- import net.minecraft.network.chat.MutableComponent;
-+import net.minecraft.network.protocol.Packet;
- import net.minecraft.resources.ResourceKey;
- import net.minecraft.resources.ResourceLocation;
+ import java.net.InetSocketAddress;
+ import java.net.SocketAddress;
+ import java.util.Queue;
+@@ -186,6 +188,8 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+     private boolean receivedClientInformation = false;
+     // Fiddle end - client perspective - wait for client information
+ 
++    private @Nullable WeakReference<Connection> weakReference; // Fiddle - client perspective - packets are modifiable - expose target client properties
++
+     public Connection(PacketFlow side) {
+         this.receiving = side;
+     }
+@@ -951,6 +955,18 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+     }
+     // Fiddle end - client perspective - item replacements - store original in NBT - get player game mode from connection
+ 
++    // Fiddle start - client perspective - packets are modifiable - expose target client properties
++    /**
++     * @return A {@link WeakReference} to this {@link Connection} instance.
++     */
++    public final @NotNull WeakReference<Connection> getWeakReference() {
++        if (this.weakReference == null) {
++            this.weakReference = new WeakReference<>(this);
++        }
++        return this.weakReference;
++    }
++    // Fiddle end - client perspective - packets are modifiable - expose target client properties
++
+     private static class PacketHolder {
+ 
+         final Packet<?> packet;
+diff --git a/src/main/java/net/minecraft/network/protocol/Packet.java b/src/main/java/net/minecraft/network/protocol/Packet.java
+index c31cdd9ee5e60320d4df1474f11eaa0177bbeffd..0368ff21eb65804d97b24b06e58f54656a6826ce 100644
+--- a/src/main/java/net/minecraft/network/protocol/Packet.java
++++ b/src/main/java/net/minecraft/network/protocol/Packet.java
+@@ -3,8 +3,12 @@ package net.minecraft.network.protocol;
+ import net.minecraft.network.Connection;
+ import net.minecraft.network.FriendlyByteBuf;
+ import net.minecraft.network.PacketListener;
 +import net.minecraft.server.level.ServerPlayer;
 +import net.minecraft.server.level.ServerPlayerGameMode;
- import net.minecraft.util.Crypt;
- import net.minecraft.util.CryptException;
- import net.minecraft.util.GsonHelper;
-@@ -76,9 +80,12 @@ import net.minecraft.util.Mth;
- import net.minecraft.world.item.Item;
- import net.minecraft.world.item.ItemStack;
- import net.minecraft.world.level.ChunkPos;
 +import net.minecraft.world.level.GameType;
- import net.minecraft.world.level.Level;
- import net.minecraft.world.phys.BlockHitResult;
- import net.minecraft.world.phys.Vec3;
-+import org.fiddlemc.fiddle.packet.ClientPerspective;
-+import org.jetbrains.annotations.NotNull;
- import org.joml.Quaternionf;
- import org.joml.Vector3f;
+ import org.fiddlemc.fiddle.packet.ClientPerspective;
+ import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
  
-@@ -98,6 +105,13 @@ public class FriendlyByteBuf extends ByteBuf {
-     private static final int MAX_PUBLIC_KEY_LENGTH = 512;
-     private static final Gson GSON = new Gson();
+ public interface Packet<T extends PacketListener> {
+     void write(FriendlyByteBuf buf);
+@@ -62,4 +66,66 @@ public interface Packet<T extends PacketListener> {
+     }
+     // Fiddle end - client perspective - packets are modifiable
  
-+    // Fiddle start - client perspective - packets are modifiable - store explicit perspective and locale - FriendlyByteBuf
++    // Fiddle start - client perspective - packets are modifiable - expose target client properties
 +    /**
-+     * The packet that is writing its contents to this {@link FriendlyByteBuf}.
++     * @return The {@link ClientPerspective} of the receiving client of this packet, if explicitly known.
++     * This must be implemented for some instances of {@link Packet} for which the {@link ClientPerspective} is needed
++     * at the time of {@linkplain #write(FriendlyByteBuf) writing the packet to a byte buffer}.
++     * @throws UnsupportedOperationException If there is no implementation for this method.
++     * The default implementation of this method in {@link Packet} always throws this exception.
++     * An exception being thrown from this method should never actually happen (because it is slow):
++     * this method must not be called when there is any chance of an exception
++     * (including a {@link NullPointerException} if an attempt is made to return a non-null value) being thrown.
++     * No exception from this method should be caught, because if one occurs,
++     * it indicates that there is code that needs this value,
++     * but it is not available early enough for the value to be available.
 +     */
-+    public @Nullable WeakReference<@NotNull Packet<?>> writingPacket;
-+    // Fiddle end - client perspective - packets are modifiable - store explicit perspective and locale - FriendlyByteBuf
-+
-     public FriendlyByteBuf(ByteBuf parent) {
-         this.source = parent;
-     }
-@@ -1676,4 +1690,58 @@ public class FriendlyByteBuf extends ByteBuf {
-             };
-         }
-     }
-+
-+    // Fiddle start - client perspective - packets are modifiable - expose target client properties - can be used by FriendlyByteBuf
-+    /**
-+     * @return The explicit {@link ClientPerspective} of the target client of a packet that is writing its contents
-+     * to this {@link FriendlyByteBuf}.
-+     * This method always return a non-null value or throws an exception, and it must never actually throw
-+     * such an exception (if there is a possibility of an exception being thrown,
-+     * the method should not be called at all), similarly to
-+     * {@link Packet#getExplicitTargetClientPerspective()}.
-+     */
-+    public @NotNull ClientPerspective getExplicitTargetClientPerspective() throws NullPointerException {
-+        return this.writingPacket.get().getExplicitTargetClientPerspective();
++    default @NotNull ClientPerspective getExplicitTargetClientPerspective() throws UnsupportedOperationException {
++        throw new UnsupportedOperationException("Tried to call getExplicitTargetClientPerspective() on a " + Packet.class.getSimpleName() + " instance of type " + this.getClass().getName() + ", but no overriding implementation is available");
 +    }
 +
 +    /**
 +     * @return The same value as {@link #getExplicitTargetClientPerspective()}, except that it returns null
 +     * where {@link #getExplicitTargetClientPerspective()} would otherwise throw an exception.
 +     */
-+    public @Nullable ClientPerspective getExplicitTargetClientPerspectiveOrNull() throws NullPointerException {
-+        if (this.writingPacket == null) {
-+            return null;
-+        }
-+        var actualWritingPacket = this.writingPacket.get();
-+        if (actualWritingPacket == null) {
-+            return null;
-+        }
-+        return actualWritingPacket.getExplicitTargetClientPerspectiveOrNull();
++    default @Nullable ClientPerspective getExplicitTargetClientPerspectiveOrNull() {
++        return null;
 +    }
 +
 +    /**
-+     * @return The explicit {@link ServerPlayer#locale} of the target client of a packet that is writing its contents
-+     * to this {@link FriendlyByteBuf}.
-+     * This method always return a nullable value or throws an exception, and it must never actually throw
-+     * such an exception (if there is a possibility of an exception being thrown,
-+     * the method should not be called at all), similarly to
-+     * {@link Packet#getExplicitTargetLocale()}.
++     * @return The {@linkplain ServerPlayer#locale locale} of the receiving client of this packet, if explicitly known.
++     * This must be implemented for some instances of {@link Packet} for which the locale is needed
++     * (amongst others, at the time of {@linkplain #write(FriendlyByteBuf) writing the packet to a byte buffer}).
++     * @throws UnsupportedOperationException If there is no implementation for this method.
++     * The default implementation of this method in {@link Packet} always throws this exception.
++     * An exception being thrown from this method should never actually happen (because it is slow):
++     * this method must not be called when there is any chance of an exception
++     * (including a {@link NullPointerException} if an attempt is made to return a non-null value) being thrown.
++     * No exception from this method should be caught, because if one occurs,
++     * it indicates that there is code that needs this value,
++     * but it is not available early enough for the value to be available.
 +     */
-+    public @Nullable String getExplicitTargetLocale() throws NullPointerException {
-+        return this.writingPacket.get().getExplicitTargetLocale();
++    default @Nullable String getExplicitTargetLocale() throws UnsupportedOperationException {
++        throw new UnsupportedOperationException("Tried to call getExplicitTargetLocale() on a " + Packet.class.getSimpleName() + " instance of type " + this.getClass().getName() + ", but no overriding implementation is available");
 +    }
 +
 +    /**
-+     * @return The explicit {@linkplain ServerPlayerGameMode#getGameModeForPlayer() game mode} of the target player
-+     * of a packet that is writing its contents to this {@link FriendlyByteBuf}.
-+     * This method always return a non-null value or throws an exception, and it must never actually throw
-+     * such an exception (if there is a possibility of an exception being thrown,
-+     * the method should not be called at all), similarly to
-+     * {@link Packet#getExplicitTargetClientPerspective()}.
++     * @return The {@linkplain ServerPlayerGameMode#getGameModeForPlayer() game mode}
++     * of the receiving player of this packet, if explicitly known.
++     * This must be implemented for some instances of {@link Packet} for which the {@link ClientPerspective} is needed
++     * at the time of {@linkplain #write(FriendlyByteBuf) writing the packet to a byte buffer}.
++     * @throws UnsupportedOperationException If there is no implementation for this method.
++     * The default implementation of this method in {@link Packet} always throws this exception.
++     * An exception being thrown from this method should never actually happen (because it is slow):
++     * this method must not be called when there is any chance of an exception
++     * (including a {@link NullPointerException} if an attempt is made to return a non-null value) being thrown.
++     * No exception from this method should be caught, because if one occurs,
++     * it indicates that there is code that needs this value,
++     * but it is not available early enough for the value to be available.
 +     */
-+    public @NotNull GameType getExplicitTargetGameMode() throws NullPointerException {
-+        return this.writingPacket.get().getExplicitTargetGameMode();
++    default @NotNull GameType getExplicitTargetGameMode() throws UnsupportedOperationException {
++        throw new UnsupportedOperationException("Tried to call getExplicitTargetGameMode() on a " + Packet.class.getSimpleName() + " instance of type " + this.getClass().getName() + ", but no overriding implementation is available");
 +    }
-+    // Fiddle end - client perspective - packets are modifiable - expose target client properties - can be used by FriendlyByteBuf
++    // Fiddle end - client perspective - packets are modifiable - expose target client properties
 +
  }
-diff --git a/src/main/java/net/minecraft/network/PacketEncoder.java b/src/main/java/net/minecraft/network/PacketEncoder.java
-index fbfadeb83719b81f42724e79c59e92ed88fdece7..22d9af1f5f3aeaed853b094716d5b6e63e628025 100644
---- a/src/main/java/net/minecraft/network/PacketEncoder.java
-+++ b/src/main/java/net/minecraft/network/PacketEncoder.java
-@@ -6,6 +6,8 @@ import io.netty.channel.ChannelHandlerContext;
- import io.netty.handler.codec.MessageToByteEncoder;
- import io.papermc.paper.adventure.PaperAdventure; // Paper
- import java.io.IOException;
-+import java.lang.ref.WeakReference;
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/PacketWithExplicitTargetClientConnection.java b/src/main/java/org/fiddlemc/fiddle/packet/PacketWithExplicitTargetClientConnection.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..d3f1db6cf065805b5387560b3c8582a043cf02c8
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/packet/PacketWithExplicitTargetClientConnection.java
+@@ -0,0 +1,74 @@
++// Fiddle - client perspective - packets are modifiable - expose target client properties
 +
- import net.minecraft.network.protocol.Packet;
- import net.minecraft.network.protocol.PacketFlow;
- import net.minecraft.util.profiling.jfr.JvmProfiler;
-@@ -33,6 +35,7 @@ public class PacketEncoder extends MessageToByteEncoder<Packet<?>> {
-                 throw new IOException("Can't serialize unregistered packet");
-             } else {
-                 FriendlyByteBuf friendlyByteBuf = new FriendlyByteBuf(byteBuf);
-+                friendlyByteBuf.writingPacket = new WeakReference<>(packet); // Fiddle - client perspective - packets are modifiable - expose target client properties - can be used by FriendlyByteBuf
-                 friendlyByteBuf.writeVarInt(i);
-                 friendlyByteBuf.adventure$locale = channelHandlerContext.channel().attr(PaperAdventure.LOCALE_ATTRIBUTE).get(); // Paper
- 
++package org.fiddlemc.fiddle.packet;
++
++import net.minecraft.network.Connection;
++import net.minecraft.network.PacketListener;
++import net.minecraft.network.protocol.Packet;
++import net.minecraft.world.level.GameType;
++import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
++
++import java.lang.ref.WeakReference;
++import java.util.Objects;
++
++/**
++ * An abstract base for {@link Packet}s that stores the {@link Connection} of its target client
++ * (after it is provided through {@link #adaptForClient}) and then use it to implement
++ * {@link #getExplicitTargetClientPerspective()} and {@link #getExplicitTargetLocale()}.
++ */
++public abstract class PacketWithExplicitTargetClientConnection<T extends PacketListener> implements Packet<T> {
++
++    /**
++     * The {@linkplain Connection#getPlayerClientPerspective perspective} of the client of the {@link Connection}
++     * passed to the last {@link #adaptForClient} call on this {@link Packet} instance.
++     * This will be null if and only if {@link #adaptForClient} was not called yet.
++     */
++    private @Nullable WeakReference<Connection> targetClientConnection;
++
++    /**
++     * This method is called after setting {@link #targetClientConnection} in {@link #adaptForClient},
++     * and must be overridden instead of {@link #adaptForClient}.
++     */
++    protected @NotNull Packet<T> postSetConnectionAdaptForClient(@NotNull Connection connection) {
++        return this;
++    }
++
++    @Override
++    public final @NotNull Packet<T> adaptForClient(@NotNull Connection connection) {
++        this.targetClientConnection = connection.getWeakReference();
++        return this.postSetConnectionAdaptForClient(connection);
++    }
++
++    public @NotNull Connection getExplicitTargetClientConnection() throws NullPointerException {
++        return Objects.requireNonNull(this.targetClientConnection.get());
++    }
++
++    @Override
++    public @NotNull ClientPerspective getExplicitTargetClientPerspective() throws NullPointerException {
++        return Objects.requireNonNull(this.targetClientConnection.get().getPlayerClientPerspective());
++    }
++
++    @Override
++    public @Nullable ClientPerspective getExplicitTargetClientPerspectiveOrNull() throws NullPointerException {
++        if (this.targetClientConnection == null) {
++            return null;
++        }
++        var actualTargetClientConnection = this.targetClientConnection.get();
++        if (actualTargetClientConnection == null) {
++            return null;
++        }
++        return actualTargetClientConnection.getPlayerClientPerspective();
++    }
++
++    @Override
++    public @Nullable String getExplicitTargetLocale() throws NullPointerException {
++        return this.targetClientConnection.get().getPlayerLocale();
++    }
++
++    @Override
++    public @NotNull GameType getExplicitTargetGameMode() throws NullPointerException {
++        return this.targetClientConnection.get().getPlayerGameMode();
++    }
++
++}

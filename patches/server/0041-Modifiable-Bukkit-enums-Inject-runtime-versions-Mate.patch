@@ -7,7 +7,7 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index 753819767f318a95d9b303935a6c518846f17793..9acb869c151724143888abb1a8d54cc52c9d4537 100644
+index 66345be27a2424d9f4ac6c647b7257969dc23d7e..49d63ca2b4e0d4e9e03b061ec1efe1224df3d0d5 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
 @@ -1,5 +1,6 @@
@@ -57,12 +57,11 @@ index 753819767f318a95d9b303935a6c518846f17793..9acb869c151724143888abb1a8d54cc5
  import net.minecraft.core.registries.Registries;
  import net.minecraft.nbt.NbtOps;
  import net.minecraft.nbt.Tag;
-@@ -63,15 +75,21 @@ import net.minecraft.world.level.storage.LevelStorageSource;
+@@ -63,14 +75,20 @@ import net.minecraft.world.level.storage.LevelStorageSource;
  import net.minecraft.world.level.storage.LevelSummary;
  import net.minecraft.world.level.storage.PrimaryLevelData;
  import net.minecraft.world.level.storage.WorldData;
 +import org.bukkit.Material;
- import org.fiddlemc.fiddle.server.FiddleFeatureSupport;
  import org.fiddlemc.fiddle.configuration.FiddleConfigurations;
  import org.fiddlemc.fiddle.configuration.PermanenceConfirmation;
 +import org.fiddlemc.fiddle.material.*;
@@ -79,7 +78,7 @@ index 753819767f318a95d9b303935a6c518846f17793..9acb869c151724143888abb1a8d54cc5
  import net.minecraft.SharedConstants;
  import org.bukkit.configuration.file.YamlConfiguration;
  // CraftBukkit end
-@@ -82,6 +100,54 @@ public class Main {
+@@ -81,6 +99,54 @@ public class Main {
  
      public Main() {}
  
@@ -133,8 +132,8 @@ index 753819767f318a95d9b303935a6c518846f17793..9acb869c151724143888abb1a8d54cc5
 +
      @DontObfuscate
      public static void main(final OptionSet optionset) { // CraftBukkit - replaces main(String[] astring)
-         FiddleFeatureSupport.setSupportsFiddleFeatures(); // Fiddle - runtime environment feature support flag
-@@ -179,6 +245,63 @@ public class Main {
+         SharedConstants.tryDetectVersion();
+@@ -177,6 +243,63 @@ public class Main {
              var injectRuntimeClassVersionHelper = new InjectRuntimeClassVersionHelper();
              // Fiddle end - modifiable Bukkit enums - inject runtime versions - common utilities
  

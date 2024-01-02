@@ -1,60 +1,101 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
-Date: Sat, 29 Jul 2023 18:53:58 +0200
+Date: Sat, 30 Dec 2023 21:37:02 +0100
 Subject: [PATCH] Client perspective - Block state visualization - Apply to
- chunk packets - Chunk packet data can use buffer partially
+ chunk packets - Do not multicast chunk packets for anti-x-ray
 
-Instead of assuming we can precisely pre-calculate the size of the byte buffer needed
-to contain the data in ClientboundLevelChunkPacketData, we begin by assuming that the
-used buffer length is indeed the size that we pre-calculated, but we store it in a field (`bufferUsedLength`)
-that may be modified if it later becomes clear the the buffer is in fact not entirely filled.
-This gives us the opportunity to perform further changes to the chunk data after it has already been
-stored in the buffer, when those changes may have a higher final buffer length than we initially
-calculated. In that case, we can, instead of allocating a buffer with the precise length known in advance,
-allocate a buffer with a length that is sufficient instead, and later set `bufferUsedLength` to the length
-that was actually used, without having to re-allocate a new byte buffer with the correct trimmed size.
+Removes the mechanism by which constructed `ClientboundLevelChunkWithLightPacket` instances may be sent to multiple targets, if they all must or all must not have anti-x-ray applied.
 
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
-diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java
-index f28006e6ea84bb37f94398973772655ccc77520e..1fc308c8b3daab144032aa1f6c4eea49dde24aa8 100644
---- a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java
-+++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java
-@@ -30,6 +30,7 @@ public class ClientboundLevelChunkPacketData {
-     // Fiddle end - client perspective - block state visualization - apply to chunk packets - ClientboundLevelChunkPacketData has a reference to its ClientboundLevelChunkWithLightPacket
-     private final CompoundTag heightmaps;
-     private final byte[] buffer;
-+    public int bufferUsedLength; // Fiddle - client perspective - block state visualization - apply to chunk packets - chunk packet data can use buffer partially
-     private final List<ClientboundLevelChunkPacketData.BlockEntityInfo> blockEntitiesData;
-     // Paper start
-     private final java.util.List<net.minecraft.network.protocol.Packet> extraPackets = new java.util.ArrayList<>();
-@@ -55,6 +56,7 @@ public class ClientboundLevelChunkPacketData {
+diff --git a/src/main/java/io/papermc/paper/chunk/system/RegionizedPlayerChunkLoader.java b/src/main/java/io/papermc/paper/chunk/system/RegionizedPlayerChunkLoader.java
+index 924539d4ac50c70178ba220424ffacd6ff277c8b..e56177a6bae4c191a8826235e26c96bb2ff9dd95 100644
+--- a/src/main/java/io/papermc/paper/chunk/system/RegionizedPlayerChunkLoader.java
++++ b/src/main/java/io/papermc/paper/chunk/system/RegionizedPlayerChunkLoader.java
+@@ -482,7 +482,7 @@ public class RegionizedPlayerChunkLoader {
+         private void sendChunk(final int chunkX, final int chunkZ) {
+             if (this.sentChunks.add(CoordinateUtils.getChunkKey(chunkX, chunkZ))) {
+                 this.world.getChunkSource().chunkMap.updateChunkTracking(this.player,
+-                    new ChunkPos(chunkX, chunkZ), new MutableObject<>(), false, true); // unloaded, loaded
++                    new ChunkPos(chunkX, chunkZ), false, true); // unloaded, loaded // Fiddle - client perspective - block state visualization - apply to chunk packets - do not cache for anti-x-ray
+                 return;
+             }
+             throw new IllegalStateException();
+@@ -497,7 +497,7 @@ public class RegionizedPlayerChunkLoader {
+ 
+         private void sendUnloadChunkRaw(final int chunkX, final int chunkZ) {
+             this.player.serverLevel().getChunkSource().chunkMap.updateChunkTracking(this.player,
+-                new ChunkPos(chunkX, chunkZ), null, true, false); // unloaded, loaded
++                new ChunkPos(chunkX, chunkZ), true, false); // unloaded, loaded // Fiddle - client perspective - block state visualization - apply to chunk packets - do not cache for anti-x-ray
          }
  
-         this.buffer = new byte[calculateChunkSize(chunk)];
-+        this.bufferUsedLength = this.buffer.length; // Fiddle - client perspective - block state visualization - apply to chunk packets - chunk packet data can use buffer partially - initially we assume the entire buffer will be used
+         private final SingleUserAreaMap<PlayerChunkLoaderData> broadcastMap = new SingleUserAreaMap<>(this) {
+diff --git a/src/main/java/net/minecraft/server/level/ChunkMap.java b/src/main/java/net/minecraft/server/level/ChunkMap.java
+index 9209b598d7168b82574e4800056b8b9f84265dd0..e632a7e6fcb37ff5ad6d6ae15c98f9b851796dba 100644
+--- a/src/main/java/net/minecraft/server/level/ChunkMap.java
++++ b/src/main/java/net/minecraft/server/level/ChunkMap.java
+@@ -832,7 +832,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
  
-         // Paper start - Anti-Xray - Add chunk packet info
-         if (chunkPacketInfo != null) {
-@@ -94,6 +96,7 @@ public class ClientboundLevelChunkPacketData {
-                 throw new RuntimeException("Chunk Packet trying to allocate too much memory on read.");
-             } else {
-                 this.buffer = new byte[i];
-+                this.bufferUsedLength = this.buffer.length; // Fiddle - client perspective - block state visualization - apply to chunk packets - chunk packet data can use buffer partially - initially we assume the entire buffer will be used
-                 buf.readBytes(this.buffer);
-                 this.blockEntitiesData = buf.readList(ClientboundLevelChunkPacketData.BlockEntityInfo::new);
-             }
-@@ -102,8 +105,10 @@ public class ClientboundLevelChunkPacketData {
+     }
  
-     public void write(FriendlyByteBuf buf) {
-         buf.writeNbt(this.heightmaps, DeepReplacementScope.NOTHING); // Fiddle - client perspective - deep replacements - pass scope - to FriendlyByteBuf#writeNbt - this never contains replaceables
--        buf.writeVarInt(this.buffer.length);
--        buf.writeBytes(this.buffer);
-+        // Fiddle start - client perspective - block state visualization - apply to chunk packets - chunk packet data can use buffer partially
-+        buf.writeVarInt(this.bufferUsedLength);
-+        buf.writeBytes(this.buffer, 0, this.bufferUsedLength);
-+        // Fiddle end - client perspective - block state visualization - apply to chunk packets - chunk packet data can use buffer partially
-         buf.writeCollection(this.blockEntitiesData, (buf2, entry) -> {
-             entry.write(buf2);
-         });
+-    public void updateChunkTracking(ServerPlayer player, ChunkPos pos, MutableObject<java.util.Map<Object, ClientboundLevelChunkWithLightPacket>> packet, boolean oldWithinViewDistance, boolean newWithinViewDistance) { // Paper - public // Paper - Anti-Xray - Bypass
++    public void updateChunkTracking(ServerPlayer player, ChunkPos pos, boolean oldWithinViewDistance, boolean newWithinViewDistance) { // Paper - public // Paper - Anti-Xray - Bypass // Fiddle - client perspective - block state visualization - apply to chunk packets - do not cache for anti-x-ray
+         io.papermc.paper.util.TickThread.ensureTickThread(this.level, pos, "May not update chunk tracking for chunk async"); // Paper - replace chunk loader system
+         io.papermc.paper.util.TickThread.ensureTickThread(player, "May not update chunk tracking for player async"); // Paper - replace chunk loader system
+         if (player.level() == this.level) {
+@@ -845,7 +845,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+ 
+                     if (chunk != null) {
+                         playerchunk.addPlayer(player); // Paper - replace chunk loader system
+-                        this.playerLoadedChunk(player, packet, chunk);
++                        this.playerLoadedChunk(player, chunk); // Fiddle - client perspective - block state visualization - apply to chunk packets - do not cache for anti-x-ray
+                     }
+ 
+                     DebugPackets.sendPoiPacketsForChunk(this.level, pos);
+@@ -1374,15 +1374,12 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+     }
+ 
+     // Paper start - Anti-Xray - Bypass
+-    private void playerLoadedChunk(ServerPlayer player, MutableObject<java.util.Map<Object, ClientboundLevelChunkWithLightPacket>> cachedDataPackets, LevelChunk chunk) {
+-        if (cachedDataPackets.getValue() == null) {
+-            cachedDataPackets.setValue(new java.util.HashMap<>());
+-        }
+-
+-        Boolean shouldModify = chunk.getLevel().chunkPacketBlockController.shouldModify(player, chunk);
+-        player.trackChunk(chunk.getPos(), (Packet) cachedDataPackets.getValue().computeIfAbsent(shouldModify, (s) -> {
+-            return new ClientboundLevelChunkWithLightPacket(chunk, this.lightEngine, (BitSet) null, (BitSet) null, (Boolean) s);
+-        }));
++    // Fiddle start - client perspective - block state visualization - apply to chunk packets - do not cache for anti-x-ray
++    private void playerLoadedChunk(ServerPlayer player, LevelChunk chunk) {
++        boolean shouldModify = chunk.getLevel().chunkPacketBlockController.shouldModify(player, chunk);
++        var packet = new ClientboundLevelChunkWithLightPacket(chunk, this.lightEngine, (BitSet) null, (BitSet) null, shouldModify);
++        player.trackChunk(chunk.getPos(), packet);
++        // Fiddle end - client perspective - block state visualization - apply to chunk packets - do not cache for anti-x-ray
+         // Paper end
+         DebugPackets.sendPoiPacketsForChunk(this.level, chunk.getPos());
+         // Paper - no longer needed - this was used to account for clients bugging out since they needed a chunk to store entities, but they no longer need a chunk
+diff --git a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
+index 550dcb7d595221b221e4710890d8a3cad789fc07..e83000b0045740ef34a3626265c2d7ebc21600ec 100644
+--- a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
++++ b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
+@@ -515,14 +515,14 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+                 if (playersInRange.isEmpty()) return true; // Paper - rewrite player chunk loader
+ 
+                 // Paper start - Anti-Xray - Bypass
+-                Map<Object, ClientboundLevelChunkWithLightPacket> refreshPackets = new HashMap<>();
+                 for (ServerPlayer player : playersInRange) {
+                     if (player.connection == null) continue;
+ 
+-                    Boolean shouldModify = chunk.getLevel().chunkPacketBlockController.shouldModify(player, chunk);
+-                    player.connection.send(refreshPackets.computeIfAbsent(shouldModify, s -> { // Use connection to prevent creating firing event
+-                        return new ClientboundLevelChunkWithLightPacket(chunk, this.world.getLightEngine(), null, null, (Boolean) s);
+-                    }));
++                    // Fiddle start - client perspective - block state visualization - apply to chunk packets - do not cache for anti-x-ray
++                    boolean shouldModify = chunk.getLevel().chunkPacketBlockController.shouldModify(player, chunk);
++                    var packet = new ClientboundLevelChunkWithLightPacket(chunk, this.world.getLightEngine(), null, null, shouldModify);
++                    player.connection.send(packet); // Use connection to prevent creating firing event
++                    // Fiddle end - client perspective - block state visualization - apply to chunk packets - do not cache for anti-x-ray
+                     // Paper end
+                 }
+         // Paper - rewrite player chunk loader

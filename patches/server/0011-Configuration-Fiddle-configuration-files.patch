@@ -211,18 +211,18 @@ index ad2177cdbc61a6f41c7e2ed81af262d4ffe7d861..294eadf976853692e73505996963893c
 +    // Fiddle end - Fiddle configuration
  }
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index 80f587c1b16c59dfa724f9fdda847ffedb48d787..4f9ed921ba2b499396fbc4ecd36b2a7310de9045 100644
+index dae36c6452ccd57a436dd918547b64d59957ab0a..af8fae4135aa5cc7f568efe62465b24b6a314baf 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
-@@ -64,6 +64,7 @@ import net.minecraft.world.level.storage.LevelSummary;
+@@ -63,6 +63,7 @@ import net.minecraft.world.level.storage.LevelStorageSource;
+ import net.minecraft.world.level.storage.LevelSummary;
  import net.minecraft.world.level.storage.PrimaryLevelData;
  import net.minecraft.world.level.storage.WorldData;
- import org.fiddlemc.fiddle.server.FiddleFeatureSupport;
 +import org.fiddlemc.fiddle.configuration.FiddleConfigurations;
  import org.slf4j.Logger;
  
  // CraftBukkit start
-@@ -125,6 +126,11 @@ public class Main {
+@@ -123,6 +124,11 @@ public class Main {
                  JvmProfiler.INSTANCE.start(Environment.SERVER);
              }
  

@@ -1,0 +1,140 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sat, 22 Jul 2023 16:12:39 +0200
+Subject: [PATCH] Client perspective - Expose packet target client properties -
+ Can be used by FriendlyByteBuf
+
+License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/network/FriendlyByteBuf.java b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
+index 9938bb90bef84cf784f9a1ceb02a1a45aa8b48a1..1d015f01908991ee7433896e74be829285311164 100644
+--- a/src/main/java/net/minecraft/network/FriendlyByteBuf.java
++++ b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
+@@ -27,6 +27,7 @@ import java.io.DataOutput;
+ import java.io.IOException;
+ import java.io.InputStream;
+ import java.io.OutputStream;
++import java.lang.ref.WeakReference;
+ import java.nio.ByteBuffer;
+ import java.nio.ByteOrder;
+ import java.nio.channels.FileChannel;
+@@ -67,8 +68,11 @@ import net.minecraft.nbt.NbtIo;
+ import net.minecraft.nbt.Tag;
+ import net.minecraft.network.chat.Component;
+ import net.minecraft.network.chat.MutableComponent;
++import net.minecraft.network.protocol.Packet;
+ import net.minecraft.resources.ResourceKey;
+ import net.minecraft.resources.ResourceLocation;
++import net.minecraft.server.level.ServerPlayer;
++import net.minecraft.server.level.ServerPlayerGameMode;
+ import net.minecraft.util.Crypt;
+ import net.minecraft.util.CryptException;
+ import net.minecraft.util.GsonHelper;
+@@ -76,9 +80,12 @@ import net.minecraft.util.Mth;
+ import net.minecraft.world.item.Item;
+ import net.minecraft.world.item.ItemStack;
+ import net.minecraft.world.level.ChunkPos;
++import net.minecraft.world.level.GameType;
+ import net.minecraft.world.level.Level;
+ import net.minecraft.world.phys.BlockHitResult;
+ import net.minecraft.world.phys.Vec3;
++import org.fiddlemc.fiddle.packet.ClientPerspective;
++import org.jetbrains.annotations.NotNull;
+ import org.joml.Quaternionf;
+ import org.joml.Vector3f;
+ 
+@@ -98,6 +105,13 @@ public class FriendlyByteBuf extends ByteBuf {
+     private static final int MAX_PUBLIC_KEY_LENGTH = 512;
+     private static final Gson GSON = new Gson();
+ 
++    // Fiddle start - client perspective - packets are modifiable - store explicit perspective and locale - FriendlyByteBuf
++    /**
++     * The packet that is writing its contents to this {@link FriendlyByteBuf}.
++     */
++    public @Nullable WeakReference<@NotNull Packet<?>> writingPacket;
++    // Fiddle end - client perspective - packets are modifiable - store explicit perspective and locale - FriendlyByteBuf
++
+     public FriendlyByteBuf(ByteBuf parent) {
+         this.source = parent;
+     }
+@@ -1676,4 +1690,58 @@ public class FriendlyByteBuf extends ByteBuf {
+             };
+         }
+     }
++
++    // Fiddle start - client perspective - packets are modifiable - expose target client properties - can be used by FriendlyByteBuf
++    /**
++     * @return The explicit {@link ClientPerspective} of the target client of a packet that is writing its contents
++     * to this {@link FriendlyByteBuf}.
++     * This method always return a non-null value or throws an exception, and it must never actually throw
++     * such an exception (if there is a possibility of an exception being thrown,
++     * the method should not be called at all), similarly to
++     * {@link Packet#getExplicitTargetClientPerspective()}.
++     */
++    public @NotNull ClientPerspective getExplicitTargetClientPerspective() throws NullPointerException {
++        return this.writingPacket.get().getExplicitTargetClientPerspective();
++    }
++
++    /**
++     * @return The same value as {@link #getExplicitTargetClientPerspective()}, except that it returns null
++     * where {@link #getExplicitTargetClientPerspective()} would otherwise throw an exception.
++     */
++    public @Nullable ClientPerspective getExplicitTargetClientPerspectiveOrNull() throws NullPointerException {
++        if (this.writingPacket == null) {
++            return null;
++        }
++        var actualWritingPacket = this.writingPacket.get();
++        if (actualWritingPacket == null) {
++            return null;
++        }
++        return actualWritingPacket.getExplicitTargetClientPerspectiveOrNull();
++    }
++
++    /**
++     * @return The explicit {@link ServerPlayer#locale} of the target client of a packet that is writing its contents
++     * to this {@link FriendlyByteBuf}.
++     * This method always return a nullable value or throws an exception, and it must never actually throw
++     * such an exception (if there is a possibility of an exception being thrown,
++     * the method should not be called at all), similarly to
++     * {@link Packet#getExplicitTargetLocale()}.
++     */
++    public @Nullable String getExplicitTargetLocale() throws NullPointerException {
++        return this.writingPacket.get().getExplicitTargetLocale();
++    }
++
++    /**
++     * @return The explicit {@linkplain ServerPlayerGameMode#getGameModeForPlayer() game mode} of the target player
++     * of a packet that is writing its contents to this {@link FriendlyByteBuf}.
++     * This method always return a non-null value or throws an exception, and it must never actually throw
++     * such an exception (if there is a possibility of an exception being thrown,
++     * the method should not be called at all), similarly to
++     * {@link Packet#getExplicitTargetClientPerspective()}.
++     */
++    public @NotNull GameType getExplicitTargetGameMode() throws NullPointerException {
++        return this.writingPacket.get().getExplicitTargetGameMode();
++    }
++    // Fiddle end - client perspective - packets are modifiable - expose target client properties - can be used by FriendlyByteBuf
++
+ }
+diff --git a/src/main/java/net/minecraft/network/PacketEncoder.java b/src/main/java/net/minecraft/network/PacketEncoder.java
+index fbfadeb83719b81f42724e79c59e92ed88fdece7..22d9af1f5f3aeaed853b094716d5b6e63e628025 100644
+--- a/src/main/java/net/minecraft/network/PacketEncoder.java
++++ b/src/main/java/net/minecraft/network/PacketEncoder.java
+@@ -6,6 +6,8 @@ import io.netty.channel.ChannelHandlerContext;
+ import io.netty.handler.codec.MessageToByteEncoder;
+ import io.papermc.paper.adventure.PaperAdventure; // Paper
+ import java.io.IOException;
++import java.lang.ref.WeakReference;
++
+ import net.minecraft.network.protocol.Packet;
+ import net.minecraft.network.protocol.PacketFlow;
+ import net.minecraft.util.profiling.jfr.JvmProfiler;
+@@ -33,6 +35,7 @@ public class PacketEncoder extends MessageToByteEncoder<Packet<?>> {
+                 throw new IOException("Can't serialize unregistered packet");
+             } else {
+                 FriendlyByteBuf friendlyByteBuf = new FriendlyByteBuf(byteBuf);
++                friendlyByteBuf.writingPacket = new WeakReference<>(packet); // Fiddle - client perspective - packets are modifiable - expose target client properties - can be used by FriendlyByteBuf
+                 friendlyByteBuf.writeVarInt(i);
+                 friendlyByteBuf.adventure$locale = channelHandlerContext.channel().attr(PaperAdventure.LOCALE_ATTRIBUTE).get(); // Paper
+ 

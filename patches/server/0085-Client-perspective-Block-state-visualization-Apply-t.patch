@@ -1,76 +1,41 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
-Date: Sun, 31 Dec 2023 13:48:55 +0100
+Date: Sat, 30 Dec 2023 21:26:58 +0100
 Subject: [PATCH] Client perspective - Block state visualization - Apply to
- chunk packets - ClientboundLevelChunkPacketData has a reference to its
- ClientboundLevelChunkWithLightPacket
+ chunk packets - Store connection explicitly in chunk packets
 
-In `ClientboundLevelChunkPacketData`, adds a reference to its containing `ClientboundLevelChunkWithLightPacket`.
-This will later allow us to implement applying the visualization in `ClientboundLevelChunkPacketData`, and then mark the packet as ready when it has finished.
+Makes all instances of `ClientboundLevelChunkWithLightPacket` bound to a particular explicit target connection.
+This is done by making it a subclass of `PacketWithExplicitTargetClientConnection`.
 
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
-diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java
-index 4a6a04ebed3b5afb531a2ef298a32db263e8e927..f28006e6ea84bb37f94398973772655ccc77520e 100644
---- a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java
-+++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java
-@@ -22,6 +22,12 @@ import org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope;
- 
- public class ClientboundLevelChunkPacketData {
-     private static final int TWO_MEGABYTES = 2097152;
-+    // Fiddle start - client perspective - block state visualization - apply to chunk packets - ClientboundLevelChunkPacketData has a reference to its ClientboundLevelChunkWithLightPacket
-+    /**
-+     * The {@link ClientboundLevelChunkWithLightPacket} that contains this instance as its chunk data.
-+     */
-+    private final ClientboundLevelChunkWithLightPacket containingPacket;
-+    // Fiddle end - client perspective - block state visualization - apply to chunk packets - ClientboundLevelChunkPacketData has a reference to its ClientboundLevelChunkWithLightPacket
-     private final CompoundTag heightmaps;
-     private final byte[] buffer;
-     private final List<ClientboundLevelChunkPacketData.BlockEntityInfo> blockEntitiesData;
-@@ -35,7 +41,10 @@ public class ClientboundLevelChunkPacketData {
-     // Paper end
- 
-     // Paper start - Anti-Xray - Add chunk packet info
--    public ClientboundLevelChunkPacketData(LevelChunk chunk, @Nullable com.destroystokyo.paper.antixray.ChunkPacketInfoAntiXray chunkPacketInfo) { // Fiddle - client perspective - block state visualization - apply to chunk packets - every ChunkPacketInfo is ChunkPacketInfoAntiXray - the parameter type is always ChunkPacketInfoAntiXray, and is non-null if anti-x-ray is to be applied (but if it is non-null, still no anti-x-ray would be applied if the used ChunkPacketBlockController never applies anti-x-ray)
-+    // Fiddle start - client perspective - block state visualization - apply to chunk packets - ClientboundLevelChunkPacketData has a reference to its ClientboundLevelChunkWithLightPacket
-+    public ClientboundLevelChunkPacketData(ClientboundLevelChunkWithLightPacket containingPacket, LevelChunk chunk, @Nullable com.destroystokyo.paper.antixray.ChunkPacketInfoAntiXray chunkPacketInfo) { // Fiddle - client perspective - block state visualization - apply to chunk packets - every ChunkPacketInfo is ChunkPacketInfoAntiXray - the parameter type is always ChunkPacketInfoAntiXray, and is non-null if anti-x-ray is to be applied (but if it is non-null, still no anti-x-ray would be applied if the used ChunkPacketBlockController never applies anti-x-ray)
-+        this.containingPacket = containingPacket;
-+        // Fiddle end - client perspective - block state visualization - apply to chunk packets - ClientboundLevelChunkPacketData has a reference to its ClientboundLevelChunkWithLightPacket
-         // Paper end
-         this.heightmaps = new CompoundTag();
- 
-@@ -72,7 +81,10 @@ public class ClientboundLevelChunkPacketData {
- 
-     }
- 
--    public ClientboundLevelChunkPacketData(FriendlyByteBuf buf, int x, int z) {
-+    // Fiddle start - client perspective - block state visualization - apply to chunk packets - ClientboundLevelChunkPacketData has a reference to its ClientboundLevelChunkWithLightPacket
-+    public ClientboundLevelChunkPacketData(ClientboundLevelChunkWithLightPacket containingPacket, FriendlyByteBuf buf, int x, int z) {
-+        this.containingPacket = containingPacket;
-+        // Fiddle end - client perspective - block state visualization - apply to chunk packets - ClientboundLevelChunkPacketData has a reference to its ClientboundLevelChunkWithLightPacket
-         this.heightmaps = buf.readNbt();
-         if (this.heightmaps == null) {
-             throw new RuntimeException("Can't read heightmap in packet for [" + x + ", " + z + "]");
 diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
-index 8841369d883c69ef2bc4dc70d508c2ce06a04245..5c9f6ee422ea7491b591d624f97a9d622cefb902 100644
+index 3305c7695193ec6299ae1015dd2b916d2405500b..8841369d883c69ef2bc4dc70d508c2ce06a04245 100644
 --- a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
 +++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
-@@ -34,7 +34,7 @@ public class ClientboundLevelChunkWithLightPacket extends org.fiddlemc.fiddle.pa
+@@ -8,7 +8,7 @@ import net.minecraft.world.level.ChunkPos;
+ import net.minecraft.world.level.chunk.LevelChunk;
+ import net.minecraft.world.level.lighting.LevelLightEngine;
+ 
+-public class ClientboundLevelChunkWithLightPacket implements Packet<ClientGamePacketListener> {
++public class ClientboundLevelChunkWithLightPacket extends org.fiddlemc.fiddle.packet.PacketWithExplicitTargetClientConnection<ClientGamePacketListener> { // Fiddle - client perspective - block state visualization - apply to chunk packets - store connection explicitly
+     private final int x;
+     private final int z;
+     private final ClientboundLevelChunkPacketData chunkData;
+@@ -29,6 +29,7 @@ public class ClientboundLevelChunkWithLightPacket implements Packet<ClientGamePa
+     // Paper start - Anti-Xray - Add chunk packet info
+     @Deprecated @io.papermc.paper.annotation.DoNotUse public ClientboundLevelChunkWithLightPacket(LevelChunk chunk, LevelLightEngine lightProvider, @Nullable BitSet skyBits, @Nullable BitSet blockBits) { this(chunk, lightProvider, skyBits, blockBits, true); }
+     public ClientboundLevelChunkWithLightPacket(LevelChunk chunk, LevelLightEngine lightProvider, @Nullable BitSet skyBits, @Nullable BitSet blockBits, boolean modifyBlocks) {
++        super(); // Fiddle - client perspective - block state visualization - apply to chunk packets - store connection explicitly
+         ChunkPos chunkPos = chunk.getPos();
          this.x = chunkPos.x;
          this.z = chunkPos.z;
-         var chunkPacketInfo = modifyBlocks ? chunk.getLevel().chunkPacketBlockController.getChunkPacketInfo(this, chunk) : null; // Fiddle - client perspective - block state visualization - apply to chunk packets - every ChunkPacketInfo is ChunkPacketInfoAntiXray - no effective changes to this field except the type is inferred
--        this.chunkData = new ClientboundLevelChunkPacketData(chunk, chunkPacketInfo);
-+        this.chunkData = new ClientboundLevelChunkPacketData(this, chunk, chunkPacketInfo); // Fiddle - client perspective - block state visualization - apply to chunk packets - ClientboundLevelChunkPacketData has a reference to its ClientboundLevelChunkWithLightPacket
-         // Paper end
-         this.lightData = new ClientboundLightUpdatePacketData(chunkPos, lightProvider, skyBits, blockBits);
-         chunk.getLevel().chunkPacketBlockController.modifyBlocks(this, chunkPacketInfo); // Paper - Anti-Xray - Modify blocks
-@@ -44,7 +44,7 @@ public class ClientboundLevelChunkWithLightPacket extends org.fiddlemc.fiddle.pa
-         super(); // Fiddle - client perspective - block state visualization - apply to chunk packets - store connection explicitly
-         this.x = buf.readInt();
-         this.z = buf.readInt();
--        this.chunkData = new ClientboundLevelChunkPacketData(buf, this.x, this.z);
-+        this.chunkData = new ClientboundLevelChunkPacketData(this, buf, this.x, this.z); // Fiddle - client perspective - block state visualization - apply to chunk packets - ClientboundLevelChunkPacketData has a reference to its ClientboundLevelChunkWithLightPacket
-         this.lightData = new ClientboundLightUpdatePacketData(buf, this.x, this.z);
+@@ -40,6 +41,7 @@ public class ClientboundLevelChunkWithLightPacket implements Packet<ClientGamePa
      }
  
+     public ClientboundLevelChunkWithLightPacket(FriendlyByteBuf buf) {
++        super(); // Fiddle - client perspective - block state visualization - apply to chunk packets - store connection explicitly
+         this.x = buf.readInt();
+         this.z = buf.readInt();
+         this.chunkData = new ClientboundLevelChunkPacketData(buf, this.x, this.z);

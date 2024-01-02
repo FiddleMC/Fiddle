@@ -8,10 +8,10 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index c8b504a84adee11f14cf1dff7ccd1aea654b326e..753819767f318a95d9b303935a6c518846f17793 100644
+index 0031765eb9f50c46f450b02dce456555ca2d513e..66345be27a2424d9f4ac6c647b7257969dc23d7e 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
-@@ -151,6 +151,34 @@ public class Main {
+@@ -149,6 +149,34 @@ public class Main {
              Path path1 = Paths.get("server.properties");
              DedicatedServerSettings dedicatedserversettings = new DedicatedServerSettings(optionset); // CraftBukkit - CLI argument support
  

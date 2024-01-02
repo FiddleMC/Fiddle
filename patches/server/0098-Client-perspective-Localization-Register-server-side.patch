@@ -8,7 +8,7 @@ License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index 0a46669503131fef418a4cd200061bc4d9c50495..f5a2c2dede0ce27db7e514f7c20264fa7256f4ce 100644
+index 61e78eb9838cad653a281b3e92489ab27dec6049..30faee5954fc9dc58a8d782b929d508f7f89c4b4 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
 @@ -73,6 +73,7 @@ import net.minecraft.world.level.storage.LevelSummary;
@@ -16,10 +16,10 @@ index 0a46669503131fef418a4cd200061bc4d9c50495..f5a2c2dede0ce27db7e514f7c20264fa
  import net.minecraft.world.level.storage.WorldData;
  import org.bukkit.Material;
 +import org.fiddlemc.fiddle.packet.locale.ServerSideTranslations;
- import org.fiddlemc.fiddle.server.FiddleFeatureSupport;
  import org.fiddlemc.fiddle.configuration.FiddleConfigurations;
  import org.fiddlemc.fiddle.configuration.PermanenceConfirmation;
-@@ -236,6 +237,18 @@ public class Main {
+ import org.fiddlemc.fiddle.material.*;
+@@ -234,6 +235,18 @@ public class Main {
              Path path1 = Paths.get("server.properties");
              DedicatedServerSettings dedicatedserversettings = new DedicatedServerSettings(optionset); // CraftBukkit - CLI argument support
  
