@@ -1,0 +1,36 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sun, 16 Jul 2023 13:30:05 +0200
+Subject: [PATCH] Cache Block, Item and BlockState registry index - Use - Item
+
+Replaces lookups of `Item` registry keys (occurrences of `BuiltInRegistries.ITEM.getId`) with the lazily computed value in `Item` (`Item.getIndexInItemRegistry`) added in the "Cache Block, Item and BlockState registry index - Provide" patch.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/world/entity/player/StackedContents.java b/src/main/java/net/minecraft/world/entity/player/StackedContents.java
+index 574ebb3a2fcd0e4e426a8a7ee88d722ed3b9c3f5..c65112aefc40fb35e8b56ec45a904e5c63da5a72 100644
+--- a/src/main/java/net/minecraft/world/entity/player/StackedContents.java
++++ b/src/main/java/net/minecraft/world/entity/player/StackedContents.java
+@@ -42,7 +42,7 @@ public class StackedContents {
+     }
+ 
+     public static int getStackingIndex(ItemStack stack) {
+-        return BuiltInRegistries.ITEM.getId(stack.getItem());
++        return stack.getItem().getIndexInItemRegistry(); // Fiddle - cache registry indices as fields - use instead of lookup - item
+     }
+ 
+     boolean has(int itemId) {
+diff --git a/src/main/java/net/minecraft/world/item/Item.java b/src/main/java/net/minecraft/world/item/Item.java
+index d115b48a4736bdf7a1c2b729a6786ffb56c91625..7aee975f12aba989b9867915d3faaa91be22a21d 100644
+--- a/src/main/java/net/minecraft/world/item/Item.java
++++ b/src/main/java/net/minecraft/world/item/Item.java
+@@ -128,7 +128,7 @@ public class Item implements FeatureElement, ItemLike {
+     // Fiddle end - cache registry indices as fields - item
+ 
+     public static int getId(Item item) {
+-        return item == null ? 0 : BuiltInRegistries.ITEM.getId(item);
++        return item == null ? 0 : item.getIndexInItemRegistry(); // Fiddle - cache registry indices as fields - use instead of lookup - item
+     }
+ 
+     public static Item byId(int id) {

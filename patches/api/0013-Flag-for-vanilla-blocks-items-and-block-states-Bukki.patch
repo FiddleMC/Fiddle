@@ -1,0 +1,83 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Wed, 3 Jan 2024 18:23:11 +0100
+Subject: [PATCH] Flag for vanilla blocks, items and block states - Bukkit API
+
+Allows getting whether a block, item or block state is present in vanilla.
+This is done by providing the abstract methods `UnsafeValues.isVanillaBlock()`, `UnsafeValues.isVanillaItem()` and `BlockData.isVanilla()`, which are implemented in the "Flag for vanilla blocks, items and block states - Bukkit API" patch in the `fiddle-server` module,
+and adding the `Material.isVanillaBlock()` and `Material.isVanillaItem()` aliases for the respective methods in `UnsafeValues`.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
+index 039d8152639b22fbb6af9dfbcc7eb38466ef0f6a..4be53e8527558d180627fda7967f2a7be1247db0 100644
+--- a/src/main/java/org/bukkit/Material.java
++++ b/src/main/java/org/bukkit/Material.java
+@@ -11074,4 +11074,23 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+     public boolean isEnabledByFeature(@NotNull World world) {
+         return Bukkit.getDataPackManager().isEnabledByFeature(this, world);
+     }
++
++    // Fiddle start - flags for vanilla content - API - block
++    /**
++     * @return Whether this {@link Material} is present in vanilla as a block.
++     */
++    public boolean isVanillaBlock() {
++        return Bukkit.getUnsafe().isVanillaBlock(this);
++    }
++    // Fiddle end - flags for vanilla content - API - block
++
++    // Fiddle start - flags for vanilla content - API - item
++    /**
++     * @return Whether this {@link Material} is present in vanilla as an item.
++     */
++    public boolean isVanillaItem() {
++        return Bukkit.getUnsafe().isVanillaItem(this);
++    }
++    // Fiddle end - flags for vanilla content - API - item
++
+ }
+diff --git a/src/main/java/org/bukkit/UnsafeValues.java b/src/main/java/org/bukkit/UnsafeValues.java
+index c661eab343ae76488de701630424e2d589f44fc0..e4c0862a848aaa99c174afde43ad46202b46435c 100644
+--- a/src/main/java/org/bukkit/UnsafeValues.java
++++ b/src/main/java/org/bukkit/UnsafeValues.java
+@@ -250,4 +250,21 @@ public interface UnsafeValues {
+      */
+     void setBiomeKey(RegionAccessor accessor, int x, int y, int z, NamespacedKey biomeKey);
+     // Paper end
++
++    // Fiddle start - flags for vanilla content - API - block
++    /**
++     * @param material A {@link Material} type.
++     * @return Whether the given {@link Material} is present in vanilla as a block.
++     */
++    boolean isVanillaBlock(Material material);
++    // Fiddle end - flags for vanilla content - API - block
++
++    // Fiddle start - flags for vanilla content - API - item
++    /**
++     * @param material A {@link Material} type.
++     * @return Whether the given {@link Material} is present in vanilla as an item.
++     */
++    boolean isVanillaItem(Material material);
++    // Fiddle end - flags for vanilla content - API - item
++
+ }
+diff --git a/src/main/java/org/bukkit/block/data/BlockData.java b/src/main/java/org/bukkit/block/data/BlockData.java
+index c6b17605090f2f284e6536567ddf0e0977eeaaf8..44b0a1a92c6ff1d099fb107099cd46d77dfafd7f 100644
+--- a/src/main/java/org/bukkit/block/data/BlockData.java
++++ b/src/main/java/org/bukkit/block/data/BlockData.java
+@@ -257,4 +257,12 @@ public interface BlockData extends Cloneable {
+      */
+     boolean isRandomlyTicked();
+     // Paper end
++
++    // Fiddle start - flags for vanilla content - API - block state
++    /**
++     * @return Whether this block state is present in vanilla.
++     */
++    boolean isVanilla();
++    // Fiddle end - flags for vanilla content - API - block state
++
+ }

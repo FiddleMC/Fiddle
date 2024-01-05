@@ -1,0 +1,39 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Mon, 10 Jul 2023 22:05:08 +0200
+Subject: [PATCH] Material fixes - Add missing values to isOccluding
+
+Adds the missing legacy values for dyed shulker boxes to `Material.isOccluding`.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
+index 37996b12738d937b4bc8ca2258f570dbd2a5c629..7a79ad8b2d7a71768991091f013abb52cba10324 100644
+--- a/src/main/java/org/bukkit/Material.java
++++ b/src/main/java/org/bukkit/Material.java
+@@ -8436,6 +8436,24 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+             case LEGACY_NETHER_WART_BLOCK:
+             case LEGACY_RED_NETHER_BRICK:
+             case LEGACY_BONE_BLOCK:
++            // Fiddle start - add missing Material values that are occluding
++            case LEGACY_WHITE_SHULKER_BOX:
++            case LEGACY_ORANGE_SHULKER_BOX:
++            case LEGACY_MAGENTA_SHULKER_BOX:
++            case LEGACY_LIGHT_BLUE_SHULKER_BOX:
++            case LEGACY_YELLOW_SHULKER_BOX:
++            case LEGACY_LIME_SHULKER_BOX:
++            case LEGACY_PINK_SHULKER_BOX:
++            case LEGACY_GRAY_SHULKER_BOX:
++            case LEGACY_SILVER_SHULKER_BOX:
++            case LEGACY_CYAN_SHULKER_BOX:
++            case LEGACY_PURPLE_SHULKER_BOX:
++            case LEGACY_BLUE_SHULKER_BOX:
++            case LEGACY_BROWN_SHULKER_BOX:
++            case LEGACY_GREEN_SHULKER_BOX:
++            case LEGACY_RED_SHULKER_BOX:
++            case LEGACY_BLACK_SHULKER_BOX:
++            // Fiddle end - add missing Material values that are occluding
+             case LEGACY_WHITE_GLAZED_TERRACOTTA:
+             case LEGACY_ORANGE_GLAZED_TERRACOTTA:
+             case LEGACY_MAGENTA_GLAZED_TERRACOTTA:

@@ -5,6 +5,7 @@ Subject: [PATCH] Fiddle branding changes - Load Bukkit version from Fiddle
  pom.properties
 
 Looks up the Bukkit version that Fiddle was compiled against in the `pom.properties` for Fiddle, rather than that for Paper.
+
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 

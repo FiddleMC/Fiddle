@@ -1,0 +1,98 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Thu, 4 Jan 2024 19:20:04 +0100
+Subject: [PATCH] Client perspective - Block state visualization - Level event
+ data - Data can be BlockState
+
+Allows the data of level events (`ClientboundLevelEventPacket.data`) to be a `BlockState` instance,
+and provides the implementation of turning it into an integer value for all event types (`ClientboundLevelEventPacket.type`) that can possibly come with a `BlockState` as data.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelEventPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelEventPacket.java
+index ffca1a0330afd98669b0c9f4d16563668a60f27a..0db82f87b99b9f96de01eb844945f90ca59d12fc 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelEventPacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelEventPacket.java
+@@ -38,6 +38,20 @@ public class ClientboundLevelEventPacket extends org.fiddlemc.fiddle.packet.Clon
+     final protected boolean canSkipCloning() {
+         if (this.data instanceof Integer) {
+             return true;
++            // Fiddle start - client perspective - block state visualization - level event data - data can be BlockState
++        } else if (this.data instanceof net.minecraft.world.level.block.state.BlockState state) {
++            net.minecraft.world.level.block.state.BlockState stateToSend = null;
++            if (state.visualizationSetupper == null) {
++                stateToSend = state;
++            } else {
++                stateToSend = state.visualizationSetupper.setUp(state, this.getBlockStateVisualizationPurposeByType());
++            }
++            if (stateToSend != null) {
++                if (org.fiddlemc.fiddle.packet.ClientPerspective.getSinglePacketBlockStateId(stateToSend) != -1) {
++                    return true;
++                }
++            }
++            // Fiddle end - client perspective - block state visualization - level event data - data can be BlockState
+         }
+         return false;
+     }
+@@ -68,6 +82,47 @@ public class ClientboundLevelEventPacket extends org.fiddlemc.fiddle.packet.Clon
+         // Fiddle start - client perspective - level event data value replacements - data can be generic
+         if (this.data instanceof Integer dataAsInteger) {
+             return dataAsInteger;
++            // Fiddle start - client perspective - block state visualization - level event data - data can be BlockState
++        } else if (this.data instanceof net.minecraft.world.level.block.state.BlockState state) {
++            // Apply the desired visualization
++            var purpose = this.getBlockStateVisualizationPurposeByType();
++            net.minecraft.world.level.block.state.BlockState stateToSend;
++            if (state.visualizationSetupper == null) {
++                stateToSend = state;
++            } else {
++                var player = this.getExplicitTargetClientConnection().getPlayer();
++                var level = (net.minecraft.server.level.ServerLevel) player.level();
++                if (level == null) {
++                    level = net.minecraft.server.MinecraftServer.getServer().getAllLevels().iterator().next(); // This fallback shouldn't be necessary, but it could occur when packets are sent with bad timing
++                }
++                var clientPerspective = this.getExplicitTargetClientPerspective();
++                var definitelyHasNoVisualizationDifferentThanItself = state.visualizationSetupper.preCheckWhetherDefinitelyHasNoVisualizationDifferentThanItself(state, player, clientPerspective, purpose);
++                if (definitelyHasNoVisualizationDifferentThanItself == null) {
++                    definitelyHasNoVisualizationDifferentThanItself = state.visualizationSetupper.preCheckWhetherDefinitelyHasNoVisualizationDifferentThanItself(level, state, player, clientPerspective, purpose);
++                    if (definitelyHasNoVisualizationDifferentThanItself == null) {
++                        definitelyHasNoVisualizationDifferentThanItself = state.visualizationSetupper.preCheckWhetherDefinitelyHasNoVisualizationDifferentThanItself(level, this.pos.getX(), this.pos.getY(), this.pos.getZ(), state, player, clientPerspective, purpose);
++                    }
++                }
++                if (definitelyHasNoVisualizationDifferentThanItself) {
++                    stateToSend = state;
++                } else {
++                    stateToSend = state.visualizationSetupper.setUp(state, player, clientPerspective, org.fiddlemc.fiddle.packet.block.BlockStateVisualizationSetupper.BlockStateVisualizationPurpose.PARTICLE);
++                    if (stateToSend == null) {
++                        stateToSend = state.visualizationSetupper.setUp(level, state, player, clientPerspective, org.fiddlemc.fiddle.packet.block.BlockStateVisualizationSetupper.BlockStateVisualizationPurpose.PARTICLE);
++                        if (stateToSend == null) {
++                            stateToSend = state.visualizationSetupper.setUp(level, this.pos.getX(), this.pos.getY(), this.pos.getZ(), state, player, clientPerspective, org.fiddlemc.fiddle.packet.block.BlockStateVisualizationSetupper.BlockStateVisualizationPurpose.PARTICLE);
++                        }
++                    }
++                }
++            }
++            // Turn the state to send into an id that the client can interpret
++            int singleValue = org.fiddlemc.fiddle.packet.ClientPerspective.getSinglePacketBlockStateId(stateToSend);
++            if (singleValue != -1) {
++                return singleValue;
++            }
++            var clientPerspective = this.getExplicitTargetClientPerspective();
++            return clientPerspective.getPacketBlockStateId(stateToSend);
++            // Fiddle end - client perspective - block state visualization - level event data - data can be BlockState
+         } else {
+             throw new IllegalStateException("A level event packet has an invalid data type: " + this.data.getClass().getName() + " (" + this.data + ")");
+         }
+@@ -77,4 +132,12 @@ public class ClientboundLevelEventPacket extends org.fiddlemc.fiddle.packet.Clon
+     public BlockPos getPos() {
+         return this.pos;
+     }
++
++    // Fiddle start - client perspective - block state visualization - level event data - data can be BlockState
++    private org.fiddlemc.fiddle.packet.block.BlockStateVisualizationSetupper.BlockStateVisualizationPurpose getBlockStateVisualizationPurposeByType() {
++        throw new IllegalStateException("Tried to convert level event data from BlockState with an unsupported type: " + this.type);
++    }
++    // Fiddle end - client perspective - block state visualization - level event data - data can be BlockState
++
+ }
++

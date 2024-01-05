@@ -3,14 +3,18 @@ From: Martijn Muijsers <martijnmuijsers@live.nl>
 Date: Fri, 14 Apr 2023 17:05:19 +0200
 Subject: [PATCH] Create eula.txt before bootstrap
 
+Moves the `eula.txt` file creation to before the server bootstrap (which includes, amongst others, `Bootstrap.bootStrap`).
+
+This makes sure the server owner first can deal with accepting the EULA before dealing with anything going wrong during bootstrapping when the server is first started (for example, because there are Fiddle packs with errors present already, or because a plugin causes an error during bootstrapping).
+
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index af8fae4135aa5cc7f568efe62465b24b6a314baf..142a3b3e3280dbede3c78153bf596fd58ff13499 100644
+index 37cdb4be04251e14118e71d939a6d73ad31c42ea..66803db4244b6eb28d51fbc11d0a2c26a6171021 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
-@@ -124,6 +124,11 @@ public class Main {
+@@ -123,6 +123,11 @@ public class Main {
                  JvmProfiler.INSTANCE.start(Environment.SERVER);
              }
  
@@ -20,9 +24,9 @@ index af8fae4135aa5cc7f568efe62465b24b6a314baf..142a3b3e3280dbede3c78153bf596fd5
 +            // Fiddle end - create eula.txt before bootstrap
 +
              // Fiddle start - Fiddle configuration - load Fiddle global configuration before bootstrap
-             FiddleConfigurations fiddleConfigurations = FiddleConfigurations.get(optionset);
+             var fiddleConfigurations = org.fiddlemc.fiddle.configuration.FiddleConfigurations.get(optionset);
              fiddleConfigurations.initializeGlobalConfiguration();
-@@ -137,8 +142,6 @@ public class Main {
+@@ -136,8 +141,6 @@ public class Main {
              DedicatedServerSettings dedicatedserversettings = new DedicatedServerSettings(optionset); // CraftBukkit - CLI argument support
  
              dedicatedserversettings.forceSave();

@@ -14,7 +14,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 97239145e23b4d15b0e2f0fc68d8992676fd3a54..b258ac74655448ff0e7245a5c108e48b57b2e515 100644
+index 9abd9127f63fe20b4f41a8510e319064e8e4fbf6..858c531178a25a27fb018278493b078f11ae9fa2 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
 @@ -4390,8 +4390,8 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
@@ -90,12 +90,12 @@ index 97239145e23b4d15b0e2f0fc68d8992676fd3a54..b258ac74655448ff0e7245a5c108e48b
  
      /**
 diff --git a/src/main/java/org/bukkit/UnsafeValues.java b/src/main/java/org/bukkit/UnsafeValues.java
-index 8aabd57965991e4dab0842e90c557e065ebcd448..292d3d4670ae85d6be962361ca30355d0fb0c794 100644
+index 97e3a68bd1772c9706b4d142fee15c0b310cae95..35e98fd602e1ec0bec8e9d15aedea76fe039102c 100644
 --- a/src/main/java/org/bukkit/UnsafeValues.java
 +++ b/src/main/java/org/bukkit/UnsafeValues.java
-@@ -270,6 +270,10 @@ public interface UnsafeValues {
- 
-     boolean isItemAddedByFiddle(@NotNull Material material); // Fiddle - load packs - blocks - flag for added items - API
+@@ -282,6 +282,10 @@ public interface UnsafeValues {
+     boolean isVanillaItem(Material material);
+     // Fiddle end - flags for vanilla content - API - item
  
 +    int getMaxStackSize(Material material); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - max stack size
 +

@@ -1,0 +1,70 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Wed, 3 Jan 2024 21:00:41 +0100
+Subject: [PATCH] Client perspective - Base ids on perspective - Block -
+ Provide
+
+Provides functionality to base `Block` ids (the ids they are identified by in packets sent to clients) on the target client's perspective.
+For clients that can understand the server-side block ids directly, the id is taken from the regular registry (`BuiltInRegistries.BLOCK`), and for those who do not, the ids are taken from the vanilla-only registry (`Block.VANILLA_ONLY_BLOCK_REGISTRY`).
+
+Does not add any usages of this functionality.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/ClientPerspective.java b/src/main/java/org/fiddlemc/fiddle/packet/ClientPerspective.java
+index cf87eea90d072d246184b24a4614573164aa1e5a..d5a82c34e37d2856c6661144c88c4a93e85e1c77 100644
+--- a/src/main/java/org/fiddlemc/fiddle/packet/ClientPerspective.java
++++ b/src/main/java/org/fiddlemc/fiddle/packet/ClientPerspective.java
+@@ -2,7 +2,12 @@
+ 
+ package org.fiddlemc.fiddle.packet;
+ 
++import net.minecraft.core.IdMap;
++import net.minecraft.core.registries.BuiltInRegistries;
++import net.minecraft.world.level.block.Block;
++import net.minecraft.world.level.block.Blocks;
+ import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
+ 
+ /**
+  * This class represents the static circumstances under which a client (typically a player) observes the data sent.
+@@ -61,6 +66,38 @@ public class ClientPerspective {
+         this.understandsServerSideTranslations = understandsServerSideTranslations;
+     }
+ 
++    // Fiddle start - client perspective - base ids on perspective - provide - block
++    /**
++     * @return The {@link IdMap} that {@linkplain IdMap#getId provides} the ids for {@linkplain Block blocks}
++     * that a client with this perspective interprets correctly.
++     */
++    public IdMap<Block> getPacketBlockIdMap() {
++        return understandsServerSideItemsAndBlocks ? BuiltInRegistries.BLOCK : Block.VANILLA_ONLY_BLOCK_REGISTRY;
++    }
++
++    /**
++     * @return The id provided by this perspective's {@link #getPacketBlockIdMap()}, for the given {@link Block}.
++     * A null value will be interpreted as {@link Blocks#AIR}.
++     * <p>
++     *     This is based on {@link #getPacketBlockIdMap()}, but uses the cached id for optimization instead.
++     * </p>
++     */
++    public int getPacketBlockId(@Nullable Block block) {
++        var blockToQuery = block == null ? Blocks.AIR : block;
++        return understandsServerSideItemsAndBlocks ? blockToQuery.getIndexInBlockRegistry() : blockToQuery.getIndexInVanillaOnlyBlockRegistry();
++    }
++
++    /**
++     * @return The single {@link #getPacketBlockId} value for the given {@link Block}, if it is the same
++     * for all possible perspectives, or -1 otherwise.
++     */
++    public static int getSinglePacketBlockId(@Nullable Block block) {
++        var blockToQuery = block == null ? Blocks.AIR : block;
++        int potentialSingleIndex = blockToQuery.getIndexInBlockRegistry();
++        return potentialSingleIndex == blockToQuery.getIndexInVanillaOnlyBlockRegistry() ? potentialSingleIndex : -1;
++    }
++    // Fiddle end - client perspective - base ids on perspective - provide - block
++
+     @Override
+     public int hashCode() {
+         return this.category.ordinal();

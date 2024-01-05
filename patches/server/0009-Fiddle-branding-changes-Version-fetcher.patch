@@ -19,33 +19,10 @@ Licensed (except for image files) under: GPL-3.0 (https://www.gnu.org/licenses/g
 Gale - https://galemc.org
 
 diff --git a/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java b/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
-index 9d687da5bdf398bb3f6c84cdf1249a7213d09f2e..0393a61ef229868568fe8127e71d9c442d835a58 100644
+index 9d687da5bdf398bb3f6c84cdf1249a7213d09f2e..472a44760ef3d551e8fa2118e93c98be05791c60 100644
 --- a/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
 +++ b/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
-@@ -1,85 +1,40 @@
- package com.destroystokyo.paper;
- 
--import com.destroystokyo.paper.util.VersionFetcher;
- import com.google.common.base.Charsets;
- import com.google.common.io.Resources;
--import com.google.gson.*;
--import net.kyori.adventure.text.Component;
--import net.kyori.adventure.text.event.ClickEvent;
--import net.kyori.adventure.text.format.NamedTextColor;
--import net.kyori.adventure.text.format.TextDecoration;
--import net.kyori.adventure.text.TextComponent;
-+import com.google.gson.Gson;
-+import com.google.gson.JsonArray;
-+import com.google.gson.JsonObject;
-+import com.google.gson.JsonSyntaxException;
-+import org.fiddlemc.fiddle.version.AbstractPaperVersionFetcher;
- 
--import javax.annotation.Nonnull;
- import javax.annotation.Nullable;
--import java.io.*;
--import java.net.HttpURLConnection;
-+import java.io.BufferedReader;
-+import java.io.IOException;
+@@ -17,69 +17,27 @@ import java.net.HttpURLConnection;
  import java.net.URL;
  import java.util.stream.StreamSupport;
  
@@ -57,9 +34,9 @@ index 9d687da5bdf398bb3f6c84cdf1249a7213d09f2e..0393a61ef229868568fe8127e71d9c44
 +// Fiddle start - branding changes - version fetcher
 +/**
 + * The original version fetcher for Paper. Most of the original content of this class has been moved to
-+ * {@link AbstractPaperVersionFetcher}.
++ * {@link org.fiddlemc.fiddle.version.AbstractPaperVersionFetcher}.
 + */
-+public class PaperVersionFetcher extends AbstractPaperVersionFetcher {
++public class PaperVersionFetcher extends org.fiddlemc.fiddle.version.AbstractPaperVersionFetcher {
  
 -    @Override
 -    public long getCacheTime() {
@@ -129,7 +106,7 @@ index 9d687da5bdf398bb3f6c84cdf1249a7213d09f2e..0393a61ef229868568fe8127e71d9c44
  
      private static int fetchDistanceFromSiteApi(int jenkinsBuild, @Nullable String siteApiVersion) {
          if (siteApiVersion == null) { return -1; }
-@@ -105,45 +60,4 @@ public class PaperVersionFetcher implements VersionFetcher {
+@@ -105,45 +63,4 @@ public class PaperVersionFetcher implements VersionFetcher {
          }
      }
  

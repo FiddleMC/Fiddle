@@ -1,0 +1,155 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Wed, 3 Jan 2024 19:23:10 +0100
+Subject: [PATCH] Flag for vanilla blocks, items and block states - Create
+
+Adds an `isVanilla` field and corresponding method to `Block`, `Item` and `BlockState` indicating whether it is present in vanilla.
+Also calls the corresponding `setVanilla` before registering vanilla instances to their respective registries.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/world/item/Item.java b/src/main/java/net/minecraft/world/item/Item.java
+index dd2f6c67533cc3344a171fe3ae9b3704796d8c50..fdcc7c24e61d78964c18fede55ab8013bd6e985f 100644
+--- a/src/main/java/net/minecraft/world/item/Item.java
++++ b/src/main/java/net/minecraft/world/item/Item.java
+@@ -71,6 +71,29 @@ public class Item implements FeatureElement, ItemLike {
+     private final FoodProperties foodProperties;
+     private final FeatureFlagSet requiredFeatures;
+ 
++    // Fiddle start - flags for vanilla content - item
++    /**
++     * Whether this item is present in vanilla.
++     * <p>
++     *     This does not take into account whether any details of this item, such as its max stack size,
++     *     are different (were modified) from vanilla.
++     * </p>
++     * <p>
++     *     This must be set to true with {@link #setVanilla} before being registered to
++     *     {@link BuiltInRegistries#ITEM}.
++     * </p>
++     */
++    private boolean isVanilla;
++
++    public boolean isVanilla() {
++        return this.isVanilla;
++    }
++
++    public void setVanilla() {
++        this.isVanilla = true;
++    }
++    // Fiddle end - flags for vanilla content - item
++
+     public static int getId(Item item) {
+         return item == null ? 0 : BuiltInRegistries.ITEM.getId(item);
+     }
+diff --git a/src/main/java/net/minecraft/world/item/Items.java b/src/main/java/net/minecraft/world/item/Items.java
+index 5f20e075c532f0f1d413242949d1738c0c152bf7..581c01f64939c23fda4cbf98e871de672aabe636 100644
+--- a/src/main/java/net/minecraft/world/item/Items.java
++++ b/src/main/java/net/minecraft/world/item/Items.java
+@@ -1305,6 +1305,7 @@ public class Items {
+     }
+ 
+     public static Item registerItem(ResourceKey<Item> key, Item item) {
++        item.setVanilla(); // Fiddle - flags for vanilla content - item
+         if (item instanceof BlockItem) {
+             ((BlockItem)item).registerBlocks(Item.BY_BLOCK, item);
+         }
+diff --git a/src/main/java/net/minecraft/world/level/block/Block.java b/src/main/java/net/minecraft/world/level/block/Block.java
+index 9522e646529f3d849471931b4b3c0d133e7fcfc5..0dfa4ca3d356cf50a89a226cad4f4fb48316b2ba 100644
+--- a/src/main/java/net/minecraft/world/level/block/Block.java
++++ b/src/main/java/net/minecraft/world/level/block/Block.java
+@@ -123,6 +123,32 @@ public class Block extends BlockBehaviour implements ItemLike {
+         return object2bytelinkedopenhashmap;
+     });
+ 
++    // Fiddle start - flags for vanilla content - block
++    /**
++     * Whether this block is present in vanilla.
++     * <p>
++     *     This does not take into account whether any details of this block, such as its properties,
++     *     are different (were modified) from vanilla.
++     * </p>
++     * <p>
++     *     All block states of this block have the same value in {@link BlockState#isVanilla()}.
++     * </p>
++     * <p>
++     *     This must be set to true with {@link #setVanilla} before being registered to
++     *     {@link BuiltInRegistries#BLOCK}.
++     * </p>
++     */
++    private boolean isVanilla;
++
++    public boolean isVanilla() {
++        return this.isVanilla;
++    }
++
++    public void setVanilla() {
++        this.isVanilla = true;
++    }
++    // Fiddle end - flags for vanilla content - block
++
+     public static int getId(@Nullable BlockState state) {
+         if (state == null) {
+             return 0;
+diff --git a/src/main/java/net/minecraft/world/level/block/Blocks.java b/src/main/java/net/minecraft/world/level/block/Blocks.java
+index f41e335be934d24080472be9d260f1be7c01614d..5f6234d522693d670ef4907908fca7f784003fba 100644
+--- a/src/main/java/net/minecraft/world/level/block/Blocks.java
++++ b/src/main/java/net/minecraft/world/level/block/Blocks.java
+@@ -1248,6 +1248,7 @@ public class Blocks {
+     }
+ 
+     public static Block register(String id, Block block) {
++        block.setVanilla(); // Fiddle - flags for vanilla content - block
+         return Registry.register(BuiltInRegistries.BLOCK, id, block);
+     }
+ 
+@@ -1258,6 +1259,11 @@ public class Blocks {
+     static {
+         for(Block block : BuiltInRegistries.BLOCK) {
+             for(BlockState blockState : block.getStateDefinition().getPossibleStates()) {
++                // Fiddle start - flags for vanilla content - block state
++                if (block.isVanilla()) {
++                    blockState.setVanilla();
++                }
++                // Fiddle end - flags for vanilla content - block state
+                 Block.BLOCK_STATE_REGISTRY.add(blockState);
+                 blockState.initCache();
+             }
+diff --git a/src/main/java/net/minecraft/world/level/block/state/BlockState.java b/src/main/java/net/minecraft/world/level/block/state/BlockState.java
+index a9b0f5950b6f97ea4c2a1075946b92008b62c9d9..acb458e03bfffdae406eae99eb81ce0c3078c9ea 100644
+--- a/src/main/java/net/minecraft/world/level/block/state/BlockState.java
++++ b/src/main/java/net/minecraft/world/level/block/state/BlockState.java
+@@ -25,6 +25,32 @@ public class BlockState extends BlockBehaviour.BlockStateBase {
+         super(block, propertyMap, codec);
+     }
+ 
++    // Fiddle start - flags for vanilla content - block state
++    /**
++     * Whether this block state is present in vanilla.
++     * <p>
++     *     This does not take into account whether any details of this block state, such as its collision box,
++     *     are different (were modified) from vanilla.
++     * </p>
++     * <p>
++     *     This state's block has the same value in {@link Block#isVanilla()}.
++     * </p>
++     * <p>
++     *     This must be set to true with {@link #setVanilla} before being registered to
++     *     {@link Block#BLOCK_STATE_REGISTRY}.
++     * </p>
++     */
++    private boolean isVanilla;
++
++    public boolean isVanilla() {
++        return this.isVanilla;
++    }
++
++    public void setVanilla() {
++        this.isVanilla = true;
++    }
++    // Fiddle end - flags for vanilla content - block state
++
+     @Override
+     protected BlockState asState() {
+         return this;

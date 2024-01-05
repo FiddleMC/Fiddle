@@ -1,0 +1,44 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sat, 29 Jul 2023 11:01:29 +0200
+Subject: [PATCH] Client perspective - Deep replacements - Cache client
+ perspective and settings supplier in FriendlyByteBuf
+
+License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/network/FriendlyByteBuf.java b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
+index f64c58d0decb751ad191ca0db48be7df9483ea94..28460c99ae8610f3697105e1fe02aa37829c9cf7 100644
+--- a/src/main/java/net/minecraft/network/FriendlyByteBuf.java
++++ b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
+@@ -79,6 +79,7 @@ import net.minecraft.world.level.ChunkPos;
+ import net.minecraft.world.level.Level;
+ import net.minecraft.world.phys.BlockHitResult;
+ import net.minecraft.world.phys.Vec3;
++import org.fiddlemc.fiddle.packet.deepreplacement.ClientPerspectiveAndSettingsSupplier;
+ import org.jetbrains.annotations.NotNull;
+ import org.joml.Quaternionf;
+ import org.joml.Vector3f;
+@@ -106,6 +107,8 @@ public class FriendlyByteBuf extends ByteBuf {
+     public @Nullable java.lang.ref.WeakReference<net.minecraft.network.protocol.@NotNull Packet<?>> writingPacket;
+     // Fiddle end - client perspective - packets are modifiable - store explicit perspective and locale - FriendlyByteBuf
+ 
++    private @Nullable ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettingsSupplier; // Fiddle - client perspective - deep replacements - perspective and settings supplier - cache in FriendlyByteBuf
++
+     public FriendlyByteBuf(ByteBuf parent) {
+         this.source = parent;
+     }
+@@ -1760,4 +1763,13 @@ public class FriendlyByteBuf extends ByteBuf {
+     }
+     // Fiddle end - client perspective - packets are modifiable - expose target client properties - can be used by FriendlyByteBuf
+ 
++    // Fiddle start - client perspective - deep replacements - perspective and settings supplier - cache in FriendlyByteBuf
++    public @NotNull ClientPerspectiveAndSettingsSupplier getClientPerspectiveAndSettingsSupplier() {
++        if (this.clientPerspectiveAndSettingsSupplier == null) {
++            this.clientPerspectiveAndSettingsSupplier = ClientPerspectiveAndSettingsSupplier.forFriendlyByteBuf(this);
++        }
++        return this.clientPerspectiveAndSettingsSupplier;
++    }
++    // Fiddle end - client perspective - deep replacements - perspective and settings supplier - cache in FriendlyByteBuf
++
+ }

@@ -1,0 +1,64 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Wed, 3 Jan 2024 18:58:37 +0100
+Subject: [PATCH] Modded registries - Register item blocks from item registry
+
+Moves the pre-register operation of registering the blocks for a `BlockItem` with `BlockItem.registerBlocks`, from the `Items.registerItem` method to the `ItemRegistry.register` method.
+
+This means this operation is performed for all `BlockItem` instances that are registered, not only the vanilla items defined in `Items`.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/world/item/Items.java b/src/main/java/net/minecraft/world/item/Items.java
+index 581c01f64939c23fda4cbf98e871de672aabe636..1225c28aa72ac54ac103c72a5eb92e7349e9c94d 100644
+--- a/src/main/java/net/minecraft/world/item/Items.java
++++ b/src/main/java/net/minecraft/world/item/Items.java
+@@ -1306,10 +1306,6 @@ public class Items {
+ 
+     public static Item registerItem(ResourceKey<Item> key, Item item) {
+         item.setVanilla(); // Fiddle - flags for vanilla content - item
+-        if (item instanceof BlockItem) {
+-            ((BlockItem)item).registerBlocks(Item.BY_BLOCK, item);
+-        }
+-
+         return Registry.register(BuiltInRegistries.ITEM, key, item);
+     }
+ }
+diff --git a/src/main/java/org/fiddlemc/fiddle/registry/ItemRegistry.java b/src/main/java/org/fiddlemc/fiddle/registry/ItemRegistry.java
+index 2ecd34b36d1c2d6c54ce6b2e7496b77cb76bff7c..7e238aca79778dd83ea2aefc280afbbfeca1b2ff 100644
+--- a/src/main/java/org/fiddlemc/fiddle/registry/ItemRegistry.java
++++ b/src/main/java/org/fiddlemc/fiddle/registry/ItemRegistry.java
+@@ -4,9 +4,11 @@ package org.fiddlemc.fiddle.registry;
+ 
+ import com.mojang.serialization.Lifecycle;
+ import net.minecraft.core.DefaultedMappedRegistry;
++import net.minecraft.core.Holder;
+ import net.minecraft.core.Registry;
+ import net.minecraft.core.registries.BuiltInRegistries;
+ import net.minecraft.resources.ResourceKey;
++import net.minecraft.world.item.BlockItem;
+ import net.minecraft.world.item.Item;
+ 
+ /**
+@@ -18,4 +20,20 @@ public final class ItemRegistry extends DefaultedMappedRegistry<Item> {
+         super(defaultId, key, lifecycle, intrusive);
+     }
+ 
++    // Fiddle start - modded registries - register item blocks from item registry
++    @Override
++    public Holder.Reference<Item> register(ResourceKey<Item> key, Item entry, Lifecycle lifecycle) {
++        // Register the entry
++        var reference = super.register(key, entry, lifecycle);
++
++        // Register the item by its blocks if applicable
++        if (entry instanceof BlockItem blockItem) {
++            blockItem.registerBlocks(Item.BY_BLOCK, entry);
++        }
++
++        // Return the reference
++        return reference;
++    }
++    // Fiddle end - modded registries - register item blocks from item registry
++
+ }

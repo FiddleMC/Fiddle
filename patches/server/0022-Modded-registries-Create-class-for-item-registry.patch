@@ -1,0 +1,52 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Wed, 3 Jan 2024 18:57:45 +0100
+Subject: [PATCH] Modded registries - Create class for item registry
+
+* Creates a subclass of `Registry` for the item registry: `ItemRegistry`.
+* Changes the `BuiltInRegistries.ITEM` registry instancs to have that type.
+Does not add any behavior to that registry class.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/core/registries/BuiltInRegistries.java b/src/main/java/net/minecraft/core/registries/BuiltInRegistries.java
+index df491d7b512c401beff2014d0e7c14c5512fee99..0bee103fb335d7f31480b1055d4fe622dc79aa3a 100644
+--- a/src/main/java/net/minecraft/core/registries/BuiltInRegistries.java
++++ b/src/main/java/net/minecraft/core/registries/BuiltInRegistries.java
+@@ -134,7 +134,7 @@ public class BuiltInRegistries {
+     });
+     public static final DefaultedRegistry<Item> ITEM = registerDefaultedWithIntrusiveHolders(Registries.ITEM, "air", (registry) -> {
+         return Items.AIR;
+-    });
++    }, org.fiddlemc.fiddle.registry.ItemRegistry::new); // Fiddle - modded registries - class for item registry
+     public static final DefaultedRegistry<Potion> POTION = registerDefaulted(Registries.POTION, "empty", (registry) -> {
+         return Potions.EMPTY;
+     });
+diff --git a/src/main/java/org/fiddlemc/fiddle/registry/ItemRegistry.java b/src/main/java/org/fiddlemc/fiddle/registry/ItemRegistry.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..2ecd34b36d1c2d6c54ce6b2e7496b77cb76bff7c
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/registry/ItemRegistry.java
+@@ -0,0 +1,21 @@
++// Fiddle - modded registries - class for item registry
++
++package org.fiddlemc.fiddle.registry;
++
++import com.mojang.serialization.Lifecycle;
++import net.minecraft.core.DefaultedMappedRegistry;
++import net.minecraft.core.Registry;
++import net.minecraft.core.registries.BuiltInRegistries;
++import net.minecraft.resources.ResourceKey;
++import net.minecraft.world.item.Item;
++
++/**
++ * An implementation of {@link Registry} specially for {@link BuiltInRegistries#ITEM}.
++ */
++public final class ItemRegistry extends DefaultedMappedRegistry<Item> {
++
++    public ItemRegistry(String defaultId, ResourceKey<? extends Registry<Item>> key, Lifecycle lifecycle, boolean intrusive) {
++        super(defaultId, key, lifecycle, intrusive);
++    }
++
++}

@@ -1,0 +1,88 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Wed, 3 Jan 2024 19:47:40 +0100
+Subject: [PATCH] Modded registries - Vanilla-only registries - Create for
+ blocks, items and block states
+
+Creates registries for blocks, items and block states that are present in vanilla (respectively `Block.VANILLA_ONLY_REGISTRY`, `Item.VANILLA_ONLY_REGISTRY` and `Block.VANILLA_ONLY_BLOCK_STATE_REGISTRY`).
+Registers vanilla blocks, items and block states to these registries when they are registered to their regular registries.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/world/item/Item.java b/src/main/java/net/minecraft/world/item/Item.java
+index fdcc7c24e61d78964c18fede55ab8013bd6e985f..22baff7eaee96b8b12b7ff1e33f58273e9ba4852 100644
+--- a/src/main/java/net/minecraft/world/item/Item.java
++++ b/src/main/java/net/minecraft/world/item/Item.java
+@@ -59,6 +59,7 @@ public class Item implements FeatureElement, ItemLike {
+     public static final int EAT_DURATION = 32;
+     public static final int MAX_BAR_WIDTH = 13;
+     private final Holder.Reference<Item> builtInRegistryHolder = BuiltInRegistries.ITEM.createIntrusiveHolder(this);
++    public static final net.minecraft.core.IdMapper<Item> VANILLA_ONLY_ITEM_REGISTRY = new net.minecraft.core.IdMapper<>(); // Fiddle - modded registries - vanilla-only registries - create - item
+     public final Rarity rarity;
+     private final int maxStackSize;
+     private final int maxDamage;
+diff --git a/src/main/java/net/minecraft/world/level/block/Block.java b/src/main/java/net/minecraft/world/level/block/Block.java
+index 0dfa4ca3d356cf50a89a226cad4f4fb48316b2ba..e5679dfa8b891054f9247edb44c2072c726941b0 100644
+--- a/src/main/java/net/minecraft/world/level/block/Block.java
++++ b/src/main/java/net/minecraft/world/level/block/Block.java
+@@ -66,7 +66,22 @@ public class Block extends BlockBehaviour implements ItemLike {
+ 
+     private static final Logger LOGGER = LogUtils.getLogger();
+     private final Holder.Reference<Block> builtInRegistryHolder;
+-    public static final IdMapper<BlockState> BLOCK_STATE_REGISTRY = new IdMapper<>();
++    public static final IdMapper<Block> VANILLA_ONLY_BLOCK_REGISTRY = new IdMapper<>(); // Fiddle - modded registries - vanilla-only registries - create - block
++    // Fiddle start - modded registries - vanilla-only registries - create - block state
++    public static final IdMapper<BlockState> BLOCK_STATE_REGISTRY = new IdMapper<>() {
++
++        @Override
++        public void add(BlockState value) {
++            super.add(value);
++            // Also add the block state to the vanilla-only registry if applicable
++            if (value.isVanilla()) {
++                VANILLA_ONLY_BLOCK_STATE_REGISTRY.add(value);
++            }
++        }
++
++    };
++    public static final IdMapper<BlockState> VANILLA_ONLY_BLOCK_STATE_REGISTRY = new IdMapper<>();
++    // Fiddle end - modded registries - vanilla-only registries - create - block state
+     private static final LoadingCache<VoxelShape, Boolean> SHAPE_FULL_BLOCK_CACHE = CacheBuilder.newBuilder().maximumSize(512L).weakKeys().build(new CacheLoader<VoxelShape, Boolean>() {
+         public Boolean load(VoxelShape voxelshape) {
+             return !Shapes.joinIsNotEmpty(Shapes.block(), voxelshape, BooleanOp.NOT_SAME);
+diff --git a/src/main/java/org/fiddlemc/fiddle/registry/BlockRegistry.java b/src/main/java/org/fiddlemc/fiddle/registry/BlockRegistry.java
+index fb9128c8ff86356e1660bc0551d9bde8d847f643..07419764bfb7f9e174df3efc6eefa147e9e93c71 100644
+--- a/src/main/java/org/fiddlemc/fiddle/registry/BlockRegistry.java
++++ b/src/main/java/org/fiddlemc/fiddle/registry/BlockRegistry.java
+@@ -57,6 +57,13 @@ public final class BlockRegistry extends DefaultedMappedRegistry<Block> {
+         }
+         entry.getLootTable();
+ 
++        // Fiddle start - modded registries - vanilla-only registries - create - block
++        // Also add the block to the vanilla-only registry if applicable
++        if (entry.isVanilla()) {
++            Block.VANILLA_ONLY_BLOCK_REGISTRY.add(entry);
++        }
++        // Fiddle end - modded registries - vanilla-only registries - create - block
++
+         // Return the reference
+         return reference;
+     }
+diff --git a/src/main/java/org/fiddlemc/fiddle/registry/ItemRegistry.java b/src/main/java/org/fiddlemc/fiddle/registry/ItemRegistry.java
+index 7e238aca79778dd83ea2aefc280afbbfeca1b2ff..900c72eb518d9f0b6dc488fe55c27f117db0e9f0 100644
+--- a/src/main/java/org/fiddlemc/fiddle/registry/ItemRegistry.java
++++ b/src/main/java/org/fiddlemc/fiddle/registry/ItemRegistry.java
+@@ -31,6 +31,13 @@ public final class ItemRegistry extends DefaultedMappedRegistry<Item> {
+             blockItem.registerBlocks(Item.BY_BLOCK, entry);
+         }
+ 
++        // Fiddle start - modded registries - vanilla-only registries - create - item
++        // Also add the item to the vanilla-only registry if applicable
++        if (entry.isVanilla()) {
++            Item.VANILLA_ONLY_ITEM_REGISTRY.add(entry);
++        }
++        // Fiddle end - modded registries - vanilla-only registries - create - item
++
+         // Return the reference
+         return reference;
+     }

@@ -10,18 +10,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/resources/ResourceLocation.java b/src/main/java/net/minecraft/resources/ResourceLocation.java
-index fa9b84b604659a6b35262fbe5acbee0fdb20a56d..e6d1cf0b566b5b749d2cbf69e942cc6fcf32af7f 100644
+index fa9b84b604659a6b35262fbe5acbee0fdb20a56d..fa8f87b839ae42955ce8bd30b6fa55d7ac3036d3 100644
 --- a/src/main/java/net/minecraft/resources/ResourceLocation.java
 +++ b/src/main/java/net/minecraft/resources/ResourceLocation.java
-@@ -19,6 +19,7 @@ import net.minecraft.ResourceLocationException;
- import net.minecraft.network.chat.Component;
- import net.minecraft.util.GsonHelper;
- import org.apache.commons.lang3.StringUtils;
-+import org.bukkit.NamespacedKey;
- 
- public class ResourceLocation implements Comparable<ResourceLocation> {
-     public static final Codec<ResourceLocation> CODEC = Codec.STRING.comapFlatMap(ResourceLocation::read, ResourceLocation::toString).stable();
-@@ -26,6 +27,14 @@ public class ResourceLocation implements Comparable<ResourceLocation> {
+@@ -26,6 +26,14 @@ public class ResourceLocation implements Comparable<ResourceLocation> {
      public static final char NAMESPACE_SEPARATOR = ':';
      public static final String DEFAULT_NAMESPACE = "minecraft";
      public static final String REALMS_NAMESPACE = "realms";
@@ -31,7 +23,7 @@ index fa9b84b604659a6b35262fbe5acbee0fdb20a56d..e6d1cf0b566b5b749d2cbf69e942cc6f
 +     * This is for {@link ResourceLocation}s that are defined by and belong to Fiddle itself,
 +     * not those of packs that are loaded by Fiddle (content in those packs uses its own namespaces).
 +     */
-+    public static final String FIDDLE_NAMESPACE = NamespacedKey.FIDDLE;
++    public static final String FIDDLE_NAMESPACE = org.bukkit.NamespacedKey.FIDDLE;
 +    // Fiddle end - define Fiddle namespace
      private final String namespace;
      private final String path;

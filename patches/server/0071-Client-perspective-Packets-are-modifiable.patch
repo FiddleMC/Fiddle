@@ -1,0 +1,180 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sat, 22 Jul 2023 12:04:44 +0200
+Subject: [PATCH] Client perspective - Packets are modifiable
+
+Allows packets to be adapted to the client that they are sent to.
+
+License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/network/Connection.java b/src/main/java/net/minecraft/network/Connection.java
+index 7487b961ce6c364224ae579da23abf1f3e8c4d7a..4717220c7b668a3b39279d4d45362d8fe792a489 100644
+--- a/src/main/java/net/minecraft/network/Connection.java
++++ b/src/main/java/net/minecraft/network/Connection.java
+@@ -384,6 +384,7 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+     }
+ 
+     public void send(Packet<?> packet, @Nullable PacketSendListener callbacks) {
++        packet = packet.adaptForClient(this); // Fiddle - client perspective - packets are modifiable - adapt packet before sending
+         // Paper start - handle oversized packets better
+         boolean connected = this.isConnected();
+         if (!connected && !preparing) {
+@@ -394,7 +395,7 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+             io.papermc.paper.util.MCUtil.isMainThread() && packet.isReady() && this.queue.isEmpty() &&
+             (packet.getExtraPackets() == null || packet.getExtraPackets().isEmpty())
+         ))) {
+-            this.sendPacket(packet, callbacks, null); // Paper
++            this.sendPacket(packet, callbacks, null, true); // Paper // Fiddle - client perspective - packets are modifiable - adapt packet before sending
+             return;
+         }
+         // write the packets to the queue, then flush - antixray hooks there already
+@@ -418,10 +419,22 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+     }
+ 
+     private void sendPacket(Packet<?> packet, @Nullable PacketSendListener callbacks) {
++        // Fiddle start - client perspective - packets are modifiable - adapt packet before sending
++        this.sendPacket(packet, callbacks, false);
++    }
++
++    private void sendPacket(Packet<?> packet, @Nullable PacketSendListener callbacks, boolean alreadyAdapted) {
++        // Fiddle end - client perspective - packets are modifiable - adapt packet before sending
+         // Paper start - add flush parameter
+-        this.sendPacket(packet, callbacks, Boolean.TRUE);
++        this.sendPacket(packet, callbacks, Boolean.TRUE, alreadyAdapted); // Fiddle - client perspective - packets are modifiable - adapt packet before sending
+     }
+     private void sendPacket(Packet<?> packet, @Nullable PacketSendListener callbacks, Boolean flushConditional) {
++        // Fiddle start - client perspective - packets are modifiable - adapt packet before sending
++        this.sendPacket(packet, callbacks, flushConditional, false);
++    }
++    private void sendPacket(Packet<?> originalPacket, @Nullable PacketSendListener callbacks, Boolean flushConditional, boolean alreadyAdapted) {
++        var packet = alreadyAdapted ? originalPacket : originalPacket.adaptForClient(this);
++        // Fiddle end - client perspective - packets are modifiable - adapt packet before sending
+         this.packetWrites.getAndIncrement(); // must be befeore using canFlush
+         boolean effectiveFlush = flushConditional == null ? this.canFlush : flushConditional.booleanValue();
+         final boolean flush = effectiveFlush || packet instanceof net.minecraft.network.protocol.game.ClientboundKeepAlivePacket || packet instanceof ClientboundDisconnectPacket; // no delay for certain packets
+@@ -566,7 +579,7 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+             } else {
+                 iterator.remove();
+                 if (queued.tryMarkConsumed()) { // Paper - try to mark isConsumed flag for de-duplicating packet
+-                    this.sendPacket(packet, queued.listener, (!iterator.hasNext() && (needsFlush || this.canFlush)) ? Boolean.TRUE : Boolean.FALSE); // Paper - make only one flush call per sendPacketQueue() call
++                    this.sendPacket(packet, queued.listener, (!iterator.hasNext() && (needsFlush || this.canFlush)) ? Boolean.TRUE : Boolean.FALSE, true); // Paper - make only one flush call per sendPacketQueue() call // Fiddle - client perspective - packets are modifiable - adapt packet before sending
+                     hasWrotePacket = true; // Paper - make only one flush call per sendPacketQueue() call
+                 }
+             }
+diff --git a/src/main/java/net/minecraft/network/protocol/BundlePacket.java b/src/main/java/net/minecraft/network/protocol/BundlePacket.java
+index ba1763d6d399f282e34aa51a4d40a4e6a0eefcbb..0462cbff6eb3366077c1628c0c8a10e99c9fdf90 100644
+--- a/src/main/java/net/minecraft/network/protocol/BundlePacket.java
++++ b/src/main/java/net/minecraft/network/protocol/BundlePacket.java
+@@ -4,7 +4,7 @@ import net.minecraft.network.FriendlyByteBuf;
+ import net.minecraft.network.PacketListener;
+ 
+ public abstract class BundlePacket<T extends PacketListener> implements Packet<T> {
+-    private final Iterable<Packet<T>> packets;
++    protected Iterable<Packet<T>> packets; // Fiddle - client perspective - packets are modifiable - bundle - private -> protected, non-final -> final
+ 
+     protected BundlePacket(Iterable<Packet<T>> packets) {
+         this.packets = packets;
+diff --git a/src/main/java/net/minecraft/network/protocol/Packet.java b/src/main/java/net/minecraft/network/protocol/Packet.java
+index e8fcd56906d26f6dc87959e32c4c7c78cfea9658..c6157e73945cb4cf503174db0475ae62f4848203 100644
+--- a/src/main/java/net/minecraft/network/protocol/Packet.java
++++ b/src/main/java/net/minecraft/network/protocol/Packet.java
+@@ -30,4 +30,35 @@ public interface Packet<T extends PacketListener> {
+     default boolean isSkippable() {
+         return false;
+     }
++
++    // Fiddle start - client perspective - packets are modifiable
++    /**
++     * This method is called from {@link net.minecraft.network.Connection} with the
++     * {@linkplain org.fiddlemc.fiddle.packet.ClientPerspective perspective} of the client
++     * that the packet is being sent to.
++     * <br>
++     * By default, this method simply returns this {@link Packet} instance itself
++     * (so for implementations that directly override this default implementation,
++     * it is never necessary to make a call to this default implementation).
++     * This method can be overridden for packet types for which an action must be performed when it is sent to a client,
++     * or where the content of the packet must be modified based on the given
++     * {@link org.fiddlemc.fiddle.packet.ClientPerspective} (or both).
++     * For instance, items, block states and more may be modified or replaced.
++     *
++     * @param connection The connection of the client that this packet is poised to be sent to.
++     * @return The packet that will actually be sent to the client.
++     * This may be this packet itself. In that case, this packet may be unchanged (which will be the case for any
++     * packet types that do not have an overriding implementation) or may have been modified in-place.
++     * This may also not be this packet, but a different instance (possibly specially newly constructed,
++     * but not necessarily - it may also be a packet instance retrieved from a cache of common instances, for example).
++     * For packet types for which {@link Packet} instances may be constructed and then sent to multiple players,
++     * overriding implementations of this method that wish to make modifications to the packet instance,
++     * would normally not make in-place modifications to this original {@link Packet} instance,
++     * but return a {@link Packet} instance specially constructed for each client.
++     */
++    default @org.jetbrains.annotations.NotNull Packet<T> adaptForClient(@org.jetbrains.annotations.NotNull net.minecraft.network.Connection connection) {
++        return this;
++    }
++    // Fiddle end - client perspective - packets are modifiable
++
+ }
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundBundlePacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundBundlePacket.java
+index 9ec905a409b6f0785bf8dcabffc43d67ebf6560e..ef465411b1a9e53eedb3c3b0ee3bb2975755a1e5 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundBundlePacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundBundlePacket.java
+@@ -4,6 +4,16 @@ import net.minecraft.network.protocol.BundlePacket;
+ import net.minecraft.network.protocol.Packet;
+ 
+ public class ClientboundBundlePacket extends BundlePacket<ClientGamePacketListener> {
++
++    // Fiddle start - client perspective - packets are modifiable - bundle
++    /**
++     * We assume by default that a {@link BundlePacket} instance is not sent to multiple clients,
++     * but when there is a chance of this happening for a specific instance, this value can be set to true
++     * with {@link #setMayBeSentToMultipleTargetClients}.
++     */
++    private boolean mayBeSentToMultipleTargetClients = false;
++    // Fiddle end - client perspective - packets are modifiable - bundle
++
+     public ClientboundBundlePacket(Iterable<Packet<ClientGamePacketListener>> packets) {
+         super(packets);
+     }
+@@ -12,4 +22,41 @@ public class ClientboundBundlePacket extends BundlePacket<ClientGamePacketListen
+     public void handle(ClientGamePacketListener listener) {
+         listener.handleBundlePacket(this);
+     }
++
++    // Fiddle start - client perspective - packets are modifiable - bundle
++    /**
++     * Marks this packet as potentially being sent to multiple target clients.
++     * Note that this means that the bundle packet cannot contain any packets that make in-place modifications
++     * in their {@link #adaptForClient} implementation (i.e. all packets in this bundle must either return
++     * themselves while making no in-place modifications, or return a different {@link Packet} instance without
++     * making any modifications to themselves).
++     *
++     * @see #mayBeSentToMultipleTargetClients
++     */
++    public void setMayBeSentToMultipleTargetClients() {
++        this.mayBeSentToMultipleTargetClients = true;
++    }
++
++    @Override
++    public @org.jetbrains.annotations.NotNull ClientboundBundlePacket adaptForClient(@org.jetbrains.annotations.NotNull net.minecraft.network.Connection connection) {
++        if (!this.mayBeSentToMultipleTargetClients && this.packets instanceof java.util.ArrayList<Packet<ClientGamePacketListener>> packetsAsList) {
++            // If this.mayBeSentToMultipleTargetClients os false and the packet iterable is an ArrayList, modify it in-place
++            for (int i = 0; i < packetsAsList.size(); i++) {
++                packetsAsList.set(i, packetsAsList.get(i).adaptForClient(connection));
++            }
++            return this;
++        }
++        // If the packet iterable is a Collection, we know the resulting list's size, otherwise we have to guess
++        java.util.List<Packet<ClientGamePacketListener>> newPackets = new java.util.ArrayList<>(this.packets instanceof java.util.Collection<?> packetsAsCollection ? packetsAsCollection.size() : 8);
++        for (var packet : this.packets) {
++            newPackets.add(packet.adaptForClient(connection));
++        }
++        if (this.mayBeSentToMultipleTargetClients) {
++            return new ClientboundBundlePacket(newPackets);
++        }
++        this.packets = newPackets;
++        return this;
++    }
++    // Fiddle end - client perspective - packets are modifiable - bundle
++
+ }

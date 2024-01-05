@@ -11,7 +11,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 76d4f17e7f1cc0821328d0969f5ef68fe741c883..5997420ab7c7dcb8d3f42ec5b99df24daf71c939 100644
+index 87596aa13b0c60536eab382c34594dc2a410f172..d9b2e074e4c9b3f1dec51e1ca2a8c0df51db0a01 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
 @@ -4620,6 +4620,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
@@ -34,10 +34,10 @@ index 76d4f17e7f1cc0821328d0969f5ef68fe741c883..5997420ab7c7dcb8d3f42ec5b99df24d
       * Checks if this Material is a placable block
       *
 diff --git a/src/main/java/org/bukkit/UnsafeValues.java b/src/main/java/org/bukkit/UnsafeValues.java
-index 6c816ed5cc29ef24a3f5b82978dbc5e9db8b9d5a..d7723b8f60f282a7d97202308e54b10f5134f96d 100644
+index a90f706933ae5aba1b70a7c908ea8b218d3e579c..738c35f67633cd87ed34b21093485ce4749999b5 100644
 --- a/src/main/java/org/bukkit/UnsafeValues.java
 +++ b/src/main/java/org/bukkit/UnsafeValues.java
-@@ -275,6 +275,8 @@ public interface UnsafeValues {
+@@ -287,6 +287,8 @@ public interface UnsafeValues {
  
      short getMaxDurability(Material material); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - durability
  

@@ -1,0 +1,37 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Fri, 5 Jan 2024 17:34:50 +0100
+Subject: [PATCH] Client perspective - Block state visualization - Determine
+ and store desired setuppers
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
+index fdecb167687fdf3ace899fd30f3b98f0d8496b05..a9d5baad5cb88db38dde58316410d8b243c983b6 100644
+--- a/src/main/java/net/minecraft/server/Main.java
++++ b/src/main/java/net/minecraft/server/Main.java
+@@ -211,6 +211,23 @@ public class Main {
+             Path path1 = Paths.get("server.properties");
+             DedicatedServerSettings dedicatedserversettings = new DedicatedServerSettings(optionset); // CraftBukkit - CLI argument support
+ 
++            // Fiddle start - client perspective - block state visualization - determine and store desired setuppers
++            // TODO This doesn't do anything interesting yet: should be replaced with an actual mechanism that bases this on the resource pack assets
++            for (var block : net.minecraft.core.registries.BuiltInRegistries.BLOCK) {
++                if (!block.isVanilla()) {
++                    for (var state : block.getStateDefinition().getPossibleStates()) {
++                        state.visualizationSetupper = new org.fiddlemc.fiddle.packet.block.OnePerCategoryBlockStateVisualizationSetupper(perspective ->
++                            switch (perspective) {
++                                case JAVA_DEFAULT -> net.minecraft.world.level.block.Blocks.STONE.defaultBlockState();
++                                case JAVA_WITH_ENABLED_RESOURCE_PACK -> net.minecraft.world.level.block.Blocks.STONE_BRICKS.defaultBlockState();
++                                case JAVA_WITH_FIDDLE_CLIENT_MOD -> state;
++                            }
++                        );
++                    }
++                }
++            }
++            // Fiddle end - client perspective - block state visualization - determine and store desired setuppers
++
+             // Fiddle start - modifiable Bukkit enums - inject runtime versions - common utilities
+             ClassLoader systemClassLoader = ClassLoader.getSystemClassLoader();
+             class InjectRuntimeClassVersionHelper {

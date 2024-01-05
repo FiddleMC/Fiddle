@@ -1,0 +1,25 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Thu, 13 Jul 2023 19:54:12 +0200
+Subject: [PATCH] Modifiable Bukkit enums - Inject runtime versions - Material
+ - Name and key conversion
+
+License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
+index b716af8dbd5b6d8dc4563a865170aa11907d281a..b18647ef07ad98e09ad5088d1a785f6ff1d3636e 100644
+--- a/src/main/java/net/minecraft/server/Main.java
++++ b/src/main/java/net/minecraft/server/Main.java
+@@ -278,6 +278,11 @@ public class Main {
+                 }).build())
+                 .make()
+                 .load(ClassLoader.getSystemClassLoader(), net.bytebuddy.dynamic.loading.ClassLoadingStrategy.Default.INJECTION);
++            // Fiddle start - modifiable Bukkit enums - inject runtime versions - Material - name and key conversion
++            for (var fiddleEnumName : fiddleEnumNames) {
++                org.fiddlemc.fiddle.material.MaterialNameAndKeyConversion.registerFiddleEnumNameToNamespacedKey(fiddleEnumName.getFirst(), fiddleEnumName.getSecond().getNamespace(), fiddleEnumName.getSecond().getPath());
++            }
++            // Fiddle end - modifiable Bukkit enums - inject runtime versions - Material - name and key conversion
+             // Fiddle end - modifiable Bukkit enums - inject runtime versions - Material
+ 
+             dedicatedserversettings.forceSave();

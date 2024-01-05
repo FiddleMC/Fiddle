@@ -1,0 +1,151 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Tue, 11 Jul 2023 16:46:24 +0200
+Subject: [PATCH] Gameplay mechanics - Max banner patterns
+
+Adds configuration (and implementation thereof) for the maximum number of banner patterns that players can use:
+* A setting (`copyWithCraftingTable`) for the maximum number of patterns that can be on a banner when a player copies it with a crafting table.
+* A setting (`createWithLoom`) for the maximum number of patterns that can be applied to a banner using a loom.
+  Note that this setting does not work properly due to client-side issues: see the configuration setting Javadoc for more details.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/world/inventory/LoomMenu.java b/src/main/java/net/minecraft/world/inventory/LoomMenu.java
+index 0a87996a6ab5b4d67c2aa10daadf6174bc647a44..308e6674cb213cd7515bd223c14cd9f909393ef4 100644
+--- a/src/main/java/net/minecraft/world/inventory/LoomMenu.java
++++ b/src/main/java/net/minecraft/world/inventory/LoomMenu.java
+@@ -263,7 +263,14 @@ public class LoomMenu extends AbstractContainerMenu {
+ 
+             if (holder != null) {
+                 CompoundTag nbttagcompound = BlockItem.getBlockEntityData(itemstack);
+-                boolean flag1 = nbttagcompound != null && nbttagcompound.contains("Patterns", 9) && !itemstack.isEmpty() && nbttagcompound.getList("Patterns", 10).size() >= 6;
++                // Fiddle start - gameplay mechanics - max banner patterns
++                var playerBukkitWorld = this.player.getWorld();
++                int maxBannerPatterns = playerBukkitWorld instanceof org.bukkit.craftbukkit.CraftWorld playerCraftWorld ? playerCraftWorld.getHandle().fiddleConfig().gameplayMechanics.maxBannerPatterns.createWithLoom : -1;
++                if (maxBannerPatterns < 0) {
++                    maxBannerPatterns = 6;
++                }
++                boolean flag1 = nbttagcompound != null && nbttagcompound.contains("Patterns", 9) && !itemstack.isEmpty() && nbttagcompound.getList("Patterns", 10).size() >= maxBannerPatterns;
++                // Fiddle end - gameplay mechanics - max banner patterns
+ 
+                 if (flag1) {
+                     this.selectedBannerPatternIndex.set(-1);
+diff --git a/src/main/java/net/minecraft/world/item/crafting/BannerDuplicateRecipe.java b/src/main/java/net/minecraft/world/item/crafting/BannerDuplicateRecipe.java
+index 8353dc836de40d18e07eaffa518399ed5bb2ac69..d5bf63bdc3bb01199cbb996b373e9d84c4010d5a 100644
+--- a/src/main/java/net/minecraft/world/item/crafting/BannerDuplicateRecipe.java
++++ b/src/main/java/net/minecraft/world/item/crafting/BannerDuplicateRecipe.java
+@@ -18,6 +18,13 @@ public class BannerDuplicateRecipe extends CustomRecipe {
+ 
+     @Override
+     public boolean matches(CraftingContainer inventory, Level world) {
++        // Fiddle start - gameplay mechanics - max banner patterns
++        int maxBannerPatterns = world.fiddleConfig().gameplayMechanics.maxBannerPatterns.copyWithCraftingTable;
++        if (maxBannerPatterns < 0) {
++            maxBannerPatterns = 6;
++        }
++        // Fiddle end - gameplay mechanics - max banner patterns
++
+         DyeColor dyeColor = null;
+         ItemStack itemStack = null;
+         ItemStack itemStack2 = null;
+@@ -38,7 +45,7 @@ public class BannerDuplicateRecipe extends CustomRecipe {
+                 }
+ 
+                 int j = BannerBlockEntity.getPatternCount(itemStack3);
+-                if (j > 6) {
++                if (j > maxBannerPatterns) { // Fiddle - gameplay mechanics - max banner patterns
+                     return false;
+                 }
+ 
+@@ -63,11 +70,44 @@ public class BannerDuplicateRecipe extends CustomRecipe {
+ 
+     @Override
+     public ItemStack assemble(CraftingContainer inventory, RegistryAccess registryManager) {
++        // Fiddle start - gameplay mechanics - max banner patterns
++        Level world = null;
++        // Get the world from the inventory owner
++        var inventoryOwner = inventory.getOwner();
++        if (inventoryOwner instanceof org.bukkit.inventory.BlockInventoryHolder blockInventoryOwner) {
++            var bukkitWorld = blockInventoryOwner.getBlock().getWorld();
++            if (bukkitWorld instanceof org.bukkit.craftbukkit.CraftWorld craftWorld) {
++                world = craftWorld.getHandle();
++            }
++        } else if (inventoryOwner instanceof org.bukkit.entity.Entity entityInventoryHolder) {
++            var bukkitWorld = entityInventoryHolder.getWorld();
++            if (bukkitWorld instanceof org.bukkit.craftbukkit.CraftWorld craftWorld) {
++                world = craftWorld.getHandle();
++            }
++        }
++        // If not set yet, get the world from the inventory viewers
++        if (world == null) {
++            for (var inventoryViewer : inventory.getViewers()) {
++                var bukkitWorld = inventoryViewer.getWorld();
++                if (bukkitWorld instanceof org.bukkit.craftbukkit.CraftWorld craftWorld) {
++                    world = craftWorld.getHandle();
++                    if (world != null) {
++                        break;
++                    }
++                }
++            }
++        }
++        int maxBannerPatterns = world == null ? -1 : world.fiddleConfig().gameplayMechanics.maxBannerPatterns.copyWithCraftingTable;
++        if (maxBannerPatterns < 0) {
++            maxBannerPatterns = 6;
++        }
++        // Fiddle end - gameplay mechanics - max banner patterns
++
+         for(int i = 0; i < inventory.getContainerSize(); ++i) {
+             ItemStack itemStack = inventory.getItem(i);
+             if (!itemStack.isEmpty()) {
+                 int j = BannerBlockEntity.getPatternCount(itemStack);
+-                if (j > 0 && j <= 6) {
++                if (j > 0 && j <= maxBannerPatterns) { // Fiddle - gameplay mechanics - max banner patterns
+                     return itemStack.copyWithCount(1);
+                 }
+             }
+diff --git a/src/main/java/org/fiddlemc/fiddle/configuration/FiddleWorldConfiguration.java b/src/main/java/org/fiddlemc/fiddle/configuration/FiddleWorldConfiguration.java
+index ad2b35278ee7ef1460e2a76d2953d3fce72d52d8..d8cfbe0c2f052433b9d11cabef8fcdc0c31b3286 100644
+--- a/src/main/java/org/fiddlemc/fiddle/configuration/FiddleWorldConfiguration.java
++++ b/src/main/java/org/fiddlemc/fiddle/configuration/FiddleWorldConfiguration.java
+@@ -30,4 +30,40 @@ public class FiddleWorldConfiguration extends ConfigurationPart {
+     @Setting(Configuration.VERSION_FIELD)
+     public int version = CURRENT_VERSION;
+ 
++    // Fiddle start - gameplay mechanics settings
++    public GameplayMechanics gameplayMechanics;
++    public class GameplayMechanics extends ConfigurationPart {
++
++        // Fiddle start - gameplay mechanics - max banner patterns
++        public MaxBannerPatterns maxBannerPatterns;
++
++        /**
++         * Note that even after increasing the max banner patterns, the client will only display the first 6
++         * in the list shown when hovering over an item in the inventory.
++         */
++        public class MaxBannerPatterns extends ConfigurationPart {
++
++            /**
++             * This setting does not work properly.
++             * While it works in setting the server-side max banner patterns when creating a banner in a loom,
++             * the client refuses to displays the shape buttons in the loom menu.
++             * Adding additional patterns can still be achieved either with a banner pattern, or by selecting
++             * a shape while a banner with fewer than 6 patterns is in the input slot, and then swapping it out
++             * with the intended recipient banner.
++             * <br>
++             * In the future, we should probably decide to mark this value as non-experimental (by making it
++             * no longer transient) if it is properly supported with the Fiddle client mod (by including the setting
++             * value in a packet sent to the client) - and simply document that it mostly works, but not smoothly,
++             * without the client mod.
++             */
++            public transient int createWithLoom = 6;
++
++            public int copyWithCraftingTable = 6;
++
++        }
++        // Fiddle end - gameplay mechanics - max banner patterns
++
++    }
++    // Fiddle end - gameplay mechanics settings
++
+ }

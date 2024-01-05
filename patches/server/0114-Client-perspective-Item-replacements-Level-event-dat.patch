@@ -1,0 +1,60 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Thu, 4 Jan 2024 22:14:55 +0100
+Subject: [PATCH] Client perspective - Item replacements - Level event data -
+ Data can be ItemStack
+
+Allows the data of level events (`ClientboundLevelEventPacket.data`) to be an `ItemStack` instance,
+and provides the implementation of turning it into an integer value in an analogous way to that for `Item` instances provided in the "Client perspective - Item replacements - Level event data - Data can be Item" patch.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelEventPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelEventPacket.java
+index 563ac780f7de798095297ef4b729412e3105f983..fa60a241c006596df52bd8f9b80f50a14dc7bc9d 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelEventPacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelEventPacket.java
+@@ -53,8 +53,15 @@ public class ClientboundLevelEventPacket extends org.fiddlemc.fiddle.packet.Clon
+             }
+             // Fiddle end - client perspective - block state visualization - level event data - data can be BlockState
+             // Fiddle start - client perspective - item replacements - level event data - data can be Item
+-        } else if (this.data instanceof net.minecraft.world.item.Item item) {
+-            var itemToSend = org.fiddlemc.fiddle.packet.item.ItemInPacketReplacer.replace(item, this.getItemInPacketContextByType());
++            // Fiddle start - client perspective - item replacements - level event data - data can be ItemStack
++        } else if (this.data instanceof net.minecraft.world.item.Item || this.data instanceof net.minecraft.world.item.ItemStack) {
++            net.minecraft.world.item.Item itemToSend;
++            if (this.data instanceof net.minecraft.world.item.Item item) {
++                itemToSend = org.fiddlemc.fiddle.packet.item.ItemInPacketReplacer.replace(item, this.getItemInPacketContextByType());
++            } else {
++                itemToSend = org.fiddlemc.fiddle.packet.item.ItemInPacketReplacer.replace((net.minecraft.world.item.ItemStack) this.data, this.getItemInPacketContextByType());
++            }
++            // Fiddle end - client perspective - item replacements - level event data - data can be ItemStack
+             if (itemToSend != null) {
+                 if (org.fiddlemc.fiddle.packet.ClientPerspective.getSinglePacketItemId(itemToSend) != -1) {
+                     return true;
+@@ -133,14 +140,24 @@ public class ClientboundLevelEventPacket extends org.fiddlemc.fiddle.packet.Clon
+             return clientPerspective.getPacketBlockStateId(stateToSend);
+             // Fiddle end - client perspective - block state visualization - level event data - data can be BlockState
+             // Fiddle start - client perspective - item replacements - level event data - data can be Item
+-        } else if (this.data instanceof net.minecraft.world.item.Item item) {
++        } else if (this.data instanceof net.minecraft.world.item.Item || this.data instanceof net.minecraft.world.item.ItemStack) { // Fiddle - client perspective - item replacements - level event data - data can be ItemStack
+             // Replace the item
+             net.minecraft.world.item.Item itemToSend;
++            if (this.data instanceof net.minecraft.world.item.Item item) { // Fiddle - client perspective - item replacements - level event data - data can be ItemStack
+             itemToSend = org.fiddlemc.fiddle.packet.item.ItemInPacketReplacer.replace(item, this.getItemInPacketContextByType());
+             if (itemToSend == null) {
+                 var clientPerspective = this.getExplicitTargetClientPerspective();
+                 itemToSend = org.fiddlemc.fiddle.packet.item.ItemInPacketReplacer.replace(item, clientPerspective, this.getItemInPacketContextByType());
+             }
++            // Fiddle start - client perspective - item replacements - level event data - data can be ItemStack
++            } else {
++                itemToSend = org.fiddlemc.fiddle.packet.item.ItemInPacketReplacer.replace((net.minecraft.world.item.ItemStack) this.data, this.getItemInPacketContextByType());
++                if (itemToSend == null) {
++                    var clientPerspective = this.getExplicitTargetClientPerspective();
++                    itemToSend = org.fiddlemc.fiddle.packet.item.ItemInPacketReplacer.replace((net.minecraft.world.item.ItemStack) this.data, clientPerspective, this.getItemInPacketContextByType());
++                }
++            }
++            // Fiddle end - client perspective - item replacements - level event data - data can be ItemStack
+             // Turn the item to send into an id that the client can interpret
+             int singleValue = org.fiddlemc.fiddle.packet.ClientPerspective.getSinglePacketItemId(itemToSend);
+             if (singleValue != -1) {
