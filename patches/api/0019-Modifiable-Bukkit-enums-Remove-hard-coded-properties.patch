@@ -4,18 +4,20 @@ Date: Mon, 10 Jul 2023 22:05:08 +0200
 Subject: [PATCH] Modifiable Bukkit enums - Remove hard-coded properties -
  Material - Is empty, is transparent
 
-Modifies the Material properties isEmpty() and isTransparent() so that they are no longer hard-coded directly.
-Determining the values of the properties however still relies on a hard-coded list, since
-the properties are not backed by any implementation that can be used.
+Modifies the `Material` properties `isEmpty()` and `isTransparent()` so that they are no longer hard-coded directly.
+
+Determining the values of the properties instead relies on functions
+(either defined in `UnsafeValues`, and implemented in `CraftMagicNumbers` in the `fiddle-server` module, or defined and implemented in `MaterialDefaultImplementations`)
+backed by the same hard-coded list, since the properties are not backed by any implementation that can be used.
 
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 858c531178a25a27fb018278493b078f11ae9fa2..1ee2281037899f9a436bbd384db366a3c0aaa74e 100644
+index 753fdbd7d588d5913bc918eb61ba0e4fcc4bc2d1..0a8e4c247d802feedcdeee8b8dcbed5d58f807fd 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -4441,15 +4441,13 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4440,15 +4440,13 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
  
      /**
       * @return If the type is either AIR, CAVE_AIR or VOID_AIR
@@ -32,11 +34,11 @@ index 858c531178a25a27fb018278493b078f11ae9fa2..1ee2281037899f9a436bbd384db366a3
 -                return true;
 -        }
 -        return false;
-+        return MaterialDefaultImplementations.isEmpty(this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - is empty
++        return org.fiddlemc.fiddle.material.MaterialDefaultImplementations.isEmpty(this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - is empty
      }
  
      @Override
-@@ -5088,142 +5086,22 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -5086,142 +5084,22 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material is a block and does not block any light
       * @deprecated currently does not have an implementation which is well
       * linked to the underlying server. Contributions welcome.

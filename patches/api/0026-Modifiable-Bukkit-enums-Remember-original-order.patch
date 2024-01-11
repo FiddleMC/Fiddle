@@ -3,6 +3,14 @@ From: Martijn Muijsers <martijnmuijsers@live.nl>
 Date: Wed, 12 Jul 2023 21:22:03 +0200
 Subject: [PATCH] Modifiable Bukkit enums - Remember original order
 
+Remembers the `OrderedEmptyMaterial` enum, which holds the same vanilla members as the `Material` enum source file, in the same order,
+but without any of the parameters.
+
+This preserves the order even when the `Material` class is not loaded.
+This order is used by the
+"Modifiable Bukkit enums - Inject runtime versions - Material" patch in the `fiddle-server` module,
+to add the correct members in the same order to the `Material` class version injected at runtime.
+
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 

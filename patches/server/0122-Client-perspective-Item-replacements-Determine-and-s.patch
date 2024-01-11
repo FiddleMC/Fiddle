@@ -1,0 +1,29 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sun, 23 Jul 2023 12:05:40 +0200
+Subject: [PATCH] Client perspective - Item replacements - Determine and store
+ desired visual handles
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
+index 157dec0857b316057dcfee617c961f350190d5fa..043acc170c2f2949cb6ff41932b27be0e5dde97c 100644
+--- a/src/main/java/net/minecraft/server/Main.java
++++ b/src/main/java/net/minecraft/server/Main.java
+@@ -240,6 +240,15 @@ public class Main {
+             org.fiddlemc.fiddle.packet.locale.ServerSideTranslations.registerVanillaTranslationReplacement("en_us", "block.minecraft.bookshelf", "Oak Bookshelf");
+             // Fiddle end - client perspective - localization - register server-side translations
+ 
++            // Fiddle start - client perspective - item replacements - determine and store desired visual handles
++            // TODO This doesn't do anything interesting yet: should be replaced with an actual mechanism that bases this on the resource pack assets
++            for (var item : net.minecraft.core.registries.BuiltInRegistries.ITEM) {
++                if (!item.isVanilla()) {
++                    item.visualHandleOrProvider = new org.fiddlemc.fiddle.packet.item.VanillaItemOverrideItemVisualHandle(net.minecraft.world.item.Items.STONE, 0);
++                }
++            }
++            // Fiddle end - client perspective - item replacements - determine and store desired visual handles
++
+             // Fiddle start - modifiable Bukkit enums - inject runtime versions - common utilities
+             ClassLoader systemClassLoader = ClassLoader.getSystemClassLoader();
+             class InjectRuntimeClassVersionHelper {

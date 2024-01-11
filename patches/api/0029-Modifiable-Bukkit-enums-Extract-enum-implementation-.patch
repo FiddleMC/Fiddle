@@ -1,0 +1,67 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Mon, 10 Jul 2023 22:05:08 +0200
+Subject: [PATCH] Modifiable Bukkit enums - Extract enum implementation -
+ Create corresponding interfaces
+
+Creates interfaces (currently, only for `Material`) that are intended to provide base implementations for most enum properties.
+Such an interface, even if it itself references the target enum, can be loaded by a `ClassLoader`
+without the enum itself being loaded.
+
+This allows definining the enum at runtime, without having to re-provide implementations that are present in the interface,
+since these can be inherited by having the runtime enum definition implement the interface.
+
+The moving of the implementations of the enum to their corresponding interface is done in the
+"Modifiable Bukkit enums - Extract enum implementation - Move implementation" patch.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
+index ada94b91c1d4c899ad3c5db937dbf2c0118c18b6..715ff6a1a6e1d24856bf7d0f73232c132c5567c3 100644
+--- a/src/main/java/org/bukkit/Material.java
++++ b/src/main/java/org/bukkit/Material.java
+@@ -112,6 +112,7 @@ import org.bukkit.block.data.type.WallSign;
+ import org.bukkit.inventory.CreativeCategory;
+ import org.bukkit.inventory.EquipmentSlot;
+ import org.bukkit.material.MaterialData;
++import org.fiddlemc.fiddle.material.AbstractMaterial;
+ import org.jetbrains.annotations.NotNull;
+ import org.jetbrains.annotations.Nullable;
+ 
+@@ -119,7 +120,7 @@ import org.jetbrains.annotations.Nullable;
+  * An enum of all material IDs accepted by the official server and client
+  */
+ @SuppressWarnings({"DeprecatedIsStillUsed", "deprecation"}) // Paper
+-public enum Material implements Keyed, Translatable, net.kyori.adventure.translation.Translatable { // Paper
++public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiable Bukkit enums - create corresponding interfaces - Material
+     //<editor-fold desc="Materials" defaultstate="collapsed">
+     AIR(9648, 0),
+     STONE(22948),
+diff --git a/src/main/java/org/fiddlemc/fiddle/material/AbstractMaterial.java b/src/main/java/org/fiddlemc/fiddle/material/AbstractMaterial.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..c5232856b5537b21751f93d3b5d48c17c3fe9e83
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/material/AbstractMaterial.java
+@@ -0,0 +1,21 @@
++// Fiddle - modifiable Bukkit enums - create corresponding interfaces - Material
++
++package org.fiddlemc.fiddle.material;
++
++import org.bukkit.Keyed;
++import org.bukkit.Material;
++import org.bukkit.Translatable;
++import org.jetbrains.annotations.NotNull;
++
++/**
++ * An interface that provides default implementations for most {@link Material} methods.
++ * This interface, while it itself reference the {@link Material} class, can be loaded by a ClassLoader
++ * without the {@link Material} class being loaded.
++ */
++public interface AbstractMaterial extends Keyed, Translatable, net.kyori.adventure.translation.Translatable {
++
++    int ordinal();
++
++    @NotNull String name();
++
++}

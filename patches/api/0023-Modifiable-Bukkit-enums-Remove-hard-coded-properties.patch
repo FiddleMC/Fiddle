@@ -4,18 +4,19 @@ Date: Wed, 12 Jul 2023 14:34:23 +0200
 Subject: [PATCH] Modifiable Bukkit enums - Remove hard-coded properties -
  Material - Data class
 
-Adds a computeData() method to Material.
-This method allows to obtain the desired value of the data field without relying on it being set in the Material constructor.
+Adds a `computeData()` method to `Material`.
+
+This method allows to obtain the desired value of the `data` field without relying on it being set in the `Material` constructor.
 
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 87596aa13b0c60536eab382c34594dc2a410f172..d9b2e074e4c9b3f1dec51e1ca2a8c0df51db0a01 100644
+index 66ab22ec884cc5bc4d02080943fa5e210578e463..82b19d461cc167101a113fd1f58de0f28f4f5f95 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -4620,6 +4620,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
-         return MaterialDefaultImplementations.getNewMaterialDataInstance(this, raw); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - cached constructor
+@@ -4619,6 +4619,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+         return org.fiddlemc.fiddle.material.MaterialDefaultImplementations.getNewMaterialDataInstance(this, raw); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - cached constructor
      }
  
 +    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - data
@@ -34,10 +35,10 @@ index 87596aa13b0c60536eab382c34594dc2a410f172..d9b2e074e4c9b3f1dec51e1ca2a8c0df
       * Checks if this Material is a placable block
       *
 diff --git a/src/main/java/org/bukkit/UnsafeValues.java b/src/main/java/org/bukkit/UnsafeValues.java
-index a90f706933ae5aba1b70a7c908ea8b218d3e579c..738c35f67633cd87ed34b21093485ce4749999b5 100644
+index 114073f7068438a149600e9b48c8d2008a822083..0cb9983a47001964305ea1e66a9cc0bb334eee54 100644
 --- a/src/main/java/org/bukkit/UnsafeValues.java
 +++ b/src/main/java/org/bukkit/UnsafeValues.java
-@@ -287,6 +287,8 @@ public interface UnsafeValues {
+@@ -286,6 +286,8 @@ public interface UnsafeValues {
  
      short getMaxDurability(Material material); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - durability
  
@@ -47,10 +48,10 @@ index a90f706933ae5aba1b70a7c908ea8b218d3e579c..738c35f67633cd87ed34b21093485ce4
      boolean isBlock(Material material);
  
 diff --git a/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java b/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
-index b0940e391f0cde49803b0106e4691afc1f95885e..9f61d86722754ec6c1f4282878acb549896a05df 100644
+index a7d7e49ffc6768e85f98df1d44b7e437d9a01fff..3ba8ba2a102bf2bdc24469aeb46a8b50394164e0 100644
 --- a/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
 +++ b/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
-@@ -130,6 +130,73 @@ public final class MaterialDefaultImplementations {
+@@ -128,6 +128,73 @@ public final class MaterialDefaultImplementations {
      }
      // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - durability
  

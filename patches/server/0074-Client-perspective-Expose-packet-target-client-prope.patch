@@ -2,38 +2,86 @@ From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
 Date: Sat, 22 Jul 2023 15:06:25 +0200
 Subject: [PATCH] Client perspective - Expose packet target client properties -
- Implement for bundle packets
+ Packet can provide explicit connection
 
-License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
+Adds abstract methods in `Packet` that allow it to, based on some implementation,
+provide an explicit perspective and locale of the client it is poised to be sent to.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
-diff --git a/src/main/java/net/minecraft/network/protocol/BundlePacket.java b/src/main/java/net/minecraft/network/protocol/BundlePacket.java
-index 0462cbff6eb3366077c1628c0c8a10e99c9fdf90..ecd10f0aaa29f442a8086954112bbac6b797f6a3 100644
---- a/src/main/java/net/minecraft/network/protocol/BundlePacket.java
-+++ b/src/main/java/net/minecraft/network/protocol/BundlePacket.java
-@@ -3,10 +3,11 @@ package net.minecraft.network.protocol;
- import net.minecraft.network.FriendlyByteBuf;
- import net.minecraft.network.PacketListener;
- 
--public abstract class BundlePacket<T extends PacketListener> implements Packet<T> {
-+public abstract class BundlePacket<T extends PacketListener> extends org.fiddlemc.fiddle.packet.PacketWithExplicitTargetClientConnection<T> { // Fiddle - client perspective - packets are modifiable - expose target client properties - bundle
-     protected Iterable<Packet<T>> packets; // Fiddle - client perspective - packets are modifiable - bundle - private -> protected, non-final -> final
- 
-     protected BundlePacket(Iterable<Packet<T>> packets) {
-+        super(); // Fiddle - client perspective - packets are modifiable - expose target client properties - bundle
-         this.packets = packets;
+diff --git a/src/main/java/net/minecraft/network/protocol/Packet.java b/src/main/java/net/minecraft/network/protocol/Packet.java
+index c6157e73945cb4cf503174db0475ae62f4848203..534497c61366f05228c3ff4302c0e07caf1ef7f5 100644
+--- a/src/main/java/net/minecraft/network/protocol/Packet.java
++++ b/src/main/java/net/minecraft/network/protocol/Packet.java
+@@ -61,4 +61,70 @@ public interface Packet<T extends PacketListener> {
      }
+     // Fiddle end - client perspective - packets are modifiable
  
-diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundBundlePacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundBundlePacket.java
-index ef465411b1a9e53eedb3c3b0ee3bb2975755a1e5..d11bc0d4bd3cdf2fc49b12ac76b9493cc984bd1e 100644
---- a/src/main/java/net/minecraft/network/protocol/game/ClientboundBundlePacket.java
-+++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundBundlePacket.java
-@@ -38,7 +38,7 @@ public class ClientboundBundlePacket extends BundlePacket<ClientGamePacketListen
-     }
- 
-     @Override
--    public @org.jetbrains.annotations.NotNull ClientboundBundlePacket adaptForClient(@org.jetbrains.annotations.NotNull net.minecraft.network.Connection connection) {
-+    public @org.jetbrains.annotations.NotNull ClientboundBundlePacket postSetConnectionAdaptForClient(@org.jetbrains.annotations.NotNull net.minecraft.network.Connection connection) { // Fiddle - client perspective - packets are modifiable - expose target client properties - bundle
-         if (!this.mayBeSentToMultipleTargetClients && this.packets instanceof java.util.ArrayList<Packet<ClientGamePacketListener>> packetsAsList) {
-             // If this.mayBeSentToMultipleTargetClients os false and the packet iterable is an ArrayList, modify it in-place
-             for (int i = 0; i < packetsAsList.size(); i++) {
++    // Fiddle start - client perspective - expose target client properties - packet can provide explicit connection
++    /**
++     * @return The {@link org.fiddlemc.fiddle.packet.ClientPerspective} of the receiving client of this packet,
++     * if explicitly known.
++     * This must be implemented for some instances of {@link Packet}
++     * for which the {@link org.fiddlemc.fiddle.packet.ClientPerspective} is needed
++     * at the time of {@linkplain #write(FriendlyByteBuf) writing the packet to a byte buffer}.
++     * @throws UnsupportedOperationException If there is no implementation for this method.
++     * The default implementation of this method in {@link Packet} always throws this exception.
++     * An exception being thrown from this method should never actually happen (because it is slow):
++     * this method must not be called when there is any chance of an exception
++     * (including a {@link NullPointerException} if an attempt is made to return a non-null value) being thrown.
++     * No exception from this method should be caught, because if one occurs,
++     * it indicates that there is code that needs this value,
++     * but it is not available early enough for the value to be available.
++     */
++    default @org.jetbrains.annotations.NotNull org.fiddlemc.fiddle.packet.ClientPerspective getExplicitTargetClientPerspective() throws UnsupportedOperationException {
++        throw new UnsupportedOperationException("Tried to call getExplicitTargetClientPerspective() on a " + Packet.class.getSimpleName() + " instance of type " + this.getClass().getName() + ", but no overriding implementation is available");
++    }
++
++    /**
++     * @return The same value as {@link #getExplicitTargetClientPerspective()}, except that it returns null
++     * where {@link #getExplicitTargetClientPerspective()} would otherwise throw an exception.
++     */
++    default @org.jetbrains.annotations.Nullable org.fiddlemc.fiddle.packet.ClientPerspective getExplicitTargetClientPerspectiveOrNull() {
++        return null;
++    }
++
++    /**
++     * @return The {@linkplain net.minecraft.server.level.ServerPlayer#locale locale}
++     * of the receiving client of this packet, if explicitly known.
++     * This must be implemented for some instances of {@link Packet} for which the locale is needed
++     * (amongst others, at the time of {@linkplain #write(FriendlyByteBuf) writing the packet to a byte buffer}).
++     * @throws UnsupportedOperationException If there is no implementation for this method.
++     * The default implementation of this method in {@link Packet} always throws this exception.
++     * An exception being thrown from this method should never actually happen (because it is slow):
++     * this method must not be called when there is any chance of an exception
++     * (including a {@link NullPointerException} if an attempt is made to return a non-null value) being thrown.
++     * No exception from this method should be caught, because if one occurs,
++     * it indicates that there is code that needs this value,
++     * but it is not available early enough for the value to be available.
++     */
++    default @org.jetbrains.annotations.Nullable String getExplicitTargetLocale() throws UnsupportedOperationException {
++        throw new UnsupportedOperationException("Tried to call getExplicitTargetLocale() on a " + Packet.class.getSimpleName() + " instance of type " + this.getClass().getName() + ", but no overriding implementation is available");
++    }
++
++    /**
++     * @return The {@linkplain net.minecraft.server.level.ServerPlayerGameMode#getGameModeForPlayer() game mode}
++     * of the receiving player of this packet, if explicitly known.
++     * This must be implemented for some instances of {@link Packet}
++     * for which the {@link org.fiddlemc.fiddle.packet.ClientPerspective} is needed
++     * at the time of {@linkplain #write(FriendlyByteBuf) writing the packet to a byte buffer}.
++     * @throws UnsupportedOperationException If there is no implementation for this method.
++     * The default implementation of this method in {@link Packet} always throws this exception.
++     * An exception being thrown from this method should never actually happen (because it is slow):
++     * this method must not be called when there is any chance of an exception
++     * (including a {@link NullPointerException} if an attempt is made to return a non-null value) being thrown.
++     * No exception from this method should be caught, because if one occurs,
++     * it indicates that there is code that needs this value,
++     * but it is not available early enough for the value to be available.
++     */
++    default @org.jetbrains.annotations.NotNull net.minecraft.world.level.GameType getExplicitTargetGameMode() throws UnsupportedOperationException {
++        throw new UnsupportedOperationException("Tried to call getExplicitTargetGameMode() on a " + Packet.class.getSimpleName() + " instance of type " + this.getClass().getName() + ", but no overriding implementation is available");
++    }
++    // Fiddle end - client perspective - expose target client properties - packet can provide explicit connection
++
+ }

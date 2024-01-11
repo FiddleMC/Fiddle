@@ -1,0 +1,233 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Wed, 10 Jan 2024 19:37:04 +0100
+Subject: [PATCH] Modifiable Bukkit enums - Expand Material matching
+
+Expands and generalizes the implementation of the `Material.matchMaterial` method in 2 ways:
+* Matching is attempted strictly (case-sensitive) first, then case-insensitive, and then with leaving out increasingly lesser important characters.
+* Matching is performed on the namespaced key, the namespaced key path and the enum name.
+
+This means plugins that use `matchMaterial` to find the `Material` for a string will always find it, whether the string they have
+(that occurred in a database, was given by a player, etc.) was originally based on the namespaced key, the enum name, and whether or not
+it is complete, with the correct case, etc.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
+index d39e4d3b9e009497fca2e23dba2ac12e151782e4..ada94b91c1d4c899ad3c5db937dbf2c0118c18b6 100644
+--- a/src/main/java/org/bukkit/Material.java
++++ b/src/main/java/org/bukkit/Material.java
+@@ -4752,11 +4752,30 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+     /**
+      * Attempts to match the Material with the given name.
+      * <p>
+-     * This is a match lookup; names will be stripped of the "minecraft:"
+-     * namespace, converted to uppercase, then stripped of special characters in
+-     * an attempt to format it like the enum.
++     * <!-- // Fiddle start - modifiable Bukkit enums - expand Material matching -->
++     * This is a match lookup.
++     * It will attempt to match the given the {@code string} to a {@link Material},
++     * by comparing it to some string identifying that Material.
++     * <br>
++     * The following comparisons are performed, in the given order:
++     * <ol>
++     *     <li>An exact match</li>
++     *     <li>A match ignoring case</li>
++     *     <li>A match ignoring case and only checking letters, digits, <code>_</code> and <code>:</code></li>
++     *     <li>A match ignoring case and only checking letters, digits and <code>_</code></li>
++     *     <li>A match ignoring case and only checking letters and digits</li>
++     * </ol>
++     * For each of the above comparisons, the following string will be checked against for a certain Material:
++     * <ol>
++     *     <li>The {@linkplain #getKey() namespaced key}, for example: <code>"minecraft:stone_bricks"</code> or <code>"masonry:tuff_bricks"</code></li>
++     *     <li>The namespaced key path (part behind the : in a namespaced key), for example: <code>"stone_bricks"</code> or <code>"tuff_bricks"</code></li>
++     *     <li>The enum name, for example: <code>"STONE_BRICKS"</code></li>
++     * </ol>
++     * In other words, first the given string will be checked case-sensitively against the namespaced key,
++     * then case-sensitively against the namespaced key path, and so on.
+      *
+-     * @param name Name of the material to get
++     * @param name String of the material to get
++     * <!-- // Fiddle end - modifiable Bukkit enums - expand Material matching -->
+      * @return Material if found, or null
+      */
+     @Nullable
+@@ -4766,15 +4785,23 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+ 
+     /**
+      * Attempts to match the Material with the given name.
+-     * <p>
+-     * This is a match lookup; names will be stripped of the "minecraft:"
+-     * namespace, converted to uppercase, then stripped of special characters in
+-     * an attempt to format it like the enum.
+-     *
+-     * @param name Name of the material to get
++     * <!-- // Fiddle start - modifiable Bukkit enums - expand Material matching -->
++     * Returns the same as {@link #matchMaterial(String)} if {@code legacyName} is false.
++     * If {@code legacyName} is true, the following steps are performed on the string in order:
++     * <ol>
++     *     <li>If it starts with the case-sensitive prefix <code>"minecraft:"</code>, that prefix is removed.</li>
++     *     <li>It is transformed to uppercase.</li>
++     *     <li>Every contiguous substring of whitespace characters (as given by regex <code>\s</code>) is replaced by a single underscore (<code>_</code>).</li>
++     *     <li>Every non-word character (as given by regex <code>\W</code>) is removed.</li>
++     *     <li>If it does not start with the prefix {@link org.fiddlemc.fiddle.material.MaterialLegacyNameChecker#LEGACY_MATERIAL_PREFIX}, that prefix is prepended.</li>
++     *     <li>Finally, a {@link Material} with exactly the string as its enum name, if present, is mapped to its non-legacy variant (with priority for matching blocks over items) and returned.</li>
++     * </ol>
++     * @param name String of the material to get
++     * <!-- // Fiddle end - modifiable Bukkit enums - expand Material matching -->
+      * @param legacyName whether this is a legacy name (see
+      * {@link #getMaterial(java.lang.String, boolean)}
+      * @return Material if found, or null
++     * @see #matchMaterial(String) <!-- // Fiddle - modifiable Bukkit enums - expand Material matching -->
+      */
+     @Nullable
+     public static Material matchMaterial(@NotNull final String name, boolean legacyName) {
+diff --git a/src/main/java/org/fiddlemc/fiddle/material/MaterialNameAndKeyConversion.java b/src/main/java/org/fiddlemc/fiddle/material/MaterialNameAndKeyConversion.java
+index 6a43a90bd4fc533cfc5a738c3b196d72711b171e..582b539d165454611c5bb74a7bae78d5eaf6fae3 100644
+--- a/src/main/java/org/fiddlemc/fiddle/material/MaterialNameAndKeyConversion.java
++++ b/src/main/java/org/fiddlemc/fiddle/material/MaterialNameAndKeyConversion.java
+@@ -48,6 +48,121 @@ public final class MaterialNameAndKeyConversion {
+     }
+     // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - getMaterial
+ 
++    // Fiddle start - modifiable Bukkit enums - expand Material matching
++    private static @Nullable Map<String, Material> cachedMaterialsByMatchableString = null;
++
++    private static @NotNull Map<String, Material> getCachedMaterialsByMatchableString() {
++        if (cachedMaterialsByMatchableString == null) {
++            cachedMaterialsByMatchableString = Maps.newHashMap();
++            for (int valueIndex = 0; valueIndex < numberOfMatchMaterialValues; valueIndex++) {
++                for (int normalizationIndex = 0; normalizationIndex < NormalizedMatchMaterialStrings.numberOfNormalizations; normalizationIndex++) {
++                    for (var material : CachedMaterialProperty.getCachedMaterialValues()) {
++                        var value = getMatchMaterialValue(material, valueIndex);
++                        if (value != null) {
++                            var normalizedValue = new NormalizedMatchMaterialStrings(value).getNormalized(normalizationIndex);
++                            cachedMaterialsByMatchableString.putIfAbsent(normalizedValue, material);
++                        }
++                    }
++                }
++            }
++        }
++        return cachedMaterialsByMatchableString;
++    }
++
++    private static final int numberOfMatchMaterialValues = 3;
++
++    private static @Nullable String getMatchMaterialValue(@NotNull Material material, int valueIndex) {
++        return switch (valueIndex) {
++            case 0 -> material.isLegacy() ? null : material.getKey().toString();
++            case 1 -> material.isLegacy() ? null : material.getKey().getKey();
++            case 2 -> material.name();
++            default -> throw new IllegalArgumentException("Invalid valueIndex: " + valueIndex);
++        };
++    }
++
++    private static class NormalizedMatchMaterialStrings {
++
++        public static final int numberOfNormalizations = 5;
++
++        public final @NotNull String original;
++        private @Nullable String lowerCase;
++        private @Nullable String lowerCaseLettersDigitsUnderscoresAndColons;
++        private @Nullable String lowerCaseLettersDigitsAndUnderscores;
++        private @Nullable String lowerCaseLettersAndDigits;
++
++        public NormalizedMatchMaterialStrings(@NotNull String original) {
++            this.original = original;
++        }
++
++        public @NotNull String getLowerCase() {
++            if (this.lowerCase == null) {
++                this.lowerCase = this.original.toLowerCase(Locale.ROOT);
++            }
++            return this.lowerCase;
++        }
++
++        public @NotNull String getLowerCaseLettersDigitsUnderscoresAndColons() {
++            if (this.lowerCaseLettersDigitsUnderscoresAndColons == null) {
++                char[] characters = this.getLowerCase().toCharArray();
++                int writeIndex = 0;
++                for (int readIndex = 0; readIndex < characters.length; readIndex++) {
++                    char character = characters[readIndex];
++                    if ((character >= 'a' && character <= 'z') || (character >= '0' && character <= '9') || character == '_' || character == ':') {
++                        characters[writeIndex] = character;
++                        writeIndex++;
++                    }
++                }
++                this.lowerCaseLettersDigitsUnderscoresAndColons = new String(characters, 0, writeIndex);
++            }
++            return this.lowerCaseLettersDigitsUnderscoresAndColons;
++        }
++
++        public @NotNull String getLowerCaseLettersDigitsAndUnderscores() {
++            if (this.lowerCaseLettersDigitsAndUnderscores == null) {
++                char[] characters = this.getLowerCaseLettersDigitsUnderscoresAndColons().toCharArray();
++                int writeIndex = 0;
++                for (int readIndex = 0; readIndex < characters.length; readIndex++) {
++                    char character = characters[readIndex];
++                    if ((character >= 'a' && character <= 'z') || (character >= '0' && character <= '9') || character == '_') {
++                        characters[writeIndex] = character;
++                        writeIndex++;
++                    }
++                }
++                this.lowerCaseLettersDigitsAndUnderscores = new String(characters, 0, writeIndex);
++            }
++            return this.lowerCaseLettersDigitsAndUnderscores;
++        }
++
++        public @NotNull String getLowerCaseLettersAndDigits() {
++            if (this.lowerCaseLettersAndDigits == null) {
++                char[] characters = this.getLowerCaseLettersDigitsAndUnderscores().toCharArray();
++                int writeIndex = 0;
++                for (int readIndex = 0; readIndex < characters.length; readIndex++) {
++                    char character = characters[readIndex];
++                    if ((character >= 'a' && character <= 'z') || (character >= '0' && character <= '9')) {
++                        characters[writeIndex] = character;
++                        writeIndex++;
++                    }
++                }
++                this.lowerCaseLettersAndDigits = new String(characters, 0, writeIndex);
++            }
++            return this.lowerCaseLettersAndDigits;
++        }
++
++        public @NotNull String getNormalized(int normalizationIndex) {
++            return switch (normalizationIndex) {
++                case 0 -> this.original;
++                case 1 -> this.getLowerCase();
++                case 2 -> this.getLowerCaseLettersDigitsUnderscoresAndColons();
++                case 3 -> this.getLowerCaseLettersDigitsAndUnderscores();
++                case 4 -> this.getLowerCaseLettersAndDigits();
++                default -> throw new IllegalArgumentException("Invalid normalizationIndex: " + normalizationIndex);
++            };
++        }
++
++    }
++    // Fiddle end - modifiable Bukkit enums - expand Material matching
++
+     // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - key
+     /**
+      * @throws IllegalArgumentException If the given {@code material} is {@linkplain Material#isLegacy() legacy}.
+@@ -91,7 +206,20 @@ public final class MaterialNameAndKeyConversion {
+      */
+     public static @Nullable Material matchMaterial(@NotNull final String name, boolean legacyName) {
+         // Based on the original org.bukkit.Material#matchMaterial(String, boolean)
+-        Preconditions.checkArgument(name != null, "Name cannot be null");
++        // Fiddle start - modifiable Bukkit enums - expand Material matching
++        Preconditions.checkArgument(name != null, "Name string given to matchMaterial(...) cannot be null");
++        if (!legacyName) {
++            var cachedMaterialsByMatchableString = getCachedMaterialsByMatchableString();
++            var normalizedStrings = new NormalizedMatchMaterialStrings(name);
++            for (int normalizationIndex = 0; normalizationIndex < NormalizedMatchMaterialStrings.numberOfNormalizations; normalizationIndex++) {
++                var materialFound = cachedMaterialsByMatchableString.get(normalizedStrings.getNormalized(normalizationIndex));
++                if (materialFound != null) {
++                    return materialFound;
++                }
++            }
++            return null;
++        }
++        // Fiddle end - modifiable Bukkit enums - expand Material matching
+ 
+         String filtered = name;
+         if (filtered.startsWith(NamespacedKey.MINECRAFT + ":")) {

@@ -2,47 +2,171 @@ From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
 Date: Mon, 10 Jul 2023 22:05:08 +0200
 Subject: [PATCH] Modifiable Bukkit enums - Remove hard-coded properties -
- Material - Key
+ Material - Max stack size, durability
 
-Modifies the Material property getKey() so that it is no longer computed in Material, but in UnsafeValues.
+Implements the abstract methods defined in `UnsafeValues`
+in the "Modifiable Bukkit enums - Remove hard-coded properties - Material - Max stack size, durability" patch in the `fiddle-api` module,
+in `CraftMagicNumbers`.
 
-The property values are cached after being computed, for performant access.
+The property values are also cached after being computed, for performant access.
+
+Also adds tests based on the original backing implementations,
+and a check in `CraftLegacy` that verifies equality of the existence of durability between legacy and modern `Material` instances.
 
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
-diff --git a/src/test/java/org/fiddlemc/fiddle/material/legacy/PerNonLegacyMaterialTest.java b/src/test/java/org/fiddlemc/fiddle/material/legacy/PerNonLegacyMaterialTest.java
-index 4e7efd1c5c64d0e4df11ceb4314837f86de1d81a..2e3af5beaf505db6ec74cc9dc53adf94e6b99d83 100644
---- a/src/test/java/org/fiddlemc/fiddle/material/legacy/PerNonLegacyMaterialTest.java
-+++ b/src/test/java/org/fiddlemc/fiddle/material/legacy/PerNonLegacyMaterialTest.java
-@@ -3,12 +3,14 @@
- package org.fiddlemc.fiddle.material.legacy;
+diff --git a/src/main/java/org/bukkit/craftbukkit/legacy/CraftLegacy.java b/src/main/java/org/bukkit/craftbukkit/legacy/CraftLegacy.java
+index bd3a4db2db5232a28f43c9ea3ce5446960b0c5ce..57133abd0052203e147f15542e88ef1cd8ecaf34 100644
+--- a/src/main/java/org/bukkit/craftbukkit/legacy/CraftLegacy.java
++++ b/src/main/java/org/bukkit/craftbukkit/legacy/CraftLegacy.java
+@@ -373,7 +373,7 @@ public final class CraftLegacy {
+             }
  
- import org.bukkit.Material;
-+import org.bukkit.NamespacedKey;
- import org.bukkit.craftbukkit.legacy.CraftLegacy;
- import org.bukkit.support.AbstractTestingBase;
- import org.junit.Test;
+             // Handle items (and second fallback for blocks)
+-            int maxData = material.getMaxDurability() == 0 ? 16 : 1;
++            int maxData = material.hasNonZeroMaxDurability() ? 1 : 16; // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - durability
+             // Manually do oldold spawn eggs
+             if (material == Material.LEGACY_MONSTER_EGG) {
+                 maxData = 121; // Vilager + 1
+@@ -485,6 +485,18 @@ public final class CraftLegacy {
+         }
+         // Fiddle end - modifiable Bukkit enums - Material - make legacy conversion complete - ensure correct LEGACY_LONG_GRASS
  
- import java.util.Arrays;
- import java.util.function.Predicate;
-+import java.util.Locale;
++        // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - durability
++        // Ensure that whether legacy Materials have durability is correct, because this is used to compute their corresponding non-legacy Materials
++        for (Material material : Material.values()) {
++            if (material.isLegacy()) {
++                if ((material.hasNonZeroMaxDurability() != org.bukkit.craftbukkit.util.CraftLegacy.fromLegacy(material, true).hasNonZeroMaxDurability())) {
++                    LOGGER.error("A Bukkit legacy item Material (" + material + " had" + (material.hasNonZeroMaxDurability() ? "" : " no") + " max durability, while its corresponding non-legacy item Material (" + org.bukkit.craftbukkit.util.CraftLegacy.fromLegacy(material, true) + ") did" + (material.hasNonZeroMaxDurability() ? " not" : ""));
++                    System.exit(1);
++                }
++            }
++        }
++        // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - durability
++
+     }
  
- import static org.junit.Assert.assertEquals;
+     public static void main(String[] args) {
+diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
+index 8e9b700eb5d732601accee7f0421e39e192d2c69..3c63595ae4673b6f25532eb02f11a2620793082a 100644
+--- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
++++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
+@@ -75,6 +75,33 @@ public final class CraftMagicNumbers implements UnsafeValues {
  
-@@ -35,6 +37,15 @@ public class PerNonLegacyMaterialTest extends AbstractTestingBase {
+     private CraftMagicNumbers() {}
+ 
++    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - max stack size
++    private final CachedMaterialIntProperty maxStackSizeCache = new CachedMaterialIntProperty(material -> {
++        if (!material.isItem()) {
++            return Item.MAX_STACK_SIZE;
++        }
++        // Based on org.bukkit.PerMaterialTest#maxStackSize
++        if (material == Material.AIR || material == Material.LEGACY_AIR) {
++            return 0;
++        }
++        return getItem(material).getMaxStackSize();
++    });
++    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - max stack size
++
++    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - durability
++    private final CachedMaterialShortProperty maxDurabilityCache = new CachedMaterialShortProperty(material -> {
++        // Use hard-coded value instead of non-legacy value, to avoid circular reference
++        if (material.isLegacy()) {
++            return MaterialDefaultImplementations.getMaxDurabilityLegacy(material);
++        }
++        // Based on org.bukkit.PerMaterialTest#testDurability
++        if (material.isBlock()) {
++            return (short) 0;
++        }
++        return (short) getItem(material).getMaxDamage();
++    });
++    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - durability
++
+     // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
+     private final CachedMaterialBooleanProperty isBlockCache = new CachedMaterialBooleanProperty(material -> {
+         if (material.isLegacy()) {
+@@ -789,6 +816,20 @@ public final class CraftMagicNumbers implements UnsafeValues {
+         public static final int TAG_ANY_NUMBER = 99;
+     }
+ 
++    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - max stack size
++    @Override
++    public int getMaxStackSize(Material material) {
++        return this.maxStackSizeCache.get(material);
++    }
++    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - max stack size
++
++    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - durability
++    @Override
++    public short getMaxDurability(Material material) {
++        return this.maxDurabilityCache.get(material);
++    }
++    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - durability
++
+     // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
+     @Override
+     public boolean isBlock(Material material) {
+diff --git a/src/test/java/org/fiddlemc/fiddle/material/legacy/PerLegacyMaterialTest.java b/src/test/java/org/fiddlemc/fiddle/material/legacy/PerLegacyMaterialTest.java
+index 5584b3271cdbd62faab7d6b9949e5750326650b6..6e983a44d7f014483722321714b9e049156b141c 100644
+--- a/src/test/java/org/fiddlemc/fiddle/material/legacy/PerLegacyMaterialTest.java
++++ b/src/test/java/org/fiddlemc/fiddle/material/legacy/PerLegacyMaterialTest.java
+@@ -35,6 +35,31 @@ public class PerLegacyMaterialTest extends AbstractTestingBase {
          }
      }
  
-+    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - key
++    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - max stack size
 +    @Test
-+    public void getKey() {
++    public void getMaxStackSize() {
 +        for (Material material : getMaterials()) {
-+            assertEquals("getKey is correct for " + material, NamespacedKey.minecraft(material.name().toLowerCase(Locale.ROOT)), material.getKey());
++            assertEquals("getMaxStackSize equals hard-coded getMaxStackSize for " + material, material.getMaxStackSizeHardcoded(), material.getMaxStackSize());
 +        }
 +    }
-+    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - key
++    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - max stack size
 +
-     // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - max stack size
++    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - durability
++    @Test
++    public void getMaxDurability_hardcoded() {
++        for (Material material : getMaterials()) {
++            assertEquals("getMaxDurability equals hard-coded getMaxDurability for " + material, material.getMaxDurabilityHardcoded(), material.getMaxDurability());
++        }
++    }
++
++    @Test
++    public void getMaxDurability_legacy() {
++        for (Material material : getMaterials()) {
++            assertEquals("getMaxDurability equals legacy getMaxDurability for " + material, material.getMaxDurabilityLegacy(), material.getMaxDurability());
++        }
++    }
++    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - durability
++
+     // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
      @Test
-     public void getMaxStackSize() {
+     public void isBlock() {
+diff --git a/src/test/java/org/fiddlemc/fiddle/material/legacy/PerNonLegacyMaterialTest.java b/src/test/java/org/fiddlemc/fiddle/material/legacy/PerNonLegacyMaterialTest.java
+index 4a0b27c8472e8f694841a7dd76066e5023c17148..5f2a50ccbcaff6213b6f0cd6afd0eba545cbe520 100644
+--- a/src/test/java/org/fiddlemc/fiddle/material/legacy/PerNonLegacyMaterialTest.java
++++ b/src/test/java/org/fiddlemc/fiddle/material/legacy/PerNonLegacyMaterialTest.java
+@@ -35,4 +35,22 @@ public class PerNonLegacyMaterialTest extends AbstractTestingBase {
+         }
+     }
+ 
++    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - max stack size
++    @Test
++    public void getMaxStackSize() {
++        for (Material material : getMaterials()) {
++            assertEquals("getMaxStackSize equals hard-coded getMaxStackSize for " + material, material.getMaxStackSizeHardcoded(), material.getMaxStackSize());
++        }
++    }
++    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - max stack size
++
++    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - durability
++    @Test
++    public void getMaxDurability() {
++        for (Material material : getMaterials()) {
++            assertEquals("getMaxDurability equals hard-coded getMaxDurability for " + material, material.getMaxDurabilityHardcoded(), material.getMaxDurability());
++        }
++    }
++    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - durability
++
+ }

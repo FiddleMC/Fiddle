@@ -1,0 +1,21 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Tue, 18 Jul 2023 22:42:43 +0200
+Subject: [PATCH] Client perspective - For players - Set based on resource pack
+ status
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
+index fe33c9953e36ba28d68d6918b28e22b189172013..aa208c03065fc1d83914ab1021f9a1b092d22927 100644
+--- a/src/main/java/net/minecraft/server/players/PlayerList.java
++++ b/src/main/java/net/minecraft/server/players/PlayerList.java
+@@ -211,6 +211,7 @@ public abstract class PlayerList {
+         player.hasBeenPlacedIntoPlayerList = true;
+         Connection connection = playerconnection.connection;
+         // Fiddle end - client perspective - send resource pack
++        player.setClientPerspective(player.getBukkitEntity().getResourcePackStatus() == org.bukkit.event.player.PlayerResourcePackStatusEvent.Status.SUCCESSFULLY_LOADED ? org.fiddlemc.fiddle.packet.ClientPerspectiveCategory.JAVA_WITH_ENABLED_RESOURCE_PACK.mostLikelyPerspective : org.fiddlemc.fiddle.packet.ClientPerspectiveCategory.JAVA_DEFAULT.mostLikelyPerspective); // Fiddle - client perspective - player - set based on resource pack status
+         player.isRealPlayer = true; // Paper
+         player.loginTime = System.currentTimeMillis(); // Paper
+         GameProfile gameprofile = player.getGameProfile();

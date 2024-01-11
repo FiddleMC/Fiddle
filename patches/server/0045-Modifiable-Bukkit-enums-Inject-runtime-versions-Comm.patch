@@ -1,0 +1,48 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Mon, 10 Jul 2023 22:05:08 +0200
+Subject: [PATCH] Modifiable Bukkit enums - Inject runtime versions - Common
+ utilities
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
+index 1e6d40165e015aa5004e118e2dba926b9962ca7a..7d74e7f5e2e25294eb7889b4d8a179cab3adae9a 100644
+--- a/src/main/java/net/minecraft/server/Main.java
++++ b/src/main/java/net/minecraft/server/Main.java
+@@ -147,6 +147,34 @@ public class Main {
+             Path path1 = Paths.get("server.properties");
+             DedicatedServerSettings dedicatedserversettings = new DedicatedServerSettings(optionset); // CraftBukkit - CLI argument support
+ 
++            // Fiddle start - modifiable Bukkit enums - inject runtime versions - common utilities
++            ClassLoader systemClassLoader = ClassLoader.getSystemClassLoader();
++            class InjectRuntimeClassVersionHelper {
++
++                /**
++                 * Checks if the given class is loaded, and if it is, prints an error message to the logger.
++                 *
++                 * @return Whether the given class was loaded, or if checking if the given was loaded failed.
++                 */
++                boolean wasClassLoaded(String qualifiedClassName) {
++                    try {
++                        java.lang.reflect.Method findLoadedClassMethod = ClassLoader.class.getDeclaredMethod("findLoadedClass", String.class);
++                        findLoadedClassMethod.setAccessible(true);
++                        if (findLoadedClassMethod.invoke(systemClassLoader, qualifiedClassName) != null) {
++                            LOGGER.error("A Bukkit enum class (" + qualifiedClassName + ") was already loaded before additional values could be added. This may be caused by a plugin using the class before the server started, or an instrumentation agent or class loader runtime flag forcibly loading the class.");
++                            return true;
++                        }
++                    } catch (Exception e) {
++                        LOGGER.error("Failed to check if Bukkit enum classes were already loaded: please add \"--add-opens=java.base/java.lang=ALL-UNNAMED\" to your server command line, for example \"java -jar server.jar --add-opens=java.base/java.lang=ALL-UNNAMED\"", e);
++                        return true;
++                    }
++                    return false;
++                }
++
++            }
++            var injectRuntimeClassVersionHelper = new InjectRuntimeClassVersionHelper();
++            // Fiddle end - modifiable Bukkit enums - inject runtime versions - common utilities
++
+             dedicatedserversettings.forceSave();
+             // Paper start - load config files for access below if needed
+             org.bukkit.configuration.file.YamlConfiguration bukkitConfiguration = io.papermc.paper.configuration.PaperConfigurations.loadLegacyConfigFile((File) optionset.valueOf("bukkit-settings"));

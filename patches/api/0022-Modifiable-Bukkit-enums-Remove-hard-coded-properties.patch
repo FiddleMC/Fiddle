@@ -4,8 +4,7 @@ Date: Mon, 10 Jul 2023 22:05:08 +0200
 Subject: [PATCH] Modifiable Bukkit enums - Remove hard-coded properties -
  Material - Cached MaterialData constructor
 
-Modifies the Material properties getData() and getNewData(byte)
-so that they are no longer computed in Material, but in UnsafeValues.
+Modifies the `Material` properties `getData()` and `getNewData(byte)` so that they are no longer computed in `Material`, but based on functions defined and implemented in `MaterialDefaultImplementations`.
 
 The property values are cached after being computed, for performant access.
 
@@ -13,26 +12,18 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index b3bf2cf559caf001345419a55aabbeee5b2381a0..76d4f17e7f1cc0821328d0969f5ef68fe741c883 100644
+index 82dc9cccf3dd31d40c9e07624c0caece45641fde..66ab22ec884cc5bc4d02080943fa5e210578e463 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -3,7 +3,6 @@ package org.bukkit;
- import com.google.common.base.Preconditions;
- import com.google.common.collect.Maps;
- import com.google.common.collect.Multimap;
--import java.lang.reflect.Constructor;
- import java.util.Map;
- import java.util.function.Consumer;
- import org.bukkit.attribute.Attribute;
-@@ -4389,7 +4388,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
-     public static final String LEGACY_PREFIX = MaterialLegacyNameChecker.LEGACY_MATERIAL_PREFIX; // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - is legacy
+@@ -4387,7 +4387,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+     public static final String LEGACY_PREFIX = org.fiddlemc.fiddle.material.MaterialLegacyNameChecker.LEGACY_MATERIAL_PREFIX; // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - is legacy
  
      private final int id;
 -    private final Constructor<? extends MaterialData> ctor;
      private static final Map<String, Material> BY_NAME = Maps.newHashMap();
      private final int maxStackHardcoded;
      private final short durabilityHardcoded;
-@@ -4420,18 +4418,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4418,18 +4417,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
          this.durabilityHardcoded = (short) durability;
          this.maxStackHardcoded = stack;
          this.data = data;
@@ -51,17 +42,17 @@ index b3bf2cf559caf001345419a55aabbeee5b2381a0..76d4f17e7f1cc0821328d0969f5ef68f
      }
  
      // Paper start
-@@ -4617,8 +4603,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4615,8 +4602,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      @NotNull
      @Deprecated // Paper
      public Class<? extends MaterialData> getData() {
 -        Preconditions.checkArgument(this.isLegacy(), "Cannot get data class of Modern Material"); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - is legacy
 -        return ctor.getDeclaringClass();
-+        return MaterialDefaultImplementations.getMaterialDataConstructorDeclaringClass(this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - cached constructor
++        return org.fiddlemc.fiddle.material.MaterialDefaultImplementations.getMaterialDataConstructorDeclaringClass(this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - cached constructor
      }
  
      /**
-@@ -4632,21 +4617,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4630,21 +4616,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      @Deprecated
      @NotNull
      public MaterialData getNewData(final byte raw) {
@@ -80,26 +71,26 @@ index b3bf2cf559caf001345419a55aabbeee5b2381a0..76d4f17e7f1cc0821328d0969f5ef68f
 -        } catch (Throwable t) {
 -            throw new AssertionError(t);
 -        }
-+        return MaterialDefaultImplementations.getNewMaterialDataInstance(this, raw); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - cached constructor
++        return org.fiddlemc.fiddle.material.MaterialDefaultImplementations.getNewMaterialDataInstance(this, raw); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - cached constructor
      }
  
      /**
 diff --git a/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java b/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
-index 55e5ff84f945d5f23847876b657e2fa73b26c6b6..b0940e391f0cde49803b0106e4691afc1f95885e 100644
+index 8c1a9e038002168dafe8b566b6964812e97c05e0..a7d7e49ffc6768e85f98df1d44b7e437d9a01fff 100644
 --- a/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
 +++ b/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
-@@ -5,8 +5,10 @@ package org.fiddlemc.fiddle.material;
+@@ -4,6 +4,10 @@ package org.fiddlemc.fiddle.material;
+ 
  import com.google.common.base.Preconditions;
  import org.bukkit.Material;
- import org.bukkit.NamespacedKey;
 +import org.bukkit.material.MaterialData;
- import org.jetbrains.annotations.NotNull;
- 
++import org.jetbrains.annotations.NotNull;
++
 +import java.lang.reflect.Constructor;
- import java.util.Locale;
  
  /**
-@@ -38,6 +40,35 @@ public final class MaterialDefaultImplementations {
+  * This class provides a number of default implementations for {@link Material} that
+@@ -34,6 +38,35 @@ public final class MaterialDefaultImplementations {
      };
      // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - is legacy
  
@@ -135,7 +126,7 @@ index 55e5ff84f945d5f23847876b657e2fa73b26c6b6..b0940e391f0cde49803b0106e4691afc
      // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - is empty
      public static boolean isEmpty(Material material) {
          // Based on the original org.bukkit.Material#isEmpty()
-@@ -99,6 +130,40 @@ public final class MaterialDefaultImplementations {
+@@ -95,6 +128,40 @@ public final class MaterialDefaultImplementations {
      }
      // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - durability
  

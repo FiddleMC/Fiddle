@@ -1,55 +1,57 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
-Date: Thu, 4 Jan 2024 17:14:24 +0100
+Date: Thu, 4 Jan 2024 17:21:44 +0100
 Subject: [PATCH] Client perspective - Level event data value replacements -
- Craft effect data value can be generic
+ Store connection explicitly in level event packets
 
-As an expansion to the "Client perspective - Level event data value replacements - Data can be generic" patch,
-this also allows the value returned by `CraftEffect.getDataValue` to have any type.
+Makes instances of `ClientboundLevelEventPacket` potentially bound to a particular explicit target connection.
+This is done by making them a subclass of `CloningPacketWithExplicitTargetClientConnection`.
+
+Note that the level event packets can still be sent to multiple target clients.
+This is okay, because the packet is cloned when adapting for a client.
+This is notwithstanding the possibility in a subsequent patch for `ClientboundLevelEventPacket` to implement `canSkipCloning` to skip the cloning if it is unnecessary.
 
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
-diff --git a/src/main/java/org/bukkit/craftbukkit/CraftEffect.java b/src/main/java/org/bukkit/craftbukkit/CraftEffect.java
-index 5a5a8945c786e16ff0df62494ddd1ac85c42b53f..21222247e436dc6035006b3c9aa91a596804a3d8 100644
---- a/src/main/java/org/bukkit/craftbukkit/CraftEffect.java
-+++ b/src/main/java/org/bukkit/craftbukkit/CraftEffect.java
-@@ -12,8 +12,10 @@ import org.bukkit.craftbukkit.util.CraftMagicNumbers;
- import org.bukkit.potion.Potion;
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelEventPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelEventPacket.java
+index 7b822a682d45aacffa93862452e9590a8628aa65..b3fb1241fe5bc228bedd12469f05f03ec5f19169 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelEventPacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelEventPacket.java
+@@ -4,13 +4,14 @@ import net.minecraft.core.BlockPos;
+ import net.minecraft.network.FriendlyByteBuf;
+ import net.minecraft.network.protocol.Packet;
  
- public class CraftEffect {
--    public static <T> int getDataValue(Effect effect, T data) {
--        int datavalue;
-+    // Fiddle start - client perspective - level event data value replacements - craft effect data value can be generic
-+    public static <T> Object getDataValue(Effect effect, T data) {
-+        Object datavalue;
-+        // Fiddle end - client perspective - level event data value replacements - craft effect data value can be generic
-         switch (effect) {
-         case VILLAGER_PLANT_GROW:
-             datavalue = (Integer) data;
-diff --git a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
-index 550dcb7d595221b221e4710890d8a3cad789fc07..06d752df0dec5eeaf4a4a8f44dddca34a4f265f3 100644
---- a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
-+++ b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
-@@ -1380,7 +1380,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
-             Preconditions.checkArgument(effect.getData() == null || effect == Effect.ELECTRIC_SPARK, "Wrong kind of data for the %s effect", effect);
-         }
+-public class ClientboundLevelEventPacket implements Packet<ClientGamePacketListener> {
++public class ClientboundLevelEventPacket extends org.fiddlemc.fiddle.packet.CloningPacketWithExplicitTargetClientConnection<ClientGamePacketListener> { // Fiddle - client perspective - level event data value replacements - store connection explicitly
+     private final int type;
+     private final BlockPos pos;
+     private final int data;
+     private final boolean globalEvent;
  
--        int datavalue = CraftEffect.getDataValue(effect, data);
-+        var datavalue = CraftEffect.getDataValue(effect, data); // Fiddle - client perspective - level event data value replacements - craft effect data value can be generic
-         this.playEffect(loc, effect, datavalue, radius);
+     public ClientboundLevelEventPacket(int eventId, BlockPos pos, int data, boolean global) {
++        super(); // Fiddle - client perspective - level event data value replacements - store connection explicitly
+         this.type = eventId;
+         this.pos = pos.immutable();
+         this.data = data;
+@@ -18,12 +19,20 @@ public class ClientboundLevelEventPacket implements Packet<ClientGamePacketListe
      }
  
-diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index 391c2c780c2ba6831070309f72d93f06b3afb466..e5d97d63678ee8be89041368d44c45deeb23446e 100644
---- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-+++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -865,7 +865,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
-             Preconditions.checkArgument(effect.getData() == null || effect == Effect.ELECTRIC_SPARK, "Wrong kind of data for the %s effect", effect);
-         }
- 
--        int datavalue = CraftEffect.getDataValue(effect, data);
-+        var datavalue = CraftEffect.getDataValue(effect, data); // Fiddle - client perspective - level event data value replacements - craft effect data value can be generic
-         this.playEffect(loc, effect, datavalue);
+     public ClientboundLevelEventPacket(FriendlyByteBuf buf) {
++        super(); // Fiddle - client perspective - level event data value replacements - store connection explicitly
+         this.type = buf.readInt();
+         this.pos = buf.readBlockPos();
+         this.data = buf.readInt();
+         this.globalEvent = buf.readBoolean();
      }
  
++    // Fiddle start - client perspective - level event data value replacements - store connection explicitly
++    @Override
++    final protected ClientboundLevelEventPacket makeClone() {
++        return new ClientboundLevelEventPacket(this.type, this.pos, this.data, this.globalEvent);
++    }
++    // Fiddle end - client perspective - level event data value replacements - store connection explicitly
++
+     @Override
+     public void write(FriendlyByteBuf buf) {
+         buf.writeInt(this.type);

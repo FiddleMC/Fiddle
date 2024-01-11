@@ -1,0 +1,927 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Mon, 10 Jul 2023 22:05:08 +0200
+Subject: [PATCH] Modifiable Bukkit enums - Extract enum implementation - Move
+ implementation
+
+Moves base implementations of modifiable enum types (currently, only for `Material`)
+to the interface (added in the "Modifiable Bukkit enums - Extract enum implementation - Create corresponding interfaces" patch)
+that they implement for that reason.
+
+The content of the original methods, of which the implementation is moved,
+is replaced by a call to the interface implementation. This is superfluous,
+as removing the method from the original enum would have the same effect, as the
+enum already implements the interface. However, the methods themselves are preserved
+in order to keep their documentation intact.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
+index 715ff6a1a6e1d24856bf7d0f73232c132c5567c3..86740f906a8b968d16df1b9963ccdb85f50fa83b 100644
+--- a/src/main/java/org/bukkit/Material.java
++++ b/src/main/java/org/bukkit/Material.java
+@@ -4384,9 +4384,6 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+     ;
+     //</editor-fold>
+ 
+-    @Deprecated
+-    public static final String LEGACY_PREFIX = org.fiddlemc.fiddle.material.MaterialLegacyNameChecker.LEGACY_MATERIAL_PREFIX; // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - is legacy
+-
+     private final int id;
+     private final int maxStackHardcoded;
+     private final short durabilityHardcoded;
+@@ -4428,17 +4425,14 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+      * it returns false for all materials added with Fiddle..
+      * <!-- // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - is empty -->
+      */
++    @Override // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     public boolean isEmpty() {
+-        return org.fiddlemc.fiddle.material.MaterialDefaultImplementations.isEmpty(this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - is empty
++        return AbstractMaterial.super.isEmpty(); // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     }
+ 
+     @Override
+     public @NotNull String translationKey() {
+-        if (this.isItem()) {
+-            return Bukkit.getUnsafe().getItemTranslationKey(this);
+-        } else {
+-            return Bukkit.getUnsafe().getBlockTranslationKey(this);
+-        }
++        return AbstractMaterial.super.translationKey(); // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     }
+ 
+     /**
+@@ -4447,9 +4441,10 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+      *
+      * @return the item rarity
+      */
++    @Override // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     @NotNull
+     public io.papermc.paper.inventory.ItemRarity getItemRarity() {
+-        return Bukkit.getUnsafe().getItemRarity(this);
++        return AbstractMaterial.super.getItemRarity(); // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     }
+ 
+     /**
+@@ -4461,10 +4456,10 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+      * @return an immutable multimap of attributes
+      * @deprecated use {@link #getDefaultAttributeModifiers(EquipmentSlot)}
+      */
++    @Override // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     @NotNull
+-    @Deprecated
+     public Multimap<Attribute, AttributeModifier> getItemAttributes(@NotNull EquipmentSlot equipmentSlot) {
+-        return Bukkit.getUnsafe().getItemAttributes(this, equipmentSlot);
++        return AbstractMaterial.super.getItemAttributes(equipmentSlot); // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     }
+ 
+     /**
+@@ -4473,8 +4468,9 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+      * @return true if collidable
+      * @throws IllegalArgumentException if {@link #isBlock()} is false
+      */
++    @Override // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     public boolean isCollidable() {
+-        return Bukkit.getUnsafe().isCollidable(this);
++        return AbstractMaterial.super.isCollidable(); // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     }
+     // Paper end
+ 
+@@ -4484,14 +4480,15 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+      * @return ID of this material
+      * @deprecated Magic value
+      */
+-    @Deprecated
++    @Override // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     public int getId() {
+         // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - id
+-        return org.fiddlemc.fiddle.material.MaterialDefaultImplementations.getLegacyId(this);
++        return AbstractMaterial.super.getId(); // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     }
+ 
+     /**
+      * @deprecated Do not use: this method is for internal testing purposes only.
++     * This method will not be present during runtime. <!-- // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material -->
+      */
+     @Deprecated(forRemoval = true)
+     public int getIdLegacy() {
+@@ -4505,8 +4502,9 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+      * @return legacy status
+      */
+     // @Deprecated // Paper - this is useful, don't deprecate
++    @Override // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     public boolean isLegacy() {
+-        return org.fiddlemc.fiddle.material.MaterialDefaultImplementations.isLegacy(this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - is legacy
++        return AbstractMaterial.super.isLegacy(); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - is legacy // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     }
+ 
+     @NotNull
+@@ -4520,13 +4518,15 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+      *
+      * @return Maximum stack size for this material
+      */
++    @Override // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     public int getMaxStackSize() {
+         // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - max stack size
+-        return Bukkit.getUnsafe().getMaxStackSize(this);
++        return AbstractMaterial.super.getMaxStackSize(); // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     }
+ 
+     /**
+      * @deprecated Do not use: this method is for internal testing purposes only.
++     * This method will not be present during runtime. <!-- // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material -->
+      */
+     @Deprecated(forRemoval = true)
+     public int getMaxStackSizeHardcoded() {
+@@ -4539,17 +4539,20 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+      *
+      * @return Maximum durability for this material
+      */
++    @Override // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     public short getMaxDurability() {
+         // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - durability
+-        return Bukkit.getUnsafe().getMaxDurability(this);
++        return AbstractMaterial.super.getMaxDurability(); // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     }
+ 
++    @Override // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     public boolean hasNonZeroMaxDurability() {
+-        return org.fiddlemc.fiddle.material.MaterialDefaultImplementations.hasNonZeroMaxDurability(this);
++        return AbstractMaterial.super.hasNonZeroMaxDurability(); // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     }
+ 
+     /**
+      * @deprecated Do not use: this method is for internal testing purposes only.
++     * This method will not be present during runtime. <!-- // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material -->
+      */
+     @Deprecated(forRemoval = true)
+     public short getMaxDurabilityHardcoded() {
+@@ -4559,9 +4562,9 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+     /**
+      * @deprecated Do not use: for internal use only.
+      */
+-    @Deprecated(forRemoval = true)
++    @Override // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     public short getMaxDurabilityLegacy() {
+-        return org.fiddlemc.fiddle.material.MaterialDefaultImplementations.getMaxDurabilityLegacy(this);
++        return AbstractMaterial.super.getMaxDurabilityLegacy(); // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+         // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - durability
+     }
+ 
+@@ -4571,9 +4574,10 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+      *
+      * @return new data instance
+      */
++    @Override // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     @NotNull
+     public BlockData createBlockData() {
+-        return Bukkit.createBlockData(this);
++        return AbstractMaterial.super.createBlockData(); // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     }
+ 
+     /**
+@@ -4583,9 +4587,10 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+      * @param consumer consumer to run on new instance before returning
+      * @return new data instance
+      */
++    @Override // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     @NotNull
+     public BlockData createBlockData(@Nullable Consumer<BlockData> consumer) {
+-        return Bukkit.createBlockData(this, consumer);
++        return AbstractMaterial.super.createBlockData(consumer); // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     }
+ 
+     /**
+@@ -4597,9 +4602,10 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+      * @return new data instance
+      * @throws IllegalArgumentException if the specified data is not valid
+      */
++    @Override // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     @NotNull
+     public BlockData createBlockData(@Nullable String data) throws IllegalArgumentException {
+-        return Bukkit.createBlockData(this, data);
++        return AbstractMaterial.super.createBlockData(data); // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     }
+ 
+     /**
+@@ -4608,10 +4614,10 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+      * @return MaterialData associated with this Material
+      * @deprecated use {@link #createBlockData()}
+      */
++    @Override // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     @NotNull
+-    @Deprecated // Paper
+     public Class<? extends MaterialData> getData() {
+-        return org.fiddlemc.fiddle.material.MaterialDefaultImplementations.getMaterialDataConstructorDeclaringClass(this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - cached constructor
++        return AbstractMaterial.super.getData(); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - cached constructor // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     }
+ 
+     /**
+@@ -4622,10 +4628,10 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+      * @return New MaterialData with the given data
+      * @deprecated Magic value
+      */
+-    @Deprecated
++    @Override // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     @NotNull
+     public MaterialData getNewData(final byte raw) {
+-        return org.fiddlemc.fiddle.material.MaterialDefaultImplementations.getNewMaterialDataInstance(this, raw); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - cached constructor
++        return AbstractMaterial.super.getNewData(raw); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - cached constructor // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     }
+ 
+     // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - data
+@@ -4633,10 +4639,10 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+      * @return The computed value of {@link #data} that this instance should have.
+      * @deprecated Do not use: for internal use only.
+      */
+-    @Deprecated(forRemoval = true)
++    @Override // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     @NotNull
+     public Class<?> computeData() {
+-        return Bukkit.getUnsafe().computeData(this);
++        return AbstractMaterial.super.computeData(); // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     }
+     // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - data
+ 
+@@ -4645,13 +4651,15 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+      *
+      * @return true if this material is a block
+      */
++    @Override // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     public boolean isBlock() {
+         // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
+-        return Bukkit.getUnsafe().isBlock(this);
++        return AbstractMaterial.super.isBlock(); // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     }
+ 
+     /**
+      * @deprecated Do not use: this method is for internal testing purposes only.
++     * This method will not be present during runtime. <!-- // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material -->
+      */
+     @Deprecated(forRemoval = true)
+     public boolean isBlockLegacy() {
+@@ -4664,13 +4672,15 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+      *
+      * @return true if this Material is edible.
+      */
++    @Override // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     public boolean isEdible() {
+         // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
+-        return Bukkit.getUnsafe().isEdible(this);
++        return AbstractMaterial.super.isEdible(); // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     }
+ 
+     /**
+      * @deprecated Do not use: this method is for internal testing purposes only.
++     * In fact, this method will not be present during runtime. <!-- // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material -->
+      */
+     @Deprecated(forRemoval = true)
+     public boolean isEdibleLegacy() {
+@@ -4725,7 +4735,7 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+      */
+     @Nullable
+     public static Material getMaterial(@NotNull final String name) {
+-        return MaterialNameAndKeyConversion.getMaterial(name); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - getMaterial
++        return (Material) AbstractMaterial.getAbstractMaterial(name); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - getMaterial // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     }
+ 
+     /**
+@@ -4746,7 +4756,7 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+     @Nullable
+     // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - getMaterial
+     public static Material getMaterial(@NotNull final String name, boolean legacyName) {
+-        return MaterialNameAndKeyConversion.getMaterial(name, legacyName);
++        return (Material) AbstractMaterial.getAbstractMaterial(name, legacyName); // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+         // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - getMaterial
+     }
+ 
+@@ -4781,7 +4791,7 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+      */
+     @Nullable
+     public static Material matchMaterial(@NotNull final String name) {
+-        return MaterialNameAndKeyConversion.matchMaterial(name); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - matchMaterial
++        return (Material) AbstractMaterial.matchAbstractMaterial(name); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - matchMaterial // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     }
+ 
+     /**
+@@ -4806,19 +4816,21 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+      */
+     @Nullable
+     public static Material matchMaterial(@NotNull final String name, boolean legacyName) {
+-        return MaterialNameAndKeyConversion.matchMaterial(name, legacyName); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - matchMaterial
++        return (Material) AbstractMaterial.matchAbstractMaterial(name, legacyName); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - matchMaterial // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     }
+ 
+     /**
+      * @return True if this material represents a playable music disk.
+      */
++    @Override // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     public boolean isRecord() {
+         // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
+-        return Bukkit.getUnsafe().isRecord(this);
++        return AbstractMaterial.super.isRecord(); // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     }
+ 
+     /**
+      * @deprecated Do not use: this method is for internal testing purposes only.
++     * In fact, this method will not be present during runtime. <!-- // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material -->
+      */
+     @Deprecated(forRemoval = true)
+     public boolean isRecordLegacy() {
+@@ -4832,13 +4844,15 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+      *
+      * @return True if this material is a block and solid
+      */
++    @Override // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     public boolean isSolid() {
+         // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
+-        return Bukkit.getUnsafe().isSolid(this);
++        return AbstractMaterial.super.isSolid(); // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     }
+ 
+     /**
+      * @deprecated Do not use: this method is for internal testing purposes only.
++     * In fact, this method will not be present during runtime. <!-- // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material -->
+      */
+     @Deprecated(forRemoval = true)
+     public boolean isSolidLegacy() {
+@@ -5056,13 +5070,15 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+      *
+      * @return True if this material is an air block.
+      */
++    @Override // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     public boolean isAir() {
+         // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
+-        return Bukkit.getUnsafe().isAir(this);
++        return AbstractMaterial.super.isAir(); // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     }
+ 
+     /**
+      * @deprecated Do not use: this method is for internal testing purposes only.
++     * In fact, this method will not be present during runtime. <!-- // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material -->
+      */
+     @Deprecated(forRemoval = true)
+     public boolean isAirLegacy() {
+@@ -5078,14 +5094,15 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+      * linked to the underlying server. Contributions welcome.
+      * Because there is no linked implementation, this method returns false for all materials added with Fiddle.<!-- // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - is transparent -->
+      */
+-    @Deprecated
++    @Override // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     public boolean isTransparent() {
+         // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - is transparent
+-        return Bukkit.getUnsafe().isTransparent(this);
++        return AbstractMaterial.super.isTransparent(); // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     }
+ 
+     /**
+      * @deprecated Do not use: this method is for internal testing purposes only.
++     * In fact, this method will not be present during runtime. <!-- // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material -->
+      */
+     @Deprecated(forRemoval = true)
+     public boolean isTransparentLegacy() {
+@@ -5155,13 +5172,15 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+      *
+      * @return True if this material is a block and can catch fire
+      */
++    @Override // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     public boolean isFlammable() {
+         // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
+-        return Bukkit.getUnsafe().isFlammable(this);
++        return AbstractMaterial.super.isFlammable(); // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     }
+ 
+     /**
+      * @deprecated Do not use: this method is for internal testing purposes only.
++     * In fact, this method will not be present during runtime. <!-- // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material -->
+      */
+     @Deprecated(forRemoval = true)
+     public boolean isFlammableLegacy() {
+@@ -5235,13 +5254,15 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+      *
+      * @return True if this material is a block and can burn away
+      */
++    @Override // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     public boolean isBurnable() {
+         // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
+-        return Bukkit.getUnsafe().isBurnable(this);
++        return AbstractMaterial.super.isBurnable(); // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     }
+ 
+     /**
+      * @deprecated Do not use: this method is for internal testing purposes only.
++     * In fact, this method will not be present during runtime. <!-- // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material -->
+      */
+     @Deprecated(forRemoval = true)
+     public boolean isBurnableLegacy() {
+@@ -5297,13 +5318,15 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+      *
+      * @return true if this Material can be used as fuel.
+      */
++    @Override // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     public boolean isFuel() {
+         // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
+-        return Bukkit.getUnsafe().isFuel(this);
++        return AbstractMaterial.super.isFuel(); // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     }
+ 
+     /**
+      * @deprecated Do not use: this method is for internal testing purposes only.
++     * In fact, this method will not be present during runtime. <!-- // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material -->
+      */
+     @Deprecated(forRemoval = true)
+     public boolean isFuelLegacy() {
+@@ -5399,13 +5422,15 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+      *
+      * @return True if this material is a block and occludes light
+      */
++    @Override // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     public boolean isOccluding() {
+         // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
+-        return Bukkit.getUnsafe().isOccluding(this);
++        return AbstractMaterial.super.isOccluding(); // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     }
+ 
+     /**
+      * @deprecated Do not use: this method is for internal testing purposes only.
++     * In fact, this method will not be present during runtime. <!-- // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material -->
+      */
+     @Deprecated(forRemoval = true)
+     public boolean isOccludingLegacy() {
+@@ -5538,13 +5563,15 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+     /**
+      * @return True if this material is affected by gravity.
+      */
++    @Override // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     public boolean hasGravity() {
+         // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
+-        return Bukkit.getUnsafe().hasGravity(this);
++        return AbstractMaterial.super.hasGravity(); // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     }
+ 
+     /**
+      * @deprecated Do not use: this method is for internal testing purposes only.
++     * In fact, this method will not be present during runtime. <!-- // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material -->
+      */
+     @Deprecated(forRemoval = true)
+     public boolean hasGravityLegacy() {
+@@ -5568,13 +5595,15 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+      *
+      * @return true if this material is an item
+      */
++    @Override // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     public boolean isItem() {
+         // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
+-        return Bukkit.getUnsafe().isItem(this);
++        return AbstractMaterial.super.isItem(); // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     }
+ 
+     /**
+      * @deprecated Do not use: this method is for internal testing purposes only.
++     * In fact, this method will not be present during runtime. <!-- // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material -->
+      */
+     @Deprecated(forRemoval = true)
+     public boolean isItemLegacy() {
+@@ -5598,8 +5627,9 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+      *
+      * @return true if this material can be interacted with.
+      */
++    @Override // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     public boolean isInteractable() {
+-        return Bukkit.getUnsafe().isInteractable(this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
++        return AbstractMaterial.super.isInteractable(); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - most properties // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     }
+ 
+     /**
+@@ -5611,8 +5641,9 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+      *
+      * @return the hardness of that material.
+      */
++    @Override // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     public float getHardness() {
+-        return Bukkit.getUnsafe().getHardness(this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
++        return AbstractMaterial.super.getHardness(); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - most properties // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     }
+ 
+     /**
+@@ -5625,8 +5656,9 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+      *
+      * @return the blast resistance of that material.
+      */
++    @Override // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     public float getBlastResistance() {
+-        return Bukkit.getUnsafe().getBlastResistance(this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
++        return AbstractMaterial.super.getBlastResistance(); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - most properties // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     }
+ 
+     /**
+@@ -5641,8 +5673,9 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+      *
+      * @return the slipperiness of this block
+      */
++    @Override // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     public float getSlipperiness() {
+-        return Bukkit.getUnsafe().getSlipperiness(this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
++        return AbstractMaterial.super.getSlipperiness(); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - most properties // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     }
+ 
+     /**
+@@ -5655,7 +5688,7 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+      */
+     @Nullable
+     public Material getCraftingRemainingItem() {
+-        return Bukkit.getUnsafe().getCraftingRemainingItem(this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
++        return (Material) AbstractMaterial.super.getAbstractCraftingRemainingItem(); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - most properties // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     }
+ 
+     /**
+@@ -5665,9 +5698,10 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+      *
+      * @return the best EquipmentSlot for this Material
+      */
++    @Override // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     @NotNull
+     public EquipmentSlot getEquipmentSlot() {
+-        return Bukkit.getUnsafe().getEquipmentSlot(this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
++        return AbstractMaterial.super.getEquipmentSlot(); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - most properties // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     }
+ 
+     /**
+@@ -5683,11 +5717,10 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+      * @return the immutable {@link Multimap} with the respective default
+      * Attributes and modifiers, or an empty map if no attributes are set.
+      */
++    @Override // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     @NotNull
+     public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(@NotNull EquipmentSlot slot) {
+-        Preconditions.checkArgument(isItem(), "The Material is not an item!");
+-
+-        return Bukkit.getUnsafe().getDefaultAttributeModifiers(this, slot);
++        return AbstractMaterial.super.getDefaultAttributeModifiers(slot); // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     }
+ 
+     /**
+@@ -5695,9 +5728,10 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+      *
+      * @return the creative category. null if does not belong to a category
+      */
++    @Override // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     @Nullable
+     public CreativeCategory getCreativeCategory() {
+-        return Bukkit.getUnsafe().getCreativeCategory(this);
++        return AbstractMaterial.super.getCreativeCategory(); // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     }
+ 
+     /**
+@@ -5715,13 +5749,8 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+      */
+     @Override
+     @NotNull
+-    @Deprecated(forRemoval = true) // Paper
+     public String getTranslationKey() {
+-        if (this.isItem()) {
+-            return Bukkit.getUnsafe().getItemTranslationKey(this);
+-        } else {
+-            return Bukkit.getUnsafe().getBlockTranslationKey(this);
+-        }
++        return AbstractMaterial.super.getTranslationKey(); // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     }
+ 
+     /**
+@@ -5731,9 +5760,10 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+      * @return the translation key of the block associated with this material,
+      * or null if this material does not have an associated block
+      */
++    @Override // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     @Nullable
+     public String getBlockTranslationKey() {
+-        return Bukkit.getUnsafe().getBlockTranslationKey(this);
++        return AbstractMaterial.super.getBlockTranslationKey(); // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     }
+ 
+     /**
+@@ -5743,9 +5773,10 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+      * @return the translation key of the item associated with this material, or
+      * null if this material does not have an associated item.
+      */
++    @Override // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     @Nullable
+     public String getItemTranslationKey() {
+-        return Bukkit.getUnsafe().getItemTranslationKey(this);
++        return AbstractMaterial.super.getItemTranslationKey(); // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     }
+ 
+     /**
+@@ -5754,8 +5785,9 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+      * @param world the world to check
+      * @return true if this material can be used in this World.
+      */
++    @Override // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     public boolean isEnabledByFeature(@NotNull World world) {
+-        return Bukkit.getDataPackManager().isEnabledByFeature(this, world);
++        return AbstractMaterial.super.isEnabledByFeature(world); // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     }
+ 
+     // Fiddle start - flags for vanilla content - API - block
+@@ -5763,7 +5795,7 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+      * @return Whether this {@link Material} is present in vanilla as a block.
+      */
+     public boolean isVanillaBlock() {
+-        return Bukkit.getUnsafe().isVanillaBlock(this);
++        return AbstractMaterial.super.isVanillaBlock(); // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     }
+     // Fiddle end - flags for vanilla content - API - block
+ 
+@@ -5772,7 +5804,7 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+      * @return Whether this {@link Material} is present in vanilla as an item.
+      */
+     public boolean isVanillaItem() {
+-        return Bukkit.getUnsafe().isVanillaItem(this);
++        return AbstractMaterial.super.isVanillaItem();
+     }
+     // Fiddle end - flags for vanilla content - API - item
+ 
+diff --git a/src/main/java/org/fiddlemc/fiddle/material/AbstractMaterial.java b/src/main/java/org/fiddlemc/fiddle/material/AbstractMaterial.java
+index c5232856b5537b21751f93d3b5d48c17c3fe9e83..b461c8b126f010eeeeccf3fa3fd075ed31c419b0 100644
+--- a/src/main/java/org/fiddlemc/fiddle/material/AbstractMaterial.java
++++ b/src/main/java/org/fiddlemc/fiddle/material/AbstractMaterial.java
+@@ -5,7 +5,19 @@ package org.fiddlemc.fiddle.material;
+ import org.bukkit.Keyed;
+ import org.bukkit.Material;
+ import org.bukkit.Translatable;
++import com.google.common.base.Preconditions;
++import com.google.common.collect.Multimap;
++import org.bukkit.*;
++import org.bukkit.attribute.Attribute;
++import org.bukkit.attribute.AttributeModifier;
++import org.bukkit.block.data.BlockData;
++import org.bukkit.inventory.CreativeCategory;
++import org.bukkit.inventory.EquipmentSlot;
++import org.bukkit.material.MaterialData;
+ import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
++
++import java.util.function.Consumer;
+ 
+ /**
+  * An interface that provides default implementations for most {@link Material} methods.
+@@ -18,4 +30,258 @@ public interface AbstractMaterial extends Keyed, Translatable, net.kyori.adventu
+ 
+     @NotNull String name();
+ 
++    // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
++    @Deprecated
++    String LEGACY_PREFIX = MaterialLegacyNameChecker.LEGACY_MATERIAL_PREFIX; // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - is legacy
++
++    default boolean isEmpty() {
++        return MaterialDefaultImplementations.isEmpty((Material) this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - is empty
++    }
++
++    @Override
++    default @NotNull String translationKey() {
++        if (this.isItem()) {
++            return Bukkit.getUnsafe().getItemTranslationKey((Material) this);
++        } else {
++            return Bukkit.getUnsafe().getBlockTranslationKey((Material) this);
++        }
++    }
++
++    @NotNull
++    default io.papermc.paper.inventory.ItemRarity getItemRarity() {
++        return Bukkit.getUnsafe().getItemRarity((Material) this);
++    }
++
++    @NotNull
++    @Deprecated
++    default Multimap<Attribute, AttributeModifier> getItemAttributes(@NotNull EquipmentSlot equipmentSlot) {
++        return Bukkit.getUnsafe().getItemAttributes((Material) this, equipmentSlot);
++    }
++
++    default boolean isCollidable() {
++        return Bukkit.getUnsafe().isCollidable((Material) this);
++    }
++
++    @Deprecated
++    default int getId() {
++        return MaterialDefaultImplementations.getLegacyId((Material) this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - id
++    }
++
++    default boolean isLegacy() {
++        return MaterialDefaultImplementations.isLegacy((Material) this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - is legacy
++    }
++
++    @NotNull
++    @Override
++    default NamespacedKey getKey() {
++        return MaterialNameAndKeyConversion.getKey((Material) this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - key
++    }
++
++    default int getMaxStackSize() {
++        return Bukkit.getUnsafe().getMaxStackSize((Material) this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - max stack size
++    }
++
++    default short getMaxDurability() {
++        return Bukkit.getUnsafe().getMaxDurability((Material) this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - durability
++    }
++
++    default boolean hasNonZeroMaxDurability() {
++        return MaterialDefaultImplementations.hasNonZeroMaxDurability((Material) this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - durability
++    }
++
++    @Deprecated(forRemoval = true)
++    default short getMaxDurabilityLegacy() {
++        return MaterialDefaultImplementations.getMaxDurabilityLegacy((Material) this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - durability
++    }
++
++    @NotNull
++    default BlockData createBlockData() {
++        return Bukkit.createBlockData((Material) this);
++    }
++
++    @NotNull
++    default BlockData createBlockData(@Nullable Consumer<BlockData> consumer) {
++        return Bukkit.createBlockData((Material) this, consumer);
++    }
++
++    @NotNull
++    default BlockData createBlockData(@Nullable String data) throws IllegalArgumentException {
++        return Bukkit.createBlockData((Material) this, data);
++    }
++
++    @NotNull
++    @Deprecated // Paper
++    default Class<? extends MaterialData> getData() {
++        return MaterialDefaultImplementations.getMaterialDataConstructorDeclaringClass((Material) this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - cached constructor
++    }
++
++    @Deprecated
++    @NotNull
++    default MaterialData getNewData(final byte raw) {
++        return MaterialDefaultImplementations.getNewMaterialDataInstance((Material) this, raw); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - cached constructor
++    }
++
++    @Deprecated(forRemoval = true)
++    @NotNull
++    default Class<?> computeData() {
++        return Bukkit.getUnsafe().computeData((Material) this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - data
++    }
++
++    default boolean isBlock() {
++        return Bukkit.getUnsafe().isBlock((Material) this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
++    }
++
++    default boolean isEdible() {
++        return Bukkit.getUnsafe().isEdible((Material) this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
++    }
++
++    /**
++     * @deprecated Do not use: for internal use only.
++     */
++    @Deprecated(forRemoval = true)
++    static AbstractMaterial getAbstractMaterial(@NotNull final String name) {
++        return MaterialNameAndKeyConversion.getMaterial(name); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - getMaterial
++    }
++
++    /**
++     * @deprecated Do not use: for internal use only.
++     */
++    @Deprecated(forRemoval = true)
++    static AbstractMaterial getAbstractMaterial(@NotNull final String name, boolean legacyName) {
++        return MaterialNameAndKeyConversion.getMaterial(name, legacyName); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - getMaterial
++    }
++
++    /**
++     * @deprecated Do not use: for internal use only.
++     */
++    @Deprecated(forRemoval = true)
++    static AbstractMaterial matchAbstractMaterial(@NotNull final String name) {
++        return MaterialNameAndKeyConversion.matchMaterial(name); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - matchMaterial
++    }
++
++    /**
++     * @deprecated Do not use: for internal use only.
++     */
++    @Deprecated(forRemoval = true)
++    static AbstractMaterial matchAbstractMaterial(@NotNull final String name, boolean legacyName) {
++        return MaterialNameAndKeyConversion.matchMaterial(name, legacyName); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - matchMaterial
++    }
++
++    default boolean isRecord() {
++        return Bukkit.getUnsafe().isRecord((Material) this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
++    }
++
++    default boolean isSolid() {
++        return Bukkit.getUnsafe().isSolid((Material) this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
++    }
++
++    default boolean isAir() {
++        return Bukkit.getUnsafe().isAir((Material) this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
++    }
++
++    @Deprecated
++    default boolean isTransparent() {
++        return Bukkit.getUnsafe().isTransparent((Material) this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - is transparent
++    }
++
++    default boolean isBurnable() {
++        return Bukkit.getUnsafe().isBurnable((Material) this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
++    }
++
++    default boolean isFlammable() {
++        return Bukkit.getUnsafe().isFlammable((Material) this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
++    }
++
++    default boolean isFuel() {
++        return Bukkit.getUnsafe().isFuel((Material) this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
++    }
++
++    default boolean isOccluding() {
++        return Bukkit.getUnsafe().isOccluding((Material) this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
++    }
++
++    default boolean hasGravity() {
++        return Bukkit.getUnsafe().hasGravity((Material) this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
++    }
++
++    default boolean isItem() {
++        return Bukkit.getUnsafe().isItem((Material) this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
++    }
++
++    default boolean isInteractable() {
++        return Bukkit.getUnsafe().isInteractable((Material) this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
++    }
++
++    default float getHardness() {
++        return Bukkit.getUnsafe().getHardness((Material) this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
++    }
++
++    default float getBlastResistance() {
++        return Bukkit.getUnsafe().getBlastResistance((Material) this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
++    }
++
++    default float getSlipperiness() {
++        return Bukkit.getUnsafe().getSlipperiness((Material) this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
++    }
++
++    /**
++     * @deprecated Do not use: for internal use only.
++     */
++    @Deprecated(forRemoval = true)
++    @Nullable
++    default AbstractMaterial getAbstractCraftingRemainingItem() {
++        return Bukkit.getUnsafe().getCraftingRemainingItem((Material) this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
++    }
++
++    @NotNull
++    default EquipmentSlot getEquipmentSlot() {
++        return Bukkit.getUnsafe().getEquipmentSlot((Material) this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
++    }
++
++    @NotNull
++    default Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(@NotNull EquipmentSlot slot) {
++        Preconditions.checkArgument(isItem(), "The Material is not an item!");
++
++        return Bukkit.getUnsafe().getDefaultAttributeModifiers((Material) this, slot);
++    }
++
++    @Nullable
++    default CreativeCategory getCreativeCategory() {
++        return Bukkit.getUnsafe().getCreativeCategory((Material) this);
++    }
++    
++    @Override
++    @NotNull
++    @Deprecated(forRemoval = true) // Paper
++    default String getTranslationKey() {
++        if (this.isItem()) {
++            return Bukkit.getUnsafe().getItemTranslationKey((Material) this);
++        } else {
++            return Bukkit.getUnsafe().getBlockTranslationKey((Material) this);
++        }
++    }
++    
++    @Nullable
++    default String getBlockTranslationKey() {
++        return Bukkit.getUnsafe().getBlockTranslationKey((Material) this);
++    }
++    
++    @Nullable
++    default String getItemTranslationKey() {
++        return Bukkit.getUnsafe().getItemTranslationKey((Material) this);
++    }
++
++    default boolean isEnabledByFeature(@NotNull World world) {
++        return Bukkit.getDataPackManager().isEnabledByFeature((Material) this, world);
++    }
++
++    default boolean isVanillaBlock() {
++        return Bukkit.getUnsafe().isVanillaBlock((Material) this); // Fiddle start - flags for vanilla content - API - block
++    }
++
++    default boolean isVanillaItem() {
++        return Bukkit.getUnsafe().isVanillaItem((Material) this); // Fiddle start - flags for vanilla content - API - item
++    }
++    // Fiddle end - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
++
+ }

@@ -1,41 +1,74 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
-Date: Sat, 30 Dec 2023 21:26:58 +0100
+Date: Wed, 3 Jan 2024 20:43:27 +0100
 Subject: [PATCH] Client perspective - Block state visualization - Apply to
- chunk packets - Store connection explicitly in chunk packets
+ block update packets - Replace states when writing
 
-Makes all instances of `ClientboundLevelChunkWithLightPacket` bound to a particular explicit target connection.
-This is done by making it a subclass of `PacketWithExplicitTargetClientConnection`.
+Implements replacement of the `BlockState` values written to the `FriendlyByteBuf` based on the target client.
 
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
-diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
-index 3305c7695193ec6299ae1015dd2b916d2405500b..8841369d883c69ef2bc4dc70d508c2ce06a04245 100644
---- a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
-+++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
-@@ -8,7 +8,7 @@ import net.minecraft.world.level.ChunkPos;
- import net.minecraft.world.level.chunk.LevelChunk;
- import net.minecraft.world.level.lighting.LevelLightEngine;
- 
--public class ClientboundLevelChunkWithLightPacket implements Packet<ClientGamePacketListener> {
-+public class ClientboundLevelChunkWithLightPacket extends org.fiddlemc.fiddle.packet.PacketWithExplicitTargetClientConnection<ClientGamePacketListener> { // Fiddle - client perspective - block state visualization - apply to chunk packets - store connection explicitly
-     private final int x;
-     private final int z;
-     private final ClientboundLevelChunkPacketData chunkData;
-@@ -29,6 +29,7 @@ public class ClientboundLevelChunkWithLightPacket implements Packet<ClientGamePa
-     // Paper start - Anti-Xray - Add chunk packet info
-     @Deprecated @io.papermc.paper.annotation.DoNotUse public ClientboundLevelChunkWithLightPacket(LevelChunk chunk, LevelLightEngine lightProvider, @Nullable BitSet skyBits, @Nullable BitSet blockBits) { this(chunk, lightProvider, skyBits, blockBits, true); }
-     public ClientboundLevelChunkWithLightPacket(LevelChunk chunk, LevelLightEngine lightProvider, @Nullable BitSet skyBits, @Nullable BitSet blockBits, boolean modifyBlocks) {
-+        super(); // Fiddle - client perspective - block state visualization - apply to chunk packets - store connection explicitly
-         ChunkPos chunkPos = chunk.getPos();
-         this.x = chunkPos.x;
-         this.z = chunkPos.z;
-@@ -40,6 +41,7 @@ public class ClientboundLevelChunkWithLightPacket implements Packet<ClientGamePa
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundBlockUpdatePacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundBlockUpdatePacket.java
+index d73bd60cad84bbfdf4ac2d6def2cb1d2c52bb7f7..7feb7e3f7fb0e8e959005a58bcde2c084c650367 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundBlockUpdatePacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundBlockUpdatePacket.java
+@@ -43,7 +43,22 @@ public class ClientboundBlockUpdatePacket extends org.fiddlemc.fiddle.packet.Pac
+     @Override
+     public void write(FriendlyByteBuf buf) {
+         buf.writeBlockPos(this.pos);
+-        buf.writeId(Block.BLOCK_STATE_REGISTRY, this.blockState);
++        // Fiddle start - client perspective - block state visualization - apply to block update packets - replace states when writing - single block update
++        var clientPerspective = this.getExplicitTargetClientPerspective();
++        var player = this.getExplicitTargetClientConnection().getPlayer();
++        var level = (net.minecraft.server.level.ServerLevel) player.level();
++        if (level == null) {
++            level = net.minecraft.server.MinecraftServer.getServer().getAllLevels().iterator().next(); // This fallback shouldn't be necessary, but it could occur when packets are sent with bad timing
++        }
++        var visualizationSetupper = this.blockState.visualizationSetupper;
++        BlockState stateToSend;
++        if (visualizationSetupper == null) {
++            stateToSend = this.blockState;
++        } else {
++            stateToSend = visualizationSetupper.setUp(level, this.pos.getX(), this.pos.getY(), this.pos.getZ(), this.blockState, player, clientPerspective, org.fiddlemc.fiddle.packet.block.BlockStateVisualizationSetupper.BlockStateVisualizationPurpose.PHYSICAL);
++        }
++        buf.writeBlockState(stateToSend);
++        // Fiddle end - client perspective - block state visualization - apply to block update packets - replace states when writing - single block update
      }
  
-     public ClientboundLevelChunkWithLightPacket(FriendlyByteBuf buf) {
-+        super(); // Fiddle - client perspective - block state visualization - apply to chunk packets - store connection explicitly
-         this.x = buf.readInt();
-         this.z = buf.readInt();
-         this.chunkData = new ClientboundLevelChunkPacketData(buf, this.x, this.z);
+     @Override
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundSectionBlocksUpdatePacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundSectionBlocksUpdatePacket.java
+index 8724e49fe73993fcb3838e766e9c1b21c07d8ff0..28b275fa55f278f37b026f830f5392fd50eb3869 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundSectionBlocksUpdatePacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundSectionBlocksUpdatePacket.java
+@@ -76,8 +76,29 @@ public class ClientboundSectionBlocksUpdatePacket extends org.fiddlemc.fiddle.pa
+         buf.writeLong(this.sectionPos.asLong());
+         buf.writeVarInt(this.positions.length);
+ 
++        // Fiddle start - client perspective - block state visualization - apply to block update packets - replace states when writing - section blocks update
++        var clientPerspective = this.getExplicitTargetClientPerspective();
++        var player = this.getExplicitTargetClientConnection().getPlayer();
++        var level = (net.minecraft.server.level.ServerLevel) player.level();
++        if (level == null) {
++            level = net.minecraft.server.MinecraftServer.getServer().getAllLevels().iterator().next(); // This fallback shouldn't be necessary, but it could occur when packets are sent with bad timing
++        }
++        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
++        // Fiddle end - client perspective - block state visualization - apply to block update packets - replace states when writing - section blocks update
+         for (int i = 0; i < this.positions.length; ++i) {
+-            buf.writeVarLong((long) Block.getId(this.states[i]) << 12 | (long) this.positions[i]);
++            // Fiddle start - client perspective - block state visualization - apply to block update packets - replace states when writing - section blocks update
++            var state = this.states[i];
++            var visualizationSetupper = state.visualizationSetupper;
++            BlockState stateToSend;
++            if (visualizationSetupper == null) {
++                stateToSend = state;
++            } else {
++                var positionShort = this.positions[i];
++                pos.set(this.sectionPos.relativeToBlockX(positionShort), this.sectionPos.relativeToBlockY(positionShort), this.sectionPos.relativeToBlockZ(positionShort));
++                stateToSend = visualizationSetupper.setUp(level, pos.getX(), pos.getY(), pos.getZ(), state, player, clientPerspective, org.fiddlemc.fiddle.packet.block.BlockStateVisualizationSetupper.BlockStateVisualizationPurpose.PHYSICAL);
++            }
++            buf.writeVarLong((long) clientPerspective.getPacketBlockStateId(stateToSend) << 12 | (long) this.positions[i]);
++            // Fiddle end - client perspective - block state visualization - apply to block update packets - replace states when writing - section blocks update
+         }
+ 
+     }

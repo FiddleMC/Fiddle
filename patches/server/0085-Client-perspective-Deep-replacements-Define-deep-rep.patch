@@ -1,0 +1,160 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sat, 29 Jul 2023 10:15:40 +0200
+Subject: [PATCH] Client perspective - Deep replacements - Define deep
+ replacement scope
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacementScope.java b/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacementScope.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..b54dbc4f3b5cfb4e63e8c4fbfce143f2ce37421d
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacementScope.java
+@@ -0,0 +1,145 @@
++// Fiddle - client perspective - deep replacements - scope
++
++package org.fiddlemc.fiddle.packet.deepreplacement;
++
++import net.minecraft.network.chat.HoverEvent;
++import net.minecraft.network.chat.contents.LiteralContents;
++import net.minecraft.network.chat.contents.TranslatableContents;
++import net.minecraft.world.item.ItemStack;
++import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
++
++/**
++ * Represents the scope of the actions that need to be taken by a deep replacement step,
++ * allowing it to forego some or all replacements.
++ * <br>
++ * All instances of this class are pre-created and cached in {@link #values}.
++ * <br>
++ * Note that when a {@link DeepReplacementScope} different from {@link #NOTHING} is passed.
++ */
++public final class DeepReplacementScope {
++
++    /**
++     * Whether to attempt replacing items and blocks, e.g. items in NBT (for example as part of the
++     * {@linkplain ItemStack#getTag() tag} of a shulker box item) or items in raw JSON text (for example as part
++     * of the {@linkplain HoverEvent.Action#SHOW_ITEM <code>show_item</code> hover event}).
++     */
++    public final boolean attemptToReplaceItemsAndBlocks;
++
++    /**
++     * Whether to attempt replacing {@linkplain TranslatableContents translatables} in raw JSON text,
++     * typically either adding a {@linkplain TranslatableContents#getFallback() fallback value} or pre-translating
++     * it into {@linkplain LiteralContents literal plain text}.
++     */
++    public final boolean attemptToReplaceTranslatables;
++
++    /**
++     * Whether to attempt looking for and making replacements in {@linkplain HoverEvent hover events} in raw JSON text.
++     */
++    public final boolean attemptToReplaceInHoverEvents;
++
++    /**
++     * The index of this instance in {@link #values}.
++     */
++    private final int indexInValues;
++
++    private DeepReplacementScope(boolean attemptToReplaceItemsAndBlocks, boolean attemptToReplaceTranslatables, boolean attemptToReplaceInHoverEvents, int indexInValues) {
++        this.attemptToReplaceItemsAndBlocks = attemptToReplaceItemsAndBlocks;
++        this.attemptToReplaceTranslatables = attemptToReplaceTranslatables;
++        this.attemptToReplaceInHoverEvents = attemptToReplaceInHoverEvents;
++        this.indexInValues = indexInValues;
++    }
++
++    /**
++     * Whether this {@link DeepReplacementScope} can lead to any replacements being applied.
++     */
++    public boolean canMakeAnyReplacements() {
++        return this.attemptToReplaceItemsAndBlocks || this.attemptToReplaceTranslatables;
++    }
++
++    public @NotNull DeepReplacementScope withAttemptToReplaceItemsAndBlocks() {
++        return values[this.indexInValues | 1];
++    }
++
++    public @NotNull DeepReplacementScope withAttemptToReplaceTranslatables() {
++        return values[this.indexInValues | 2];
++    }
++
++    public @NotNull DeepReplacementScope withAttemptToReplaceInHoverEvents() {
++        return values[this.indexInValues | 4];
++    }
++
++    public @NotNull DeepReplacementScope withoutAttemptToReplaceItemsAndBlocks() {
++        return values[this.indexInValues & (~1)];
++    }
++
++    public @NotNull DeepReplacementScope withoutAttemptToReplaceTranslatables() {
++        return values[this.indexInValues & (~2)];
++    }
++
++    public @NotNull DeepReplacementScope withoutAttemptToReplaceInHoverEvents() {
++        return values[this.indexInValues & (~4)];
++    }
++
++    public @NotNull DeepReplacementScope withoutUnnecessaryReplacements(@Nullable ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings) {
++        // If there are already no replacements, we do not have to remove any
++        if (this == DeepReplacementScope.NOTHING) {
++            return this;
++        }
++        // Do not make any replacements if no perspective is present
++        if (clientPerspectiveAndSettings == null) {
++            return DeepReplacementScope.NOTHING;
++        }
++        var perspectiveOrNull = clientPerspectiveAndSettings.getPerspectiveOrNull();
++        if (perspectiveOrNull == null) {
++            return DeepReplacementScope.NOTHING;
++        }
++        // Remove specific unnecessary replacements
++        var possiblyWithoutItemsAndBlocks = perspectiveOrNull.understandsServerSideItemsAndBlocks ? this.withoutAttemptToReplaceItemsAndBlocks() : this;
++        return perspectiveOrNull.understandsServerSideTranslations ? possiblyWithoutItemsAndBlocks.withoutAttemptToReplaceTranslatables() : possiblyWithoutItemsAndBlocks;
++    }
++
++    @Override
++    public int hashCode() {
++        return this.indexInValues;
++    }
++
++    @Override
++    public boolean equals(Object obj) {
++        return obj instanceof DeepReplacementScope other && this.indexInValues == other.indexInValues;
++    }
++
++    @Override
++    public String toString() {
++        return "{attemptToReplaceItemsAndBlocks=" + this.attemptToReplaceItemsAndBlocks + ", attemptToReplaceTranslatables=" + this.attemptToReplaceTranslatables + ", attemptToReplaceInHoverEvents=" + this.attemptToReplaceInHoverEvents + "}";
++    }
++
++    private static @NotNull DeepReplacementScope @NotNull [] values;
++    static {
++        values = new DeepReplacementScope[8];
++        for (boolean attemptToReplaceItemsAndBlocks : new boolean[]{false, true}) {
++            for (boolean attemptToReplaceTranslatables : new boolean[]{false, true}) {
++                for (boolean attemptToReplaceInHoverEvents : new boolean[]{false, true}) {
++                    int index = (attemptToReplaceItemsAndBlocks ? 1 : 0) + (attemptToReplaceTranslatables ? 2 : 0) + (attemptToReplaceInHoverEvents ? 4 : 0);
++                    values[index] = new DeepReplacementScope(attemptToReplaceItemsAndBlocks, attemptToReplaceTranslatables, attemptToReplaceInHoverEvents, index);
++                }
++            }
++        }
++    }
++
++    public static @NotNull DeepReplacementScope of(boolean attemptToReplaceItemsAndBlocks, boolean attemptToReplaceTranslatables, boolean attemptToReplaceInHoverEvents) {
++        int index = (attemptToReplaceItemsAndBlocks ? 1 : 0) + (attemptToReplaceTranslatables ? 2 : 0) + (attemptToReplaceInHoverEvents ? 4 : 0);
++        return values[index];
++    }
++
++    /**
++     * A {@link DeepReplacementScope} that performs all replacement checks.
++     */
++    public static final @NotNull DeepReplacementScope EVERYTHING = of(true, true, true);
++
++    /**
++     * A {@link DeepReplacementScope} that makes no replacements.
++     */
++    public static final @NotNull DeepReplacementScope NOTHING = of(false, false, false);
++
++}

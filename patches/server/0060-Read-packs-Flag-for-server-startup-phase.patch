@@ -1,0 +1,66 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Mon, 15 May 2023 20:59:39 +0200
+Subject: [PATCH] Read packs - Flag for server startup phase
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
+index b18647ef07ad98e09ad5088d1a785f6ff1d3636e..1e207fff27625f9df6e992adcef09c55b1b34db8 100644
+--- a/src/main/java/net/minecraft/server/Main.java
++++ b/src/main/java/net/minecraft/server/Main.java
+@@ -434,6 +434,8 @@ public class Main {
+                 return;
+             }
+ 
++            org.fiddlemc.fiddle.pack.read.StartupPackLoadPhase.endStartupLoadPhase(); // Fiddle - read packs - startup load phase - end after initial read
++
+             /*
+             IRegistryCustom.Dimension iregistrycustom_dimension = worldstem.registries().compositeAccess();
+ 
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/StartupPackLoadPhase.java b/src/main/java/org/fiddlemc/fiddle/pack/read/StartupPackLoadPhase.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..8fec3e9d10f66fb4183302586fb46cca4f2b3f90
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/StartupPackLoadPhase.java
+@@ -0,0 +1,39 @@
++// Fiddle - read packs - startup load phase
++
++package org.fiddlemc.fiddle.pack.read;
++
++import joptsimple.OptionSet;
++import net.minecraft.server.Main;
++import org.fiddlemc.fiddle.pack.files.FiddlePackFilesProvider;
++
++/**
++ * A singleton that manages a {@linkplain #inStartupLoadPhase flag} for whether the server
++ * is loading packs as part of the startup phase of the server (as opposed to reloading specific parts of packs).
++ */
++public final class StartupPackLoadPhase {
++
++    private StartupPackLoadPhase() {
++        throw new RuntimeException();
++    }
++
++    /**
++     * Whether the server is in the startup phase.
++     * While in this phase, the closing of file handles of clearing of caches
++     * (using {@link FiddlePackFilesProvider#closeHandlesAndClearCache()}) by any readers of parts of the packs
++     * (such as resource pack content or data pack content) is not necessary, since it will be done
++     * afterwards in the server startup (in {@link Main#main(OptionSet)}) as well.
++     */
++    private static boolean inStartupLoadPhase = true;
++
++    public static void endStartupLoadPhase() {
++        if (!inStartupLoadPhase) {
++            throw new IllegalStateException("Tried to end the Fiddle pack startup load phase after it had already been ended");
++        }
++        inStartupLoadPhase = false;
++    }
++
++    public static boolean isInStartupLoadPhase() {
++        return inStartupLoadPhase;
++    }
++
++}

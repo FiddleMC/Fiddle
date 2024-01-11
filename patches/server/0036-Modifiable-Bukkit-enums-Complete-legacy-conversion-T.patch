@@ -1,0 +1,99 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Mon, 8 Jan 2024 19:02:50 +0100
+Subject: [PATCH] Modifiable Bukkit enums - Complete legacy conversion - Test
+ completeness
+
+Adds tests to verify that the "Modifiable Bukkit enums - Complete legacy conversion - Add missing conversions" patch does indeed make legacy conversion complete.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/test/java/org/fiddlemc/fiddle/material/legacy/PerLegacyMaterialTest.java b/src/test/java/org/fiddlemc/fiddle/material/legacy/PerLegacyMaterialTest.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..95e539a0c7ede3a4bed906a6e624ab328480d0e6
+--- /dev/null
++++ b/src/test/java/org/fiddlemc/fiddle/material/legacy/PerLegacyMaterialTest.java
+@@ -0,0 +1,38 @@
++// Fiddle - modifiable Bukkit enums - Material - make legacy conversion complete - tests
++
++package org.fiddlemc.fiddle.material.legacy;
++
++import org.bukkit.Material;
++import org.bukkit.craftbukkit.legacy.CraftLegacy;
++import org.bukkit.support.AbstractTestingBase;
++import org.junit.Test;
++
++import java.util.Arrays;
++
++import static org.junit.Assert.*;
++
++/**
++ * Does a number of sanity checks on {@linkplain Material#isLegacy() legacy} {@link Material}s.
++ */
++public class PerLegacyMaterialTest extends AbstractTestingBase {
++
++    private Material[] getMaterials() {
++        return Arrays.stream(Material.values()).filter(Material::isLegacy).toList().toArray(Material[]::new);
++    }
++
++    @Test
++    @SuppressWarnings("deprecation")
++    public void hasMappedNonLegacy() {
++        for (Material material : getMaterials()) {
++            for (boolean itemPriority : new boolean[]{false, true}) {
++                // when
++                var nonLegacy = CraftLegacy.fromLegacy(material, itemPriority);
++
++                // then
++                assertNotNull("Non-legacy is non-null for " + material + " with item priority = " + itemPriority, nonLegacy);
++                assertEquals("Non-legacy is non-air (unless original is legacy air) for " + material + " with item priority = " + itemPriority,material == Material.LEGACY_AIR, nonLegacy == Material.AIR);
++            }
++        }
++    }
++
++}
+diff --git a/src/test/java/org/fiddlemc/fiddle/material/legacy/PerNonLegacyMaterialTest.java b/src/test/java/org/fiddlemc/fiddle/material/legacy/PerNonLegacyMaterialTest.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..4a0b27c8472e8f694841a7dd76066e5023c17148
+--- /dev/null
++++ b/src/test/java/org/fiddlemc/fiddle/material/legacy/PerNonLegacyMaterialTest.java
+@@ -0,0 +1,38 @@
++// Fiddle - modifiable Bukkit enums - Material - make legacy conversion complete - tests
++
++package org.fiddlemc.fiddle.material.legacy;
++
++import org.bukkit.Material;
++import org.bukkit.craftbukkit.legacy.CraftLegacy;
++import org.bukkit.support.AbstractTestingBase;
++import org.junit.Test;
++
++import java.util.Arrays;
++import java.util.function.Predicate;
++
++import static org.junit.Assert.assertEquals;
++
++/**
++ * Does a number of sanity checks on {@linkplain Material#isLegacy() non-legacy Materials}.
++ */
++public class PerNonLegacyMaterialTest extends AbstractTestingBase {
++
++    private Material[] getMaterials() {
++        return Arrays.stream(Material.values()).filter(Predicate.not(Material::isLegacy)).toList().toArray(Material[]::new);
++    }
++
++    @Test
++    @SuppressWarnings("deprecation")
++    public void hasNoMappedNonLegacy() {
++        for (Material material : getMaterials()) {
++            for (boolean itemPriority : new boolean[]{false, true}) {
++                // when
++                var nonLegacy = CraftLegacy.fromLegacy(material, itemPriority);
++
++                // then
++                assertEquals("Non-legacy is self for " + material + " with item priority = " + itemPriority, material, nonLegacy);
++            }
++        }
++    }
++
++}

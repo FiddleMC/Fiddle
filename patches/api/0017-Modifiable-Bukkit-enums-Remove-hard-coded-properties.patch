@@ -4,47 +4,39 @@ Date: Tue, 4 Jul 2023 19:20:58 +0200
 Subject: [PATCH] Modifiable Bukkit enums - Remove hard-coded properties -
  Material - Most properties
 
-Modifies most Material switch-based properties so that they are no longer hard-coded.
-Determining the values of the properties instead relies on an internal implementation
-that matches the already existing checks in org.bukkit.PerMaterialTest.
+Modifies most `Material` switch statement-based properties so that they are no longer hard-coded.
 
-The property values are also cached after being computed, for performant access.
+Determining the values of the properties instead relies on functions
+(either defined in `UnsafeValues`, and implemented in `CraftMagicNumbers` in the `fiddle-server` module, or defined and implemented in `MaterialDefaultImplementations`)
+matching the already existing checks in `org.bukkit.PerMaterialTest`.
 
 The following properties are modified:
-* isBlock()
-* isEdible()
-* isRecord()
-* isSolid()
-* isAir()
-* isFlammable()
-* isBurnable()
-* isFuel()
-* isOccluding()
-* hasGravity()
-* isItem()
-* isInteractable()
-* getHardness()
-* getBlastResistance()
-* getSlipperiness()
-* getCraftingRemainingItem()
-* getEquipmentSlot()
+* `isBlock()`
+* `isEdible()`
+* `isRecord()`
+* `isSolid()`
+* `isAir()`
+* `isFlammable()`
+* `isBurnable()`
+* `isFuel()`
+* `isOccluding()`
+* `hasGravity()`
+* `isItem()`
+* `isInteractable()`
+* `getHardness()`
+* `getBlastResistance()`
+* `getSlipperiness()`
+* `getCraftingRemainingItem()`
+* `getEquipmentSlot()`
 
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 9eca9fae9fe00f8037b69b779ab6a61ad350001f..9abd9127f63fe20b4f41a8510e319064e8e4fbf6 100644
+index 4be53e8527558d180627fda7967f2a7be1247db0..856b17682568ed092fa135eb36d5969c10e7b75c 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -112,6 +112,7 @@ import org.bukkit.block.data.type.WallSign;
- import org.bukkit.inventory.CreativeCategory;
- import org.bukkit.inventory.EquipmentSlot;
- import org.bukkit.material.MaterialData;
-+import org.fiddlemc.fiddle.material.MaterialDefaultImplementations;
- import org.jetbrains.annotations.NotNull;
- import org.jetbrains.annotations.Nullable;
- 
-@@ -4394,7 +4395,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4394,7 +4394,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      public final Class<?> data;
      private final boolean legacy;
      private final NamespacedKey key;
@@ -52,7 +44,7 @@ index 9eca9fae9fe00f8037b69b779ab6a61ad350001f..9abd9127f63fe20b4f41a8510e319064
  
      private Material(final int id) {
          this(id, 64);
-@@ -4629,1021 +4629,17 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4629,1021 +4628,17 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return true if this material is a block
       */
      public boolean isBlock() {
@@ -1079,12 +1071,12 @@ index 9eca9fae9fe00f8037b69b779ab6a61ad350001f..9abd9127f63fe20b4f41a8510e319064
 +     */
 +    @Deprecated(forRemoval = true)
 +    public boolean isBlockLegacy() {
-+        return MaterialDefaultImplementations.isBlockLegacy(this);
++        return org.fiddlemc.fiddle.material.MaterialDefaultImplementations.isBlockLegacy(this);
 +        // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
      }
  
      /**
-@@ -5652,49 +4648,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -5652,49 +4647,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return true if this Material is edible.
       */
      public boolean isEdible() {
@@ -1145,7 +1137,7 @@ index 9eca9fae9fe00f8037b69b779ab6a61ad350001f..9abd9127f63fe20b4f41a8510e319064
              case LEGACY_BREAD:
              case LEGACY_CARROT_ITEM:
              case LEGACY_BAKED_POTATO:
-@@ -5821,7 +4786,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -5820,7 +4784,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      static {
          for (Material material : values()) {
              BY_NAME.put(material.name(), material);
@@ -1153,7 +1145,7 @@ index 9eca9fae9fe00f8037b69b779ab6a61ad350001f..9abd9127f63fe20b4f41a8510e319064
          }
      }
  
-@@ -5829,29 +4793,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -5828,29 +4791,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material represents a playable music disk.
       */
      public boolean isRecord() {
@@ -1195,7 +1187,7 @@ index 9eca9fae9fe00f8037b69b779ab6a61ad350001f..9abd9127f63fe20b4f41a8510e319064
      }
  
      /**
-@@ -5860,790 +4813,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -5859,790 +4811,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material is a block and solid
       */
      public boolean isSolid() {
@@ -1997,7 +1989,7 @@ index 9eca9fae9fe00f8037b69b779ab6a61ad350001f..9abd9127f63fe20b4f41a8510e319064
              case LEGACY_STONE:
              case LEGACY_GRASS:
              case LEGACY_DIRT:
-@@ -6856,18 +5037,17 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -6855,18 +5035,17 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material is an air block.
       */
      public boolean isAir() {
@@ -2027,7 +2019,7 @@ index 9eca9fae9fe00f8037b69b779ab6a61ad350001f..9abd9127f63fe20b4f41a8510e319064
      }
  
      /**
-@@ -7076,286 +5256,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -7075,286 +5254,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material is a block and can catch fire
       */
      public boolean isFlammable() {
@@ -2325,7 +2317,7 @@ index 9eca9fae9fe00f8037b69b779ab6a61ad350001f..9abd9127f63fe20b4f41a8510e319064
              case LEGACY_WOOD:
              case LEGACY_LOG:
              case LEGACY_LEAVES:
-@@ -7424,186 +5336,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -7423,186 +5334,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material is a block and can burn away
       */
      public boolean isBurnable() {
@@ -2523,7 +2515,7 @@ index 9eca9fae9fe00f8037b69b779ab6a61ad350001f..9abd9127f63fe20b4f41a8510e319064
              case LEGACY_WOOD:
              case LEGACY_LOG:
              case LEGACY_LEAVES:
-@@ -7654,257 +5398,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -7653,257 +5396,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return true if this Material can be used as fuel.
       */
      public boolean isFuel() {
@@ -2792,7 +2784,7 @@ index 9eca9fae9fe00f8037b69b779ab6a61ad350001f..9abd9127f63fe20b4f41a8510e319064
              case LEGACY_LAVA_BUCKET:
              case LEGACY_COAL_BLOCK:
              case LEGACY_BLAZE_ROD:
-@@ -7995,368 +5500,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -7994,368 +5498,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material is a block and occludes light
       */
      public boolean isOccluding() {
@@ -3172,7 +3164,7 @@ index 9eca9fae9fe00f8037b69b779ab6a61ad350001f..9abd9127f63fe20b4f41a8510e319064
              case LEGACY_STONE:
              case LEGACY_GRASS:
              case LEGACY_DIRT:
-@@ -8484,41 +5639,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -8483,41 +5637,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material is affected by gravity.
       */
      public boolean hasGravity() {
@@ -3225,7 +3217,7 @@ index 9eca9fae9fe00f8037b69b779ab6a61ad350001f..9abd9127f63fe20b4f41a8510e319064
              case LEGACY_SAND:
              case LEGACY_GRAVEL:
              case LEGACY_DRAGON_EGG: // Fiddle - add missing Material values with gravity
-@@ -8537,213 +5669,17 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -8536,213 +5667,17 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return true if this material is an item
       */
      public boolean isItem() {
@@ -3445,12 +3437,12 @@ index 9eca9fae9fe00f8037b69b779ab6a61ad350001f..9abd9127f63fe20b4f41a8510e319064
 +     */
 +    @Deprecated(forRemoval = true)
 +    public boolean isItemLegacy() {
-+        return MaterialDefaultImplementations.isItemLegacy(this);
++        return org.fiddlemc.fiddle.material.MaterialDefaultImplementations.isItemLegacy(this);
 +        // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
      }
  
      /**
-@@ -8763,331 +5699,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -8762,331 +5697,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return true if this material can be interacted with.
       */
      public boolean isInteractable() {
@@ -3783,7 +3775,7 @@ index 9eca9fae9fe00f8037b69b779ab6a61ad350001f..9abd9127f63fe20b4f41a8510e319064
      }
  
      /**
-@@ -9100,886 +5712,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -9099,886 +5710,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return the hardness of that material.
       */
      public float getHardness() {
@@ -4671,7 +4663,7 @@ index 9eca9fae9fe00f8037b69b779ab6a61ad350001f..9abd9127f63fe20b4f41a8510e319064
      }
  
      /**
-@@ -9993,885 +5726,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -9992,885 +5724,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return the blast resistance of that material.
       */
      public float getBlastResistance() {
@@ -5558,7 +5550,7 @@ index 9eca9fae9fe00f8037b69b779ab6a61ad350001f..9abd9127f63fe20b4f41a8510e319064
      }
  
      /**
-@@ -10887,21 +5742,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -10886,21 +5740,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return the slipperiness of this block
       */
      public float getSlipperiness() {
@@ -5581,7 +5573,7 @@ index 9eca9fae9fe00f8037b69b779ab6a61ad350001f..9abd9127f63fe20b4f41a8510e319064
      }
  
      /**
-@@ -10914,20 +5755,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -10913,20 +5753,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       */
      @Nullable
      public Material getCraftingRemainingItem() {
@@ -5603,7 +5595,7 @@ index 9eca9fae9fe00f8037b69b779ab6a61ad350001f..9abd9127f63fe20b4f41a8510e319064
      }
  
      /**
-@@ -10939,53 +5767,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -10938,53 +5765,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       */
      @NotNull
      public EquipmentSlot getEquipmentSlot() {

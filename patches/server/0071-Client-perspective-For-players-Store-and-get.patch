@@ -1,0 +1,111 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sat, 29 Jul 2023 09:13:00 +0200
+Subject: [PATCH] Client perspective - For players - Store and get
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/network/Connection.java b/src/main/java/net/minecraft/network/Connection.java
+index 885e38c0cc8fb5258c7d80e5e750763a52677934..7487b961ce6c364224ae579da23abf1f3e8c4d7a 100644
+--- a/src/main/java/net/minecraft/network/Connection.java
++++ b/src/main/java/net/minecraft/network/Connection.java
+@@ -879,6 +879,59 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+     }
+     // Fiddle end - client perspective - wait for client information
+ 
++    // Fiddle start - client perspective - player - get from connection
++    /**
++     * @return The {@link org.fiddlemc.fiddle.packet.ClientPerspective} of this connection's {@linkplain #getPlayer() player}.
++     * This is null if the player is null.
++     *
++     * @see net.minecraft.server.level.ServerPlayer#getClientPerspective
++     */
++    public final @Nullable org.fiddlemc.fiddle.packet.ClientPerspective getPlayerClientPerspective() {
++        var player = this.getPlayer();
++        if (player == null) {
++            return null;
++        }
++        return player.getClientPerspective();
++    }
++    // Fiddle end - client perspective - player - get from connection
++
++    // Fiddle start - client perspective - localization - get player locale from connection
++    /**
++     * @return The {@linkplain net.minecraft.server.level.ServerPlayer#locale locale} of this connection's {@linkplain #getPlayer() player}.
++     * This is null if the player is null.
++     *
++     * @see net.minecraft.server.level.ServerPlayer#locale
++     */
++    public final @Nullable String getPlayerLocale() {
++        var player = this.getPlayer();
++        if (player == null) {
++            return null;
++        }
++        return player.locale;
++    }
++    // Fiddle end - client perspective - localization - get player locale from connection
++
++    // Fiddle start - client perspective - item replacements - store original in NBT - get player game mode from connection
++    /**
++     * @return The {@linkplain net.minecraft.server.level.ServerPlayerGameMode#getGameModeForPlayer() game mode}
++     * of this connection's {@linkplain #getPlayer() player}.
++     * This is null if the player is null or if their {@link net.minecraft.server.level.ServerPlayer#gameMode} is null.
++     *
++     * @see net.minecraft.server.level.ServerPlayerGameMode#getGameModeForPlayer()
++     */
++    public final @Nullable net.minecraft.world.level.GameType getPlayerGameMode() {
++        var player = this.getPlayer();
++        if (player == null) {
++            return null;
++        }
++        var gameMode = player.gameMode;
++        if (gameMode == null) {
++            return null;
++        }
++        return gameMode.getGameModeForPlayer();
++    }
++    // Fiddle end - client perspective - item replacements - store original in NBT - get player game mode from connection
++
+     private static class PacketHolder {
+ 
+         final Packet<?> packet;
+diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
+index f29104b8cde286bacb391b74dadd83d086ad6cc9..20a34d44b662674febba7742aae1d89c3fca36f6 100644
+--- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
++++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
+@@ -284,6 +284,8 @@ public class ServerPlayer extends Player {
+     public boolean hasBeenPlacedIntoPlayerList = false; // Fiddle - client perspective - send resource pack
+     public boolean hasFinishedBeingPlacedIntoPlayerList = false; // Fiddle - client perspective - wait for client information
+ 
++    private @Nullable org.fiddlemc.fiddle.packet.ClientPerspective clientPerspective; // Fiddle - client perspective - player
++
+     public io.papermc.paper.chunk.system.RegionizedPlayerChunkLoader.ViewDistances getViewDistances() {
+         return this.viewDistances.get();
+     }
+@@ -2652,4 +2654,25 @@ public class ServerPlayer extends Player {
+         return (CraftPlayer) super.getBukkitEntity();
+     }
+     // CraftBukkit end
++
++    // Fiddle start - client perspective - player
++    /**
++     * @return The {@link org.fiddlemc.fiddle.packet.ClientPerspective} of this player.
++     * This is null if and only if it has not been {@linkplain #setClientPerspective initialized} yet.
++     */
++    public final @Nullable org.fiddlemc.fiddle.packet.ClientPerspective getClientPerspective() {
++        return this.clientPerspective;
++    }
++
++    /**
++     * @param clientPerspective The value to initialize this player's {@link ClientPerspective} to.
++     */
++    public final void setClientPerspective(@org.jetbrains.annotations.NotNull org.fiddlemc.fiddle.packet.ClientPerspective clientPerspective) {
++        if (this.clientPerspective != null) {
++            throw new IllegalStateException("Tried to set Player.clientPerspective when it was already set");
++        }
++        this.clientPerspective = clientPerspective;
++    }
++    // Fiddle end - client perspective - player
++
+ }

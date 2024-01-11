@@ -1,0 +1,147 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Mon, 15 May 2023 20:47:48 +0200
+Subject: [PATCH] Pack definition
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/FiddlePack.java b/src/main/java/org/fiddlemc/fiddle/pack/FiddlePack.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..5c02751cbad3ce8048950df5102e90befdc9b0a3
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/FiddlePack.java
+@@ -0,0 +1,22 @@
++// Fiddle - packs - definition
++
++package org.fiddlemc.fiddle.pack;
++
++/**
++ * A Fiddle pack that has been read and (partially) loaded.
++ * <br>
++ * If the server has not finished starting yet (aka reached the 'Done' console message),
++ * instances of {@link FiddlePack} may not be fully loaded yet (for example, their custom blocks may not have been
++ * registered yet), but have already been constructed so that they can be referred to.
++ *
++ * @param developmentModeEnabled Whether development mode (additional settings for pack creators) is enabled
++ *                               for this pack.
++ */
++public record FiddlePack(FiddlePackMeta meta, boolean developmentModeEnabled) {
++
++    @Override
++    public String toString() {
++        return this.meta.displayName;
++    }
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java b/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..ff299425ded226ac3610b2aa1017a8ea35b1f660
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java
+@@ -0,0 +1,105 @@
++// Fiddle - packs - definition - meta
++
++package org.fiddlemc.fiddle.pack;
++
++import com.google.gson.JsonElement;
++import org.jetbrains.annotations.Nullable;
++
++import java.util.Objects;
++import java.util.UUID;
++
++/**
++ * The meta of a {@link FiddlePack}.
++ * <br>
++ * This contains global information about the pack, such as its display name.
++ */
++public class FiddlePackMeta {
++
++    @SuppressWarnings({"FieldCanBeLocal", "unused"})
++    private final int givenFormat;
++    public final UUID uuid;
++    public final String displayName;
++    public final String technicalName;
++    public final @Nullable String version;
++    public final @Nullable String description;
++    public final String[] authors;
++    public final Credit[] credits;
++    public final @Nullable String website;
++    public final ResourcePackMeta resourcePackMeta;
++    public final @Nullable DataPackMeta dataPackMeta;
++
++    private FiddlePackMeta(
++        int givenFormat,
++        UUID uuid,
++        String displayName,
++        String technicalName,
++        @Nullable String version,
++        @Nullable String description,
++        String[] authors,
++        Credit[] credits,
++        @Nullable String website,
++        ResourcePackMeta resourcePackMeta,
++        @Nullable DataPackMeta dataPackMeta
++    ) {
++        this.givenFormat = givenFormat;
++        this.uuid = uuid;
++        this.displayName = displayName;
++        this.technicalName = technicalName;
++        this.version = version;
++        this.description = description;
++        this.authors = authors;
++        this.credits = credits;
++        this.website = website;
++        this.resourcePackMeta = resourcePackMeta;
++        this.dataPackMeta = dataPackMeta;
++    }
++
++    public static class Credit {
++
++        public final String name;
++        public final @Nullable String role;
++
++        private Credit(String name, @Nullable String role) {
++            this.name = name;
++            this.role = role;
++        }
++
++        @Override
++        public int hashCode() {
++            return this.name.hashCode() + Objects.hashCode(this.role);
++        }
++
++        @Override
++        public boolean equals(Object obj) {
++            return obj instanceof Credit other && this.name.equals(other.name) && Objects.equals(this.role, other.role);
++        }
++
++    }
++
++    public static class ResourcePackMeta {
++
++        @SuppressWarnings({"FieldCanBeLocal", "unused"})
++        private final int givenFormat;
++        public final @Nullable String description;
++
++        private ResourcePackMeta(int givenFormat, @Nullable String description) {
++            this.givenFormat = givenFormat;
++            this.description = description;
++        }
++
++    }
++
++    public static class DataPackMeta {
++
++        @SuppressWarnings({"FieldCanBeLocal", "unused"})
++        private final int givenFormat;
++        public final @Nullable JsonElement description;
++
++        private DataPackMeta(int givenFormat, @Nullable JsonElement description) {
++            this.givenFormat = givenFormat;
++            this.description = description;
++        }
++
++    }
++
++}

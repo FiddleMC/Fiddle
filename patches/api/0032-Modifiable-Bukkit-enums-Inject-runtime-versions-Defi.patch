@@ -1,0 +1,50 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Wed, 10 Jan 2024 20:20:56 +0100
+Subject: [PATCH] Modifiable Bukkit enums - Inject runtime versions - Define
+ Fiddle enum name prefix
+
+Defines the prefix that will be used in the names of enum members added by Fiddle.
+
+Also adds a reference to it in the `Material.matchMaterial` documentation, as it is a relevant example of the possible matching.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
+index 86740f906a8b968d16df1b9963ccdb85f50fa83b..6e236e665d3af4b26d427b31c92186839391cb5b 100644
+--- a/src/main/java/org/bukkit/Material.java
++++ b/src/main/java/org/bukkit/Material.java
+@@ -4780,7 +4780,7 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+      * <ol>
+      *     <li>The {@linkplain #getKey() namespaced key}, for example: <code>"minecraft:stone_bricks"</code> or <code>"masonry:tuff_bricks"</code></li>
+      *     <li>The namespaced key path (part behind the : in a namespaced key), for example: <code>"stone_bricks"</code> or <code>"tuff_bricks"</code></li>
+-     *     <li>The enum name, for example: <code>"STONE_BRICKS"</code></li>
++     *     <li>The enum name, for example: <code>"STONE_BRICKS"</code> or <code>"{@linkplain org.fiddlemc.fiddle.material.FiddleEnumNamePrefix#PREFIX FIDDLE_}MASONRY_TUFF_BRICKS"</code></li><!-- // Fiddle - modifiable Bukkit enums - inject runtime versions - define Fiddle enum name prefix -->
+      * </ol>
+      * In other words, first the given string will be checked case-sensitively against the namespaced key,
+      * then case-sensitively against the namespaced key path, and so on.
+diff --git a/src/main/java/org/fiddlemc/fiddle/material/FiddleEnumNamePrefix.java b/src/main/java/org/fiddlemc/fiddle/material/FiddleEnumNamePrefix.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..1e63f41826c8e3020196c739c191b07f99b5e733
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/material/FiddleEnumNamePrefix.java
+@@ -0,0 +1,18 @@
++// Fiddle - modifiable Bukkit enums - inject runtime versions - define Fiddle enum name prefix
++
++package org.fiddlemc.fiddle.material;
++
++import org.jetbrains.annotations.NotNull;
++
++/**
++ * A utility class solely for holding the {@link #PREFIX} value.
++ */
++public final class FiddleEnumNamePrefix {
++
++    private FiddleEnumNamePrefix() {
++        throw new RuntimeException();
++    }
++
++    public static final @NotNull String PREFIX = "FIDDLE_";
++
++}

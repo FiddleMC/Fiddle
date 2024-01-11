@@ -4,7 +4,7 @@ Date: Mon, 10 Jul 2023 22:05:08 +0200
 Subject: [PATCH] Modifiable Bukkit enums - Remove hard-coded properties -
  Material - Key
 
-Modifies the Material property getKey() so that it is no longer computed in Material, but in UnsafeValues.
+Modifies the `Material` property `getKey()` so that it is no longer computed in `Material`, but based on a function defined and implemented in `MaterialNameAndKeyConversion`.
 
 The property values are cached after being computed, for performant access.
 
@@ -12,26 +12,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index c031c0f6286841339330e2fadbcf591a3cc672e0..2a35ff6ef1a24888a0f9469778dd5dee279c41e1 100644
+index 0a8e4c247d802feedcdeee8b8dcbed5d58f807fd..ea8c593826811031046d8858cf770e467b8ccd1e 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -4,7 +4,6 @@ import com.google.common.base.Preconditions;
- import com.google.common.collect.Maps;
- import com.google.common.collect.Multimap;
- import java.lang.reflect.Constructor;
--import java.util.Locale;
- import java.util.Map;
- import java.util.function.Consumer;
- import org.bukkit.attribute.Attribute;
-@@ -113,6 +112,7 @@ import org.bukkit.inventory.CreativeCategory;
- import org.bukkit.inventory.EquipmentSlot;
- import org.bukkit.material.MaterialData;
- import org.fiddlemc.fiddle.material.MaterialDefaultImplementations;
-+import org.fiddlemc.fiddle.material.MaterialNameAndKeyConversion;
- import org.jetbrains.annotations.NotNull;
- import org.jetbrains.annotations.Nullable;
- 
-@@ -4394,7 +4394,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4393,7 +4393,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      private final short durabilityHardcoded;
      public final Class<?> data;
      private final boolean legacy;
@@ -39,7 +23,7 @@ index c031c0f6286841339330e2fadbcf591a3cc672e0..2a35ff6ef1a24888a0f9469778dd5dee
  
      private Material(final int id) {
          this(id, 64);
-@@ -4422,7 +4421,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4421,7 +4420,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
          this.maxStackHardcoded = stack;
          this.data = data;
          this.legacy = this.name().startsWith(LEGACY_PREFIX);
@@ -47,31 +31,16 @@ index c031c0f6286841339330e2fadbcf591a3cc672e0..2a35ff6ef1a24888a0f9469778dd5dee
          // try to cache the constructor for this material
          try {
              if (MaterialData.class.isAssignableFrom(data)) {
-@@ -4521,8 +4519,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4520,8 +4518,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      @NotNull
      @Override
      public NamespacedKey getKey() {
 -        Preconditions.checkArgument(!legacy, "Cannot get key of Legacy Material");
 -        return key;
-+        return MaterialNameAndKeyConversion.getKey(this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - key
++        return org.fiddlemc.fiddle.material.MaterialNameAndKeyConversion.getKey(this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - key
      }
  
      /**
-diff --git a/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java b/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
-index 6157337d6da3ce508b9a4a989c4a138a9bf9961b..f39d520dfc368733079e0e23193f0f199eca2c14 100644
---- a/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
-+++ b/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
-@@ -4,6 +4,10 @@ package org.fiddlemc.fiddle.material;
- 
- import com.google.common.base.Preconditions;
- import org.bukkit.Material;
-+import org.bukkit.NamespacedKey;
-+import org.jetbrains.annotations.NotNull;
-+
-+import java.util.Locale;
- 
- /**
-  * This class provides a number of default implementations for {@link Material} that
 diff --git a/src/main/java/org/fiddlemc/fiddle/material/MaterialNameAndKeyConversion.java b/src/main/java/org/fiddlemc/fiddle/material/MaterialNameAndKeyConversion.java
 index db0b953c6aacd29817dcb0bd5069346ac7116b80..b600f06d62ea4b045590d72626d8029be82e89f2 100644
 --- a/src/main/java/org/fiddlemc/fiddle/material/MaterialNameAndKeyConversion.java
@@ -110,3 +79,26 @@ index db0b953c6aacd29817dcb0bd5069346ac7116b80..b600f06d62ea4b045590d72626d8029b
 +    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - key
 +
  }
+diff --git a/src/test/java/org/bukkit/MaterialTest.java b/src/test/java/org/bukkit/MaterialTest.java
+index 6b0eaaadf9772a4850cb70cea2bfe72a81a47a04..ae3766e1804ca495ee1f5e1ee77cd1b4fee916b8 100644
+--- a/src/test/java/org/bukkit/MaterialTest.java
++++ b/src/test/java/org/bukkit/MaterialTest.java
+@@ -52,6 +52,18 @@ public class MaterialTest {
+         }
+     }
+ 
++    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - key
++    @Test
++    public void matchMaterialByKeyPath() {
++        for (Material material : Material.values()) {
++            if (material.isLegacy()) {
++                continue;
++            }
++            assertThat(Material.matchMaterial(material.getKey().getKey()), is(material));
++        }
++    }
++    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - key
++
+     @Test
+     public void matchMaterialByWrongNamespace() {
+         for (Material material : Material.values()) {

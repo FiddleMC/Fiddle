@@ -1,0 +1,133 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sun, 30 Jul 2023 19:52:22 +0200
+Subject: [PATCH] Client perspective - Item replacements - Store original in
+ NBT
+
+Stores the original server-side item in the NBT of items sent to the client when the client is in creative mode,
+and interprets items sent by the client to the server in packets as that item stored in NBT if present.
+This allows creative mode clients to interact with the version of an item that they observe,
+while the actions on the server remain synchronized (and not based on the modified version that the client observes).
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/network/FriendlyByteBuf.java b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
+index b531070a3ccd7b64c7752507546876cac059ca03..36fbeb269c4bed7aa880e61e623d2d462fc22305 100644
+--- a/src/main/java/net/minecraft/network/FriendlyByteBuf.java
++++ b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
+@@ -823,6 +823,12 @@ public class FriendlyByteBuf extends ByteBuf {
+             ItemStack itemstack = new ItemStack(item, b0);
+ 
+             itemstack.setTag(this.readNbt());
++            // Fiddle start - client perspective - item replacements - store original in NBT
++            var original = org.fiddlemc.fiddle.packet.item.OriginalItemStacksInNBT.retrieveOriginalFromNBT(itemstack);
++            if (original != null) {
++                return original;
++            }
++            // Fiddle end - client perspective - item replacements - store original in NBT
+             // CraftBukkit start
+             if (false && itemstack.getTag() != null) { // Paper - This is no longer needed with raw NBT being handled in metadata
+                 CraftItemStack.setItemMeta(itemstack, CraftItemStack.getItemMeta(itemstack));
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/item/ItemStackInPacketReplacer.java b/src/main/java/org/fiddlemc/fiddle/packet/item/ItemStackInPacketReplacer.java
+index ee483678e2ca3a88e9bff6f2e80bfc7e87b03b6f..f450a50aebe1226a4876f4334c85852b968f391a 100644
+--- a/src/main/java/org/fiddlemc/fiddle/packet/item/ItemStackInPacketReplacer.java
++++ b/src/main/java/org/fiddlemc/fiddle/packet/item/ItemStackInPacketReplacer.java
+@@ -10,6 +10,7 @@ import net.minecraft.network.chat.contents.TranslatableContents;
+ import net.minecraft.network.protocol.Packet;
+ import net.minecraft.world.item.Item;
+ import net.minecraft.world.item.ItemStack;
++import net.minecraft.world.level.GameType;
+ import org.bukkit.craftbukkit.inventory.CraftMetaItem;
+ import org.fiddlemc.fiddle.packet.ClientPerspective;
+ import org.fiddlemc.fiddle.packet.deepreplacement.ClientPerspectiveAndSettingsSupplier;
+@@ -152,6 +153,14 @@ public final class ItemStackInPacketReplacer {
+             }
+         }
+ 
++        // Fiddle start - client perspective - item replacements - store original in NBT
++        if (replacement != null) {
++            if (clientPerspectiveAndSettings.getGameMode() == GameType.CREATIVE) {
++                OriginalItemStacksInNBT.storeOriginalInNBT(replacement, original);
++            }
++        }
++        // Fiddle end - client perspective - item replacements - store original in NBT
++
+         // Return the replacement if one was constructed, else return the original
+         return replacement != null ? replacement : original;
+ 
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/item/OriginalItemStacksInNBT.java b/src/main/java/org/fiddlemc/fiddle/packet/item/OriginalItemStacksInNBT.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..427bd0585a34d84351c859807e636ee08e54e64b
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/packet/item/OriginalItemStacksInNBT.java
+@@ -0,0 +1,69 @@
++// Fiddle - client perspective - item replacements - store original in NBT
++
++package org.fiddlemc.fiddle.packet.item;
++
++import net.minecraft.nbt.CompoundTag;
++import net.minecraft.nbt.Tag;
++import net.minecraft.world.item.ItemStack;
++import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
++
++/**
++ * A utility class providing the functionality to {@linkplain #storeOriginalInNBT store}
++ * an original {@link ItemStack} in a modified {@link ItemStack}'s {@linkplain ItemStack#getOrCreateTag() NBT},
++ * and {@linkplain #retrieveOriginalFromNBT retrieve} such an original {@link ItemStack} again.
++ */
++public final class OriginalItemStacksInNBT {
++
++    private OriginalItemStacksInNBT() {
++        throw new RuntimeException();
++    }
++
++    private static final @NotNull String ORIGINAL_ITEM_KEY = "ServerSide";
++
++    /**
++     * Stores the given {@code original} {@link ItemStack} in the {@linkplain ItemStack#getOrCreateTag() NBT}
++     * of the {@code replacement} {@link ItemStack} (modifying the {@code replacement} {@link ItemStack} in-place).
++     */
++    public static void storeOriginalInNBT(@NotNull ItemStack replacement, @NotNull ItemStack original) {
++        // Turn the original item into a tag
++        var originalAsTag = new CompoundTag();
++        original.save(originalAsTag);
++        // Remove the count, or otherwise items become non-stackable by client operations because the client thinks they are different
++        originalAsTag.remove("Count");
++        // Store the tag in the replacement's tag
++        replacement.getOrCreateTag().put(ORIGINAL_ITEM_KEY, originalAsTag);
++    }
++
++    /**
++     * @return The original {@link ItemStack} that was stored in the {@linkplain ItemStack#getOrCreateTag() NBT}
++     * of the of the given {@code itemStack} before (using {@link #storeOriginalInNBT}), or null if no such
++     * item stack could be found.
++     */
++    public static @Nullable ItemStack retrieveOriginalFromNBT(@Nullable ItemStack itemStack) {
++        // If the item stack has no original item tag, return null
++        if (itemStack == null) {
++            return null;
++        }
++        var tag = itemStack.getTag();
++        if (tag == null) {
++            return null;
++        }
++        if (!tag.contains(ORIGINAL_ITEM_KEY, Tag.TAG_COMPOUND)) {
++            return null;
++        }
++        var originalAsTag = tag.getCompound(ORIGINAL_ITEM_KEY);
++        ItemStack original;
++        try {
++            original = ItemStack.of(originalAsTag);
++        } catch (Exception ignored) {
++            // Malformed NBT, a client could send any nonsense if they wanted
++            return null;
++        }
++        // The intended amount is chosen by the client - the original item tag does not contain this on purpose (to make differently sized stacks of the same item stackable according to the client)
++        original.setCount(itemStack.getCount());
++        // Return the found original item stack
++        return original;
++    }
++
++}

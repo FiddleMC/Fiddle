@@ -4,9 +4,15 @@ Date: Thu, 13 Jul 2023 08:42:26 +0200
 Subject: [PATCH] Modifiable Bukkit enums - Remove hard-coded properties -
  Material - Name and key conversion utility
 
-Adds the MaterialNameAndKeyConversion class (empty, to be populated in following commits).
+Adds the `MaterialNameAndKeyConversion` utility class for the conversion of names and keys from and to `Material` instances.
+Does not fill it with anything yet, it will be populated in subsequent patches.
 
-License: Fiddle Public License Agreement 1.0 (included in license/FPL-1.0.txt)
+* A reason for this utility is that some conversions from and to names and keys need to be modified, and additional helper methods may be useful,
+  and this class can serve as a single place to be responsible for the entire conversion.
+* Another reason is that, just like hard-coded values, we would like to move function content out of the `Material` class
+  and place it somewhere that can be called from `AbstractMaterial` so that it does not need to be re-implemented in the runtime injected `Material` class version.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/fiddlemc/fiddle/material/MaterialNameAndKeyConversion.java b/src/main/java/org/fiddlemc/fiddle/material/MaterialNameAndKeyConversion.java

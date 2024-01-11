@@ -1,0 +1,28 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Thu, 13 Jul 2023 19:54:12 +0200
+Subject: [PATCH] Modifiable Bukkit enums - Inject runtime versions - Material
+ - Register key for Fiddle values
+
+Registers the namespaced keys of Fiddle `Material` instances so that they can be returned by `Material.getKey()`,
+by calling the corresponding method added by the "Modifiable Bukkit enums - Inject runtime versions - Material - Get key for Fiddle values" patch in the `fiddle-api` module.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
+index b716af8dbd5b6d8dc4563a865170aa11907d281a..04c074f981136cd77bc008d31dd799a6f5218a2d 100644
+--- a/src/main/java/net/minecraft/server/Main.java
++++ b/src/main/java/net/minecraft/server/Main.java
+@@ -278,6 +278,11 @@ public class Main {
+                 }).build())
+                 .make()
+                 .load(ClassLoader.getSystemClassLoader(), net.bytebuddy.dynamic.loading.ClassLoadingStrategy.Default.INJECTION);
++            // Fiddle start - modifiable Bukkit enums - inject runtime versions - Material - keys for Fiddle values
++            for (var fiddleEnumName : fiddleEnumNames) {
++                org.fiddlemc.fiddle.material.MaterialNameAndKeyConversion.registerFiddleEnumNameToNamespacedKey(fiddleEnumName.getFirst(), fiddleEnumName.getSecond().getNamespace(), fiddleEnumName.getSecond().getPath());
++            }
++            // Fiddle end - modifiable Bukkit enums - inject runtime versions - Material - keys for Fiddle values
+             // Fiddle end - modifiable Bukkit enums - inject runtime versions - Material
+ 
+             dedicatedserversettings.forceSave();
