@@ -30,15 +30,15 @@ index 0000000000000000000000000000000000000000..4ad77f8ce7b43b5b54d7f7d1f9dfdebd
 +    }
 +
 +}
-diff --git a/src/test/java/org/fiddlemc/fiddle/block/PerItemTest.java b/src/test/java/org/fiddlemc/fiddle/block/PerItemTest.java
+diff --git a/src/test/java/org/fiddlemc/fiddle/item/PerItemTest.java b/src/test/java/org/fiddlemc/fiddle/item/PerItemTest.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..b6dcad9c6a26bbc2e06259b292f5f914b299c213
+index 0000000000000000000000000000000000000000..d1d9ee8190fa648efacea96ddaf5b55801e2ade7
 --- /dev/null
-+++ b/src/test/java/org/fiddlemc/fiddle/block/PerItemTest.java
++++ b/src/test/java/org/fiddlemc/fiddle/item/PerItemTest.java
 @@ -0,0 +1,15 @@
 +// Fiddle - tests related to net.minecraft.world.item.Item
 +
-+package org.fiddlemc.fiddle.block;
++package org.fiddlemc.fiddle.item;
 +
 +import net.minecraft.core.registries.BuiltInRegistries;
 +import net.minecraft.world.item.Item;

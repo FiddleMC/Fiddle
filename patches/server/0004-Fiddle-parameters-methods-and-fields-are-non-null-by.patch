@@ -1,0 +1,25 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Wed, 24 Jan 2024 18:02:02 +0100
+Subject: [PATCH] Fiddle parameters, methods and fields are non-null by default
+
+Adds a `package-info.java` for the top-level Fiddle package, that declares all parameters, methods and fields to be non-null by default.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/fiddlemc/fiddle/package-info.java b/src/main/java/org/fiddlemc/fiddle/package-info.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..336193b8d9409d91f6ce2445f2eb62327b7d899c
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/package-info.java
+@@ -0,0 +1,9 @@
++@ParametersAreNonnullByDefault
++@MethodsReturnNonnullByDefault
++@FieldsAreNonnullByDefault
++package org.fiddlemc.fiddle;
++
++import net.minecraft.FieldsAreNonnullByDefault;
++import net.minecraft.MethodsReturnNonnullByDefault;
++
++import javax.annotation.ParametersAreNonnullByDefault;

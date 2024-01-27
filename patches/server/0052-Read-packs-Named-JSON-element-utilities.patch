@@ -1,0 +1,1219 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sat, 6 May 2023 11:39:42 +0200
+Subject: [PATCH] Read packs - Named JSON element utilities
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/namedjson/NamedJsonArray.java b/src/main/java/org/fiddlemc/fiddle/pack/read/namedjson/NamedJsonArray.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..c8a7711b85fbf0ee09c6c193815a9da5c8cdbd92
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/namedjson/NamedJsonArray.java
+@@ -0,0 +1,171 @@
++// Fiddle - read packs - JSON utils - named elements
++
++package org.fiddlemc.fiddle.pack.read.namedjson;
++
++import com.google.gson.JsonArray;
++import com.google.gson.JsonElement;
++import org.fiddlemc.fiddle.pack.exception.PackException;
++import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
++
++import java.util.ArrayList;
++import java.util.Iterator;
++import java.util.List;
++import java.util.Objects;
++import java.util.stream.Collectors;
++import java.util.stream.StreamSupport;
++
++/**
++ * A potentially named {@link JsonArray}.
++ */
++@SuppressWarnings("unused")
++public record NamedJsonArray(@Nullable String name, JsonArray unnamed) implements NamedJsonElement<JsonArray>, Iterable<NamedJsonElement<?>> {
++
++    public NamedJsonArray(@Nullable String name) {
++        this(name, new JsonArray());
++    }
++
++    public NamedJsonArray(@Nullable String name, int capacity) {
++        this(name, new JsonArray(capacity));
++    }
++
++    public NamedJsonArray() {
++        this(null);
++    }
++
++    public NamedJsonArray(int capacity) {
++        this(null, capacity);
++    }
++
++    @Override
++    public NamedJsonArray deepCopy() {
++        return (NamedJsonArray) NamedJsonElement.super.deepCopy();
++    }
++
++    public void add(Boolean bool) {
++        this.unnamed.add(bool);
++    }
++
++    public void add(Character character) {
++        this.unnamed.add(character);
++    }
++
++    public void add(Number number) {
++        this.unnamed.add(number);
++    }
++
++    public void add(String string) {
++        this.unnamed.add(string);
++    }
++
++    public void add(JsonElement element) {
++        this.unnamed.add(element);
++    }
++
++    public void addAll(JsonArray array) {
++        this.unnamed.addAll(array);
++    }
++
++    public JsonElement set(int index, JsonElement element) {
++        return this.unnamed.set(index, element);
++    }
++
++    public boolean remove(JsonElement element) {
++        return this.unnamed.remove(element);
++    }
++
++    public JsonElement remove(int index) {
++        return this.unnamed.remove(index);
++    }
++
++    public boolean contains(JsonElement element) {
++        return this.unnamed.contains(element);
++    }
++
++    public int size() {
++        return this.unnamed.size();
++    }
++
++    public boolean isEmpty() {
++        return this.unnamed.isEmpty();
++    }
++
++    @Override
++    public @NotNull Iterator<NamedJsonElement<?>> iterator() {
++        return new Iterator<>() {
++
++            private int i = 0;
++
++            @Override
++            public boolean hasNext() {
++                return this.i < NamedJsonArray.this.size();
++            }
++
++            @Override
++            public NamedJsonElement<?> next() {
++                this.i++;
++                try {
++                    return NamedJsonArray.this.get(this.i - 1);
++                } catch (PackException e) {
++                    throw new RuntimeException(e);
++                }
++            }
++
++        };
++    }
++
++    public @Nullable NamedJsonElement<?> getOrNull(int i) {
++        var unnamedChild = this.unnamed.get(i);
++        if (unnamedChild == null) {
++            return null;
++        }
++        return NamedJsonElement.get(concatenateParentAndChild(this, i), unnamedChild);
++    }
++
++    public NamedJsonElement<?> get(int i) throws PackException {
++        var unnamedChild = this.unnamed.get(i);
++        if (unnamedChild == null) {
++            throw new PackException((this.name == null ? "Missing JSON" : "JSON at '" + this.name + "' is missing") + " item at index " + i);
++        }
++        return NamedJsonElement.get(concatenateParentAndChild(this, i), unnamedChild);
++    }
++
++    public List<NamedJsonElement<?>> asList() {
++        return StreamSupport
++            .stream(this.spliterator(), false)
++            .collect(Collectors.toList());
++    }
++
++    @FunctionalInterface
++    public interface NamedJsonArrayMapping<V> {
++
++        V apply(NamedJsonElement<?> element) throws PackException;
++
++    }
++
++    public <V> List<V> map(NamedJsonArrayMapping<V> mapping) throws PackException {
++        List<V> result = new ArrayList<>(this.size());
++        for (int i = 0; i < this.size(); i++) {
++            result.add(mapping.apply(this.get(i)));
++        }
++        return result;
++    }
++
++    public <V> List<V> mapNotNull(NamedJsonArrayMapping<V> mapping) throws PackException {
++        return map(mapping).stream().filter(Objects::nonNull).toList();
++    }
++
++    @Override
++    public String toString() {
++        return this.toNameAndUnnamedString();
++    }
++
++    public static String concatenateParentAndChild(@Nullable String parentName, int index) {
++        return (parentName == null ? "" : parentName) + "[" + index + "]";
++    }
++
++    public static String concatenateParentAndChild(NamedJsonArray parent, int index) {
++        return concatenateParentAndChild(parent.name(), index);
++    }
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/namedjson/NamedJsonElement.java b/src/main/java/org/fiddlemc/fiddle/pack/read/namedjson/NamedJsonElement.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..e80cd10b964d702a4a39e3f8b7a7407c082b2c87
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/namedjson/NamedJsonElement.java
+@@ -0,0 +1,268 @@
++// Fiddle - read packs - JSON utils - named elements
++
++package org.fiddlemc.fiddle.pack.read.namedjson;
++
++import com.google.gson.*;
++import org.fiddlemc.fiddle.pack.exception.PackException;
++import org.fiddlemc.fiddle.pack.exception.PackExceptionThrowingTriConsumer;
++import org.jetbrains.annotations.Nullable;
++
++import java.math.BigDecimal;
++import java.math.BigInteger;
++import java.util.Arrays;
++import java.util.List;
++import java.util.UUID;
++import java.util.function.Function;
++
++/**
++ * A potentially named {@link JsonElement}.
++ */
++@SuppressWarnings("unused")
++public sealed interface NamedJsonElement<T extends JsonElement> permits NamedJsonArray, NamedJsonNull, NamedJsonObject, NamedJsonPrimitive {
++
++    @Nullable String name();
++
++    T unnamed();
++
++    default boolean hasName() {
++        return name() != null;
++    }
++
++    default String getNameOr(String alternative) {
++        return this.hasName() ? this.name() : alternative;
++    }
++
++    default String mapNameOr(Function<String, String> nameFunction, String alternative) {
++        return this.hasName() ? nameFunction.apply(this.name()) : alternative;
++    }
++
++    default NamedJsonElement<T> deepCopy() {
++        //noinspection unchecked
++        return (NamedJsonElement<T>) get(name(), unnamed().deepCopy());
++    }
++
++    default boolean isJsonArray() {
++        return this instanceof NamedJsonArray;
++    }
++
++    default boolean isJsonObject() {
++        return this instanceof NamedJsonObject;
++    }
++
++    default boolean isJsonPrimitive() {
++        return this instanceof NamedJsonPrimitive;
++    }
++
++    default boolean isJsonNull() {
++        return this instanceof NamedJsonNull;
++    }
++
++    default NamedJsonArray asJsonArray() throws PackException {
++        if (this.isJsonArray()) {
++            return (NamedJsonArray) this;
++        }
++        throw this.invalidTypeException(JsonArray.class);
++    }
++
++    default <V> List<V> asMappedJsonArray(NamedJsonArray.NamedJsonArrayMapping<V> mapping) throws PackException {
++        return this.asJsonArray().map(mapping);
++    }
++
++    default <V> List<V> asNotNullMappedJsonArray(NamedJsonArray.NamedJsonArrayMapping<V> mapping) throws PackException {
++        return this.asJsonArray().mapNotNull(mapping);
++    }
++
++    default NamedJsonObject asJsonObject() throws PackException {
++        if (this.isJsonObject()) {
++            return (NamedJsonObject) this;
++        }
++        throw this.invalidTypeException(JsonObject.class);
++    }
++
++    default NamedJsonPrimitive asJsonPrimitive() throws PackException {
++        if (this.isJsonPrimitive()) {
++            return (NamedJsonPrimitive) this;
++        }
++        throw this.invalidTypeException(JsonPrimitive.class);
++    }
++
++    default boolean asBoolean() throws PackException {
++        throw this.invalidTypeException(Boolean.TYPE);
++    }
++
++    default Number asNumber() throws PackException {
++        throw this.invalidTypeException(Number.class);
++    }
++
++    final class NonNullBlankStringParseResult implements BlankStringParseResult {
++    }
++
++    final class NullBlankStringParseResult implements BlankStringParseResult {
++    }
++
++    sealed interface BlankStringParseResult permits NullBlankStringParseResult, NonNullBlankStringParseResult {
++        NonNullBlankStringParseResult RETURN_STRING = new NonNullBlankStringParseResult();
++        NullBlankStringParseResult RETURN_NULL = new NullBlankStringParseResult();
++        NonNullBlankStringParseResult THROW_EXCEPTION = new NonNullBlankStringParseResult();
++    }
++
++    default String asString() throws PackException {
++        throw this.invalidTypeException(String.class);
++    }
++
++    default String asString(boolean trim, NonNullBlankStringParseResult blankResult, @Nullable Integer maxLength) throws PackException {
++        return this.asString(trim, (BlankStringParseResult) blankResult, maxLength);
++    }
++
++    default @Nullable String asString(boolean trim, BlankStringParseResult blankResult, @Nullable Integer maxLength) throws PackException {
++        throw this.invalidTypeException(String.class);
++    }
++
++    default double asDouble(@Nullable Double min, @Nullable Double max) throws PackException {
++        return this.asDouble(min, null, max, null);
++    }
++
++    default double asDouble(@Nullable Double min, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, Double, Double> minFailureConsumer, @Nullable Double max, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, Double, Double> maxFailureConsumer) throws PackException {
++        throw this.invalidTypeException(Double.TYPE);
++    }
++
++    default BigDecimal asBigDecimal(@Nullable BigDecimal min, @Nullable BigDecimal max) throws PackException {
++        return this.asBigDecimal(min, null, max, null);
++    }
++
++    default BigDecimal asBigDecimal(@Nullable BigDecimal min, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, BigDecimal, BigDecimal> minFailureConsumer, @Nullable BigDecimal max, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, BigDecimal, BigDecimal> maxFailureConsumer) throws PackException {
++        throw this.invalidTypeException(BigDecimal.class);
++    }
++
++    default BigInteger asBigInteger(@Nullable BigInteger min, @Nullable BigInteger max) throws PackException {
++        return this.asBigInteger(min, null, max, null);
++    }
++
++    default BigInteger asBigInteger(@Nullable BigInteger min, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, BigInteger, BigInteger> minFailureConsumer, @Nullable BigInteger max, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, BigInteger, BigInteger> maxFailureConsumer) throws PackException {
++        throw this.invalidTypeException(BigInteger.class);
++    }
++
++    default float asFloat(@Nullable Float min, @Nullable Float max) throws PackException {
++        return this.asFloat(min, null, max, null);
++    }
++
++    default float asFloat(@Nullable Float min, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, Float, Float> minFailureConsumer, @Nullable Float max, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, Float, Float> maxFailureConsumer) throws PackException {
++        throw this.invalidTypeException(Float.TYPE);
++    }
++
++    default long asLong(@Nullable Long min, @Nullable Long max) throws PackException {
++        return this.asLong(min, null, max, null);
++    }
++
++    default long asLong(@Nullable Long min, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, Long, Long> minFailureConsumer, @Nullable Long max, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, Long, Long> maxFailureConsumer) throws PackException {
++        throw this.invalidTypeException("long (64-bit integer)");
++    }
++
++    default short asShort(@Nullable Short min, @Nullable Short max) throws PackException {
++        return this.asShort(min, null, max, null);
++    }
++
++    default short asShort(@Nullable Short min, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, Short, Short> minFailureConsumer, @Nullable Short max, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, Short, Short> maxFailureConsumer) throws PackException {
++        throw this.invalidTypeException("short (16-bit integer)");
++    }
++
++    default int asInt(@Nullable Integer min, @Nullable Integer max) throws PackException {
++        return this.asInt(min, null, max, null);
++    }
++
++    default int asInt(@Nullable Integer min, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, Integer, Integer> minFailureConsumer, @Nullable Integer max, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, Integer, Integer> maxFailureConsumer) throws PackException {
++        throw this.invalidTypeException("int (32-bit integer)");
++    }
++
++    default byte asByte(@Nullable Byte min, @Nullable Byte max) throws PackException {
++        return this.asByte(min, null, max, null);
++    }
++
++    default byte asByte(@Nullable Byte min, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, Byte, Byte> minFailureConsumer, @Nullable Byte max, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, Byte, Byte> maxFailureConsumer) throws PackException {
++        throw this.invalidTypeException("byte (8-bit integer)");
++    }
++
++    default UUID asUUID() throws PackException {
++        throw this.invalidTypeException("UUID string");
++    }
++
++    default NamedJsonNull asJsonNull() throws PackException {
++        if (this.isJsonNull()) {
++            return (NamedJsonNull) this;
++        }
++        throw this.invalidTypeException(JsonNull.class);
++    }
++
++    default String unnamedPartString() {
++        return this.unnamed().toString();
++    }
++
++    default String toNameAndUnnamedString() {
++        return this.name() == null ? this.unnamed().toString() : this.name() + ": " + this.unnamedPartString();
++    }
++
++    default PackException invalidTypeException(String... desiredTypes) {
++        StringBuilder desiredTypesStringBuilder;
++        if (desiredTypes.length == 0) {
++            desiredTypesStringBuilder = new StringBuilder("is of the wrong type: " + unnamed().getClass().getSimpleName());
++        } else {
++            desiredTypesStringBuilder = new StringBuilder("is a " + unnamed().getClass().getSimpleName() + ", but it must be a ");
++            for (int i = 0; i < desiredTypes.length; i++) {
++                if (i == desiredTypes.length - 1) {
++                    desiredTypesStringBuilder.append(" or ");
++                } else if (i > 0) {
++                    desiredTypesStringBuilder.append(", ");
++                }
++                desiredTypesStringBuilder.append(desiredTypes[i]);
++            }
++        }
++        return new PackException("The value " + mapNameOr(name -> "for '" + name() + "' ", "") + desiredTypesStringBuilder);
++    }
++
++    default PackException invalidTypeException(Class<?>... desiredTypes) {
++        return this.invalidTypeException(Arrays.stream(desiredTypes).map(Class::getSimpleName).toArray(String[]::new));
++    }
++
++    default PackException nullException() {
++        return new PackException("The value " + mapNameOr(name -> "for '" + name() + "' ", "") + " cannot be null");
++    }
++
++    default PackException invalidValueException(Object value, Object desired) {
++        return new PackException("The value " + mapNameOr(name -> "for '" + name() + "' ", "") + " is invalid: it is " + value + ", but it must be " + desired);
++    }
++
++    default PackException defaultMinFailureException(Object value, Object minimum) {
++        return new PackException("The value " + mapNameOr(name -> "for '" + name() + "' ", "") + " is too low: it is " + value + ", but the minimum is " + minimum);
++    }
++
++    default PackException defaultMaxFailureException(Object value, Object maximum) {
++        return new PackException("The value " + mapNameOr(name -> "for '" + name() + "' ", "") + " is too high: it is " + value + ", but the maximum is " + maximum);
++    }
++
++    @SuppressWarnings("unchecked")
++    static <T extends JsonElement> NamedJsonElement<T> get(@Nullable String name, T json) {
++        if (json.isJsonArray()) {
++            return (NamedJsonElement<T>) new NamedJsonArray(name, json.getAsJsonArray());
++        } else if (json.isJsonObject()) {
++            return (NamedJsonElement<T>) new NamedJsonObject(name, json.getAsJsonObject());
++        } else if (json.isJsonPrimitive()) {
++            return (NamedJsonElement<T>) new NamedJsonPrimitive(name, json.getAsJsonPrimitive());
++        } else if (json.isJsonNull()) {
++            return (NamedJsonElement<T>) (name == null ? NamedJsonNull.UNNAMED_INSTANCE : new NamedJsonNull(name, json.getAsJsonNull()));
++        }
++        // Cannot happen
++        throw new IllegalArgumentException("Unknown type of JSON instance: " + json.getClass().getName());
++    }
++
++    static <T extends JsonElement> NamedJsonElement<T> get(T json) {
++        return get(null, json);
++    }
++
++    static void enforceMaxByteLength(String string, @Nullable String name, int maxLength) throws PackException {
++        var length = string.getBytes().length;
++        if (length > maxLength) {
++            throw new PackException((name == null ? "A JSON string value" : name) + " is too long: " + length + " bytes (maximum is " + maxLength + " bytes)");
++        }
++    }
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/namedjson/NamedJsonNull.java b/src/main/java/org/fiddlemc/fiddle/pack/read/namedjson/NamedJsonNull.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..ef8ccc8b149921e143cc165b6724875377ed790e
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/namedjson/NamedJsonNull.java
+@@ -0,0 +1,32 @@
++// Fiddle - read packs - JSON utils - named elements
++
++package org.fiddlemc.fiddle.pack.read.namedjson;
++
++import com.google.gson.JsonNull;
++import org.jetbrains.annotations.Nullable;
++
++import java.util.Objects;
++
++/**
++ * A potentially named {@link JsonNull}.
++ */
++@SuppressWarnings("unused")
++public record NamedJsonNull(@Nullable String name, JsonNull unnamed) implements NamedJsonElement<JsonNull> {
++
++    public static final NamedJsonNull UNNAMED_INSTANCE = new NamedJsonNull(null, JsonNull.INSTANCE);
++
++    public NamedJsonNull(String name) {
++        this(Objects.requireNonNull(name), JsonNull.INSTANCE);
++    }
++
++    @Override
++    public NamedJsonNull deepCopy() {
++        return this == UNNAMED_INSTANCE ? UNNAMED_INSTANCE : (NamedJsonNull) NamedJsonElement.super.deepCopy();
++    }
++
++    @Override
++    public String toString() {
++        return this.toNameAndUnnamedString();
++    }
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/namedjson/NamedJsonObject.java b/src/main/java/org/fiddlemc/fiddle/pack/read/namedjson/NamedJsonObject.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..c6cb5b61af6f956fbedebdfb28a909a9af003a5d
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/namedjson/NamedJsonObject.java
+@@ -0,0 +1,408 @@
++// Fiddle - read packs - JSON utils - named elements
++
++package org.fiddlemc.fiddle.pack.read.namedjson;
++
++import com.google.gson.*;
++import org.fiddlemc.fiddle.pack.exception.PackException;
++import org.fiddlemc.fiddle.pack.exception.PackExceptionThrowingTriConsumer;
++import org.jetbrains.annotations.Nullable;
++
++import java.math.BigDecimal;
++import java.math.BigInteger;
++import java.util.List;
++import java.util.Map;
++import java.util.Set;
++import java.util.UUID;
++import java.util.stream.Collectors;
++
++/**
++ * A potentially named {@link JsonObject}.
++ */
++@SuppressWarnings("unused")
++public record NamedJsonObject(@Nullable String name, JsonObject unnamed) implements NamedJsonElement<JsonObject> {
++
++    public NamedJsonObject(@Nullable String name) {
++        this(name, new JsonObject());
++    }
++
++    @Override
++    public NamedJsonObject deepCopy() {
++        return (NamedJsonObject) NamedJsonElement.super.deepCopy();
++    }
++
++    public void add(String property, JsonElement value) {
++        this.unnamed.add(property, value);
++    }
++
++    public JsonElement remove(String property) {
++        return this.unnamed.remove(property);
++    }
++
++    public void addProperty(String property, String value) {
++        this.unnamed.addProperty(property, value);
++    }
++
++    public void addProperty(String property, Number value) {
++        this.unnamed.addProperty(property, value);
++    }
++
++    public void addProperty(String property, Boolean value) {
++        this.unnamed.addProperty(property, value);
++    }
++
++    public void addProperty(String property, Character value) {
++        this.unnamed.addProperty(property, value);
++    }
++
++    public Set<Map.Entry<String, NamedJsonElement<JsonElement>>> entrySet() {
++        return this.unnamed.entrySet().stream()
++            .map(entry -> Map.entry(entry.getKey(), NamedJsonElement.get(concatenateParentAndChild(this, entry.getKey()), entry.getValue())))
++            .collect(Collectors.toSet());
++    }
++
++    public Set<String> keySet() {
++        return this.unnamed.keySet();
++    }
++
++    public int size() {
++        return this.unnamed.size();
++    }
++
++    public boolean has(String memberName) {
++        return this.unnamed.has(memberName);
++    }
++
++    public @Nullable NamedJsonElement<?> getOrNull(String memberName) {
++        var unnamedChild = this.unnamed.get(memberName);
++        if (unnamedChild == null) {
++            return null;
++        }
++        return NamedJsonElement.get(concatenateParentAndChild(this, memberName), unnamedChild);
++    }
++
++    public NamedJsonElement<?> get(String memberName) throws PackException {
++        var child = this.getOrNull(memberName);
++        if (child == null) {
++            throw new PackException((this.name == null ? "Missing JSON" : "JSON at '" + this.name + "' is missing") + " key '" + memberName + "'");
++        }
++        return child;
++    }
++
++    public NamedJsonArray getAsJsonArray(String memberName) throws PackException {
++        return get(memberName).asJsonArray();
++    }
++
++    public @Nullable NamedJsonArray getAsJsonArrayIfPresent(String memberName) throws PackException {
++        var child = getOrNull(memberName);
++        if (child == null) {
++            return null;
++        }
++        return child.asJsonArray();
++    }
++
++    public <V> List<V> getAsMappedJsonArray(String memberName, NamedJsonArray.NamedJsonArrayMapping<V> mapping) throws PackException {
++        return get(memberName).asMappedJsonArray(mapping);
++    }
++
++    public <V> @Nullable List<V> getAsMappedJsonArrayIfPresent(String memberName, NamedJsonArray.NamedJsonArrayMapping<V> mapping) throws PackException {
++        var child = getOrNull(memberName);
++        if (child == null) {
++            return null;
++        }
++        return child.asMappedJsonArray(mapping);
++    }
++
++    public <V> List<V> getAsNotNullMappedJsonArray(String memberName, NamedJsonArray.NamedJsonArrayMapping<V> mapping) throws PackException {
++        return get(memberName).asNotNullMappedJsonArray(mapping);
++    }
++
++    public <V> @Nullable List<V> getAsNotNullMappedJsonArrayIfPresent(String memberName, NamedJsonArray.NamedJsonArrayMapping<V> mapping) throws PackException {
++        var child = getOrNull(memberName);
++        if (child == null) {
++            return null;
++        }
++        return child.asNotNullMappedJsonArray(mapping);
++    }
++
++    public NamedJsonObject getAsJsonObject(String memberName) throws PackException {
++        return get(memberName).asJsonObject();
++    }
++
++    public @Nullable NamedJsonObject getAsJsonObjectIfPresent(String memberName) throws PackException {
++        var child = getOrNull(memberName);
++        if (child == null) {
++            return null;
++        }
++        return child.asJsonObject();
++    }
++
++    public NamedJsonPrimitive getAsJsonPrimitive(String memberName) throws PackException {
++        return get(memberName).asJsonPrimitive();
++    }
++
++    public @Nullable NamedJsonPrimitive getAsJsonPrimitiveIfPresent(String memberName) throws PackException {
++        var child = getOrNull(memberName);
++        if (child == null) {
++            return null;
++        }
++        return child.asJsonPrimitive();
++    }
++
++    public boolean getAsBoolean(String memberName) throws PackException {
++        return get(memberName).asBoolean();
++    }
++
++    public @Nullable Boolean getAsBooleanIfPresent(String memberName) throws PackException {
++        var child = getOrNull(memberName);
++        if (child == null) {
++            return null;
++        }
++        return child.asBoolean();
++    }
++
++    public Number getAsNumber(String memberName) throws PackException {
++        return get(memberName).asNumber();
++    }
++
++    public @Nullable Number getAsNumberIfPresent(String memberName) throws PackException {
++        var child = getOrNull(memberName);
++        if (child == null) {
++            return null;
++        }
++        return child.asNumber();
++    }
++
++    public String getAsString(String memberName) throws PackException {
++        return get(memberName).asString();
++    }
++
++    public @Nullable String getAsStringIfPresent(String memberName) throws PackException {
++        var child = getOrNull(memberName);
++        if (child == null) {
++            return null;
++        }
++        return child.asString();
++    }
++
++    public String getAsString(String memberName, boolean trim, NonNullBlankStringParseResult blankResult, @Nullable Integer maxLength) throws PackException {
++        return this.getAsString(memberName, trim, (BlankStringParseResult) blankResult, maxLength);
++    }
++
++    public @Nullable String getAsString(String memberName, boolean trim, BlankStringParseResult blankResult, @Nullable Integer maxLength) throws PackException {
++        return get(memberName).asString(trim, blankResult, maxLength);
++    }
++
++    public String getAsStringIfPresent(String memberName, boolean trim, NonNullBlankStringParseResult blankResult, @Nullable Integer maxLength) throws PackException {
++        return this.getAsStringIfPresent(memberName, trim, (BlankStringParseResult) blankResult, maxLength);
++    }
++
++    public @Nullable String getAsStringIfPresent(String memberName, boolean trim, BlankStringParseResult blankResult, @Nullable Integer maxLength) throws PackException {
++        var child = getOrNull(memberName);
++        if (child == null) {
++            return null;
++        }
++        return child.asString(trim, blankResult, maxLength);
++    }
++
++    public Double getAsDouble(String memberName, @Nullable Double min, @Nullable Double max) throws PackException {
++        return this.getAsDouble(memberName, min, null, max, null);
++    }
++
++    public Double getAsDouble(String memberName, @Nullable Double min, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, Double, Double> minFailureConsumer, @Nullable Double max, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, Double, Double> maxFailureConsumer) throws PackException {
++        return get(memberName).asDouble(min, minFailureConsumer, max, maxFailureConsumer);
++    }
++
++    public @Nullable Double getAsDoubleIfPresent(String memberName, @Nullable Double min, @Nullable Double max) throws PackException {
++        return this.getAsDoubleIfPresent(memberName, min, null, max, null);
++    }
++
++    public @Nullable Double getAsDoubleIfPresent(String memberName, @Nullable Double min, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, Double, Double> minFailureConsumer, @Nullable Double max, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, Double, Double> maxFailureConsumer) throws PackException {
++        var child = getOrNull(memberName);
++        if (child == null) {
++            return null;
++        }
++        return child.asDouble(min, minFailureConsumer, max, maxFailureConsumer);
++    }
++
++    public BigDecimal getAsBigDecimal(String memberName, @Nullable BigDecimal min, @Nullable BigDecimal max) throws PackException {
++        return this.getAsBigDecimal(memberName, min, null, max, null);
++    }
++
++    public BigDecimal getAsBigDecimal(String memberName, @Nullable BigDecimal min, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, BigDecimal, BigDecimal> minFailureConsumer, @Nullable BigDecimal max, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, BigDecimal, BigDecimal> maxFailureConsumer) throws PackException {
++        return get(memberName).asBigDecimal(min, minFailureConsumer, max, maxFailureConsumer);
++    }
++
++    public @Nullable BigDecimal getAsBigDecimalIfPresent(String memberName, @Nullable BigDecimal min, @Nullable BigDecimal max) throws PackException {
++        return this.getAsBigDecimalIfPresent(memberName, min, null, max, null);
++    }
++
++    public @Nullable BigDecimal getAsBigDecimalIfPresent(String memberName, @Nullable BigDecimal min, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, BigDecimal, BigDecimal> minFailureConsumer, @Nullable BigDecimal max, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, BigDecimal, BigDecimal> maxFailureConsumer) throws PackException {
++        var child = getOrNull(memberName);
++        if (child == null) {
++            return null;
++        }
++        return child.asBigDecimal(min, minFailureConsumer, max, maxFailureConsumer);
++    }
++
++    public BigInteger getAsBigInteger(String memberName, @Nullable BigInteger min, @Nullable BigInteger max) throws PackException {
++        return this.getAsBigInteger(memberName, min, null, max, null);
++    }
++
++    public BigInteger getAsBigInteger(String memberName, @Nullable BigInteger min, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, BigInteger, BigInteger> minFailureConsumer, @Nullable BigInteger max, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, BigInteger, BigInteger> maxFailureConsumer) throws PackException {
++        return get(memberName).asBigInteger(min, minFailureConsumer, max, maxFailureConsumer);
++    }
++
++    public @Nullable BigInteger getAsBigIntegerIfPresent(String memberName, @Nullable BigInteger min, @Nullable BigInteger max) throws PackException {
++        return this.getAsBigIntegerIfPresent(memberName, min, null, max, null);
++    }
++
++    public @Nullable BigInteger getAsBigIntegerIfPresent(String memberName, @Nullable BigInteger min, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, BigInteger, BigInteger> minFailureConsumer, @Nullable BigInteger max, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, BigInteger, BigInteger> maxFailureConsumer) throws PackException {
++        var child = getOrNull(memberName);
++        if (child == null) {
++            return null;
++        }
++        return child.asBigInteger(min, minFailureConsumer, max, maxFailureConsumer);
++    }
++
++    public float getAsFloat(String memberName, @Nullable Float min, @Nullable Float max) throws PackException {
++        return this.getAsFloat(memberName, min, null, max, null);
++    }
++
++    public float getAsFloat(String memberName, @Nullable Float min, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, Float, Float> minFailureConsumer, @Nullable Float max, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, Float, Float> maxFailureConsumer) throws PackException {
++        return get(memberName).asFloat(min, minFailureConsumer, max, maxFailureConsumer);
++    }
++
++    public @Nullable Float getAsFloatIfPresent(String memberName, @Nullable Float min, @Nullable Float max) throws PackException {
++        return this.getAsFloatIfPresent(memberName, min, null, max, null);
++    }
++
++    public @Nullable Float getAsFloatIfPresent(String memberName, @Nullable Float min, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, Float, Float> minFailureConsumer, @Nullable Float max, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, Float, Float> maxFailureConsumer) throws PackException {
++        var child = getOrNull(memberName);
++        if (child == null) {
++            return null;
++        }
++        return child.asFloat(min, minFailureConsumer, max, maxFailureConsumer);
++    }
++
++    public long getAsLong(String memberName, @Nullable Long min, @Nullable Long max) throws PackException {
++        return this.getAsLong(memberName, min, null, max, null);
++    }
++
++    public long getAsLong(String memberName, @Nullable Long min, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, Long, Long> minFailureConsumer, @Nullable Long max, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, Long, Long> maxFailureConsumer) throws PackException {
++        return get(memberName).asLong(min, minFailureConsumer, max, maxFailureConsumer);
++    }
++
++    public @Nullable Long getAsLongIfPresent(String memberName, @Nullable Long min, @Nullable Long max) throws PackException {
++        return this.getAsLongIfPresent(memberName, min, null, max, null);
++    }
++
++    public @Nullable Long getAsLongIfPresent(String memberName, @Nullable Long min, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, Long, Long> minFailureConsumer, @Nullable Long max, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, Long, Long> maxFailureConsumer) throws PackException {
++        var child = getOrNull(memberName);
++        if (child == null) {
++            return null;
++        }
++        return child.asLong(min, minFailureConsumer, max, maxFailureConsumer);
++    }
++
++    public short getAsShort(String memberName, @Nullable Short min, @Nullable Short max) throws PackException {
++        return this.getAsShort(memberName, min, null, max, null);
++    }
++
++    public short getAsShort(String memberName, @Nullable Short min, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, Short, Short> minFailureConsumer, @Nullable Short max, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, Short, Short> maxFailureConsumer) throws PackException {
++        return get(memberName).asShort(min, minFailureConsumer, max, maxFailureConsumer);
++    }
++
++    public @Nullable Short getAsShortIfPresent(String memberName, @Nullable Short min, @Nullable Short max) throws PackException {
++        return this.getAsShortIfPresent(memberName, min, null, max, null);
++    }
++
++    public @Nullable Short getAsShortIfPresent(String memberName, @Nullable Short min, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, Short, Short> minFailureConsumer, @Nullable Short max, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, Short, Short> maxFailureConsumer) throws PackException {
++        var child = getOrNull(memberName);
++        if (child == null) {
++            return null;
++        }
++        return child.asShort(min, minFailureConsumer, max, maxFailureConsumer);
++    }
++
++    public int getAsInt(String memberName, @Nullable Integer min, @Nullable Integer max) throws PackException {
++        return this.getAsInt(memberName, min, null, max, null);
++    }
++
++    public int getAsInt(String memberName, @Nullable Integer min, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, Integer, Integer> minFailureConsumer, @Nullable Integer max, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, Integer, Integer> maxFailureConsumer) throws PackException {
++        return get(memberName).asInt(min, minFailureConsumer, max, maxFailureConsumer);
++    }
++
++    public @Nullable Integer getAsIntIfPresent(String memberName, @Nullable Integer min, @Nullable Integer max) throws PackException {
++        return this.getAsIntIfPresent(memberName, min, null, max, null);
++    }
++
++    public @Nullable Integer getAsIntIfPresent(String memberName, @Nullable Integer min, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, Integer, Integer> minFailureConsumer, @Nullable Integer max, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, Integer, Integer> maxFailureConsumer) throws PackException {
++        var child = getOrNull(memberName);
++        if (child == null) {
++            return null;
++        }
++        return child.asInt(min, minFailureConsumer, max, maxFailureConsumer);
++    }
++
++    public byte getAsByte(String memberName, @Nullable Byte min, @Nullable Byte max) throws PackException {
++        return this.getAsByte(memberName, min, null, max, null);
++    }
++
++    public byte getAsByte(String memberName, @Nullable Byte min, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, Byte, Byte> minFailureConsumer, @Nullable Byte max, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, Byte, Byte> maxFailureConsumer) throws PackException {
++        return get(memberName).asByte(min, minFailureConsumer, max, maxFailureConsumer);
++    }
++
++    public @Nullable Byte getAsByteIfPresent(String memberName, @Nullable Byte min, @Nullable Byte max) throws PackException {
++        return this.getAsByteIfPresent(memberName, min, null, max, null);
++    }
++
++    public @Nullable Byte getAsByteIfPresent(String memberName, @Nullable Byte min, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, Byte, Byte> minFailureConsumer, @Nullable Byte max, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, Byte, Byte> maxFailureConsumer) throws PackException {
++        var child = getOrNull(memberName);
++        if (child == null) {
++            return null;
++        }
++        return child.asByte(min, minFailureConsumer, max, maxFailureConsumer);
++    }
++
++    public UUID getAsUUID(String memberName) throws PackException {
++        return get(memberName).asUUID();
++    }
++
++    public @Nullable UUID getAsUUIDIfPresent(String memberName) throws PackException {
++        var child = getOrNull(memberName);
++        if (child == null) {
++            return null;
++        }
++        return child.asUUID();
++    }
++
++    public NamedJsonNull getAsJsonNull(String memberName) throws PackException {
++        return get(memberName).asJsonNull();
++    }
++
++    public @Nullable NamedJsonNull getAsJsonNullIfPresent(String memberName) throws PackException {
++        var child = getOrNull(memberName);
++        if (child == null) {
++            return null;
++        }
++        return child.asJsonNull();
++    }
++
++    public Map<String, JsonElement> asMap() {
++        return this.unnamed.asMap();
++    }
++
++    @Override
++    public String toString() {
++        return this.toNameAndUnnamedString();
++    }
++
++    public static String concatenateParentAndChild(@Nullable String parentName, String key) {
++        return parentName == null ? key : parentName + "." + key;
++    }
++
++    public static String concatenateParentAndChild(NamedJsonObject parent, String key) {
++        return concatenateParentAndChild(parent.name(), key);
++    }
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/namedjson/NamedJsonPrimitive.java b/src/main/java/org/fiddlemc/fiddle/pack/read/namedjson/NamedJsonPrimitive.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..22de8993312e9fb3af096f7b1568811c8e33c1f3
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/namedjson/NamedJsonPrimitive.java
+@@ -0,0 +1,302 @@
++// Fiddle - read packs - JSON utils - named elements
++
++package org.fiddlemc.fiddle.pack.read.namedjson;
++
++import com.google.gson.JsonPrimitive;
++import org.fiddlemc.fiddle.pack.exception.PackException;
++import org.fiddlemc.fiddle.pack.exception.PackExceptionThrowingTriConsumer;
++import org.jetbrains.annotations.Nullable;
++
++import java.math.BigDecimal;
++import java.math.BigInteger;
++import java.util.UUID;
++
++/**
++ * A potentially named {@link JsonPrimitive}.
++ */
++@SuppressWarnings("unused")
++public record NamedJsonPrimitive(
++    @Nullable String name,
++    JsonPrimitive unnamed
++) implements NamedJsonElement<JsonPrimitive> {
++
++    public static float SAFE_HIGH_INTEGER_FLOAT = 8388606F;
++    public static float SAFE_LOW_INTEGER_FLOAT = -8388606F;
++
++    @Override
++    public NamedJsonPrimitive deepCopy() {
++        return this;
++    }
++
++    public Object getValue() {
++        if (this.unnamed.isBoolean()) {
++            return this.unnamed.getAsBoolean();
++        } else if (this.unnamed.isNumber()) {
++            return this.unnamed.getAsNumber();
++        }
++        try {
++            return this.unnamed.getAsBigInteger();
++        } catch (Exception ignored) {
++        }
++        try {
++            return this.unnamed.getAsBigDecimal();
++        } catch (Exception ignored) {
++        }
++        return this.unnamed.getAsString();
++    }
++
++    public boolean isBoolean() {
++        return this.unnamed.isBoolean();
++    }
++
++    @Override
++    public boolean asBoolean() throws PackException {
++        if (!this.isBoolean()) {
++            throw this.invalidTypeException(Boolean.TYPE);
++        }
++        return this.unnamed.getAsBoolean();
++    }
++
++    public boolean isNumber() {
++        return this.unnamed.isNumber();
++    }
++
++    @Override
++    public Number asNumber() throws PackException {
++        if (!this.isNumber()) {
++            throw this.invalidTypeException(Number.class);
++        }
++        return this.unnamed.getAsNumber();
++    }
++
++    public boolean isString() {
++        return this.unnamed.isString();
++    }
++
++    @Override
++    public String asString() throws PackException {
++        if (!this.isString()) {
++            return NamedJsonElement.super.asString();
++        }
++        return this.unnamed.getAsString();
++    }
++
++    @Override
++    public @Nullable String asString(boolean trim, BlankStringParseResult blankResult, @Nullable Integer maxLength) throws PackException {
++        var value = this.asString();
++        if (trim) {
++            value = value.trim();
++        }
++        if (blankResult != BlankStringParseResult.RETURN_STRING) {
++            if (value.isBlank()) {
++                if (blankResult == BlankStringParseResult.RETURN_NULL) {
++                    return null;
++                } else if (blankResult == BlankStringParseResult.THROW_EXCEPTION) {
++                    throw new PackException(this.getNameOr("A required JSON string value is empty") + " can not be empty");
++                }
++            }
++        }
++        if (maxLength != null) {
++            NamedJsonElement.enforceMaxByteLength(value, this.name, maxLength);
++        }
++        return value;
++    }
++
++    @Override
++    public double asDouble(@Nullable Double min, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, Double, Double> minFailureConsumer, @Nullable Double max, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, Double, Double> maxFailureConsumer) throws PackException {
++        var value = this.asNumber().doubleValue();
++        if (min != null && value < min) {
++            if (minFailureConsumer != null) {
++                minFailureConsumer.accept(this, value, min);
++            } else {
++                throw this.defaultMinFailureException(value, min);
++            }
++        }
++        if (max != null && value > max) {
++            if (maxFailureConsumer != null) {
++                maxFailureConsumer.accept(this, value, max);
++            } else {
++                throw this.defaultMaxFailureException(value, max);
++            }
++        }
++        return value;
++    }
++
++    @Override
++    public BigDecimal asBigDecimal(@Nullable BigDecimal min, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, BigDecimal, BigDecimal> minFailureConsumer, @Nullable BigDecimal max, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, BigDecimal, BigDecimal> maxFailureConsumer) throws PackException {
++        try {
++            var value = this.unnamed.getAsBigDecimal();
++            if (min != null && value.compareTo(min) < 0) {
++                if (minFailureConsumer != null) {
++                    minFailureConsumer.accept(this, value, min);
++                } else {
++                    throw this.defaultMinFailureException(value, min);
++                }
++            }
++            if (max != null && value.compareTo(max) > 0) {
++                if (maxFailureConsumer != null) {
++                    maxFailureConsumer.accept(this, value, max);
++                } else {
++                    throw this.defaultMaxFailureException(value, max);
++                }
++            }
++            return value;
++        } catch (NumberFormatException ignored) {
++            return NamedJsonElement.super.asBigDecimal(min, minFailureConsumer, max, maxFailureConsumer);
++        }
++    }
++
++    @Override
++    public BigInteger asBigInteger(@Nullable BigInteger min, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, BigInteger, BigInteger> minFailureConsumer, @Nullable BigInteger max, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, BigInteger, BigInteger> maxFailureConsumer) throws PackException {
++        try {
++            var value = this.unnamed.getAsBigInteger();
++            if (min != null && value.compareTo(min) < 0) {
++                if (minFailureConsumer != null) {
++                    minFailureConsumer.accept(this, value, min);
++                } else {
++                    throw this.defaultMinFailureException(value, min);
++                }
++            }
++            if (max != null && value.compareTo(max) > 0) {
++                if (maxFailureConsumer != null) {
++                    maxFailureConsumer.accept(this, value, max);
++                } else {
++                    throw this.defaultMaxFailureException(value, max);
++                }
++            }
++            return value;
++        } catch (NumberFormatException ignored) {
++            return NamedJsonElement.super.asBigInteger(min, minFailureConsumer, max, maxFailureConsumer);
++        }
++    }
++
++    @Override
++    public float asFloat(@Nullable Float min, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, Float, Float> minFailureConsumer, @Nullable Float max, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, Float, Float> maxFailureConsumer) throws PackException {
++        var value = this.asNumber().floatValue();
++        if (min != null && value < min) {
++            if (minFailureConsumer != null) {
++                minFailureConsumer.accept(this, value, min);
++            } else {
++                throw this.defaultMinFailureException(value, min);
++            }
++        }
++        if (max != null && value > max) {
++            if (maxFailureConsumer != null) {
++                maxFailureConsumer.accept(this, value, max);
++            } else {
++                throw this.defaultMaxFailureException(value, max);
++            }
++        }
++        return value;
++    }
++
++    @Override
++    public long asLong(@Nullable Long min, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, Long, Long> minFailureConsumer, @Nullable Long max, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, Long, Long> maxFailureConsumer) throws PackException {
++        var number = this.asNumber();
++        var value = number.longValue();
++        if (((double) value) == this.asNumber().doubleValue()) {
++            if (min != null && value < min) {
++                if (minFailureConsumer != null) {
++                    minFailureConsumer.accept(this, value, min);
++                } else {
++                    throw this.defaultMinFailureException(value, min);
++                }
++            }
++            if (max != null && value > max) {
++                if (maxFailureConsumer != null) {
++                    maxFailureConsumer.accept(this, value, max);
++                } else {
++                    throw this.defaultMaxFailureException(value, max);
++                }
++            }
++            return value;
++        }
++        return NamedJsonElement.super.asLong(min, minFailureConsumer, max, maxFailureConsumer);
++    }
++
++    @Override
++    public short asShort(@Nullable Short min, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, Short, Short> minFailureConsumer, @Nullable Short max, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, Short, Short> maxFailureConsumer) throws PackException {
++        var number = this.asNumber();
++        var value = number.shortValue();
++        if (((double) value) == this.asNumber().doubleValue()) {
++            if (min != null && value < min) {
++                if (minFailureConsumer != null) {
++                    minFailureConsumer.accept(this, value, min);
++                } else {
++                    throw this.defaultMinFailureException(value, min);
++                }
++            }
++            if (max != null && value > max) {
++                if (maxFailureConsumer != null) {
++                    maxFailureConsumer.accept(this, value, max);
++                } else {
++                    throw this.defaultMaxFailureException(value, max);
++                }
++            }
++            return value;
++        }
++        return NamedJsonElement.super.asShort(min, minFailureConsumer, max, maxFailureConsumer);
++    }
++
++    @Override
++    public int asInt(@Nullable Integer min, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, Integer, Integer> minFailureConsumer, @Nullable Integer max, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, Integer, Integer> maxFailureConsumer) throws PackException {
++        var number = this.asNumber();
++        var value = number.intValue();
++        if (((double) value) == this.asNumber().doubleValue()) {
++            if (min != null && value < min) {
++                if (minFailureConsumer != null) {
++                    minFailureConsumer.accept(this, value, min);
++                } else {
++                    throw this.defaultMinFailureException(value, min);
++                }
++            }
++            if (max != null && value > max) {
++                if (maxFailureConsumer != null) {
++                    maxFailureConsumer.accept(this, value, max);
++                } else {
++                    throw this.defaultMaxFailureException(value, max);
++                }
++            }
++            return value;
++        }
++        return NamedJsonElement.super.asInt(min, minFailureConsumer, max, maxFailureConsumer);
++    }
++
++    @Override
++    public byte asByte(@Nullable Byte min, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, Byte, Byte> minFailureConsumer, @Nullable Byte max, @Nullable PackExceptionThrowingTriConsumer<NamedJsonPrimitive, Byte, Byte> maxFailureConsumer) throws PackException {
++        var number = this.asNumber();
++        var value = number.byteValue();
++        if (((double) value) == this.asNumber().doubleValue()) {
++            return value;
++        }
++        return NamedJsonElement.super.asByte(min, minFailureConsumer, max, maxFailureConsumer);
++    }
++
++    @Override
++    public UUID asUUID() throws PackException {
++        var asString = this.asString();
++        try {
++            return UUID.fromString(asString);
++        } catch (Exception e) {
++            return NamedJsonElement.super.asUUID();
++        }
++    }
++
++    public PackException invalidValueException(Object desired) {
++        return this.invalidValueException(this.getValue(), desired);
++    }
++
++    public PackException defaultMinFailureException(Object minimum) {
++        return this.defaultMinFailureException(this.getValue(), minimum);
++    }
++
++    public PackException defaultMaxFailureException(Object maximum) {
++        return this.defaultMaxFailureException(this.getValue(), maximum);
++    }
++
++    @Override
++    public String toString() {
++        return this.toNameAndUnnamedString();
++    }
++
++}

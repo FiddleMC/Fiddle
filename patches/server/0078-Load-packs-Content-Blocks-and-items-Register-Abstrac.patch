@@ -1,0 +1,209 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sat, 27 Jan 2024 14:18:43 +0100
+Subject: [PATCH] Load packs - Content - Blocks and items - Register - Abstract
+ implementation
+
+This provides a common abstract implementation for the patches "Load packs - Content - Blocks - Register - Implementation" and "Load packs - Content - Items - Register - Implementation".
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/load/fiddlecontent/blockoritem/BlockOrItemByDefinitionLoader.java b/src/main/java/org/fiddlemc/fiddle/pack/load/fiddlecontent/blockoritem/BlockOrItemByDefinitionLoader.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..04fd085f18b3b30d3135c787b5885f30a6a41218
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/load/fiddlecontent/blockoritem/BlockOrItemByDefinitionLoader.java
+@@ -0,0 +1,151 @@
++// Fiddle - load packs - blocks and items - register - implementation
++
++package org.fiddlemc.fiddle.pack.load.fiddlecontent.blockoritem;
++
++import net.minecraft.core.Registry;
++import net.minecraft.resources.ResourceLocation;
++import org.apache.commons.lang.StringUtils;
++import org.fiddlemc.fiddle.pack.load.fiddlecontent.withparent.FiddleContentDefinitionWithParentLoader;
++import org.fiddlemc.fiddle.pack.exception.PackException;
++import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.FiddleContentDefinition;
++import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.FiddleContentDefinitionType;
++import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.blockoritem.*;
++import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.withparent.FiddleContentDefinitionKeyParent;
++import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.withparent.FiddleContentDefinitionParent;
++import org.jetbrains.annotations.Nullable;
++import org.slf4j.Logger;
++import org.slf4j.LoggerFactory;
++
++import java.util.List;
++
++/**
++ * The common base for the {@link FiddleContentDefinitionWithParentLoader} for blocks and items.
++ */
++public abstract class BlockOrItemByDefinitionLoader<Resource, Properties, PropertiesDefinition extends BlockOrItemPropertiesDefinition, T extends BlockOrItemDefinition<PropertiesDefinition>>
++    extends FiddleContentDefinitionWithParentLoader<Resource> {
++
++    protected final Logger logger;
++    private final Registry<Resource> registry;
++    private final FiddleContentDefinitionType<?> type;
++
++    protected BlockOrItemByDefinitionLoader(Registry<Resource> registry, FiddleContentDefinitionType<?> type) {
++        this.logger = LoggerFactory.getLogger(this.getClass().getSimpleName());
++        this.registry = registry;
++        this.type = type;
++    }
++
++    protected final String uncapitalizedDefinitionName(T definition) {
++        return this.type.textualName + " definition '" + definition.untypedResourceLocation + "'";
++    }
++
++    protected final String capitalizedDefinitionName(T definition) {
++        return StringUtils.capitalize(this.uncapitalizedDefinitionName(definition));
++    }
++
++    @Override
++    protected final boolean isKeyParentInvalid(FiddleContentDefinitionKeyParent<Resource> keyParent) {
++        return !this.registry.containsKey(keyParent.resourceLocation);
++    }
++
++    @Override
++    protected Resource getResource(ResourceLocation resourceLocation) {
++        return this.registry.get(resourceLocation);
++    }
++
++    public abstract Properties createDefaultProperties();
++
++    protected abstract Properties copyPropertiesFromResource(Resource resource);
++
++    public Properties createPropertiesFromParent(FiddleContentDefinitionParent parent) {
++        if (parent instanceof FiddleContentDefinitionKeyParent<?> keyParent) {
++            return this.copyPropertiesFromResource(this.getResource(keyParent.resourceLocation));
++        } else if (parent instanceof BlockOrItemDefinitionBase<?> base) {
++            //noinspection RedundantCast,unchecked
++            return ((BlockOrItemDefinitionBase<Properties>) base).propertiesInitializer.apply(this.createDefaultProperties());
++        }
++        throw new UnsupportedOperationException("Unknown parent type: " + parent.getClass().getName());
++    }
++
++    protected Properties buildProperties(T definition) throws PackException {
++        // Initialize the properties based on the parent
++        FiddleContentDefinitionParent propertiesParent;
++        if (definition.propertiesDefinition.parent != null) {
++            propertiesParent = definition.propertiesDefinition.parent;
++            if (this.isParentInvalid(propertiesParent)) {
++                throw new PackException(
++                     this.capitalizedDefinitionName(definition) + " has an invalid properties parent: " +
++                         propertiesParent.getOriginalString());
++            }
++        } else {
++            propertiesParent = definition.parent;
++        }
++        //noinspection UnnecessaryLocalVariable
++        Properties properties = this.createPropertiesFromParent(propertiesParent);
++
++        // Return the properties
++        return properties;
++    }
++
++    protected abstract Resource buildResourceFromProperties(T definition, @Nullable Resource parentResource, Properties properties) throws PackException;
++
++    private Resource build(T definition) throws PackException {
++        // Check validity of the parent
++        if (this.isParentInvalid(definition.parent)) {
++            throw new PackException(this.capitalizedDefinitionName(definition) +
++                " has an invalid parent: " + definition.parent.getOriginalString());
++        }
++        // Get the parent resource, if the parent is not a base
++        var parentResource = definition.parent instanceof FiddleContentDefinitionKeyParent<?> keyParent ? this.getResource(keyParent.resourceLocation) : null;
++
++        // Build the properties
++        var properties = this.buildProperties(definition);
++
++        // Build and return the resource by its properties
++        return this.buildResourceFromProperties(definition, parentResource, properties);
++    }
++
++    private void register(T definition) throws PackException {
++        Registry.register(this.registry, definition.untypedResourceLocation, this.build(definition));
++    }
++
++    protected abstract void copyProperties(Resource from, Resource to);
++
++    private void reload(T definition) throws PackException {
++        // Verify that the resource exists
++        if (this.registry.containsKey(definition.untypedResourceLocation)) {
++            throw new PackException("Tried to reload a " + this.type.textualName + " '" +
++                definition.untypedResourceLocation + "' but it was not registered");
++        }
++        // Find the existing resource definition
++        var existingResource = this.registry.get(definition.untypedResourceLocation);
++        // Build a new resource instance
++        var newResource = this.build(definition);
++        // Copy the properties
++        this.copyProperties(newResource, existingResource);
++    }
++
++    /**
++     * Registers new {@linkplain Resource resources} to the {@link #registry}, corresponding to the given definitions.
++     *
++     * @param sortedDefinitions A list of {@linkplain T definitions}s,
++     *                          {@linkplain FiddleContentDefinition#getSortedTopologicallyByReferences sorted}
++     *                          by dependencies.
++     */
++    public final void register(List<T> sortedDefinitions) throws PackException {
++        for (var definition : sortedDefinitions) {
++            logger.info("Registering " + this.type.textualName + " '" + definition.untypedResourceLocation + "'");
++            this.register(definition);
++        }
++    }
++
++    /**
++     * Reloads the information from the given definitions into their already registered {@link Resource resource}s,
++     * to whichever degree possible.
++     */
++    public final void reload(List<T> sortedDefinitions) throws PackException {
++        for (var definition : sortedDefinitions) {
++            this.reload(definition);
++        }
++    }
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/blockoritem/BlockOrItemDefinitionBase.java b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/blockoritem/BlockOrItemDefinitionBase.java
+index f844dce10a27c7b205d42b54fd0f4211ec70919c..2752f2c442788c881bf83dc14fd359e5d5a84bd2 100644
+--- a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/blockoritem/BlockOrItemDefinitionBase.java
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/blockoritem/BlockOrItemDefinitionBase.java
+@@ -3,19 +3,34 @@
+ package org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.blockoritem;
+ 
+ import net.minecraft.resources.ResourceLocation;
++import org.fiddlemc.fiddle.pack.load.fiddlecontent.blockoritem.BlockOrItemByDefinitionLoader;
+ import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.FiddleContentDefinitionType;
+ import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.withparent.FiddleContentDefinitionBase;
+ import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.withparent.FiddleContentDefinitionParent;
+ 
+-public abstract class BlockOrItemDefinitionBase
++import java.util.function.Function;
++
++public abstract class BlockOrItemDefinitionBase<Properties> // Fiddle - load packs - blocks and items - register - implementation
+     extends FiddleContentDefinitionBase
+     implements FiddleContentDefinitionParent {
+ 
++    // Fiddle start - load packs - blocks and items - register - implementation
++    /**
++     * The modifier of values for {@link BlockOrItemByDefinitionLoader#createPropertiesFromParent}.
++     * It is always given the return value of {@link BlockOrItemByDefinitionLoader#createDefaultProperties}.
++     */
++    public final Function<Properties, Properties> propertiesInitializer;
++    // Fiddle end - load packs - blocks and items - register - implementation
++
+     protected BlockOrItemDefinitionBase(
+         FiddleContentDefinitionType<?> type,
+-        ResourceLocation untypedResourceLocation
++        // Fiddle start - load packs - blocks and items - register - implementation
++        ResourceLocation untypedResourceLocation,
++        Function<Properties, Properties> propertiesInitializer
++        // Fiddle end - load packs - blocks and items - register - implementation
+     ) {
+         super(type, untypedResourceLocation);
++        this.propertiesInitializer = propertiesInitializer; // Fiddle - load packs - blocks and items - register - implementation
+     }
+ 
+ }

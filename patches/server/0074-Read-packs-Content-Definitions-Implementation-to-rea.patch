@@ -1,0 +1,156 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Thu, 25 Jan 2024 20:09:33 +0100
+Subject: [PATCH] Read packs - Content - Definitions - Implementation to read
+ all
+
+Adds the `FiddleContentDefinitionReader` class, that provides a `readAndSortDefinitions` method that reads the content definitions of all types from all packs.
+This is done by subsequently scanning all packs with the `PackFiddleContentDefinitionScanner` defined in the "Read packs - Content - Definitions - Scan from packs" patch.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/FiddleContentDefinitionReader.java b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/FiddleContentDefinitionReader.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..17610ac1f02eaf249d8828b4aa89586e0b4c22e8
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/FiddleContentDefinitionReader.java
+@@ -0,0 +1,89 @@
++// Fiddle - read packs - content definitions - read all
++
++package org.fiddlemc.fiddle.pack.read.fiddlecontent.definition;
++
++import it.unimi.dsi.fastutil.Pair;
++import net.minecraft.resources.ResourceLocation;
++import org.bukkit.NamespacedKey;
++import org.fiddlemc.fiddle.pack.FiddlePack;
++import org.fiddlemc.fiddle.pack.FiddlePacks;
++import org.fiddlemc.fiddle.pack.exception.PackException;
++import org.fiddlemc.fiddle.pack.read.namedjson.NamedJsonElement;
++
++import java.util.*;
++
++/**
++ * A utility class providing functionality to read all {@link FiddleContentDefinition}s from all packs.
++ */
++public final class FiddleContentDefinitionReader {
++
++    private FiddleContentDefinitionReader() {
++        throw new RuntimeException();
++    }
++
++    /**
++     * A subprocedure for {@link #readAndSortDefinitions()}.
++     */
++    private static <T extends FiddleContentDefinition> List<T> readDefinitionsFromPack(
++        FiddlePack pack,
++        FiddleContentDefinitionType<T> type
++    ) throws PackException {
++        var namespacedFolderFiles = PackFiddleContentDefinitionScanner.getSubNamespacedFolderFilesInContentFolderAsJSON(pack, type.contentSubNamespaceFolderName);
++        if (namespacedFolderFiles.isEmpty()) {
++            return Collections.emptyList();
++        }
++        List<T> parsed = new ArrayList<>(namespacedFolderFiles.size());
++        for (var namespacedFolderFile : namespacedFolderFiles) {
++            var json = namespacedFolderFile.first();
++            var resourceLocation = namespacedFolderFile.second();
++
++            // Validate that the resource location's namespace is allowed for Fiddle blocks or items
++            var namespace = resourceLocation.getNamespace();
++            if (namespace.equals(ResourceLocation.DEFAULT_NAMESPACE) || namespace.equals(ResourceLocation.REALMS_NAMESPACE) || namespace.equals(ResourceLocation.FIDDLE_NAMESPACE) || namespace.equals(NamespacedKey.BUKKIT)) {
++                throw new PackException("The " + type.textualName + " definition '" + resourceLocation + "' in pack '" + pack + "' has a namespace ('" + namespace + "') that is not allowed for " + type.textualName + "s");
++            }
++
++            // Parse the JSON
++            try {
++                parsed.add(type.parser.parse(resourceLocation, NamedJsonElement.get(json).asJsonObject()));
++            } catch (Exception e) {
++                throw new PackException("Could not parse " + type.textualName + " definition '" + resourceLocation + "' in pack '" + pack + "'", e);
++            }
++        }
++        return parsed;
++    }
++
++    /**
++     * Reads the definitions from packs and returns them, already sorted.
++     */
++    public static FiddleContentDefinitionsByType readAndSortDefinitions() throws PackException {
++        Map<FiddleContentDefinitionType<?>, List<FiddleContentDefinition>> definitionsByType = new IdentityHashMap<>(FiddleContentDefinitionTypes.VALUES.length);
++        // Read the definitions from each pack
++        for (var type : FiddleContentDefinitionTypes.VALUES) {
++            var untypedResourceLocationToDefinitionAndDeclaringPack = new HashMap<ResourceLocation, Pair<FiddleContentDefinition, FiddlePack>>();
++            for (var pack : FiddlePacks.getPacks()) {
++                // Read the definitions of the type from the pack
++                List<FiddleContentDefinition> definitions;
++                try {
++                    //noinspection unchecked
++                    definitions = (List<FiddleContentDefinition>) readDefinitionsFromPack(pack, type);
++                } catch (Exception e) {
++                    throw new PackException("Could not read " + type.contentSubNamespaceFolderName + " from a Fiddle pack '" + pack + "'", e);
++                }
++                // Check that there are no duplicate definitions (with the same resource location) for this type
++                for (var definition : definitions) {
++                    var existingEntry = untypedResourceLocationToDefinitionAndDeclaringPack.get(definition.untypedResourceLocation);
++                    if (existingEntry != null) {
++                        throw new PackException("Two packs both declare the same " + type.resourceLocationPathIdentifier + ": pack '" + existingEntry.second() + "' and pack '" + pack + "' both declare the " + type.resourceLocationPathIdentifier + " '" + definition.untypedResourceLocation + "'");
++                    }
++                    untypedResourceLocationToDefinitionAndDeclaringPack.put(definition.untypedResourceLocation, Pair.of(definition, pack));
++                }
++                // Add the definitions to the result map
++                definitionsByType.computeIfAbsent(type, $ -> new ArrayList<>(definitions.size())).addAll(definitions);
++            }
++        }
++        // Return definitions, topologically ordered by cross-references
++        return new FiddleContentDefinitionsByType(definitionsByType);
++    }
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/FiddleContentDefinitionsByType.java b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/FiddleContentDefinitionsByType.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..197dc1a0ca10142c8d73165a35efe9daca4b35de
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/FiddleContentDefinitionsByType.java
+@@ -0,0 +1,43 @@
++// Fiddle - read packs - content definitions - read all
++
++package org.fiddlemc.fiddle.pack.read.fiddlecontent.definition;
++
++import java.util.Collections;
++import java.util.IdentityHashMap;
++import java.util.List;
++import java.util.Map;
++
++/**
++ * A collection of {@linkplain FiddleContentDefinitionReader#readAndSortDefinitions() read definitions},
++ * stored per {@link FiddleContentDefinitionType}.
++ */
++public final class FiddleContentDefinitionsByType {
++
++    /**
++     * The internal map containing all definitions per type.
++     */
++    private final Map<FiddleContentDefinitionType<?>, List<FiddleContentDefinition>> definitions;
++
++    public FiddleContentDefinitionsByType(Map<FiddleContentDefinitionType<?>, List<FiddleContentDefinition>> definitions) {
++        // Store the definitions in topological order
++        this.definitions = new IdentityHashMap<>(definitions.size());
++        for (var entry : definitions.entrySet()) {
++            var sortedValues = FiddleContentDefinition.getSortedTopologicallyByReferences(entry.getValue());
++            this.definitions.put(entry.getKey(), sortedValues);
++        }
++    }
++
++    /**
++     * @return The {@linkplain FiddleContentDefinition#getSortedTopologicallyByReferences topologically sorted}
++     * definitions for the given {@code type}.
++     */
++    public <T extends FiddleContentDefinition> List<T> get(FiddleContentDefinitionType<T> type) {
++        //noinspection unchecked
++        return (List<T>) definitions.get(type);
++    }
++
++    public static FiddleContentDefinitionsByType empty() {
++        return new FiddleContentDefinitionsByType(Collections.emptyMap());
++    }
++
++}

@@ -1,0 +1,65 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Wed, 3 Jan 2024 21:02:47 +0100
+Subject: [PATCH] Client perspective - Base ids on perspective - Item - Provide
+
+Provides functionality to base `Item` ids (the ids they are identified by in packets sent to clients) on the target client's perspective.
+For clients that can understand the server-side item ids directly, the id is taken from the regular registry (`BuiltInRegistries.ITEM`), and for those who do not, the ids are taken from the vanilla-only registry (`Item.VANILLA_ONLY_ITEM_REGISTRY`).
+
+Does not add any usages of this functionality, those are added in the "Client perspective - Base ids on perspective - Item - Apply to effect data value" patch.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/ClientPerspective.java b/src/main/java/org/fiddlemc/fiddle/packet/ClientPerspective.java
+index 0393fce9dbe9cb66ba776a4dd85d8310e8750fa2..39110113ec5189bdef3378b6e65dd1a18bf79ba5 100644
+--- a/src/main/java/org/fiddlemc/fiddle/packet/ClientPerspective.java
++++ b/src/main/java/org/fiddlemc/fiddle/packet/ClientPerspective.java
+@@ -4,6 +4,8 @@ package org.fiddlemc.fiddle.packet;
+ 
+ import net.minecraft.core.IdMap;
+ import net.minecraft.core.registries.BuiltInRegistries;
++import net.minecraft.world.item.Item;
++import net.minecraft.world.item.Items;
+ import net.minecraft.world.level.block.Block;
+ import net.minecraft.world.level.block.Blocks;
+ import org.jetbrains.annotations.NotNull;
+@@ -98,6 +100,38 @@ public class ClientPerspective {
+     }
+     // Fiddle end - client perspective - base ids on perspective - provide - block
+ 
++    // Fiddle start - client perspective - base ids on perspective - provide - item
++    /**
++     * The {@link IdMap} that {@linkplain IdMap#getId provides} the ids for {@linkplain Item items}
++     * that a client with this perspective interprets correctly.
++     */
++    public IdMap<Item> getPacketItemIdMap() {
++        return understandsServerSideItemsAndBlocks ? BuiltInRegistries.ITEM : Item.VANILLA_ONLY_ITEM_REGISTRY;
++    }
++
++    /**
++     * The id provided by this perspective's {@link #getPacketItemIdMap()}, for the given {@link Item}.
++     * A null value will be interpreted as {@link Items#AIR}.
++     * <p>
++     *     This is based on {@link #getPacketItemIdMap()}, but uses the cached id for optimization instead.
++     * </p>
++     */
++    public int getPacketItemId(@Nullable Item item) {
++        var itemToQuery = item == null ? Items.AIR : item;
++        return understandsServerSideItemsAndBlocks ? itemToQuery.indexInItemRegistry : itemToQuery.indexInVanillaOnlyItemRegistry;
++    }
++
++    /**
++     * @return The single {@link #getPacketItemId} value for the given {@link Item}, if it is the same
++     * for all possible perspectives, or -1 otherwise.
++     */
++    public static int getSinglePacketItemId(@Nullable Item item) {
++        var itemToQuery = item == null ? Items.AIR : item;
++        int potentialSingleIndex = itemToQuery.indexInItemRegistry;
++        return potentialSingleIndex == itemToQuery.indexInVanillaOnlyItemRegistry ? potentialSingleIndex : -1;
++    }
++    // Fiddle end - client perspective - base ids on perspective - provide - item
++
+     @Override
+     public int hashCode() {
+         return this.category.ordinal();

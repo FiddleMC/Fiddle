@@ -1,0 +1,75 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sun, 23 Jul 2023 12:05:40 +0200
+Subject: [PATCH] Client perspective - Item replacements - Determine and store
+ desired visual handles
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
+index a80ffa7aed493a4b98f6e4a3a26141052d409ca8..dde1df391eb172c11d5e1e8250d6f303010d4bbb 100644
+--- a/src/main/java/net/minecraft/server/Main.java
++++ b/src/main/java/net/minecraft/server/Main.java
+@@ -214,6 +214,7 @@ public class Main {
+ 
+             org.fiddlemc.fiddle.pack.load.fiddlecontent.block.BlockStateVisualizationLoader.determineAndStore(); // Fiddle - client perspective - block state visualization - determine and store desired setuppers
+             org.fiddlemc.fiddle.pack.load.assets.lang.TranslationLoader.registerServerSideTranslations(); // Fiddle - client perspective - localization - register server-side translations
++            org.fiddlemc.fiddle.pack.load.fiddlecontent.item.ItemVisualHandleLoader.determineAndStore(); // Fiddle end - client perspective - item replacements - determine and store desired visual handles
+ 
+             // Fiddle start - modifiable Bukkit enums - inject runtime versions - common utilities
+             ClassLoader systemClassLoader = ClassLoader.getSystemClassLoader();
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/load/fiddlecontent/item/ItemVisualHandleLoader.java b/src/main/java/org/fiddlemc/fiddle/pack/load/fiddlecontent/item/ItemVisualHandleLoader.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..7114db6936767c2bd32286cd69e11475b2dc1021
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/load/fiddlecontent/item/ItemVisualHandleLoader.java
+@@ -0,0 +1,48 @@
++// Fiddle - client perspective - item replacements - determine and store desired visual handles
++
++package org.fiddlemc.fiddle.pack.load.fiddlecontent.item;
++
++import net.minecraft.core.registries.BuiltInRegistries;
++import net.minecraft.world.item.BlockItem;
++import net.minecraft.world.item.Item;
++import net.minecraft.world.item.Items;
++import net.minecraft.world.level.block.StairBlock;
++import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.item.ItemDefinition;
++import org.fiddlemc.fiddle.packet.item.ItemVisualHandle;
++import org.fiddlemc.fiddle.packet.item.VanillaItemOverrideItemVisualHandle;
++
++import java.util.List;
++
++/**
++ * A utility class to determine and store the {@link ItemVisualHandle} of {@link Item}s,
++ * based on their actual runtime details (which will have been based on their {@link Item}s being
++ * {@linkplain ItemByDefinitionLoader#register(List) loaded} from their definitions),
++ * any relevant settings in their {@linkplain ItemDefinition definition} (such as specific strategy settings
++ * for the visuals) and the corresponding visual assets.
++ */
++public final class ItemVisualHandleLoader {
++
++    private ItemVisualHandleLoader() {
++        throw new RuntimeException();
++    }
++
++    public static void determineAndStore() {
++        // TODO replace by actual implementation
++        for (var item : BuiltInRegistries.ITEM) {
++            if (!item.isVanilla()) {
++                Item replacement;
++                if (item instanceof BlockItem blockItem) {
++                    if (blockItem.getBlock() instanceof StairBlock) {
++                        replacement = Items.PRISMARINE_STAIRS;
++                    } else {
++                        replacement = Items.BLUE_WOOL;
++                    }
++                } else {
++                    replacement = Items.STICK;
++                }
++                item.visualHandleOrProvider = new VanillaItemOverrideItemVisualHandle(replacement, 0);
++            }
++        }
++    }
++
++}

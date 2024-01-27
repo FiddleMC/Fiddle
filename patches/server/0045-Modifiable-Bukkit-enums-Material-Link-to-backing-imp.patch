@@ -1,0 +1,36 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Thu, 25 Jan 2024 19:44:49 +0100
+Subject: [PATCH] Modifiable Bukkit enums - Material - Link to backing
+ implementation by namespaced key
+
+Determines the `Material` instance corresponding to a `Block` or `Item` by using
+the `matchMaterial` method with the namespaced key, rather than the `getMaterial` method that expects an enum name.
+
+This is needed as the namespaced key path of custom blocks does not equal their enum name,
+unless plugin backwards compatibility mode is enabled.
+
+This relies on the `Material.matchMaterial` supporting such namespaced key queries, which is implemented in the
+"Modifiable Bukkit enums - Material - Expand matching" in the `fiddle-api` module.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
+index 458eec5b3b614429ae6e1c6578be289f9469504e..4d5b919dd993852277ea9f67cf3d46cb5b6b7f1f 100644
+--- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
++++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
+@@ -300,11 +300,11 @@ public final class CraftMagicNumbers implements UnsafeValues {
+         }
+         // Paper end
+         for (Block block : BuiltInRegistries.BLOCK) {
+-            BLOCK_MATERIAL.put(block, Material.getMaterial(BuiltInRegistries.BLOCK.getKey(block).getPath().toUpperCase(Locale.ROOT)));
++            BLOCK_MATERIAL.put(block, Material.matchMaterial(block.keyInBlockRegistry.toString())); // Fiddle - load packs - blocks - load definitions
+         }
+ 
+         for (Item item : BuiltInRegistries.ITEM) {
+-            ITEM_MATERIAL.put(item, Material.getMaterial(BuiltInRegistries.ITEM.getKey(item).getPath().toUpperCase(Locale.ROOT)));
++            ITEM_MATERIAL.put(item, Material.matchMaterial(item.keyInItemRegistry.toString())); // Fiddle - load packs - items - load definitions
+         }
+ 
+         for (net.minecraft.world.level.material.Fluid fluidType : BuiltInRegistries.FLUID) {

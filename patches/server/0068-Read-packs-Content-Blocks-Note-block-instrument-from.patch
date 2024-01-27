@@ -1,0 +1,56 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Thu, 25 Jan 2024 22:30:39 +0100
+Subject: [PATCH] Read packs - Content - Blocks - Note block instrument from
+ resource location
+
+Adds a mapping from resource locations to `NoteBlockInstrument` instances.
+
+This mapping is used to parse instruments from strings in the "Read packs - Content - Blocks - JSON parser" patch.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/NoteBlockInstrumentsByResourceLocation.java b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/NoteBlockInstrumentsByResourceLocation.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..fe50aa0fea68104b095cb76bca3db436928c51eb
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/NoteBlockInstrumentsByResourceLocation.java
+@@ -0,0 +1,37 @@
++package org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.block;
++
++import net.minecraft.resources.ResourceLocation;
++import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
++
++import java.util.HashMap;
++import java.util.Map;
++
++/**
++ * Provides {@link NoteBlockInstrument}s {@linkplain #get by their namespaced key}.
++ * <p>
++ *     The namespaced key of a {@link NoteBlockInstrument} is not something that exists in Minecraft:
++ *     they are not data-driven. However, to support a data-driven approach in configuring for example
++ *     the note block instrument belonging to a block, we impose a namespaced key on each existing value,
++ *     with the {@link ResourceLocation#DEFAULT_NAMESPACE}.
++ * </p>
++ */
++public final class NoteBlockInstrumentsByResourceLocation {
++
++    private NoteBlockInstrumentsByResourceLocation() {
++        throw new RuntimeException();
++    }
++
++    private static final Map<ResourceLocation, NoteBlockInstrument> BY_RESOURCE_LOCATION;
++    static {
++        var values = NoteBlockInstrument.values();
++        BY_RESOURCE_LOCATION = new HashMap<>(values.length);
++        for (NoteBlockInstrument instrument : NoteBlockInstrument.values()) {
++            BY_RESOURCE_LOCATION.put(new ResourceLocation(ResourceLocation.DEFAULT_NAMESPACE, instrument.getSerializedName()), instrument);
++        }
++    }
++
++    public static NoteBlockInstrument get(ResourceLocation resourceLocation) {
++        return BY_RESOURCE_LOCATION.get(resourceLocation);
++    }
++
++}

@@ -1,0 +1,47 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Wed, 24 Jan 2024 23:34:30 +0100
+Subject: [PATCH] Load packs - Content - Definitions - Pass read definitions to
+ bootstrap
+
+Passes the definitions read before the bootstrap, in the "Read packs - Content - Definitions - Read before bootstrap" patch,
+to the bootstrap function, so that it can use it to perform the loading actions that must be done during the bootstrap procedure.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/server/Bootstrap.java b/src/main/java/net/minecraft/server/Bootstrap.java
+index df6752b5c77bc88a4fcf1ffe918b24d41cd30ad4..4307af2e7d8d50c146802fa5278c3f053dad1608 100644
+--- a/src/main/java/net/minecraft/server/Bootstrap.java
++++ b/src/main/java/net/minecraft/server/Bootstrap.java
+@@ -43,6 +43,17 @@ public class Bootstrap {
+     public Bootstrap() {}
+ 
+     public static void bootStrap() {
++        // Fiddle start - load packs - content definitions - pass read definitions to bootstrap
++        try {
++            bootStrap(org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.FiddleContentDefinitionsByType.empty());
++        } catch (org.fiddlemc.fiddle.pack.exception.PackException e) {
++            // This should never happen as we're not adding any content
++            throw new RuntimeException(e);
++        }
++    }
++
++    public static void bootStrap(org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.FiddleContentDefinitionsByType readContentDefinitions) throws org.fiddlemc.fiddle.pack.exception.PackException {
++        // Fiddle end - load packs - content definitions - pass read definitions to bootstrap
+         if (!Bootstrap.isBootstrapped) {
+             // CraftBukkit start
+             /*String name = Bootstrap.class.getSimpleName(); // Paper
+diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
+index da4d59a1f8b62c84d9968fdf8f2acb2e98b56215..a3df08f98885d61808a912f6c8be834b5c4d55c8 100644
+--- a/src/main/java/net/minecraft/server/Main.java
++++ b/src/main/java/net/minecraft/server/Main.java
+@@ -206,7 +206,7 @@ public class Main {
+             // Fiddle end - read packs - content definitions - read before bootstrap
+ 
+             io.papermc.paper.plugin.PluginInitializerManager.load(optionset); // Paper
+-            Bootstrap.bootStrap();
++            Bootstrap.bootStrap(readContentDefinitions); // Fiddle - load packs - content definitions - pass read definitions to bootstrap
+             Bootstrap.validate();
+             Util.startTimerHackThread();
+             Path path1 = Paths.get("server.properties");

@@ -39,14 +39,10 @@ index 5f6234d522693d670ef4907908fca7f784003fba..7d4704dfbf1bcfa05394bd90a4d00033
      }
  }
 diff --git a/src/main/java/org/fiddlemc/fiddle/registry/BlockRegistry.java b/src/main/java/org/fiddlemc/fiddle/registry/BlockRegistry.java
-index 082c42a48b67a5d509b8553ddbc09991c8bd9051..fb9128c8ff86356e1660bc0551d9bde8d847f643 100644
+index c2d1ea888d0adcdd62f001b5771687189711482b..d7778a44ea4ab2c89a634c74ebd83a97fbfb7e53 100644
 --- a/src/main/java/org/fiddlemc/fiddle/registry/BlockRegistry.java
 +++ b/src/main/java/org/fiddlemc/fiddle/registry/BlockRegistry.java
-@@ -4,18 +4,62 @@ package org.fiddlemc.fiddle.registry;
- 
- import com.mojang.serialization.Lifecycle;
- import net.minecraft.core.DefaultedMappedRegistry;
-+import net.minecraft.core.Holder;
+@@ -8,13 +8,30 @@ import net.minecraft.core.Holder;
  import net.minecraft.core.Registry;
  import net.minecraft.core.registries.BuiltInRegistries;
  import net.minecraft.resources.ResourceKey;
@@ -55,7 +51,6 @@ index 082c42a48b67a5d509b8553ddbc09991c8bd9051..fb9128c8ff86356e1660bc0551d9bde8
  import net.minecraft.world.level.block.Block;
 +import net.minecraft.world.level.block.Blocks;
 +import net.minecraft.world.level.block.state.BlockState;
-+import org.jetbrains.annotations.NotNull;
  
  /**
   * An implementation of {@link Registry} specially for {@link BuiltInRegistries#BLOCK}.
@@ -78,13 +73,11 @@ index 082c42a48b67a5d509b8553ddbc09991c8bd9051..fb9128c8ff86356e1660bc0551d9bde8
      public BlockRegistry(String defaultId, ResourceKey<? extends Registry<Block>> key, Lifecycle lifecycle, boolean intrusive) {
          super(defaultId, key, lifecycle, intrusive);
      }
+@@ -25,6 +42,22 @@ public final class BlockRegistry extends DefaultedMappedRegistry<Block> {
+         // Register the entry
+         var reference = super.register(key, entry, lifecycle);
  
-+    // Fiddle start - modded registries - apply block post-register operations instantly
-+    @Override
-+    public Holder.@NotNull Reference<Block> register(@NotNull ResourceKey<Block> key, @NotNull Block entry, @NotNull Lifecycle lifecycle) {
-+        // Register the entry
-+        var reference = super.register(key, entry, lifecycle);
-+
++        // Fiddle start - modded registries - apply block post-register operations instantly
 +        // Perform the post-register operations
 +        for (BlockState blockState : entry.getStateDefinition().getPossibleStates()) {
 +            // Fiddle start - flags for vanilla content - block state
@@ -98,10 +91,8 @@ index 082c42a48b67a5d509b8553ddbc09991c8bd9051..fb9128c8ff86356e1660bc0551d9bde8
 +            }
 +        }
 +        entry.getLootTable();
++        // Fiddle end - modded registries - apply block post-register operations instantly
 +
-+        // Return the reference
-+        return reference;
-+    }
-+    // Fiddle end - modded registries - apply block post-register operations instantly
-+
- }
+         // Return the reference
+         return reference;
+ 

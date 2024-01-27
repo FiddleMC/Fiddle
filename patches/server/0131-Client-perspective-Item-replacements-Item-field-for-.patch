@@ -1,0 +1,35 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sat, 22 Jul 2023 20:14:25 +0200
+Subject: [PATCH] Client perspective - Item replacements - Item field for
+ visual handle
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/world/item/Item.java b/src/main/java/net/minecraft/world/item/Item.java
+index 3146c8319f140f7a2802b8b83cc5a48a1cfa4c14..4bb3e81deb88e66345a282e09802e34d12ce0ac7 100644
+--- a/src/main/java/net/minecraft/world/item/Item.java
++++ b/src/main/java/net/minecraft/world/item/Item.java
+@@ -125,6 +125,21 @@ public class Item implements FeatureElement, ItemLike {
+     public int indexInVanillaOnlyItemRegistry = -1;
+     // Fiddle end - cache registry indices as fields - item
+ 
++    // Fiddle start - client perspective - item replacements - Item field for visual handle
++    /**
++     * One of the following:
++     * <ul>
++     *     <li>The {@link org.fiddlemc.fiddle.packet.item.ItemVisualHandleProvider} that provides the desired
++     *     {@link org.fiddlemc.fiddle.packet.item.ItemVisualHandle}s for {@link ItemStack}s of this
++     *     {@linkplain Item item type}.</li>
++     *     <li>The desired {@link org.fiddlemc.fiddle.packet.item.ItemVisualHandle} of this item directly
++     *     (if it is the same for all {@link ItemStack}s of this item type).</li>
++     *     <li>Null if all {@link ItemStack}s of this item type can be sent unmodified to all possible clients.</li>
++     * </ul>
++     */
++    public @org.jetbrains.annotations.Nullable Object visualHandleOrProvider = null;
++    // Fiddle end - client perspective - item replacements - Item field for visual handle
++
+     public static int getId(Item item) {
+         return item == null ? 0 : BuiltInRegistries.ITEM.getId(item);
+     }

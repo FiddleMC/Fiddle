@@ -1,0 +1,39 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Thu, 25 Jan 2024 23:11:55 +0100
+Subject: [PATCH] Read packs - Content - Definitions - Array of all types
+
+Defines an array containing all `FiddleContentDefinitionType` instances.
+This is used in the "Read packs - Content - Definitions - Implementation to read all" patch.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/FiddleContentDefinitionTypes.java b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/FiddleContentDefinitionTypes.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..4d178b06772510c0a1a60b332c53ae5282691fec
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/FiddleContentDefinitionTypes.java
+@@ -0,0 +1,22 @@
++// Fiddle - read packs - content definitions - array of all types
++
++package org.fiddlemc.fiddle.pack.read.fiddlecontent.definition;
++
++import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.block.BlockDefinition;
++import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.item.ItemDefinition;
++
++/**
++ * A class that contains all {@link FiddleContentDefinitionType}s in {@link #VALUES}.
++ */
++public final class FiddleContentDefinitionTypes {
++
++    private FiddleContentDefinitionTypes() {
++        throw new RuntimeException();
++    }
++
++    public static FiddleContentDefinitionType<?>[] VALUES = {
++        BlockDefinition.TYPE,
++        ItemDefinition.TYPE
++    };
++
++}

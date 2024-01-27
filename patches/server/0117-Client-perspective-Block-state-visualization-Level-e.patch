@@ -1,0 +1,244 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Thu, 4 Jan 2024 22:23:51 +0100
+Subject: [PATCH] Client perspective - Block state visualization - Level event
+ data - Block break particles
+
+Fires the level event of block break particles, with the data value directly being the involved `BlockState`.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelEventPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelEventPacket.java
+index 0db82f87b99b9f96de01eb844945f90ca59d12fc..2a92e1d7b812b3a1b2d48d6a14ee5e36978d3cfd 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelEventPacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelEventPacket.java
+@@ -135,6 +135,11 @@ public class ClientboundLevelEventPacket extends org.fiddlemc.fiddle.packet.Clon
+ 
+     // Fiddle start - client perspective - block state visualization - level event data - data can be BlockState
+     private org.fiddlemc.fiddle.packet.block.BlockStateVisualizationSetupper.BlockStateVisualizationPurpose getBlockStateVisualizationPurposeByType() {
++        // Fiddle start - client perspective - block state visualization - level event data - block break particles
++        if (this.type == net.minecraft.world.level.block.LevelEvent.PARTICLES_DESTROY_BLOCK) {
++            return org.fiddlemc.fiddle.packet.block.BlockStateVisualizationSetupper.BlockStateVisualizationPurpose.PARTICLE;
++        }
++        // Fiddle end - client perspective - block state visualization - level event data - block break particles
+         throw new IllegalStateException("Tried to convert level event data from BlockState with an unsupported type: " + this.type);
+     }
+     // Fiddle end - client perspective - block state visualization - level event data - data can be BlockState
+diff --git a/src/main/java/net/minecraft/world/entity/ai/goal/BreakDoorGoal.java b/src/main/java/net/minecraft/world/entity/ai/goal/BreakDoorGoal.java
+index 784a894688f98f9d0368a36d456c5c94e1ee3695..7df580641a41dca0126f41be201c29f1f9be361b 100644
+--- a/src/main/java/net/minecraft/world/entity/ai/goal/BreakDoorGoal.java
++++ b/src/main/java/net/minecraft/world/entity/ai/goal/BreakDoorGoal.java
+@@ -79,7 +79,7 @@ public class BreakDoorGoal extends DoorInteractGoal {
+             // CraftBukkit end
+             this.mob.level().removeBlock(this.doorPos, false);
+             this.mob.level().levelEvent(1021, this.doorPos, 0);
+-            this.mob.level().levelEvent(2001, this.doorPos, Block.getId(this.mob.level().getBlockState(this.doorPos)));
++            this.mob.level().levelEvent(2001, this.doorPos, this.mob.level().getBlockState(this.doorPos)); // Fiddle - client perspective - block state visualization - level event data - block break particles
+         }
+ 
+     }
+diff --git a/src/main/java/net/minecraft/world/entity/ai/goal/EatBlockGoal.java b/src/main/java/net/minecraft/world/entity/ai/goal/EatBlockGoal.java
+index b0caf52d00d8cd76550ab116291f8e11144a5e59..aeaad788e51840a35bceffffef0c562a18873d61 100644
+--- a/src/main/java/net/minecraft/world/entity/ai/goal/EatBlockGoal.java
++++ b/src/main/java/net/minecraft/world/entity/ai/goal/EatBlockGoal.java
+@@ -79,7 +79,7 @@ public class EatBlockGoal extends Goal {
+ 
+                 if (this.level.getBlockState(blockposition1).is(Blocks.GRASS_BLOCK)) {
+                     if (CraftEventFactory.callEntityChangeBlockEvent(this.mob, blockposition1, Blocks.DIRT.defaultBlockState(), !this.level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING))) { // CraftBukkit // Paper - Fix wrong block state
+-                        this.level.levelEvent(2001, blockposition1, Block.getId(Blocks.GRASS_BLOCK.defaultBlockState()));
++                        this.level.levelEvent(2001, blockposition1, Blocks.GRASS_BLOCK.defaultBlockState()); // Fiddle - client perspective - block state visualization - level event data - block break particles
+                         this.level.setBlock(blockposition1, Blocks.DIRT.defaultBlockState(), 2);
+                     }
+ 
+diff --git a/src/main/java/net/minecraft/world/entity/animal/Fox.java b/src/main/java/net/minecraft/world/entity/animal/Fox.java
+index 62604ed2e82afd3603ccac5d9c6e285c431542b1..3039b01c2932c3ceb642f68abc89f99b5ea862ff 100644
+--- a/src/main/java/net/minecraft/world/entity/animal/Fox.java
++++ b/src/main/java/net/minecraft/world/entity/animal/Fox.java
+@@ -560,7 +560,7 @@ public class Fox extends Animal implements VariantHolder<Fox.Type> {
+                 BlockPos blockposition = this.blockPosition();
+                 BlockState iblockdata = this.level().getBlockState(blockposition);
+ 
+-                this.level().levelEvent(2001, blockposition, Block.getId(iblockdata));
++                this.level().levelEvent(2001, blockposition, iblockdata); // Fiddle - client perspective - block state visualization - level event data - block break particles
+             }
+         }
+ 
+diff --git a/src/main/java/net/minecraft/world/entity/animal/Rabbit.java b/src/main/java/net/minecraft/world/entity/animal/Rabbit.java
+index 082351bd5f98d8738334b9164375f63fdc890455..8426ec6c27b64d832db1497a7bbadbc658c7c121 100644
+--- a/src/main/java/net/minecraft/world/entity/animal/Rabbit.java
++++ b/src/main/java/net/minecraft/world/entity/animal/Rabbit.java
+@@ -592,7 +592,7 @@ public class Rabbit extends Animal implements VariantHolder<Rabbit.Variant> {
+                         }
+                         // CraftBukkit end
+                         world.setBlock(blockposition, (BlockState) iblockdata.setValue(CarrotBlock.AGE, i - 1), 2);
+-                        world.levelEvent(2001, blockposition, Block.getId(iblockdata));
++                        world.levelEvent(2001, blockposition, iblockdata); // Fiddle - client perspective - block state visualization - level event data - block break particles
+                     }
+ 
+                     this.rabbit.moreCarrotTicks = 40;
+diff --git a/src/main/java/net/minecraft/world/entity/animal/Turtle.java b/src/main/java/net/minecraft/world/entity/animal/Turtle.java
+index d3c15d029d5f003cba3c89f7ea1f3ed4f943f2bd..7706b1cc1d8ad1b29dffbb0f8ff9d2a60c02bcbb 100644
+--- a/src/main/java/net/minecraft/world/entity/animal/Turtle.java
++++ b/src/main/java/net/minecraft/world/entity/animal/Turtle.java
+@@ -298,7 +298,7 @@ public class Turtle extends Animal {
+             BlockPos blockposition = this.blockPosition();
+ 
+             if (TurtleEggBlock.onSand(this.level(), blockposition)) {
+-                this.level().levelEvent(2001, blockposition, Block.getId(this.level().getBlockState(blockposition.below())));
++                this.level().levelEvent(2001, blockposition, this.level().getBlockState(blockposition.below())); // Fiddle - client perspective - block state visualization - level event data - block break particles
+             }
+         }
+ 
+diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
+index 90fe20a4da4f40bacd4f1138164a2e924125aaaf..b530070bb314c9bc7b5f008a544524d683981386 100644
+--- a/src/main/java/net/minecraft/world/level/Level.java
++++ b/src/main/java/net/minecraft/world/level/Level.java
+@@ -707,7 +707,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+             // Paper end
+ 
+             if (playEffect && !(iblockdata.getBlock() instanceof BaseFireBlock)) { // Paper
+-                this.levelEvent(2001, pos, Block.getId(iblockdata));
++                this.levelEvent(2001, pos, iblockdata); // Fiddle - client perspective - block state visualization - level event data - block break particles
+             }
+ 
+             if (drop) {
+diff --git a/src/main/java/net/minecraft/world/level/block/BedBlock.java b/src/main/java/net/minecraft/world/level/block/BedBlock.java
+index d40500f9a807cab0b2fb6fa9032f33f4fb74c895..27ce2c3e2c3a81764b59117988e6cee5256a0dce 100644
+--- a/src/main/java/net/minecraft/world/level/block/BedBlock.java
++++ b/src/main/java/net/minecraft/world/level/block/BedBlock.java
+@@ -217,7 +217,7 @@ public class BedBlock extends HorizontalDirectionalBlock implements EntityBlock
+ 
+                 if (iblockdata1.is((Block) this) && iblockdata1.getValue(BedBlock.PART) == BedPart.HEAD) {
+                     world.setBlock(blockposition1, Blocks.AIR.defaultBlockState(), 35);
+-                    world.levelEvent(player, 2001, blockposition1, Block.getId(iblockdata1));
++                    world.levelEvent(player, 2001, blockposition1, iblockdata1); // Fiddle - client perspective - block state visualization - level event data - block break particles
+                 }
+             }
+         }
+diff --git a/src/main/java/net/minecraft/world/level/block/Block.java b/src/main/java/net/minecraft/world/level/block/Block.java
+index d9f1b6cbe9ed6e4b1f8cb4c10f3dcece5d5ea8a4..063176ebf7f0d0b6879f941b5009d02f307c70e8 100644
+--- a/src/main/java/net/minecraft/world/level/block/Block.java
++++ b/src/main/java/net/minecraft/world/level/block/Block.java
+@@ -519,7 +519,7 @@ public class Block extends BlockBehaviour implements ItemLike {
+     }
+ 
+     protected void spawnDestroyParticles(Level world, Player player, BlockPos pos, BlockState state) {
+-        world.levelEvent(player, 2001, pos, Block.getId(state));
++        world.levelEvent(player, 2001, pos, state); // Fiddle - client perspective - block state visualization - level event data - block break particles
+     }
+ 
+     public void playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
+diff --git a/src/main/java/net/minecraft/world/level/block/BrushableBlock.java b/src/main/java/net/minecraft/world/level/block/BrushableBlock.java
+index faf952d83a5d582995f7bde21ca27a34d5d81b6a..ca1cd7da68ce4bf175e8fb257bc21d7bcfa72ba2 100644
+--- a/src/main/java/net/minecraft/world/level/block/BrushableBlock.java
++++ b/src/main/java/net/minecraft/world/level/block/BrushableBlock.java
+@@ -73,7 +73,7 @@ public class BrushableBlock extends BaseEntityBlock implements Fallable {
+     @Override
+     public void onBrokenAfterFall(Level world, BlockPos pos, FallingBlockEntity fallingBlockEntity) {
+         Vec3 vec3 = fallingBlockEntity.getBoundingBox().getCenter();
+-        world.levelEvent(2001, BlockPos.containing(vec3), Block.getId(fallingBlockEntity.getBlockState()));
++        world.levelEvent(2001, BlockPos.containing(vec3), fallingBlockEntity.getBlockState()); // Fiddle - client perspective - block state visualization - level event data - block break particles
+         world.gameEvent(fallingBlockEntity, GameEvent.BLOCK_DESTROY, vec3);
+     }
+ 
+diff --git a/src/main/java/net/minecraft/world/level/block/CarvedPumpkinBlock.java b/src/main/java/net/minecraft/world/level/block/CarvedPumpkinBlock.java
+index 23c487e295b3b736d8800f0c884324c9b18a5373..2b8e9fb9c2236fabc5e873f154f70fb68ed26845 100644
+--- a/src/main/java/net/minecraft/world/level/block/CarvedPumpkinBlock.java
++++ b/src/main/java/net/minecraft/world/level/block/CarvedPumpkinBlock.java
+@@ -117,7 +117,7 @@ public class CarvedPumpkinBlock extends HorizontalDirectionalBlock {
+                 BlockInWorld shapedetectorblock = patternResult.getBlock(i, j, 0);
+ 
+                 world.setBlock(shapedetectorblock.getPos(), Blocks.AIR.defaultBlockState(), 2);
+-                world.levelEvent(2001, shapedetectorblock.getPos(), Block.getId(shapedetectorblock.getState()));
++                world.levelEvent(2001, shapedetectorblock.getPos(), shapedetectorblock.getState()); // Fiddle - client perspective - block state visualization - level event data - block break particles
+             }
+         }
+ 
+diff --git a/src/main/java/net/minecraft/world/level/block/DoublePlantBlock.java b/src/main/java/net/minecraft/world/level/block/DoublePlantBlock.java
+index 9db66b393e057d93a8025b803ae0ad2a1bca61f6..22e41f8fbf11cc0b6ded337f92d730d294faa024 100644
+--- a/src/main/java/net/minecraft/world/level/block/DoublePlantBlock.java
++++ b/src/main/java/net/minecraft/world/level/block/DoublePlantBlock.java
+@@ -109,7 +109,7 @@ public class DoublePlantBlock extends BushBlock {
+                 BlockState iblockdata2 = iblockdata1.getFluidState().is((Fluid) Fluids.WATER) ? Blocks.WATER.defaultBlockState() : Blocks.AIR.defaultBlockState();
+ 
+                 world.setBlock(blockposition1, iblockdata2, 35);
+-                world.levelEvent(player, 2001, blockposition1, Block.getId(iblockdata1));
++                world.levelEvent(player, 2001, blockposition1, iblockdata1); // Fiddle - client perspective - block state visualization - level event data - block break particles
+             }
+         }
+ 
+diff --git a/src/main/java/net/minecraft/world/level/block/PowderSnowBlock.java b/src/main/java/net/minecraft/world/level/block/PowderSnowBlock.java
+index 7e04ecba2a14be0f0d47c917368abd2a2bd64a05..6ac8c317009d0ee87b106ad868bcfdc122538a52 100644
+--- a/src/main/java/net/minecraft/world/level/block/PowderSnowBlock.java
++++ b/src/main/java/net/minecraft/world/level/block/PowderSnowBlock.java
+@@ -130,7 +130,7 @@ public class PowderSnowBlock extends Block implements BucketPickup {
+     public ItemStack pickupBlock(LevelAccessor world, BlockPos pos, BlockState state) {
+         world.setBlock(pos, Blocks.AIR.defaultBlockState(), 11);
+         if (!world.isClientSide()) {
+-            world.levelEvent(2001, pos, Block.getId(state));
++            world.levelEvent(2001, pos, state); // Fiddle - client perspective - block state visualization - level event data - block break particles
+         }
+ 
+         return new ItemStack(Items.POWDER_SNOW_BUCKET);
+diff --git a/src/main/java/net/minecraft/world/level/block/SpongeBlock.java b/src/main/java/net/minecraft/world/level/block/SpongeBlock.java
+index 4bce895268542531598a01a1bccd8ac1ed703b7d..a98362ef771bbc2bf7faf3802de340792e6e6767 100644
+--- a/src/main/java/net/minecraft/world/level/block/SpongeBlock.java
++++ b/src/main/java/net/minecraft/world/level/block/SpongeBlock.java
+@@ -41,7 +41,7 @@ public class SpongeBlock extends Block {
+     protected void tryAbsorbWater(Level world, BlockPos pos) {
+         if (this.removeWaterBreadthFirstSearch(world, pos)) {
+             world.setBlock(pos, Blocks.WET_SPONGE.defaultBlockState(), 2);
+-            world.levelEvent(2001, pos, Block.getId(Blocks.WATER.defaultBlockState()));
++            world.levelEvent(2001, pos, Blocks.WATER.defaultBlockState()); // Fiddle - client perspective - block state visualization - level event data - block break particles
+         }
+ 
+     }
+diff --git a/src/main/java/net/minecraft/world/level/block/TurtleEggBlock.java b/src/main/java/net/minecraft/world/level/block/TurtleEggBlock.java
+index 6c1a0e6f961e46a1a89850746a71e97b32514adf..7d4bde91564f1ec1cf3f1ec96972e645496c0718 100644
+--- a/src/main/java/net/minecraft/world/level/block/TurtleEggBlock.java
++++ b/src/main/java/net/minecraft/world/level/block/TurtleEggBlock.java
+@@ -98,7 +98,7 @@ public class TurtleEggBlock extends Block {
+         } else {
+             world.setBlock(pos, (BlockState) state.setValue(TurtleEggBlock.EGGS, i - 1), 2);
+             world.gameEvent(GameEvent.BLOCK_DESTROY, pos, GameEvent.Context.of(state));
+-            world.levelEvent(2001, pos, Block.getId(state));
++            world.levelEvent(2001, pos, state); // Fiddle - client perspective - block state visualization - level event data - block break particles
+         }
+ 
+     }
+@@ -126,7 +126,7 @@ public class TurtleEggBlock extends Block {
+                 world.removeBlock(pos, false);
+ 
+                 for (int j = 0; j < (Integer) state.getValue(TurtleEggBlock.EGGS); ++j) {
+-                    world.levelEvent(2001, pos, Block.getId(state));
++                    world.levelEvent(2001, pos, state); // Fiddle - client perspective - block state visualization - level event data - block break particles
+                     Turtle entityturtle = (Turtle) EntityType.TURTLE.create(world);
+ 
+                     if (entityturtle != null) {
+diff --git a/src/main/java/org/bukkit/craftbukkit/CraftEffect.java b/src/main/java/org/bukkit/craftbukkit/CraftEffect.java
+index 21222247e436dc6035006b3c9aa91a596804a3d8..2d8172f1b55f17bbc66dc5e870073c9df28d6abe 100644
+--- a/src/main/java/org/bukkit/craftbukkit/CraftEffect.java
++++ b/src/main/java/org/bukkit/craftbukkit/CraftEffect.java
+@@ -62,7 +62,7 @@ public class CraftEffect {
+             break;
+         case STEP_SOUND:
+             Preconditions.checkArgument(((Material) data).isBlock(), "Material %s is not a block!", data);
+-            datavalue = Block.getId(CraftMagicNumbers.getBlock((Material) data).defaultBlockState());
++            datavalue = CraftMagicNumbers.getBlock((Material) data).defaultBlockState(); // Fiddle - client perspective - block state visualization - level event data - block break particles
+             break;
+         case COMPOSTER_FILL_ATTEMPT:
+             datavalue = ((Boolean) data) ? 1 : 0;
+diff --git a/src/main/java/org/bukkit/craftbukkit/block/CraftBlock.java b/src/main/java/org/bukkit/craftbukkit/block/CraftBlock.java
+index 5401ab9f8f6ce12e1c5368dbc3acc78a250b3822..809c522aae44defec737c6cfd8e435adef945e4e 100644
+--- a/src/main/java/org/bukkit/craftbukkit/block/CraftBlock.java
++++ b/src/main/java/org/bukkit/craftbukkit/block/CraftBlock.java
+@@ -535,7 +535,7 @@ public class CraftBlock implements Block {
+                 if (iblockdata.getBlock() instanceof net.minecraft.world.level.block.BaseFireBlock) {
+                     this.world.levelEvent(net.minecraft.world.level.block.LevelEvent.SOUND_EXTINGUISH_FIRE, this.position, 0);
+                 } else {
+-                    this.world.levelEvent(net.minecraft.world.level.block.LevelEvent.PARTICLES_DESTROY_BLOCK, this.position, net.minecraft.world.level.block.Block.getId(iblockdata));
++                    this.world.levelEvent(net.minecraft.world.level.block.LevelEvent.PARTICLES_DESTROY_BLOCK, this.position, iblockdata); // Fiddle - client perspective - block state visualization - level event data - block break particles
+                 }
+             }
+             if (dropExperience) block.popExperience(this.world.getMinecraftWorld(), this.position, block.getExpDrop(iblockdata, this.world.getMinecraftWorld(), this.position, nmsItem, true));

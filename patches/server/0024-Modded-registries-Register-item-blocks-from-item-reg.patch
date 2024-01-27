@@ -26,14 +26,10 @@ index 581c01f64939c23fda4cbf98e871de672aabe636..1225c28aa72ac54ac103c72a5eb92e73
      }
  }
 diff --git a/src/main/java/org/fiddlemc/fiddle/registry/ItemRegistry.java b/src/main/java/org/fiddlemc/fiddle/registry/ItemRegistry.java
-index 2ecd34b36d1c2d6c54ce6b2e7496b77cb76bff7c..7e238aca79778dd83ea2aefc280afbbfeca1b2ff 100644
+index b8dfbb9de0ef985ded97354bc59f2f222c127714..8239fdf7c01eb71de5f1f4c25f476c8111826cd0 100644
 --- a/src/main/java/org/fiddlemc/fiddle/registry/ItemRegistry.java
 +++ b/src/main/java/org/fiddlemc/fiddle/registry/ItemRegistry.java
-@@ -4,9 +4,11 @@ package org.fiddlemc.fiddle.registry;
- 
- import com.mojang.serialization.Lifecycle;
- import net.minecraft.core.DefaultedMappedRegistry;
-+import net.minecraft.core.Holder;
+@@ -8,6 +8,7 @@ import net.minecraft.core.Holder;
  import net.minecraft.core.Registry;
  import net.minecraft.core.registries.BuiltInRegistries;
  import net.minecraft.resources.ResourceKey;
@@ -41,24 +37,17 @@ index 2ecd34b36d1c2d6c54ce6b2e7496b77cb76bff7c..7e238aca79778dd83ea2aefc280afbbf
  import net.minecraft.world.item.Item;
  
  /**
-@@ -18,4 +20,20 @@ public final class ItemRegistry extends DefaultedMappedRegistry<Item> {
-         super(defaultId, key, lifecycle, intrusive);
-     }
+@@ -25,6 +26,13 @@ public final class ItemRegistry extends DefaultedMappedRegistry<Item> {
+         // Register the entry
+         var reference = super.register(key, entry, lifecycle);
  
-+    // Fiddle start - modded registries - register item blocks from item registry
-+    @Override
-+    public Holder.Reference<Item> register(ResourceKey<Item> key, Item entry, Lifecycle lifecycle) {
-+        // Register the entry
-+        var reference = super.register(key, entry, lifecycle);
-+
++        // Fiddle start - modded registries - register item blocks from item registry
 +        // Register the item by its blocks if applicable
 +        if (entry instanceof BlockItem blockItem) {
 +            blockItem.registerBlocks(Item.BY_BLOCK, entry);
 +        }
++        // Fiddle end - modded registries - register item blocks from item registry
 +
-+        // Return the reference
-+        return reference;
-+    }
-+    // Fiddle end - modded registries - register item blocks from item registry
-+
- }
+         // Return the reference
+         return reference;
+ 

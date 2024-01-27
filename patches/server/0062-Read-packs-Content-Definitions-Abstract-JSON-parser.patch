@@ -1,0 +1,59 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Fri, 26 Jan 2024 19:00:46 +0100
+Subject: [PATCH] Read packs - Content - Definitions - Abstract JSON parser
+
+Adds the abstract `FiddleContentDefinitionParser` class, that is a base for parsers that parse JSON into `FiddleContentDefinition` instances.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/FiddleContentDefinitionParser.java b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/FiddleContentDefinitionParser.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..bd32bf67b579b1d02cce07bf0009bfeabb7f4079
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/FiddleContentDefinitionParser.java
+@@ -0,0 +1,16 @@
++// Fiddle - read packs - content definitions - JSON parser
++
++package org.fiddlemc.fiddle.pack.read.fiddlecontent.definition;
++
++import net.minecraft.resources.ResourceLocation;
++import org.fiddlemc.fiddle.pack.exception.PackException;
++import org.fiddlemc.fiddle.pack.read.namedjson.NamedJsonObject;
++
++public interface FiddleContentDefinitionParser<T extends FiddleContentDefinition> {
++
++    T parse(
++        ResourceLocation resourceLocation,
++        NamedJsonObject json
++    ) throws PackException;
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/FiddleContentDefinitionType.java b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/FiddleContentDefinitionType.java
+index 28e0cd0a0351dd4a70f43bbbb4afda98e905d219..98dc3ff82ce6592a4edb33ad00200de169d680bd 100644
+--- a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/FiddleContentDefinitionType.java
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/FiddleContentDefinitionType.java
+@@ -26,14 +26,19 @@ public class FiddleContentDefinitionType<T extends FiddleContentDefinition> {
+      */
+     public final String textualName;
+ 
+-    public FiddleContentDefinitionType(String contentSubNamespaceFolderName, String resourceLocationPathIdentifier) {
+-        this(contentSubNamespaceFolderName, resourceLocationPathIdentifier, resourceLocationPathIdentifier);
++    // Fiddle start - read packs - content definitions - JSON parser
++    public final FiddleContentDefinitionParser<T> parser;
++
++    public FiddleContentDefinitionType(String contentSubNamespaceFolderName, String resourceLocationPathIdentifier, FiddleContentDefinitionParser<T> parser) {
++        this(contentSubNamespaceFolderName, resourceLocationPathIdentifier, resourceLocationPathIdentifier, parser);
++        // Fiddle end - read packs - content definitions - JSON parser
+     }
+ 
+-    public FiddleContentDefinitionType(String contentSubNamespaceFolderName, String resourceLocationPathIdentifier, String textualName) {
++    public FiddleContentDefinitionType(String contentSubNamespaceFolderName, String resourceLocationPathIdentifier, String textualName, FiddleContentDefinitionParser<T> parser) { // Fiddle - read packs - content definitions - JSON parser
+         this.contentSubNamespaceFolderName = contentSubNamespaceFolderName;
+         this.resourceLocationPathIdentifier = resourceLocationPathIdentifier;
+         this.textualName = textualName;
++        this.parser = parser; // Fiddle - read packs - content definitions - JSON parser
+     }
+ 
+ }
