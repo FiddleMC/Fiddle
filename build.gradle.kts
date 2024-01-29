@@ -1,9 +1,5 @@
-import io.papermc.paperweight.tasks.ZippedTask
 import io.papermc.paperweight.util.path
-import io.papermc.paperweight.util.pathOrNull
 import org.gradle.configurationcache.extensions.capitalized
-import java.nio.file.Path
-import kotlin.io.path.createDirectories
 import kotlin.io.path.deleteRecursively
 import kotlin.io.path.readLines
 import kotlin.io.path.writeLines
@@ -61,7 +57,7 @@ subprojects {
 }
 
 paperweight {
-    serverProject.set(project(":fiddle-server")) // Fiddle - build changes
+    serverProject = project(":fiddle-server") // Fiddle - build changes
 
     remapRepo = paperMavenPublicUrl
     decompileRepo = paperMavenPublicUrl
