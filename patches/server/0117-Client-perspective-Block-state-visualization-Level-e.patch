@@ -26,15 +26,15 @@ index 0db82f87b99b9f96de01eb844945f90ca59d12fc..2a92e1d7b812b3a1b2d48d6a14ee5e36
      }
      // Fiddle end - client perspective - block state visualization - level event data - data can be BlockState
 diff --git a/src/main/java/net/minecraft/world/entity/ai/goal/BreakDoorGoal.java b/src/main/java/net/minecraft/world/entity/ai/goal/BreakDoorGoal.java
-index 784a894688f98f9d0368a36d456c5c94e1ee3695..7df580641a41dca0126f41be201c29f1f9be361b 100644
+index a85885ee51df585fa11ae9f8fcd67ff2a71c5a18..48497c6611bed94c705d04406ce7df898377ec68 100644
 --- a/src/main/java/net/minecraft/world/entity/ai/goal/BreakDoorGoal.java
 +++ b/src/main/java/net/minecraft/world/entity/ai/goal/BreakDoorGoal.java
-@@ -79,7 +79,7 @@ public class BreakDoorGoal extends DoorInteractGoal {
-             // CraftBukkit end
+@@ -80,7 +80,7 @@ public class BreakDoorGoal extends DoorInteractGoal {
+             final net.minecraft.world.level.block.state.BlockState oldState = this.mob.level().getBlockState(this.doorPos); // Paper - fix MC-263999
              this.mob.level().removeBlock(this.doorPos, false);
              this.mob.level().levelEvent(1021, this.doorPos, 0);
--            this.mob.level().levelEvent(2001, this.doorPos, Block.getId(this.mob.level().getBlockState(this.doorPos)));
-+            this.mob.level().levelEvent(2001, this.doorPos, this.mob.level().getBlockState(this.doorPos)); // Fiddle - client perspective - block state visualization - level event data - block break particles
+-            this.mob.level().levelEvent(2001, this.doorPos, Block.getId(oldState)); // Paper - fix MC-263999
++            this.mob.level().levelEvent(2001, this.doorPos, oldState); // Paper - fix MC-263999 // Fiddle - client perspective - block state visualization - level event data - block break particles
          }
  
      }
@@ -91,10 +91,10 @@ index d3c15d029d5f003cba3c89f7ea1f3ed4f943f2bd..7706b1cc1d8ad1b29dffbb0f8ff9d2a6
          }
  
 diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
-index 90fe20a4da4f40bacd4f1138164a2e924125aaaf..b530070bb314c9bc7b5f008a544524d683981386 100644
+index 13187b7b56b9873bb9e2f2ac9d39b7c339f0f3e0..f9de32c793ac0639976ba88dde089647a5c1d753 100644
 --- a/src/main/java/net/minecraft/world/level/Level.java
 +++ b/src/main/java/net/minecraft/world/level/Level.java
-@@ -707,7 +707,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+@@ -708,7 +708,7 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
              // Paper end
  
              if (playEffect && !(iblockdata.getBlock() instanceof BaseFireBlock)) { // Paper
