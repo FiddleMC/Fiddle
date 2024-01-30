@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
-Date: Fri, 29 Dec 2023 12:13:39 +0100
+Date: Sun, 28 Jan 2024 16:54:15 +0100
 Subject: [PATCH] Fiddle branding changes - Version fetcher
 
 Version lookups (such as done by `/version`) will check for updates to the Fiddle repository instead of Paper.
@@ -19,139 +19,157 @@ Licensed (except for image files) under: GPL-3.0 (https://www.gnu.org/licenses/g
 Gale - https://galemc.org
 
 diff --git a/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java b/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
-index 9d687da5bdf398bb3f6c84cdf1249a7213d09f2e..472a44760ef3d551e8fa2118e93c98be05791c60 100644
+index 9d687da5bdf398bb3f6c84cdf1249a7213d09f2e..31327c13c1bee7465e6e6125726fac73b7717b1a 100644
 --- a/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
 +++ b/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
-@@ -17,69 +17,27 @@ import java.net.HttpURLConnection;
+@@ -17,12 +17,35 @@ import java.net.HttpURLConnection;
  import java.net.URL;
  import java.util.stream.StreamSupport;
  
 -public class PaperVersionFetcher implements VersionFetcher {
--    private static final java.util.regex.Pattern VER_PATTERN = java.util.regex.Pattern.compile("^([0-9\\.]*)\\-.*R"); // R is an anchor, will always give '-R' at end
--    private static final String GITHUB_BRANCH_NAME = "master";
--    private static final String DOWNLOAD_PAGE = "https://papermc.io/downloads/paper";
--    private static @Nullable String mcVer;
 +// Fiddle start - branding changes - version fetcher
 +/**
-+ * The original version fetcher for Paper. Most of the original content of this class has been moved to
-+ * {@link org.fiddlemc.fiddle.version.AbstractPaperVersionFetcher}.
++ * An abstract version fetcher, derived from {@link OriginalPaperVersionFetcher}.
++ * This class was then made to be a superclass of both {@link OriginalPaperVersionFetcher}
++ * and {@link org.fiddlemc.fiddle.version.FiddleVersionFetcher}.
 + */
-+public class PaperVersionFetcher extends org.fiddlemc.fiddle.version.AbstractPaperVersionFetcher {
++public abstract class PaperVersionFetcher implements VersionFetcher {
++    // Fiddle end - branding changes - version fetcher
+     private static final java.util.regex.Pattern VER_PATTERN = java.util.regex.Pattern.compile("^([0-9\\.]*)\\-.*R"); // R is an anchor, will always give '-R' at end
+-    private static final String GITHUB_BRANCH_NAME = "master";
+-    private static final String DOWNLOAD_PAGE = "https://papermc.io/downloads/paper";
+     private static @Nullable String mcVer;
  
--    @Override
--    public long getCacheTime() {
--        return 720000;
-+    public PaperVersionFetcher() {
-+        super("master", "https://papermc.io/downloads/paper", "Paper", "PaperMC", "PaperMC", "Paper");
-     }
- 
--    @Nonnull
++    // Fiddle start - branding changes - version fetcher
++    protected final String gitHubBranchName;
++    protected final String downloadPage;
++    protected final String projectDisplayName;
++    protected final String organizationDisplayName;
++    protected final String gitHubOrganizationName;
++    protected final String gitHubRepoName;
++
++    protected PaperVersionFetcher(String githubBranchName, String downloadPage, String projectDisplayName, String organizationDisplayName, String gitHubOrganizationName, String gitHubRepoName) {
++        this.gitHubBranchName = githubBranchName;
++        this.downloadPage = downloadPage;
++        this.projectDisplayName = projectDisplayName;
++        this.organizationDisplayName = organizationDisplayName;
++        this.gitHubOrganizationName = gitHubOrganizationName;
++        this.gitHubRepoName = gitHubRepoName;
++    }
++    // Fiddle end - branding changes - version fetcher
++
      @Override
--    public Component getVersionMessage(@Nonnull String serverVersion) {
+     public long getCacheTime() {
+         return 720000;
+@@ -31,21 +54,23 @@ public class PaperVersionFetcher implements VersionFetcher {
+     @Nonnull
+     @Override
+     public Component getVersionMessage(@Nonnull String serverVersion) {
 -        String[] parts = serverVersion.substring("git-Paper-".length()).split("[-\\s]");
 -        final Component updateMessage = getUpdateStatusMessage("PaperMC/Paper", GITHUB_BRANCH_NAME, parts[0]);
--        final Component history = getHistory();
--
--        return history != null ? TextComponent.ofChildren(updateMessage, Component.newline(), history) : updateMessage;
--    }
--
++        // Fiddle start - branding changes - version fetcher
++        String[] parts = serverVersion.substring(("git-" + this.projectDisplayName + "-").length()).split("[-\\s]");
++        final Component updateMessage = getUpdateStatusMessage(this.gitHubOrganizationName + "/" + this.gitHubRepoName, this.gitHubBranchName, parts[0]);
++        // Fiddle end - branding changes - version fetcher
+         final Component history = getHistory();
+ 
+         return history != null ? TextComponent.ofChildren(updateMessage, Component.newline(), history) : updateMessage;
+     }
+ 
 -    private static @Nullable String getMinecraftVersion() {
--        if (mcVer == null) {
--            java.util.regex.Matcher matcher = VER_PATTERN.matcher(org.bukkit.Bukkit.getBukkitVersion());
--            if (matcher.find()) {
--                String result = matcher.group();
--                mcVer = result.substring(0, result.length() - 2); // strip 'R' anchor and trailing '-'
--            } else {
++    protected @Nullable String getMinecraftVersion() { // Fiddle - branding changes - version fetcher
+         if (mcVer == null) {
+             java.util.regex.Matcher matcher = VER_PATTERN.matcher(org.bukkit.Bukkit.getBukkitVersion());
+             if (matcher.find()) {
+                 String result = matcher.group();
+                 mcVer = result.substring(0, result.length() - 2); // strip 'R' anchor and trailing '-'
+             } else {
 -                org.bukkit.Bukkit.getLogger().warning("Unable to match version to pattern! Report to PaperMC!");
--                org.bukkit.Bukkit.getLogger().warning("Pattern: " + VER_PATTERN.toString());
--                org.bukkit.Bukkit.getLogger().warning("Version: " + org.bukkit.Bukkit.getBukkitVersion());
--            }
--        }
--
--        return mcVer;
-+    protected boolean canFetchDistanceFromSiteApi() {
-+        return true;
++                org.bukkit.Bukkit.getLogger().warning("Unable to match version to pattern! Report to " + this.organizationDisplayName + "!"); // Fiddle - branding changes - version fetcher
+                 org.bukkit.Bukkit.getLogger().warning("Pattern: " + VER_PATTERN.toString());
+                 org.bukkit.Bukkit.getLogger().warning("Version: " + org.bukkit.Bukkit.getBukkitVersion());
+             }
+@@ -54,12 +79,32 @@ public class PaperVersionFetcher implements VersionFetcher {
+         return mcVer;
      }
  
 -    private static Component getUpdateStatusMessage(@Nonnull String repo, @Nonnull String branch, @Nonnull String versionInfo) {
--        int distance;
--        try {
--            int jenkinsBuild = Integer.parseInt(versionInfo);
--            distance = fetchDistanceFromSiteApi(jenkinsBuild, getMinecraftVersion());
--        } catch (NumberFormatException ignored) {
--            versionInfo = versionInfo.replace("\"", "");
--            distance = fetchDistanceFromGitHub(repo, branch, versionInfo);
--        }
--
--        switch (distance) {
--            case -1:
--                return Component.text("Error obtaining version information", NamedTextColor.YELLOW);
--            case 0:
--                return Component.text("You are running the latest version", NamedTextColor.GREEN);
--            case -2:
--                return Component.text("Unknown version", NamedTextColor.YELLOW);
--            default:
--                return Component.text("You are " + distance + " version(s) behind", NamedTextColor.YELLOW)
--                        .append(Component.newline())
--                        .append(Component.text("Download the new version at: ")
--                                .append(Component.text(DOWNLOAD_PAGE, NamedTextColor.GOLD)
--                                        .hoverEvent(Component.text("Click to open", NamedTextColor.WHITE))
--                                        .clickEvent(ClickEvent.openUrl(DOWNLOAD_PAGE))));
--        }
-+    @Override
-+    protected int fetchDistanceFromSiteApi(int jenkinsBuild) {
-+        return fetchDistanceFromSiteApi(jenkinsBuild, this.getMinecraftVersion());
-     }
++    // Fiddle start - branding changes - version fetcher
++    protected abstract boolean canFetchDistanceFromSiteApi();
++
++    protected abstract int fetchDistanceFromSiteApi(int jenkinsBuild);
 +    // Fiddle end - branding changes - version fetcher
- 
-     private static int fetchDistanceFromSiteApi(int jenkinsBuild, @Nullable String siteApiVersion) {
-         if (siteApiVersion == null) { return -1; }
-@@ -105,45 +63,4 @@ public class PaperVersionFetcher implements VersionFetcher {
++
++    private Component getUpdateStatusMessage(@Nonnull String repo, @Nonnull String branch, @Nonnull String versionInfo) {
++        // Fiddle end - branding changes - version fetcher
+         int distance;
++        // Fiddle start - branding changes - version fetcher
++        distance = -1;
++        boolean readFromSiteApi = false;
++        if (this.canFetchDistanceFromSiteApi()) {
++        // Fiddle end - branding changes - version fetcher
+         try {
+             int jenkinsBuild = Integer.parseInt(versionInfo);
+-            distance = fetchDistanceFromSiteApi(jenkinsBuild, getMinecraftVersion());
++            // Fiddle start - branding changes - version fetcher
++            distance = this.fetchDistanceFromSiteApi(jenkinsBuild);
++            readFromSiteApi = true;
++            // Fiddle end - branding changes - version fetcher
+         } catch (NumberFormatException ignored) {
++            // Fiddle start - branding changes - version fetcher
++        }
++        }
++        if (!readFromSiteApi) {
++            // Fiddle end - branding changes - version fetcher
+             versionInfo = versionInfo.replace("\"", "");
+             distance = fetchDistanceFromGitHub(repo, branch, versionInfo);
+         }
+@@ -75,12 +120,34 @@ public class PaperVersionFetcher implements VersionFetcher {
+                 return Component.text("You are " + distance + " version(s) behind", NamedTextColor.YELLOW)
+                         .append(Component.newline())
+                         .append(Component.text("Download the new version at: ")
+-                                .append(Component.text(DOWNLOAD_PAGE, NamedTextColor.GOLD)
++                                .append(Component.text(this.downloadPage, NamedTextColor.GOLD) // Fiddle - branding changes - version fetcher
+                                         .hoverEvent(Component.text("Click to open", NamedTextColor.WHITE))
+-                                        .clickEvent(ClickEvent.openUrl(DOWNLOAD_PAGE))));
++                                        .clickEvent(ClickEvent.openUrl(this.downloadPage)))); // Fiddle - branding changes - version fetcher
          }
      }
  
--    // Contributed by Techcable <Techcable@outlook.com> in GH-65
--    private static int fetchDistanceFromGitHub(@Nonnull String repo, @Nonnull String branch, @Nonnull String hash) {
--        try {
--            HttpURLConnection connection = (HttpURLConnection) new URL("https://api.github.com/repos/" + repo + "/compare/" + branch + "..." + hash).openConnection();
--            connection.connect();
--            if (connection.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND) return -2; // Unknown commit
--            try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), Charsets.UTF_8))) {
--                JsonObject obj = new Gson().fromJson(reader, JsonObject.class);
--                String status = obj.get("status").getAsString();
--                switch (status) {
--                    case "identical":
--                        return 0;
--                    case "behind":
--                        return obj.get("behind_by").getAsInt();
--                    default:
--                        return -1;
--                }
--            } catch (JsonSyntaxException | NumberFormatException e) {
--                e.printStackTrace();
--                return -1;
--            }
--        } catch (IOException e) {
--            e.printStackTrace();
--            return -1;
--        }
--    }
--
--    @Nullable
--    private Component getHistory() {
--        final VersionHistoryManager.VersionData data = VersionHistoryManager.INSTANCE.getVersionData();
--        if (data == null) {
--            return null;
--        }
--
--        final String oldVersion = data.getOldVersion();
--        if (oldVersion == null) {
--            return null;
--        }
--
--        return Component.text("Previous version: " + oldVersion, NamedTextColor.GRAY, TextDecoration.ITALIC);
--    }
- }
++    // Fiddle start - branding changes - version fetcher
++    /**
++     * The original version fetcher for Paper. Most of the original content of this class has been moved to
++     * {@link PaperVersionFetcher}.
++     */
++    public static final class OriginalPaperVersionFetcher extends PaperVersionFetcher {
++
++        public OriginalPaperVersionFetcher() {
++            super("master", "https://papermc.io/downloads/paper", "Paper", "PaperMC", "PaperMC", "Paper");
++        }
++
++        @Override
++        protected boolean canFetchDistanceFromSiteApi() {
++            return true;
++        }
++
++        @Override
++        protected int fetchDistanceFromSiteApi(int jenkinsBuild) {
++            return fetchDistanceFromSiteApi(jenkinsBuild, this.getMinecraftVersion());
++        }
++        // Fiddle end - branding changes - version fetcher
++
+     private static int fetchDistanceFromSiteApi(int jenkinsBuild, @Nullable String siteApiVersion) {
+         if (siteApiVersion == null) { return -1; }
+         try {
+@@ -105,6 +172,8 @@ public class PaperVersionFetcher implements VersionFetcher {
+         }
+     }
+ 
++    } // Fiddle - branding changes - version fetcher
++
+     // Contributed by Techcable <Techcable@outlook.com> in GH-65
+     private static int fetchDistanceFromGitHub(@Nonnull String repo, @Nonnull String branch, @Nonnull String hash) {
+         try {
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 index 83cef5ec27c31f133a23cd27349f722799c786ea..90a3f82a2491379318db6382ed8b8f80524dbc0a 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
@@ -165,205 +183,32 @@ index 83cef5ec27c31f133a23cd27349f722799c786ea..90a3f82a2491379318db6382ed8b8f80
      }
  
      @Override
-diff --git a/src/main/java/org/fiddlemc/fiddle/version/AbstractPaperVersionFetcher.java b/src/main/java/org/fiddlemc/fiddle/version/AbstractPaperVersionFetcher.java
+diff --git a/src/main/java/org/fiddlemc/fiddle/version/FiddleVersionFetcher.java b/src/main/java/org/fiddlemc/fiddle/version/FiddleVersionFetcher.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..4a942eb75d5ccf9633b66a51e6208732c5da9b43
+index 0000000000000000000000000000000000000000..a14512b688dc4e35f33bf8c97eec870a079d99c2
 --- /dev/null
-+++ b/src/main/java/org/fiddlemc/fiddle/version/AbstractPaperVersionFetcher.java
-@@ -0,0 +1,179 @@
++++ b/src/main/java/org/fiddlemc/fiddle/version/FiddleVersionFetcher.java
+@@ -0,0 +1,23 @@
 +// Fiddle - branding changes - version fetcher
 +
 +package org.fiddlemc.fiddle.version;
 +
 +import com.destroystokyo.paper.PaperVersionFetcher;
-+import com.destroystokyo.paper.VersionHistoryManager;
-+import com.destroystokyo.paper.util.VersionFetcher;
-+import com.google.common.base.Charsets;
-+import com.google.gson.Gson;
-+import com.google.gson.JsonObject;
-+import com.google.gson.JsonSyntaxException;
-+import net.kyori.adventure.text.Component;
-+import net.kyori.adventure.text.TextComponent;
-+import net.kyori.adventure.text.event.ClickEvent;
-+import net.kyori.adventure.text.format.NamedTextColor;
-+import net.kyori.adventure.text.format.TextDecoration;
 +
-+import javax.annotation.Nonnull;
-+import javax.annotation.Nullable;
-+import java.io.BufferedReader;
-+import java.io.IOException;
-+import java.io.InputStreamReader;
-+import java.net.HttpURLConnection;
-+import java.net.URL;
++public final class FiddleVersionFetcher extends PaperVersionFetcher {
 +
-+/**
-+ * An abstract version fetcher, derived from {@link PaperVersionFetcher}.
-+ * This class was then made to be a superclass of both {@link PaperVersionFetcher}
-+ * and {@link FiddleVersionFetcher}.
-+ * <br>
-+ * Changes to {@link PaperVersionFetcher} are indicated by Fiddle marker comments.
-+ */
-+public abstract class AbstractPaperVersionFetcher implements VersionFetcher {
-+    private static final java.util.regex.Pattern VER_PATTERN = java.util.regex.Pattern.compile("^([0-9\\.]*)\\-.*R"); // R is an anchor, will always give '-R' at end
-+    private static @Nullable String mcVer;
-+
-+    // Fiddle start - branding changes - version fetcher
-+
-+    protected final String gitHubBranchName;
-+    protected final String downloadPage;
-+    protected final String projectDisplayName;
-+    protected final String organizationDisplayName;
-+    protected final String gitHubOrganizationName;
-+    protected final String gitHubRepoName;
-+
-+    protected AbstractPaperVersionFetcher(String githubBranchName, String downloadPage, String projectDisplayName, String organizationDisplayName, String gitHubOrganizationName, String gitHubRepoName) {
-+        this.gitHubBranchName = githubBranchName;
-+        this.downloadPage = downloadPage;
-+        this.projectDisplayName = projectDisplayName;
-+        this.organizationDisplayName = organizationDisplayName;
-+        this.gitHubOrganizationName = gitHubOrganizationName;
-+        this.gitHubRepoName = gitHubRepoName;
++    public FiddleVersionFetcher() {
++        super("master", "https://github.com/FiddleMC/Fiddle", "Fiddle", "FiddleMC", "FiddleMC", "Fiddle");
 +    }
-+
-+    // Fiddle end - branding changes - version fetcher
 +
 +    @Override
-+    public long getCacheTime() {
-+        return 720000;
-+    }
-+
-+    @Nonnull
-+    @Override
-+    public Component getVersionMessage(@Nonnull String serverVersion) {
-+        // Fiddle start - branding changes - version fetcher
-+        String[] parts = serverVersion.substring(("git-" + this.projectDisplayName + "-").length()).split("[-\\s]");
-+        final Component updateMessage = getUpdateStatusMessage(this.gitHubOrganizationName + "/" + this.gitHubRepoName, this.gitHubBranchName, parts[0]);
-+        // Fiddle end - branding changes - version fetcher
-+        final Component history = getHistory();
-+
-+        return history != null ? TextComponent.ofChildren(updateMessage, Component.newline(), history) : updateMessage;
-+    }
-+
-+    protected @Nullable String getMinecraftVersion() { // Fiddle - branding changes - version fetcher
-+        if (mcVer == null) {
-+            java.util.regex.Matcher matcher = VER_PATTERN.matcher(org.bukkit.Bukkit.getBukkitVersion());
-+            if (matcher.find()) {
-+                String result = matcher.group();
-+                mcVer = result.substring(0, result.length() - 2); // strip 'R' anchor and trailing '-'
-+            } else {
-+                org.bukkit.Bukkit.getLogger().warning("Unable to match version to pattern! Report to " + this.organizationDisplayName + "!"); // Fiddle - branding changes - version fetcher
-+                org.bukkit.Bukkit.getLogger().warning("Pattern: " + VER_PATTERN.toString());
-+                org.bukkit.Bukkit.getLogger().warning("Version: " + org.bukkit.Bukkit.getBukkitVersion());
-+            }
-+        }
-+
-+        return mcVer;
-+    }
-+
-+    // Fiddle start - branding changes - version fetcher
-+
 +    protected boolean canFetchDistanceFromSiteApi() {
 +        return false;
 +    }
 +
++    @Override
 +    protected int fetchDistanceFromSiteApi(int jenkinsBuild) {
 +        return -1;
-+    }
-+
-+    // Fiddle end - branding changes - version fetcher
-+
-+    private Component getUpdateStatusMessage(@Nonnull String repo, @Nonnull String branch, @Nonnull String versionInfo) {
-+        // Fiddle start - branding changes - version fetcher
-+        int distance = -1;
-+        boolean readFromSiteApi = false;
-+        if (this.canFetchDistanceFromSiteApi()) {
-+        // Fiddle end - branding changes - version fetcher
-+        try {
-+            int jenkinsBuild = Integer.parseInt(versionInfo);
-+            // Fiddle start - branding changes - version fetcher
-+            distance = this.fetchDistanceFromSiteApi(jenkinsBuild);
-+            readFromSiteApi = true;
-+        } catch (NumberFormatException ignored) {}
-+        }
-+        if (!readFromSiteApi) {
-+            // Fiddle end - branding changes - version fetcher
-+            versionInfo = versionInfo.replace("\"", "");
-+            distance = fetchDistanceFromGitHub(repo, branch, versionInfo);
-+        }
-+
-+        switch (distance) {
-+            case -1:
-+                return Component.text("Error obtaining version information", NamedTextColor.YELLOW);
-+            case 0:
-+                return Component.text("You are running the latest version", NamedTextColor.GREEN);
-+            case -2:
-+                return Component.text("Unknown version", NamedTextColor.YELLOW);
-+            default:
-+                return Component.text("You are " + distance + " version(s) behind", NamedTextColor.YELLOW)
-+                        .append(Component.newline())
-+                        .append(Component.text("Download the new version at: ")
-+                                .append(Component.text(this.downloadPage, NamedTextColor.GOLD) // Fiddle - branding changes - version fetcher
-+                                        .hoverEvent(Component.text("Click to open", NamedTextColor.WHITE))
-+                                        .clickEvent(ClickEvent.openUrl(this.downloadPage)))); // Fiddle - branding changes - version fetcher
-+        }
-+    }
-+
-+    // Contributed by Techcable <Techcable@outlook.com> in GH-65
-+    private static int fetchDistanceFromGitHub(@Nonnull String repo, @Nonnull String branch, @Nonnull String hash) {
-+        try {
-+            HttpURLConnection connection = (HttpURLConnection) new URL("https://api.github.com/repos/" + repo + "/compare/" + branch + "..." + hash).openConnection();
-+            connection.connect();
-+            if (connection.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND) return -2; // Unknown commit
-+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), Charsets.UTF_8))) {
-+                JsonObject obj = new Gson().fromJson(reader, JsonObject.class);
-+                String status = obj.get("status").getAsString();
-+                switch (status) {
-+                    case "identical":
-+                        return 0;
-+                    case "behind":
-+                        return obj.get("behind_by").getAsInt();
-+                    default:
-+                        return -1;
-+                }
-+            } catch (JsonSyntaxException | NumberFormatException e) {
-+                e.printStackTrace();
-+                return -1;
-+            }
-+        } catch (IOException e) {
-+            e.printStackTrace();
-+            return -1;
-+        }
-+    }
-+
-+    @Nullable
-+    private Component getHistory() {
-+        final VersionHistoryManager.VersionData data = VersionHistoryManager.INSTANCE.getVersionData();
-+        if (data == null) {
-+            return null;
-+        }
-+
-+        final String oldVersion = data.getOldVersion();
-+        if (oldVersion == null) {
-+            return null;
-+        }
-+
-+        return Component.text("Previous version: " + oldVersion, NamedTextColor.GRAY, TextDecoration.ITALIC);
-+    }
-+}
-diff --git a/src/main/java/org/fiddlemc/fiddle/version/FiddleVersionFetcher.java b/src/main/java/org/fiddlemc/fiddle/version/FiddleVersionFetcher.java
-new file mode 100644
-index 0000000000000000000000000000000000000000..714c2f94308f486f7e41d09ecb1849caa2901750
---- /dev/null
-+++ b/src/main/java/org/fiddlemc/fiddle/version/FiddleVersionFetcher.java
-@@ -0,0 +1,11 @@
-+// Fiddle - branding changes - version fetcher
-+
-+package org.fiddlemc.fiddle.version;
-+
-+public class FiddleVersionFetcher extends AbstractPaperVersionFetcher {
-+
-+    public FiddleVersionFetcher() {
-+        super("ver/1.20.1", "https://github.com/FiddleMC/Fiddle", "Fiddle", "FiddleMC", "FiddleMC", "Fiddle");
 +    }
 +
 +}
