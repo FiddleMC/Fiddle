@@ -1,106 +1,39 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
-Date: Sat, 22 Jul 2023 16:12:39 +0200
+Date: Sat, 22 Jul 2023 15:06:25 +0200
 Subject: [PATCH] Client perspective - Expose packet target client properties -
- Can be used by FriendlyByteBuf
+ Implement for bundle packets
 
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
-diff --git a/src/main/java/net/minecraft/network/FriendlyByteBuf.java b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
-index 9938bb90bef84cf784f9a1ceb02a1a45aa8b48a1..b759e92e920a14028937c24dda61b18c644684a8 100644
---- a/src/main/java/net/minecraft/network/FriendlyByteBuf.java
-+++ b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
-@@ -79,6 +79,7 @@ import net.minecraft.world.level.ChunkPos;
- import net.minecraft.world.level.Level;
- import net.minecraft.world.phys.BlockHitResult;
- import net.minecraft.world.phys.Vec3;
-+import org.jetbrains.annotations.NotNull;
- import org.joml.Quaternionf;
- import org.joml.Vector3f;
+diff --git a/src/main/java/net/minecraft/network/protocol/BundlePacket.java b/src/main/java/net/minecraft/network/protocol/BundlePacket.java
+index 0462cbff6eb3366077c1628c0c8a10e99c9fdf90..ecd10f0aaa29f442a8086954112bbac6b797f6a3 100644
+--- a/src/main/java/net/minecraft/network/protocol/BundlePacket.java
++++ b/src/main/java/net/minecraft/network/protocol/BundlePacket.java
+@@ -3,10 +3,11 @@ package net.minecraft.network.protocol;
+ import net.minecraft.network.FriendlyByteBuf;
+ import net.minecraft.network.PacketListener;
  
-@@ -98,6 +99,13 @@ public class FriendlyByteBuf extends ByteBuf {
-     private static final int MAX_PUBLIC_KEY_LENGTH = 512;
-     private static final Gson GSON = new Gson();
+-public abstract class BundlePacket<T extends PacketListener> implements Packet<T> {
++public abstract class BundlePacket<T extends PacketListener> extends org.fiddlemc.fiddle.packet.PacketWithExplicitTargetClientConnection<T> { // Fiddle - client perspective - packets are modifiable - expose target client properties - bundle
+     protected Iterable<Packet<T>> packets; // Fiddle - client perspective - packets are modifiable - bundle - private -> protected, non-final -> final
  
-+    // Fiddle start - client perspective - packets are modifiable - store explicit perspective and locale - FriendlyByteBuf
-+    /**
-+     * The packet that is writing its contents to this {@link FriendlyByteBuf}.
-+     */
-+    public @Nullable java.lang.ref.WeakReference<net.minecraft.network.protocol.@NotNull Packet<?>> writingPacket;
-+    // Fiddle end - client perspective - packets are modifiable - store explicit perspective and locale - FriendlyByteBuf
-+
-     public FriendlyByteBuf(ByteBuf parent) {
-         this.source = parent;
+     protected BundlePacket(Iterable<Packet<T>> packets) {
++        super(); // Fiddle - client perspective - packets are modifiable - expose target client properties - bundle
+         this.packets = packets;
      }
-@@ -1676,4 +1684,58 @@ public class FriendlyByteBuf extends ByteBuf {
-             };
-         }
-     }
-+
-+    // Fiddle start - client perspective - packets are modifiable - expose target client properties - can be used by FriendlyByteBuf
-+    /**
-+     * @return The explicit {@link org.fiddlemc.fiddle.packet.ClientPerspective} of the target client of a packet that is writing its contents
-+     * to this {@link FriendlyByteBuf}.
-+     * This method always return a non-null value or throws an exception, and it must never actually throw
-+     * such an exception (if there is a possibility of an exception being thrown,
-+     * the method should not be called at all), similarly to
-+     * {@link net.minecraft.network.protocol.Packet#getExplicitTargetClientPerspective()}.
-+     */
-+    public @NotNull org.fiddlemc.fiddle.packet.ClientPerspective getExplicitTargetClientPerspective() throws NullPointerException {
-+        return this.writingPacket.get().getExplicitTargetClientPerspective();
-+    }
-+
-+    /**
-+     * @return The same value as {@link #getExplicitTargetClientPerspective()}, except that it returns null
-+     * where {@link #getExplicitTargetClientPerspective()} would otherwise throw an exception.
-+     */
-+    public @Nullable org.fiddlemc.fiddle.packet.ClientPerspective getExplicitTargetClientPerspectiveOrNull() throws NullPointerException {
-+        if (this.writingPacket == null) {
-+            return null;
-+        }
-+        var actualWritingPacket = this.writingPacket.get();
-+        if (actualWritingPacket == null) {
-+            return null;
-+        }
-+        return actualWritingPacket.getExplicitTargetClientPerspectiveOrNull();
-+    }
-+
-+    /**
-+     * @return The explicit {@link net.minecraft.server.level.ServerPlayer#locale}
-+     * of the target client of a packet that is writing its contents to this {@link FriendlyByteBuf}.
-+     * This method always return a nullable value or throws an exception, and it must never actually throw
-+     * such an exception (if there is a possibility of an exception being thrown,
-+     * the method should not be called at all), similarly to
-+     * {@link net.minecraft.network.protocol.Packet#getExplicitTargetLocale()}.
-+     */
-+    public @Nullable String getExplicitTargetLocale() throws NullPointerException {
-+        return this.writingPacket.get().getExplicitTargetLocale();
-+    }
-+
-+    /**
-+     * @return The explicit {@linkplain net.minecraft.server.level.ServerPlayerGameMode#getGameModeForPlayer() game mode}
-+     * of the target player of a packet that is writing its contents to this {@link FriendlyByteBuf}.
-+     * This method always return a non-null value or throws an exception, and it must never actually throw
-+     * such an exception (if there is a possibility of an exception being thrown,
-+     * the method should not be called at all), similarly to
-+     * {@link net.minecraft.network.protocol.Packet#getExplicitTargetClientPerspective()}.
-+     */
-+    public @NotNull net.minecraft.world.level.GameType getExplicitTargetGameMode() throws NullPointerException {
-+        return this.writingPacket.get().getExplicitTargetGameMode();
-+    }
-+    // Fiddle end - client perspective - packets are modifiable - expose target client properties - can be used by FriendlyByteBuf
-+
- }
-diff --git a/src/main/java/net/minecraft/network/PacketEncoder.java b/src/main/java/net/minecraft/network/PacketEncoder.java
-index fbfadeb83719b81f42724e79c59e92ed88fdece7..2e241eae0d70080512376ad4e30dc3f220e55c1a 100644
---- a/src/main/java/net/minecraft/network/PacketEncoder.java
-+++ b/src/main/java/net/minecraft/network/PacketEncoder.java
-@@ -33,6 +33,7 @@ public class PacketEncoder extends MessageToByteEncoder<Packet<?>> {
-                 throw new IOException("Can't serialize unregistered packet");
-             } else {
-                 FriendlyByteBuf friendlyByteBuf = new FriendlyByteBuf(byteBuf);
-+                friendlyByteBuf.writingPacket = new java.lang.ref.WeakReference<>(packet); // Fiddle - client perspective - packets are modifiable - expose target client properties - can be used by FriendlyByteBuf
-                 friendlyByteBuf.writeVarInt(i);
-                 friendlyByteBuf.adventure$locale = channelHandlerContext.channel().attr(PaperAdventure.LOCALE_ATTRIBUTE).get(); // Paper
  
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundBundlePacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundBundlePacket.java
+index ef465411b1a9e53eedb3c3b0ee3bb2975755a1e5..d11bc0d4bd3cdf2fc49b12ac76b9493cc984bd1e 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundBundlePacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundBundlePacket.java
+@@ -38,7 +38,7 @@ public class ClientboundBundlePacket extends BundlePacket<ClientGamePacketListen
+     }
+ 
+     @Override
+-    public @org.jetbrains.annotations.NotNull ClientboundBundlePacket adaptForClient(@org.jetbrains.annotations.NotNull net.minecraft.network.Connection connection) {
++    public @org.jetbrains.annotations.NotNull ClientboundBundlePacket postSetConnectionAdaptForClient(@org.jetbrains.annotations.NotNull net.minecraft.network.Connection connection) { // Fiddle - client perspective - packets are modifiable - expose target client properties - bundle
+         if (!this.mayBeSentToMultipleTargetClients && this.packets instanceof java.util.ArrayList<Packet<ClientGamePacketListener>> packetsAsList) {
+             // If this.mayBeSentToMultipleTargetClients os false and the packet iterable is an ArrayList, modify it in-place
+             for (int i = 0; i < packetsAsList.size(); i++) {

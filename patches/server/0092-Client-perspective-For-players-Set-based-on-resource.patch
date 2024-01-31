@@ -8,7 +8,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
-index fe33c9953e36ba28d68d6918b28e22b189172013..aa208c03065fc1d83914ab1021f9a1b092d22927 100644
+index 71febe3f1458b2aff5a890b78836981e84fcbca7..82baf4137c9778818bf5e9e06bdbac680c3ac2b9 100644
 --- a/src/main/java/net/minecraft/server/players/PlayerList.java
 +++ b/src/main/java/net/minecraft/server/players/PlayerList.java
 @@ -211,6 +211,7 @@ public abstract class PlayerList {

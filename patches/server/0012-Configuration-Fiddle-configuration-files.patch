@@ -799,20 +799,25 @@ index 0000000000000000000000000000000000000000..19a614ad123041aa483f45bb5b613f33
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/configuration/FiddleGlobalConfiguration.java b/src/main/java/org/fiddlemc/fiddle/configuration/FiddleGlobalConfiguration.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..a351868379448a6c300ef6d271a6b84c8feb1461
+index 0000000000000000000000000000000000000000..3ab7163a0389ef22ab683e41630c3499705ba9c0
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/configuration/FiddleGlobalConfiguration.java
-@@ -0,0 +1,23 @@
+@@ -0,0 +1,28 @@
 +// Fiddle - Fiddle configuration - global configuration
 +
 +package org.fiddlemc.fiddle.configuration;
 +
++import com.mojang.logging.LogUtils;
 +import io.papermc.paper.configuration.Configuration;
 +import io.papermc.paper.configuration.ConfigurationPart;
++import org.slf4j.Logger;
 +import org.spongepowered.configurate.objectmapping.meta.Setting;
 +
 +@SuppressWarnings({"CanBeFinal", "FieldCanBeLocal", "FieldMayBeFinal", "NotNullFieldNotInitialized", "InnerClassMayBeStatic"})
 +public class FiddleGlobalConfiguration extends ConfigurationPart {
++
++    private static final Logger LOGGER = LogUtils.getClassLogger();
++
 +    static final int CURRENT_VERSION = 1;
 +    private static FiddleGlobalConfiguration instance;
 +    public static FiddleGlobalConfiguration get() {

@@ -1,80 +1,147 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
-Date: Thu, 25 Jan 2024 21:10:14 +0100
+Date: Thu, 25 Jan 2024 20:33:47 +0100
 Subject: [PATCH] Read packs - Content - Definitions with parent - Abstract
- JSON parser
+ model
 
-Adds the abstract `FiddleContentDefinitionWithParentParser` class, that is a base for parsers that parse JSON into `FiddleContentDefinitionWithParent` instances.
+Adds an abstract class `FiddleContentDefinitionWithParent` for content definitions that have a parent,
+as well as classes representing the parent of a content definition, which can either be a base (`FiddleContentDefinitionBase`) or another resource of the same type (`FiddleContentDefinitionKeyParent`).
+
+An abstract JSON parser for these definitions is added in the "Read packs - Content - Definitions with parent - Abstract JSON parser" patch,
+and the resulting definition instances can be then be loaded by corresponding loading procedures, for which an abstract basis is added in the "Load packs - Content - Definitions with a parent - Abstract implementation" patch.
 
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
-diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/withparent/FiddleContentDefinitionWithParentParser.java b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/withparent/FiddleContentDefinitionWithParentParser.java
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/withparent/FiddleContentDefinitionBase.java b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/withparent/FiddleContentDefinitionBase.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..45454b36c5cdd3a341fd8c9ece025ae65d64516a
+index 0000000000000000000000000000000000000000..eca834dc16d1f0e22843d2d33fe1f07ebce0d040
 --- /dev/null
-+++ b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/withparent/FiddleContentDefinitionWithParentParser.java
-@@ -0,0 +1,63 @@
-+// Fiddle - read packs - content definitions with parent - JSON parser
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/withparent/FiddleContentDefinitionBase.java
+@@ -0,0 +1,32 @@
++// Fiddle - read packs - content definitions with parent - model
 +
 +package org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.withparent;
 +
 +import net.minecraft.resources.ResourceLocation;
-+import org.fiddlemc.fiddle.pack.exception.PackException;
-+import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.FiddleContentDefinitionParser;
-+import org.fiddlemc.fiddle.pack.read.namedjson.NamedJsonElement;
-+import org.fiddlemc.fiddle.pack.read.namedjson.NamedJsonObject;
-+import org.jetbrains.annotations.Nullable;
++import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.FiddleContentDefinitionType;
 +
-+public abstract class FiddleContentDefinitionWithParentParser<T extends FiddleContentDefinitionWithParent>
-+    implements FiddleContentDefinitionParser<T> {
++public class FiddleContentDefinitionBase
++    implements FiddleContentDefinitionParent {
 +
-+    public static final String parentJsonKey = "parent";
++    /**
++     * The typed {@link ResourceLocation}.
++     * The path always starts with the type prefix (which is <code>base/block</code> for blocks, for example).
++     * The path may be equal to the type prefix, otherwise the prefix is followed by a <code>/</code>.
++     */
++    public final ResourceLocation typedResourceLocation;
 +
-+    protected FiddleContentDefinitionWithParentParser() {
-+    }
-+
-+    protected abstract FiddleContentDefinitionBase[] getBases();
-+
-+    protected abstract T parse(
-+        ResourceLocation resourceLocation,
-+        NamedJsonObject definitionJson,
-+        FiddleContentDefinitionParent parent
-+    ) throws PackException;
-+
-+    protected FiddleContentDefinitionParent createKeyParent(ResourceLocation resourceLocation) {
-+        return new FiddleContentDefinitionKeyParent<>(resourceLocation);
-+    }
-+
-+    public @Nullable FiddleContentDefinitionBase getBaseByTypedResourceLocation(ResourceLocation resourceLocation) {
-+        for (var base : this.getBases()) {
-+            if (base.typedResourceLocation.equals(resourceLocation)) {
-+                return base;
-+            }
-+        }
-+        return null;
-+    }
-+
-+    private FiddleContentDefinitionParent getParentByTypedResourceLocation(ResourceLocation resourceLocation) {
-+        var base = this.getBaseByTypedResourceLocation(resourceLocation);
-+        if (base != null) {
-+            return base;
-+        }
-+        return this.createKeyParent(resourceLocation);
++    protected FiddleContentDefinitionBase(FiddleContentDefinitionType<?> type, ResourceLocation untypedResourceLocation) {
++        var typePrefix = "base/" + type.resourceLocationPathIdentifier;
++        var untypedPath = untypedResourceLocation.getPath();
++        this.typedResourceLocation = new ResourceLocation(
++            untypedResourceLocation.getNamespace(),
++            untypedPath.isEmpty() ? typePrefix : typePrefix + "/" + untypedPath
++        );
 +    }
 +
 +    @Override
-+    public final T parse(
-+        ResourceLocation resourceLocation,
-+        NamedJsonObject definitionJson
-+    ) throws PackException {
-+        // Parse the parent
-+        var parentString = definitionJson.getAsString(parentJsonKey, true, NamedJsonElement.BlankStringParseResult.THROW_EXCEPTION, null);
-+        var parentResourceLocation = new ResourceLocation(parentString);
-+        var parent = this.getParentByTypedResourceLocation(parentResourceLocation);
++    public String getOriginalString() {
++        return this.typedResourceLocation.toString();
++    }
 +
-+        // Parse the rest
-+        return this.parse(resourceLocation, definitionJson, parent);
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/withparent/FiddleContentDefinitionKeyParent.java b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/withparent/FiddleContentDefinitionKeyParent.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..8e3749c373a02126d3a7524a94ddcc93cb21ea29
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/withparent/FiddleContentDefinitionKeyParent.java
+@@ -0,0 +1,31 @@
++// Fiddle - read packs - content definitions with parent - model
++
++package org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.withparent;
++
++import net.minecraft.resources.ResourceLocation;
++
++/**
++ * A {@link FiddleContentDefinitionParent} that is identified by a {@link ResourceLocation},
++ * that must (at the right time) correspond to an existing resource of the {@linkplain Resource resource type}
++ * corresponding to the definition type.
++ */
++public class FiddleContentDefinitionKeyParent<Resource>
++    implements FiddleContentDefinitionParent {
++
++    public final ResourceLocation resourceLocation;
++
++    public FiddleContentDefinitionKeyParent(ResourceLocation resourceLocation) {
++        this.resourceLocation = resourceLocation;
++    }
++
++    @Override
++    public final String getOriginalString() {
++        return this.resourceLocation.toString();
++    }
++
++    @Override
++    public final String toString() {
++        return this.getOriginalString();
++    }
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/withparent/FiddleContentDefinitionParent.java b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/withparent/FiddleContentDefinitionParent.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..39edc09f6efe2d6c5b86617db5ae4a17c2585fab
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/withparent/FiddleContentDefinitionParent.java
+@@ -0,0 +1,12 @@
++// Fiddle - read packs - content definitions with parent - model
++
++package org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.withparent;
++
++/**
++ * A potential parent of a {@link FiddleContentDefinitionWithParent}.
++ */
++public interface FiddleContentDefinitionParent {
++
++    String getOriginalString();
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/withparent/FiddleContentDefinitionWithParent.java b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/withparent/FiddleContentDefinitionWithParent.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..8db2ab95003e78b9df59be5e2fc9e474dff59340
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/withparent/FiddleContentDefinitionWithParent.java
+@@ -0,0 +1,33 @@
++// Fiddle - read packs - content definitions with parent - model
++
++package org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.withparent;
++
++import net.minecraft.resources.ResourceLocation;
++import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.FiddleContentDefinition;
++import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.FiddleContentDefinitionType;
++
++import java.util.ArrayList;
++
++/**
++ * An abstract extension of {@link FiddleContentDefinition}, that references a parent.
++ */
++public class FiddleContentDefinitionWithParent
++    extends FiddleContentDefinition {
++
++    public final FiddleContentDefinitionParent parent;
++
++    protected FiddleContentDefinitionWithParent(FiddleContentDefinitionType<?> type, ResourceLocation untypedResourceLocation, FiddleContentDefinitionParent parent) {
++        super(type, untypedResourceLocation);
++        this.parent = parent;
++    }
++
++    @Override
++    public ArrayList<ResourceLocation> buildReferencedResourceLocations() {
++        var references = super.buildReferencedResourceLocations();
++        if (this.parent instanceof FiddleContentDefinitionKeyParent<?> keyParent) {
++            references.add(keyParent.resourceLocation);
++        }
++        return references;
 +    }
 +
 +}

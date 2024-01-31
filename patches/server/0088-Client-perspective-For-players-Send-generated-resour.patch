@@ -57,7 +57,7 @@ index b777547cb9f8edf4e7b3c2cfb894f8cd1b1a35a5..8e90ffa0d59ed708ab53c1b761a2c2a1
      }
  
 diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
-index 116aadb854e802abc7d0e50b705038f4675134f2..2c993c9825a67ef751ae5823e76a473d6e35542d 100644
+index 871cb3a58b3d410957893109f4148c87d70c83e8..0f3b2594f98668b61751ef6adf90aca1a8e42b71 100644
 --- a/src/main/java/net/minecraft/server/players/PlayerList.java
 +++ b/src/main/java/net/minecraft/server/players/PlayerList.java
 @@ -189,6 +189,19 @@ public abstract class PlayerList {
@@ -88,7 +88,7 @@ index 116aadb854e802abc7d0e50b705038f4675134f2..2c993c9825a67ef751ae5823e76a473d
          GameRules gamerules = worldserver1.getGameRules();
          boolean flag = gamerules.getBoolean(GameRules.RULE_DO_IMMEDIATE_RESPAWN);
          boolean flag1 = gamerules.getBoolean(GameRules.RULE_REDUCEDDEBUGINFO);
-@@ -390,6 +402,7 @@ public abstract class PlayerList {
+@@ -395,6 +407,7 @@ public abstract class PlayerList {
          worldserver1 = player.serverLevel(); // CraftBukkit - Update in case join event changed it
          // CraftBukkit end
          this.server.getServerResourcePack().ifPresent((minecraftserver_serverresourcepackinfo) -> {
@@ -97,7 +97,7 @@ index 116aadb854e802abc7d0e50b705038f4675134f2..2c993c9825a67ef751ae5823e76a473d
          });
          Iterator iterator = player.getActiveEffects().iterator();
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index 5b201d2c21f04e0223970035e0631f8f92ea0d3a..391c2c780c2ba6831070309f72d93f06b3afb466 100644
+index dbdeb913e228651cadf5dbd7ec98afc738c80522..0e6bd208b5bb8b90fbae1125c3398bca111e9a6a 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 @@ -2189,56 +2189,51 @@ public class CraftPlayer extends CraftHumanEntity implements Player {

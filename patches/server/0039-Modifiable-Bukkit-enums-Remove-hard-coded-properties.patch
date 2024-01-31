@@ -1,32 +1,121 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
-Date: Mon, 10 Jul 2023 22:05:08 +0200
+Date: Wed, 12 Jul 2023 21:35:48 +0200
 Subject: [PATCH] Modifiable Bukkit enums - Remove hard-coded properties -
- Material - Id
+ Material - Data class
 
-Adds a test for equality between `Material.getId` and its original backing implementation.
+Implements the abstract method defined in `UnsafeValues`
+in the "Modifiable Bukkit enums - Remove hard-coded properties - Material - Data class" patch in the `fiddle-api` module,
+in `CraftMagicNumbers`.
+
+Also adds a test based on the original backing implementation.
 
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
+diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
+index 5c165f3d2c8a35ddc2017ad0d3ad5ac5c2a3b923..458eec5b3b614429ae6e1c6578be289f9469504e 100644
+--- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
++++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
+@@ -830,6 +830,48 @@ public final class CraftMagicNumbers implements UnsafeValues {
+     }
+     // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - durability
+ 
++    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - data
++    @Override
++    public @org.jetbrains.annotations.NotNull Class<?> computeData(Material material) {
++        if (material.isLegacy()) {
++            return MaterialDefaultImplementations.computeDataLegacy(material);
++        }
++        if (!material.isBlock()) {
++            return MaterialData.class;
++        }
++        // Based on org.bukkit.PerMaterialTest#testBlockDataClass
++        var bukkitBlockData = Bukkit.createBlockData(material);
++        var bukkitBlockDataClass = bukkitBlockData.getClass();
++        // Get all interfaces implemented by the class
++        java.util.Set<Class<?>> interfaces = new java.util.HashSet<>(6);
++        java.util.Deque<Class<?>> interfacesToCheck = new java.util.ArrayDeque<>(6);
++        for (Class<?> bukkitBlockDataInterface : bukkitBlockDataClass.getInterfaces()) {
++            if (interfaces.add(bukkitBlockDataInterface)) {
++                interfacesToCheck.add(bukkitBlockDataInterface);
++            }
++        }
++        while (!interfacesToCheck.isEmpty()) {
++            var interfaceToCheck = interfacesToCheck.poll();
++            for (Class<?> interfaceToCheckSubinterface : interfaceToCheck.getInterfaces()) {
++                if (interfaces.add(interfaceToCheckSubinterface)) {
++                    interfacesToCheck.add(interfaceToCheckSubinterface);
++                }
++            }
++        }
++        var validInterfaces = interfaces.stream()
++            // Filter only the interfaces that are in the org.bukkit.block.data package
++            .filter(theInterface -> theInterface.getPackageName().startsWith("org.bukkit.block.data"))
++            // Filter only the interfaces that extend (but are not equal to) org.bukkit.block.data.BlockData
++            .filter(theInterface -> !BlockData.class.equals(theInterface) && BlockData.class.isAssignableFrom(theInterface))
++            .collect(java.util.stream.Collectors.toSet());
++        return validInterfaces.stream()
++            // Filter only the interfaces that are not extended by another interface in the set
++            .filter(theInterface -> interfaces.stream().noneMatch(otherInterface -> !otherInterface.equals(theInterface) && theInterface.isAssignableFrom(otherInterface)))
++            // Find the first such interface, or fall back to MaterialData
++            .findAny().orElse(MaterialData.class);
++    }
++    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - data
++
+     // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
+     @Override
+     public boolean isBlock(Material material) {
 diff --git a/src/test/java/org/fiddlemc/fiddle/material/legacy/PerLegacyMaterialTest.java b/src/test/java/org/fiddlemc/fiddle/material/legacy/PerLegacyMaterialTest.java
-index ce1651edc34e52086fffe62f8a6f6785c6c3ac59..72df25bd4166ce19963a66b9894cd20a89fb3769 100644
+index 468f1ef483294c7ec7b1712dc8f88865ea9e5874..ce1651edc34e52086fffe62f8a6f6785c6c3ac59 100644
 --- a/src/test/java/org/fiddlemc/fiddle/material/legacy/PerLegacyMaterialTest.java
 +++ b/src/test/java/org/fiddlemc/fiddle/material/legacy/PerLegacyMaterialTest.java
-@@ -36,6 +36,16 @@ public class PerLegacyMaterialTest extends AbstractTestingBase {
-         }
-     }
+@@ -5,6 +5,7 @@ package org.fiddlemc.fiddle.material.legacy;
+ import org.bukkit.Material;
+ import org.bukkit.craftbukkit.legacy.CraftLegacy;
+ import org.bukkit.support.AbstractTestingBase;
++import org.fiddlemc.fiddle.material.MaterialDefaultImplementations;
+ import org.junit.Test;
  
-+    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - id
+ import java.util.Arrays;
+@@ -60,6 +61,22 @@ public class PerLegacyMaterialTest extends AbstractTestingBase {
+     }
+     // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - durability
+ 
++    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - data
 +    @Test
-+    @SuppressWarnings("deprecation")
-+    public void getId() {
++    public void computeData_general() {
 +        for (Material material : getMaterials()) {
-+            assertEquals("getId equals legacy getId for " + material, material.getIdLegacy(), material.getId());
++            assertEquals("computeData equals hard-coded data for " + material, material.data, material.computeData());
 +        }
 +    }
-+    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - id
 +
-     // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - max stack size
++    @Test
++    public void computeData_legacy() {
++        for (Material material : getMaterials()) {
++            assertEquals("computeData equals legacy computeData for " + material, MaterialDefaultImplementations.computeDataLegacy(material), material.computeData());
++        }
++    }
++    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - data
++
+     // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
      @Test
-     public void getMaxStackSize() {
+     public void isBlock() {
+diff --git a/src/test/java/org/fiddlemc/fiddle/material/legacy/PerNonLegacyMaterialTest.java b/src/test/java/org/fiddlemc/fiddle/material/legacy/PerNonLegacyMaterialTest.java
+index b1a96deb7a50eb9fed7f2e25a083375be8e1e3eb..3234b4e74e22c25e534913697b578cefee6995e9 100644
+--- a/src/test/java/org/fiddlemc/fiddle/material/legacy/PerNonLegacyMaterialTest.java
++++ b/src/test/java/org/fiddlemc/fiddle/material/legacy/PerNonLegacyMaterialTest.java
+@@ -64,4 +64,13 @@ public class PerNonLegacyMaterialTest extends AbstractTestingBase {
+     }
+     // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - durability
+ 
++    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - data
++    @Test
++    public void computeData() {
++        for (Material material : getMaterials()) {
++            assertEquals("computeData equals hard-coded data for " + material, material.data, material.computeData());
++        }
++    }
++    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - data
++
+ }

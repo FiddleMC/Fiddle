@@ -8,7 +8,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/inventory/CraftMetaItem.java b/src/main/java/org/bukkit/craftbukkit/inventory/CraftMetaItem.java
-index 1481c8ca684eddca3eb5db3aceac4877043b9fcd..bf1c630484478b4fde6d5c0a8190387d9b960cad 100644
+index 076e06908a0cf97f86a64a15ca0231c5b0f06fec..0e1596dddbab283a2197f8d3a1b61438d2437dd8 100644
 --- a/src/main/java/org/bukkit/craftbukkit/inventory/CraftMetaItem.java
 +++ b/src/main/java/org/bukkit/craftbukkit/inventory/CraftMetaItem.java
 @@ -112,9 +112,11 @@ import java.util.Collections;

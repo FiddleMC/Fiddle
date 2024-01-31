@@ -7,12 +7,12 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/fiddlemc/fiddle/configuration/FiddleGlobalConfiguration.java b/src/main/java/org/fiddlemc/fiddle/configuration/FiddleGlobalConfiguration.java
-index a351868379448a6c300ef6d271a6b84c8feb1461..265fbc50ad9ee7d3d0eebe4c78c13d5dd082177a 100644
+index ee3dd1e3383989ccb17318b4c412f4bfe8b6eb28..0f1b5ec876f642f02f69516482da9e8d0a40a528 100644
 --- a/src/main/java/org/fiddlemc/fiddle/configuration/FiddleGlobalConfiguration.java
 +++ b/src/main/java/org/fiddlemc/fiddle/configuration/FiddleGlobalConfiguration.java
-@@ -20,4 +20,15 @@ public class FiddleGlobalConfiguration extends ConfigurationPart {
-     @Setting(Configuration.VERSION_FIELD)
-     public int version = CURRENT_VERSION;
+@@ -75,4 +75,15 @@ public class FiddleGlobalConfiguration extends ConfigurationPart {
+     }
+     // Fiddle end - override sent feature flags
  
 +    // Fiddle start - settings for pack creators
 +    public PackCreatorSettings packCreatorSettings;

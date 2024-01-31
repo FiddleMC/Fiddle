@@ -101,7 +101,7 @@ index 8e90ffa0d59ed708ab53c1b761a2c2a1a20a1e7b..33fb5a3036d04acdd6c70b843d268136
  
      // CraftBukkit start
 diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
-index 2c993c9825a67ef751ae5823e76a473d6e35542d..fe33c9953e36ba28d68d6918b28e22b189172013 100644
+index 0f3b2594f98668b61751ef6adf90aca1a8e42b71..71febe3f1458b2aff5a890b78836981e84fcbca7 100644
 --- a/src/main/java/net/minecraft/server/players/PlayerList.java
 +++ b/src/main/java/net/minecraft/server/players/PlayerList.java
 @@ -195,6 +195,15 @@ public abstract class PlayerList {
@@ -141,9 +141,9 @@ index 2c993c9825a67ef751ae5823e76a473d6e35542d..fe33c9953e36ba28d68d6918b28e22b1
 +        var worlddata = finalWorlddata;
 +        // Fiddle end - client perspective - wait for client information
          player.getBukkitEntity().sendSupportedChannels(); // CraftBukkit
-         playerconnection.send(new ClientboundUpdateEnabledFeaturesPacket(FeatureFlags.REGISTRY.toNames(worldserver1.enabledFeatures())));
-         playerconnection.send(new ClientboundCustomPayloadPacket(ClientboundCustomPayloadPacket.BRAND, (new FriendlyByteBuf(Unpooled.buffer())).writeUtf(this.getServer().getServerModName())));
-@@ -425,6 +450,16 @@ public abstract class PlayerList {
+         // Fiddle start - override sent feature flags
+         var featureFlagsToSend = FeatureFlags.REGISTRY.toNames(worldserver1.enabledFeatures());
+@@ -430,6 +455,16 @@ public abstract class PlayerList {
              );
          }
          // Paper end

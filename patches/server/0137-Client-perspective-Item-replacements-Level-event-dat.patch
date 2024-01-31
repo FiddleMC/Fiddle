@@ -1,62 +1,60 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
-Date: Thu, 4 Jan 2024 22:05:13 +0100
+Date: Thu, 4 Jan 2024 22:14:55 +0100
 Subject: [PATCH] Client perspective - Item replacements - Level event data -
- Play jukebox sound
+ Data can be ItemStack
 
-Fires the level event of starting or stopping the sound of a music disc in a jukebox, with the data value directly being the corresponding music disc `ItemStack` (or `Items#AIR` in the case of stopping).
+Allows the data of level events (`ClientboundLevelEventPacket.data`) to be an `ItemStack` instance,
+and provides the implementation of turning it into an integer value in an analogous way to that for `Item` instances provided in the "Client perspective - Item replacements - Level event data - Data can be Item" patch.
 
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelEventPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelEventPacket.java
-index fa60a241c006596df52bd8f9b80f50a14dc7bc9d..5b1fd6d3f66398b9c55be32f5591feb598cb0645 100644
+index 563ac780f7de798095297ef4b729412e3105f983..fa60a241c006596df52bd8f9b80f50a14dc7bc9d 100644
 --- a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelEventPacket.java
 +++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelEventPacket.java
-@@ -189,6 +189,11 @@ public class ClientboundLevelEventPacket extends org.fiddlemc.fiddle.packet.Clon
- 
-     // Fiddle start - client perspective - item replacements - level event data - data can be Item
-     private org.fiddlemc.fiddle.packet.item.ItemInPacketContext getItemInPacketContextByType() {
-+        // Fiddle start - client perspective - item replacements - level event data - play jukebox sound
-+        if (this.type == net.minecraft.world.level.block.LevelEvent.SOUND_PLAY_JUKEBOX_SONG || this.type == net.minecraft.world.level.block.LevelEvent.SOUND_STOP_JUKEBOX_SONG) {
-+            return org.fiddlemc.fiddle.packet.item.ItemInPacketContext.JUKEBOX_MUSIC_DISC;
-+        }
-+        // Fiddle end - client perspective - item replacements - level event data - play jukebox sound
-         throw new IllegalStateException("Tried to convert level event data from Item with an unsupported type: " + this.type);
-     }
-     // Fiddle end - client perspective - item replacements - level event data - data can be Item
-diff --git a/src/main/java/net/minecraft/world/level/block/entity/JukeboxBlockEntity.java b/src/main/java/net/minecraft/world/level/block/entity/JukeboxBlockEntity.java
-index 62acd6686626c84c9fc3964af62097101e8e582f..7c542d041e66532bbebdb8fe6ad30cec9d9b4658 100644
---- a/src/main/java/net/minecraft/world/level/block/entity/JukeboxBlockEntity.java
-+++ b/src/main/java/net/minecraft/world/level/block/entity/JukeboxBlockEntity.java
-@@ -122,7 +122,7 @@ public class JukeboxBlockEntity extends BlockEntity implements Clearable, Contai
-         this.recordStartedTick = this.tickCount;
-         this.isPlaying = true;
-         this.level.updateNeighborsAt(this.getBlockPos(), this.getBlockState().getBlock());
--        this.level.levelEvent((Player) null, 1010, this.getBlockPos(), Item.getId(this.getFirstItem().getItem()));
-+        this.level.levelEvent((Player) null, 1010, this.getBlockPos(), this.getFirstItem()); // Fiddle - client perspective - item replacements - level event data - play jukebox sound
-         this.setChanged();
-     }
- 
-@@ -130,7 +130,7 @@ public class JukeboxBlockEntity extends BlockEntity implements Clearable, Contai
-         this.isPlaying = false;
-         this.level.gameEvent(GameEvent.JUKEBOX_STOP_PLAY, this.getBlockPos(), GameEvent.Context.of(this.getBlockState()));
-         this.level.updateNeighborsAt(this.getBlockPos(), this.getBlockState().getBlock());
--        this.level.levelEvent(1011, this.getBlockPos(), 0);
-+        this.level.levelEvent(1011, this.getBlockPos(), net.minecraft.world.item.Items.AIR); // Fiddle - client perspective - item replacements - level event data - play jukebox sound
-         this.setChanged();
-     }
- 
-diff --git a/src/main/java/org/bukkit/craftbukkit/CraftEffect.java b/src/main/java/org/bukkit/craftbukkit/CraftEffect.java
-index 2d8172f1b55f17bbc66dc5e870073c9df28d6abe..721d577e5fa29cb36b4d739e2820679c257e689f 100644
---- a/src/main/java/org/bukkit/craftbukkit/CraftEffect.java
-+++ b/src/main/java/org/bukkit/craftbukkit/CraftEffect.java
-@@ -28,7 +28,7 @@ public class CraftEffect {
-             break;
-         case RECORD_PLAY:
-             Preconditions.checkArgument(data == Material.AIR || ((Material) data).isRecord(), "Invalid record type for Material %s!", data);
--            datavalue = Item.getId(CraftMagicNumbers.getItem((Material) data));
-+            datavalue = CraftMagicNumbers.getItem((Material) data); // Fiddle - client perspective - item replacements - level event data - play jukebox sound
-             break;
-         case SMOKE:
-             switch ((BlockFace) data) {
+@@ -53,8 +53,15 @@ public class ClientboundLevelEventPacket extends org.fiddlemc.fiddle.packet.Clon
+             }
+             // Fiddle end - client perspective - block state visualization - level event data - data can be BlockState
+             // Fiddle start - client perspective - item replacements - level event data - data can be Item
+-        } else if (this.data instanceof net.minecraft.world.item.Item item) {
+-            var itemToSend = org.fiddlemc.fiddle.packet.item.ItemInPacketReplacer.replace(item, this.getItemInPacketContextByType());
++            // Fiddle start - client perspective - item replacements - level event data - data can be ItemStack
++        } else if (this.data instanceof net.minecraft.world.item.Item || this.data instanceof net.minecraft.world.item.ItemStack) {
++            net.minecraft.world.item.Item itemToSend;
++            if (this.data instanceof net.minecraft.world.item.Item item) {
++                itemToSend = org.fiddlemc.fiddle.packet.item.ItemInPacketReplacer.replace(item, this.getItemInPacketContextByType());
++            } else {
++                itemToSend = org.fiddlemc.fiddle.packet.item.ItemInPacketReplacer.replace((net.minecraft.world.item.ItemStack) this.data, this.getItemInPacketContextByType());
++            }
++            // Fiddle end - client perspective - item replacements - level event data - data can be ItemStack
+             if (itemToSend != null) {
+                 if (org.fiddlemc.fiddle.packet.ClientPerspective.getSinglePacketItemId(itemToSend) != -1) {
+                     return true;
+@@ -133,14 +140,24 @@ public class ClientboundLevelEventPacket extends org.fiddlemc.fiddle.packet.Clon
+             return clientPerspective.getPacketBlockStateId(stateToSend);
+             // Fiddle end - client perspective - block state visualization - level event data - data can be BlockState
+             // Fiddle start - client perspective - item replacements - level event data - data can be Item
+-        } else if (this.data instanceof net.minecraft.world.item.Item item) {
++        } else if (this.data instanceof net.minecraft.world.item.Item || this.data instanceof net.minecraft.world.item.ItemStack) { // Fiddle - client perspective - item replacements - level event data - data can be ItemStack
+             // Replace the item
+             net.minecraft.world.item.Item itemToSend;
++            if (this.data instanceof net.minecraft.world.item.Item item) { // Fiddle - client perspective - item replacements - level event data - data can be ItemStack
+             itemToSend = org.fiddlemc.fiddle.packet.item.ItemInPacketReplacer.replace(item, this.getItemInPacketContextByType());
+             if (itemToSend == null) {
+                 var clientPerspective = this.getExplicitTargetClientPerspective();
+                 itemToSend = org.fiddlemc.fiddle.packet.item.ItemInPacketReplacer.replace(item, clientPerspective, this.getItemInPacketContextByType());
+             }
++            // Fiddle start - client perspective - item replacements - level event data - data can be ItemStack
++            } else {
++                itemToSend = org.fiddlemc.fiddle.packet.item.ItemInPacketReplacer.replace((net.minecraft.world.item.ItemStack) this.data, this.getItemInPacketContextByType());
++                if (itemToSend == null) {
++                    var clientPerspective = this.getExplicitTargetClientPerspective();
++                    itemToSend = org.fiddlemc.fiddle.packet.item.ItemInPacketReplacer.replace((net.minecraft.world.item.ItemStack) this.data, clientPerspective, this.getItemInPacketContextByType());
++                }
++            }
++            // Fiddle end - client perspective - item replacements - level event data - data can be ItemStack
+             // Turn the item to send into an id that the client can interpret
+             int singleValue = org.fiddlemc.fiddle.packet.ClientPerspective.getSinglePacketItemId(itemToSend);
+             if (singleValue != -1) {

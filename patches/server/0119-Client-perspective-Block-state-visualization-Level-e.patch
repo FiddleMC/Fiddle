@@ -1,0 +1,37 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Thu, 4 Jan 2024 22:40:25 +0100
+Subject: [PATCH] Client perspective - Block state visualization - Level event
+ data - Block brush completion
+
+Fires the level event of block brush completion, with the data value directly being the involved `BlockState`.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelEventPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelEventPacket.java
+index 2a92e1d7b812b3a1b2d48d6a14ee5e36978d3cfd..a92d7afceec299e2aefccfa558a995b233ad89cd 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelEventPacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelEventPacket.java
+@@ -136,7 +136,7 @@ public class ClientboundLevelEventPacket extends org.fiddlemc.fiddle.packet.Clon
+     // Fiddle start - client perspective - block state visualization - level event data - data can be BlockState
+     private org.fiddlemc.fiddle.packet.block.BlockStateVisualizationSetupper.BlockStateVisualizationPurpose getBlockStateVisualizationPurposeByType() {
+         // Fiddle start - client perspective - block state visualization - level event data - block break particles
+-        if (this.type == net.minecraft.world.level.block.LevelEvent.PARTICLES_DESTROY_BLOCK) {
++        if (this.type == net.minecraft.world.level.block.LevelEvent.PARTICLES_DESTROY_BLOCK || this.type == net.minecraft.world.level.block.LevelEvent.PARTICLES_AND_SOUND_BRUSH_BLOCK_COMPLETE) { // Fiddle - client perspective - block state visualization - level event data - block brush complete
+             return org.fiddlemc.fiddle.packet.block.BlockStateVisualizationSetupper.BlockStateVisualizationPurpose.PARTICLE;
+         }
+         // Fiddle end - client perspective - block state visualization - level event data - block break particles
+diff --git a/src/main/java/net/minecraft/world/level/block/entity/BrushableBlockEntity.java b/src/main/java/net/minecraft/world/level/block/entity/BrushableBlockEntity.java
+index 0425151e688966442340ea1cf892aff34ffe0791..c9c140951e2a682333d95218d2b630da88704dad 100644
+--- a/src/main/java/net/minecraft/world/level/block/entity/BrushableBlockEntity.java
++++ b/src/main/java/net/minecraft/world/level/block/entity/BrushableBlockEntity.java
+@@ -128,7 +128,7 @@ public class BrushableBlockEntity extends BlockEntity {
+             this.dropContent(player);
+             BlockState iblockdata = this.getBlockState();
+ 
+-            this.level.levelEvent(3008, this.getBlockPos(), Block.getId(iblockdata));
++            this.level.levelEvent(3008, this.getBlockPos(), iblockdata); // Fiddle - client perspective - block state visualization - level event data - block brush complete
+             Block block = this.getBlockState().getBlock();
+             Block block1;
+ 
