@@ -19,7 +19,7 @@ Licensed (except for image files) under: GPL-3.0 (https://www.gnu.org/licenses/g
 Gale - https://galemc.org
 
 diff --git a/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java b/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
-index 9d687da5bdf398bb3f6c84cdf1249a7213d09f2e..31327c13c1bee7465e6e6125726fac73b7717b1a 100644
+index 9d687da5bdf398bb3f6c84cdf1249a7213d09f2e..00ea2f4cbdcbd41f9b8d1a18da36093df57de796 100644
 --- a/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
 +++ b/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
 @@ -17,12 +17,35 @@ import java.net.HttpURLConnection;
@@ -124,7 +124,7 @@ index 9d687da5bdf398bb3f6c84cdf1249a7213d09f2e..31327c13c1bee7465e6e6125726fac73
              versionInfo = versionInfo.replace("\"", "");
              distance = fetchDistanceFromGitHub(repo, branch, versionInfo);
          }
-@@ -75,12 +120,34 @@ public class PaperVersionFetcher implements VersionFetcher {
+@@ -75,12 +120,33 @@ public class PaperVersionFetcher implements VersionFetcher {
                  return Component.text("You are " + distance + " version(s) behind", NamedTextColor.YELLOW)
                          .append(Component.newline())
                          .append(Component.text("Download the new version at: ")
@@ -138,8 +138,7 @@ index 9d687da5bdf398bb3f6c84cdf1249a7213d09f2e..31327c13c1bee7465e6e6125726fac73
  
 +    // Fiddle start - branding changes - version fetcher
 +    /**
-+     * The original version fetcher for Paper. Most of the original content of this class has been moved to
-+     * {@link PaperVersionFetcher}.
++     * The original version fetcher for Paper.
 +     */
 +    public static final class OriginalPaperVersionFetcher extends PaperVersionFetcher {
 +
@@ -161,7 +160,7 @@ index 9d687da5bdf398bb3f6c84cdf1249a7213d09f2e..31327c13c1bee7465e6e6125726fac73
      private static int fetchDistanceFromSiteApi(int jenkinsBuild, @Nullable String siteApiVersion) {
          if (siteApiVersion == null) { return -1; }
          try {
-@@ -105,6 +172,8 @@ public class PaperVersionFetcher implements VersionFetcher {
+@@ -105,6 +171,8 @@ public class PaperVersionFetcher implements VersionFetcher {
          }
      }
  

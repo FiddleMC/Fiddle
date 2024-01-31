@@ -7,13 +7,13 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 2c3c77c287f34e4ded3d60dea2a79ebce428fd97..4511b9e87ff612cf21183ba830f44ed604749747 100644
+index cbb76b6e0102988673f667c936e3dd10cf4c0750..523f1c3943e02fab39a4067ff29cee6b878f707b 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -66,6 +66,10 @@ dependencies {
  
      implementation("io.netty:netty-all:4.1.87.Final"); // Paper - Bump netty
-     implementation("net.bytebuddy:byte-buddy:1.14.5") // Fiddle - modifiable Bukkit enums - inject runtime versions - depend on ByteBuddy
+     implementation("net.bytebuddy:byte-buddy:1.14.11") // Fiddle - modifiable Bukkit enums - inject runtime versions - depend on ByteBuddy
 +    // Fiddle start - read packs - depend on 7-Zip-JBinding
 +    implementation("net.sf.sevenzipjbinding:sevenzipjbinding:16.02-2.01")
 +    implementation("net.sf.sevenzipjbinding:sevenzipjbinding-all-platforms:16.02-2.01")
