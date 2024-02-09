@@ -49,7 +49,7 @@ index c6e897377a80133df3039394a66e3fcc30886675..befba01ebb79f651ecb3419950dd1a6d
      }
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/load/data/FiddlePackResources.java b/src/main/java/org/fiddlemc/fiddle/pack/load/data/FiddlePackResources.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..8b79202c4dcd5f9a5f63aca7dfabe5ea42817aef
+index 0000000000000000000000000000000000000000..24579d95613f30f40b48b29145df27a2f8d4c341
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/load/data/FiddlePackResources.java
 @@ -0,0 +1,200 @@
@@ -247,8 +247,8 @@ index 0000000000000000000000000000000000000000..8b79202c4dcd5f9a5f63aca7dfabe5ea
 +    public void close() {
 +        try {
 +            this.getFilesProvider().closeHandlesAndClearCacheUnlessInStartupLoadPhase();
-+        } catch (IOException e) {
-+            LOGGER.warn("IOException while closing pack resources: " + e.getMessage(), e);
++        } catch (Exception e) {
++            LOGGER.warn("Exception while closing pack resources: " + e.getMessage(), e);
 +        }
 +    }
 +

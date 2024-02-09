@@ -21,14 +21,13 @@ index c65ce69ac0cfdd04b16ce4ecd5b87536d727edd4..14bbd01eb15bb922d1562641cecf9589
      RecipeSerializer<SmithingTrimRecipe> SMITHING_TRIM = register("smithing_trim", new SmithingTrimRecipe.Serializer());
      RecipeSerializer<DecoratedPotRecipe> DECORATED_POT_RECIPE = register("crafting_decorated_pot", new SimpleCraftingRecipeSerializer<>(DecoratedPotRecipe::new));
 diff --git a/src/main/java/net/minecraft/world/item/crafting/StonecutterRecipe.java b/src/main/java/net/minecraft/world/item/crafting/StonecutterRecipe.java
-index 6d5803fcdd0a0b2d106745e9e6b859693b2aade2..2a9536867038f9a25a997d14e3688f06717c19c8 100644
+index e1b3e8c70cdc99ccff805f438b0c8063feafbc66..12991fec28f86f617e982f6701a530f6872c8cc6 100644
 --- a/src/main/java/net/minecraft/world/item/crafting/StonecutterRecipe.java
 +++ b/src/main/java/net/minecraft/world/item/crafting/StonecutterRecipe.java
-@@ -41,4 +41,29 @@ public class StonecutterRecipe extends SingleItemRecipe {
-         return recipe;
+@@ -48,4 +48,28 @@ public class StonecutterRecipe extends SingleItemRecipe {
      }
-     // CraftBukkit end
-+
+     // Fiddle end - gameplay mechanics - automatically extend stonecutter recipes
+ 
 +    // Fiddle start - client perspective - item replacements - pass context of stonecutter recipe results
 +    /**
 +     * A {@link SingleItemRecipe.Serializer} that writes the {@link #result}

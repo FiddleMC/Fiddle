@@ -1,0 +1,20 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Fri, 9 Feb 2024 18:50:12 +0100
+Subject: [PATCH] Read packs - Depend on Junrar
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/build.gradle.kts b/build.gradle.kts
+index 953f361976cb55ec4fa9625b51212019d92f2b79..d1c9e9bd44f53a07aa1a58a5c6d9ccff6dc937ff 100644
+--- a/build.gradle.kts
++++ b/build.gradle.kts
+@@ -74,6 +74,7 @@ dependencies {
+     implementation("net.sf.sevenzipjbinding:sevenzipjbinding-linux-armv6:16.02-2.01")
+     implementation("net.sf.sevenzipjbinding:sevenzipjbinding-linux-armv71:16.02-2.01")
+     // Fiddle end - read packs - depend on 7-Zip-JBinding
++    implementation("com.github.junrar:junrar:7.5.5") // Fiddle - read packs - depend on Junrar
+ }
+ 
+ val craftbukkitPackageVersion = "1_20_R1" // Paper

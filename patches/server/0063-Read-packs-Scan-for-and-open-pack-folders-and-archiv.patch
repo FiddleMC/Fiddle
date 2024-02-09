@@ -7,7 +7,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index a3db353f46cd896bfa8262ae867eae1c18803d9d..9658564ee6607b6ecae589d30bfcd709e3dd1d83 100644
+index 151648a1c6bb4ef04132f334eaa7677aa35a85cf..f7f67d159122519106005f892a87c11af09f914e 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
 @@ -188,6 +188,8 @@ public class Main {
@@ -27,7 +27,7 @@ index a3db353f46cd896bfa8262ae867eae1c18803d9d..9658564ee6607b6ecae589d30bfcd709
 +            for (var pack : org.fiddlemc.fiddle.pack.FiddlePacks.getPacks()) {
 +                try {
 +                    pack.filesProvider().closeHandlesAndClearCache();
-+                } catch (IOException e) {
++                } catch (Exception e) {
 +                    throw new RuntimeException("Exception while closing a pack that was being read", e);
 +                }
 +            }
@@ -36,7 +36,7 @@ index a3db353f46cd896bfa8262ae867eae1c18803d9d..9658564ee6607b6ecae589d30bfcd709
              /*
              IRegistryCustom.Dimension iregistrycustom_dimension = worldstem.registries().compositeAccess();
 diff --git a/src/main/java/org/bukkit/craftbukkit/Main.java b/src/main/java/org/bukkit/craftbukkit/Main.java
-index daed278d1bcf84ee42749f24e311b22b70015d79..7bf1e22ff2add483d46b851a9e21a267392dc83e 100644
+index 9dea698c1c4b07231ae8eb47b91ca53430ea5660..f535ca44db3311e8479afca06f9bf53f1b706731 100644
 --- a/src/main/java/org/bukkit/craftbukkit/Main.java
 +++ b/src/main/java/org/bukkit/craftbukkit/Main.java
 @@ -18,6 +18,13 @@ public class Main {
@@ -78,14 +78,16 @@ index daed278d1bcf84ee42749f24e311b22b70015d79..7bf1e22ff2add483d46b851a9e21a267
                          .ofType(String.class)
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/PackScanner.java b/src/main/java/org/fiddlemc/fiddle/pack/read/PackScanner.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..1293479128c9759c8f3077b5c7729ed177614ee8
+index 0000000000000000000000000000000000000000..b5f2ad47bfb87a95d8e965ad3c3dce18a2af5659
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/read/PackScanner.java
-@@ -0,0 +1,106 @@
+@@ -0,0 +1,125 @@
 +// Fiddle - read packs - scan for packs
 +
 +package org.fiddlemc.fiddle.pack.read;
 +
++import com.github.junrar.Junrar;
++import com.google.common.collect.Streams;
 +import com.google.gson.JsonElement;
 +import com.google.gson.JsonParser;
 +import com.mojang.logging.LogUtils;
@@ -105,6 +107,7 @@ index 0000000000000000000000000000000000000000..1293479128c9759c8f3077b5c7729ed1
 +import org.slf4j.Logger;
 +
 +import java.io.File;
++import java.io.IOException;
 +import java.util.*;
 +
 +/**
@@ -113,6 +116,9 @@ index 0000000000000000000000000000000000000000..1293479128c9759c8f3077b5c7729ed1
 +public final class PackScanner {
 +
 +    private static final String packMetaFilename = "pack.mcmeta";
++    // Accept .jar files in the packs folder too (to use them as packs without the plugin code, which is useful if the code has broken after an update)
++    private static final String[] javaExtractableArchiveExtensions = {"zip", "jar", "gz"};
++    private static final String[] rarExtractableArchiveExtensions = {"rar"};
 +
 +    private static final Logger LOGGER = LogUtils.getClassLogger();
 +
@@ -130,8 +136,7 @@ index 0000000000000000000000000000000000000000..1293479128c9759c8f3077b5c7729ed1
 +            if (folder.exists() && folder.isDirectory()) {
 +                for (File file : Objects.requireNonNull(folder.listFiles())) {
 +                    String lowerCaseName = file.getName().toLowerCase(Locale.ROOT);
-+                    // Accept .jar files in the packs folder too (to use them as packs without the plugin code, which is useful if the code has broken after an update)
-+                    if (lowerCaseName.endsWith(".jar") || (!checkingPlugins && (lowerCaseName.endsWith(".zip") || lowerCaseName.endsWith(".rar") || file.isDirectory()))) {
++                    if (file.isDirectory() || Streams.concat(Arrays.stream(javaExtractableArchiveExtensions), Arrays.stream(rarExtractableArchiveExtensions)).anyMatch(extension -> lowerCaseName.endsWith("." + extension))) {
 +                        scanForAndOpenPack(file);
 +                    }
 +                }
@@ -152,7 +157,21 @@ index 0000000000000000000000000000000000000000..1293479128c9759c8f3077b5c7729ed1
 +            if (packFile.isDirectory()) {
 +                filesProvider = new DirectoryFiddlePackFilesProvider(packFile);
 +            } else {
-+                filesProvider = new ArchiveFileFiddlePackFilesProvider(packFile);
++                boolean isRar = Arrays.stream(rarExtractableArchiveExtensions).anyMatch(extension -> packFile.getName().toLowerCase().endsWith("." + extension));
++                if (!SevenZipSupport.is7ZipAvailable() && isRar) {
++                    // Extract the rar into a temporary folder, then open that as a directory
++                    File temporaryDirectory = File.createTempFile("fepr.",".unrar");
++                    if(!(temporaryDirectory.delete())){
++                        throw new IOException("Could not delete temporary file/directory: " + temporaryDirectory.getPath());
++                    }
++                    if(!(temporaryDirectory.mkdir())){
++                        throw new IOException("Could not create temporary directory: " + temporaryDirectory.getPath());
++                    }
++                    Junrar.extract(packFile, temporaryDirectory);
++                    filesProvider = new DirectoryFiddlePackFilesProvider(temporaryDirectory, packFile);
++                } else {
++                    filesProvider = new ArchiveFileFiddlePackFilesProvider(packFile, isRar);
++                }
 +            }
 +            @Nullable RegularFileInPack packMetaFile = filesProvider.getTopLevelRegularFile(packMetaFilename);
 +            if (packMetaFile != null) {

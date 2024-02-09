@@ -1,0 +1,41 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Fri, 9 Feb 2024 18:24:10 +0100
+Subject: [PATCH] Main server entry point can be exited gracefully
+
+This ends a `Throwable` catching try-clause around the code that follows the main server initialization procedures,
+so that if an exception occurs there, it is ignored.
+This is so that when the actual server initialization procedure crashes (printing an exception) or fails gracefully
+after logging an informative message, it is not followed by an unimportant stack trace (particularly of the post-processing
+code failing in some way as a result of the main server initialization having failed). This makes it easier for server
+owners to find the information that is relevant to the actual failure, since it will be at the end of the log.
+
+For example, this is relevant when the server initialization fails due to a lack of the confirmation that is made necessary
+by the "Require confirming Fiddle permanence" patch.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/bukkit/craftbukkit/Main.java b/src/main/java/org/bukkit/craftbukkit/Main.java
+index daed278d1bcf84ee42749f24e311b22b70015d79..9dea698c1c4b07231ae8eb47b91ca53430ea5660 100644
+--- a/src/main/java/org/bukkit/craftbukkit/Main.java
++++ b/src/main/java/org/bukkit/craftbukkit/Main.java
+@@ -317,6 +317,7 @@ public class Main {
+             } catch (Throwable t) {
+                 t.printStackTrace();
+             }
++            try { // Fiddle - main entry point can be exited gracefully
+             // Paper start
+             // load some required classes to avoid errors during shutdown if jar is replaced
+             // also to guarantee our version loads over plugins
+@@ -361,6 +362,10 @@ public class Main {
+             tryPreloadClass(net.minecraft.util.ExceptionCollector.class.getName());
+             tryPreloadClass(io.papermc.paper.chunk.system.RegionizedPlayerChunkLoader.PlayerChunkLoaderData.class.getName());
+             // Paper end
++            // Fiddle start - main entry point can be exited gracefully
++            } catch (Throwable ignored) {
++            }
++            // Fiddle end - main entry point can be exited gracefully
+         }
+     }
+ 

@@ -15,7 +15,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index 66803db4244b6eb28d51fbc11d0a2c26a6171021..1e6d40165e015aa5004e118e2dba926b9962ca7a 100644
+index 66803db4244b6eb28d51fbc11d0a2c26a6171021..04226d313ef4f1b113c91b226006408bdbf7eafc 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
 @@ -133,6 +133,13 @@ public class Main {
@@ -24,7 +24,7 @@ index 66803db4244b6eb28d51fbc11d0a2c26a6171021..1e6d40165e015aa5004e118e2dba926b
  
 +            // Fiddle start - confirm Fiddle permanence
 +            if (!org.fiddlemc.fiddle.configuration.PermanenceConfirmation.get().hasConfirmedPermanence()) {
-+                Main.LOGGER.info("You must confirm that you wish to run Fiddle in this folder. Go to fiddle.txt for more info.");
++                Main.LOGGER.warn("You must confirm that you wish to run Fiddle in this folder. Go to fiddle.txt for more info.");
 +                return;
 +            }
 +            // Fiddle end - confirm Fiddle permanence

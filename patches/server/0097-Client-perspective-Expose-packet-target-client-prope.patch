@@ -1,106 +1,87 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
-Date: Sat, 22 Jul 2023 16:12:39 +0200
+Date: Sat, 22 Jul 2023 15:06:25 +0200
 Subject: [PATCH] Client perspective - Expose packet target client properties -
- Can be used by FriendlyByteBuf
+ Packet can provide explicit connection
+
+Adds abstract methods in `Packet` that allow it to, based on some implementation,
+provide an explicit perspective and locale of the client it is poised to be sent to.
 
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
-diff --git a/src/main/java/net/minecraft/network/FriendlyByteBuf.java b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
-index 9938bb90bef84cf784f9a1ceb02a1a45aa8b48a1..b759e92e920a14028937c24dda61b18c644684a8 100644
---- a/src/main/java/net/minecraft/network/FriendlyByteBuf.java
-+++ b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
-@@ -79,6 +79,7 @@ import net.minecraft.world.level.ChunkPos;
- import net.minecraft.world.level.Level;
- import net.minecraft.world.phys.BlockHitResult;
- import net.minecraft.world.phys.Vec3;
-+import org.jetbrains.annotations.NotNull;
- import org.joml.Quaternionf;
- import org.joml.Vector3f;
- 
-@@ -98,6 +99,13 @@ public class FriendlyByteBuf extends ByteBuf {
-     private static final int MAX_PUBLIC_KEY_LENGTH = 512;
-     private static final Gson GSON = new Gson();
- 
-+    // Fiddle start - client perspective - packets are modifiable - store explicit perspective and locale - FriendlyByteBuf
-+    /**
-+     * The packet that is writing its contents to this {@link FriendlyByteBuf}.
-+     */
-+    public @Nullable java.lang.ref.WeakReference<net.minecraft.network.protocol.@NotNull Packet<?>> writingPacket;
-+    // Fiddle end - client perspective - packets are modifiable - store explicit perspective and locale - FriendlyByteBuf
-+
-     public FriendlyByteBuf(ByteBuf parent) {
-         this.source = parent;
+diff --git a/src/main/java/net/minecraft/network/protocol/Packet.java b/src/main/java/net/minecraft/network/protocol/Packet.java
+index c6157e73945cb4cf503174db0475ae62f4848203..534497c61366f05228c3ff4302c0e07caf1ef7f5 100644
+--- a/src/main/java/net/minecraft/network/protocol/Packet.java
++++ b/src/main/java/net/minecraft/network/protocol/Packet.java
+@@ -61,4 +61,70 @@ public interface Packet<T extends PacketListener> {
      }
-@@ -1676,4 +1684,58 @@ public class FriendlyByteBuf extends ByteBuf {
-             };
-         }
-     }
-+
-+    // Fiddle start - client perspective - packets are modifiable - expose target client properties - can be used by FriendlyByteBuf
+     // Fiddle end - client perspective - packets are modifiable
+ 
++    // Fiddle start - client perspective - expose target client properties - packet can provide explicit connection
 +    /**
-+     * @return The explicit {@link org.fiddlemc.fiddle.packet.ClientPerspective} of the target client of a packet that is writing its contents
-+     * to this {@link FriendlyByteBuf}.
-+     * This method always return a non-null value or throws an exception, and it must never actually throw
-+     * such an exception (if there is a possibility of an exception being thrown,
-+     * the method should not be called at all), similarly to
-+     * {@link net.minecraft.network.protocol.Packet#getExplicitTargetClientPerspective()}.
++     * @return The {@link org.fiddlemc.fiddle.packet.ClientPerspective} of the receiving client of this packet,
++     * if explicitly known.
++     * This must be implemented for some instances of {@link Packet}
++     * for which the {@link org.fiddlemc.fiddle.packet.ClientPerspective} is needed
++     * at the time of {@linkplain #write(FriendlyByteBuf) writing the packet to a byte buffer}.
++     * @throws UnsupportedOperationException If there is no implementation for this method.
++     * The default implementation of this method in {@link Packet} always throws this exception.
++     * An exception being thrown from this method should never actually happen (because it is slow):
++     * this method must not be called when there is any chance of an exception
++     * (including a {@link NullPointerException} if an attempt is made to return a non-null value) being thrown.
++     * No exception from this method should be caught, because if one occurs,
++     * it indicates that there is code that needs this value,
++     * but it is not available early enough for the value to be available.
 +     */
-+    public @NotNull org.fiddlemc.fiddle.packet.ClientPerspective getExplicitTargetClientPerspective() throws NullPointerException {
-+        return this.writingPacket.get().getExplicitTargetClientPerspective();
++    default @org.jetbrains.annotations.NotNull org.fiddlemc.fiddle.packet.ClientPerspective getExplicitTargetClientPerspective() throws UnsupportedOperationException {
++        throw new UnsupportedOperationException("Tried to call getExplicitTargetClientPerspective() on a " + Packet.class.getSimpleName() + " instance of type " + this.getClass().getName() + ", but no overriding implementation is available");
 +    }
 +
 +    /**
 +     * @return The same value as {@link #getExplicitTargetClientPerspective()}, except that it returns null
 +     * where {@link #getExplicitTargetClientPerspective()} would otherwise throw an exception.
 +     */
-+    public @Nullable org.fiddlemc.fiddle.packet.ClientPerspective getExplicitTargetClientPerspectiveOrNull() throws NullPointerException {
-+        if (this.writingPacket == null) {
-+            return null;
-+        }
-+        var actualWritingPacket = this.writingPacket.get();
-+        if (actualWritingPacket == null) {
-+            return null;
-+        }
-+        return actualWritingPacket.getExplicitTargetClientPerspectiveOrNull();
++    default @org.jetbrains.annotations.Nullable org.fiddlemc.fiddle.packet.ClientPerspective getExplicitTargetClientPerspectiveOrNull() {
++        return null;
 +    }
 +
 +    /**
-+     * @return The explicit {@link net.minecraft.server.level.ServerPlayer#locale}
-+     * of the target client of a packet that is writing its contents to this {@link FriendlyByteBuf}.
-+     * This method always return a nullable value or throws an exception, and it must never actually throw
-+     * such an exception (if there is a possibility of an exception being thrown,
-+     * the method should not be called at all), similarly to
-+     * {@link net.minecraft.network.protocol.Packet#getExplicitTargetLocale()}.
++     * @return The {@linkplain net.minecraft.server.level.ServerPlayer#locale locale}
++     * of the receiving client of this packet, if explicitly known.
++     * This must be implemented for some instances of {@link Packet} for which the locale is needed
++     * (amongst others, at the time of {@linkplain #write(FriendlyByteBuf) writing the packet to a byte buffer}).
++     * @throws UnsupportedOperationException If there is no implementation for this method.
++     * The default implementation of this method in {@link Packet} always throws this exception.
++     * An exception being thrown from this method should never actually happen (because it is slow):
++     * this method must not be called when there is any chance of an exception
++     * (including a {@link NullPointerException} if an attempt is made to return a non-null value) being thrown.
++     * No exception from this method should be caught, because if one occurs,
++     * it indicates that there is code that needs this value,
++     * but it is not available early enough for the value to be available.
 +     */
-+    public @Nullable String getExplicitTargetLocale() throws NullPointerException {
-+        return this.writingPacket.get().getExplicitTargetLocale();
++    default @org.jetbrains.annotations.Nullable String getExplicitTargetLocale() throws UnsupportedOperationException {
++        throw new UnsupportedOperationException("Tried to call getExplicitTargetLocale() on a " + Packet.class.getSimpleName() + " instance of type " + this.getClass().getName() + ", but no overriding implementation is available");
 +    }
 +
 +    /**
-+     * @return The explicit {@linkplain net.minecraft.server.level.ServerPlayerGameMode#getGameModeForPlayer() game mode}
-+     * of the target player of a packet that is writing its contents to this {@link FriendlyByteBuf}.
-+     * This method always return a non-null value or throws an exception, and it must never actually throw
-+     * such an exception (if there is a possibility of an exception being thrown,
-+     * the method should not be called at all), similarly to
-+     * {@link net.minecraft.network.protocol.Packet#getExplicitTargetClientPerspective()}.
++     * @return The {@linkplain net.minecraft.server.level.ServerPlayerGameMode#getGameModeForPlayer() game mode}
++     * of the receiving player of this packet, if explicitly known.
++     * This must be implemented for some instances of {@link Packet}
++     * for which the {@link org.fiddlemc.fiddle.packet.ClientPerspective} is needed
++     * at the time of {@linkplain #write(FriendlyByteBuf) writing the packet to a byte buffer}.
++     * @throws UnsupportedOperationException If there is no implementation for this method.
++     * The default implementation of this method in {@link Packet} always throws this exception.
++     * An exception being thrown from this method should never actually happen (because it is slow):
++     * this method must not be called when there is any chance of an exception
++     * (including a {@link NullPointerException} if an attempt is made to return a non-null value) being thrown.
++     * No exception from this method should be caught, because if one occurs,
++     * it indicates that there is code that needs this value,
++     * but it is not available early enough for the value to be available.
 +     */
-+    public @NotNull net.minecraft.world.level.GameType getExplicitTargetGameMode() throws NullPointerException {
-+        return this.writingPacket.get().getExplicitTargetGameMode();
++    default @org.jetbrains.annotations.NotNull net.minecraft.world.level.GameType getExplicitTargetGameMode() throws UnsupportedOperationException {
++        throw new UnsupportedOperationException("Tried to call getExplicitTargetGameMode() on a " + Packet.class.getSimpleName() + " instance of type " + this.getClass().getName() + ", but no overriding implementation is available");
 +    }
-+    // Fiddle end - client perspective - packets are modifiable - expose target client properties - can be used by FriendlyByteBuf
++    // Fiddle end - client perspective - expose target client properties - packet can provide explicit connection
 +
  }
-diff --git a/src/main/java/net/minecraft/network/PacketEncoder.java b/src/main/java/net/minecraft/network/PacketEncoder.java
-index fbfadeb83719b81f42724e79c59e92ed88fdece7..2e241eae0d70080512376ad4e30dc3f220e55c1a 100644
---- a/src/main/java/net/minecraft/network/PacketEncoder.java
-+++ b/src/main/java/net/minecraft/network/PacketEncoder.java
-@@ -33,6 +33,7 @@ public class PacketEncoder extends MessageToByteEncoder<Packet<?>> {
-                 throw new IOException("Can't serialize unregistered packet");
-             } else {
-                 FriendlyByteBuf friendlyByteBuf = new FriendlyByteBuf(byteBuf);
-+                friendlyByteBuf.writingPacket = new java.lang.ref.WeakReference<>(packet); // Fiddle - client perspective - packets are modifiable - expose target client properties - can be used by FriendlyByteBuf
-                 friendlyByteBuf.writeVarInt(i);
-                 friendlyByteBuf.adventure$locale = channelHandlerContext.channel().attr(PaperAdventure.LOCALE_ATTRIBUTE).get(); // Paper
- 

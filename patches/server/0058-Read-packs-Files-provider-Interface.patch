@@ -81,7 +81,7 @@ index 0000000000000000000000000000000000000000..83b4e3ec84d09df9425fd7eaf6cf299a
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/filesprovider/FiddlePackFilesProvider.java b/src/main/java/org/fiddlemc/fiddle/pack/read/filesprovider/FiddlePackFilesProvider.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..15a1989d2a616afc3913afeec42ceaab2555f92f
+index 0000000000000000000000000000000000000000..b7c6b74452d075a633a9a5ea8fb63f6d129dc7e2
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/read/filesprovider/FiddlePackFilesProvider.java
 @@ -0,0 +1,74 @@
@@ -117,9 +117,9 @@ index 0000000000000000000000000000000000000000..15a1989d2a616afc3913afeec42ceaab
 +    /**
 +     * Closes any I/O resources currently open, and clears any cached pack details, such as its files or their contents.
 +     */
-+    void closeHandlesAndClearCache() throws IOException;
++    void closeHandlesAndClearCache() throws Exception;
 +
-+    default void closeHandlesAndClearCacheUnlessInStartupLoadPhase() throws IOException {
++    default void closeHandlesAndClearCacheUnlessInStartupLoadPhase() throws Exception {
 +        if (!StartupPackLoadPhase.isInStartupLoadPhase()) {
 +            this.closeHandlesAndClearCache();
 +        }

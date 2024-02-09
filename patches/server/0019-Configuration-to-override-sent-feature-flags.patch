@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
-Date: Wed, 31 Jan 2024 20:11:31 +0100
+Date: Wed, 31 Jan 2024 15:11:12 +0100
 Subject: [PATCH] Configuration to override sent feature flags
 
 Adds global configuration that allows declaring feature flags that are always, or never, sent to connecting cilents.

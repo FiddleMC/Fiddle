@@ -79,15 +79,15 @@ index 0000000000000000000000000000000000000000..d0fbb68217369e51aaff6becc6474f73
 +
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/PackScanner.java b/src/main/java/org/fiddlemc/fiddle/pack/read/PackScanner.java
-index 1293479128c9759c8f3077b5c7729ed177614ee8..22be4d741d178bfb24a6d7f943172b21e7494294 100644
+index b5f2ad47bfb87a95d8e965ad3c3dce18a2af5659..667d182af93be56348ca19e884a818b43551c81b 100644
 --- a/src/main/java/org/fiddlemc/fiddle/pack/read/PackScanner.java
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/read/PackScanner.java
-@@ -28,7 +28,7 @@ import java.util.*;
+@@ -31,7 +31,7 @@ import java.util.*;
   */
  public final class PackScanner {
  
 -    private static final String packMetaFilename = "pack.mcmeta";
 +    public static final String packMetaFilename = "pack.mcmeta"; // Fiddle - load packs - data packs - repository source - private -> public
- 
-     private static final Logger LOGGER = LogUtils.getClassLogger();
- 
+     // Accept .jar files in the packs folder too (to use them as packs without the plugin code, which is useful if the code has broken after an update)
+     private static final String[] javaExtractableArchiveExtensions = {"zip", "jar", "gz"};
+     private static final String[] rarExtractableArchiveExtensions = {"rar"};

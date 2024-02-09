@@ -9,10 +9,10 @@ Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/filesprovider/directory/DirectoryFiddlePackFilesProvider.java b/src/main/java/org/fiddlemc/fiddle/pack/read/filesprovider/directory/DirectoryFiddlePackFilesProvider.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..24d2cc1ec07be780587c79d1d6bfe39a4e2e97f4
+index 0000000000000000000000000000000000000000..f05a767ecf279e4ff8e60fcf58be6bea22c71b81
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/read/filesprovider/directory/DirectoryFiddlePackFilesProvider.java
-@@ -0,0 +1,82 @@
+@@ -0,0 +1,93 @@
 +// Fiddle - read packs - pack files - directory packs
 +
 +package org.fiddlemc.fiddle.pack.read.filesprovider.directory;
@@ -39,6 +39,12 @@ index 0000000000000000000000000000000000000000..24d2cc1ec07be780587c79d1d6bfe39a
 +    final File packDirectory;
 +
 +    /**
++     * The original location of this pack, from which the {@linkplain #packDirectory directory}
++     * was derived. This may, for example, by a RAR archive file, which was extracted to a directory.
++     */
++    final File originalLocation;
++
++    /**
 +     * May be empty or incomplete while not fully computed yet (instances are added on the fly when they are created).
 +     */
 +    private final List<FileInDirectoryPack> files = new ArrayList<>(1);
@@ -49,12 +55,17 @@ index 0000000000000000000000000000000000000000..24d2cc1ec07be780587c79d1d6bfe39a
 +    private @Nullable List<FileInDirectoryPack> topLevelFiles;
 +
 +    public DirectoryFiddlePackFilesProvider(File packDirectory) {
++        this(packDirectory, packDirectory);
++    }
++
++    public DirectoryFiddlePackFilesProvider(File packDirectory, File originalLocation) {
 +        this.packDirectory = packDirectory;
++        this.originalLocation = originalLocation;
 +    }
 +
 +    @Override
 +    public String getLocation() {
-+        return this.packDirectory.getPath();
++        return this.originalLocation.getPath();
 +    }
 +
 +    List<FileInDirectoryPack> getTopLevelFilesForDirectoryAndAddToAllFiles(File directory) {
