@@ -165,10 +165,10 @@ index 305b43071aa1cf8feee75fae757bb7734ae33771..8eab98754d520d74c3f960fa2170bd51
 +
  }
 diff --git a/src/main/java/net/minecraft/world/entity/decoration/ItemFrame.java b/src/main/java/net/minecraft/world/entity/decoration/ItemFrame.java
-index 955316687e2e29ad75a0052317a7b0f89034c82a..29ca6d6993cd745647706e20b9fbf0eacff64531 100644
+index dcf245387f59ce730cb2cfb5fc0e837a20d3dfe5..028431f45a2ab06056cb8e0114dd578dba84236d 100644
 --- a/src/main/java/net/minecraft/world/entity/decoration/ItemFrame.java
 +++ b/src/main/java/net/minecraft/world/entity/decoration/ItemFrame.java
-@@ -539,4 +539,12 @@ public class ItemFrame extends HangingEntity {
+@@ -547,4 +547,12 @@ public class ItemFrame extends HangingEntity {
  
          return (float) Mth.wrapDegrees(180 + enumdirection.get2DDataValue() * 90 + this.getRotation() * 45 + i);
      }

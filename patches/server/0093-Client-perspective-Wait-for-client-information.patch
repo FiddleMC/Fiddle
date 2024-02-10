@@ -71,7 +71,7 @@ index 009e3a81a257ccb428926dfeb1f7101fac598502..f29104b8cde286bacb391b74dadd83d0
      public io.papermc.paper.chunk.system.RegionizedPlayerChunkLoader.ViewDistances getViewDistances() {
          return this.viewDistances.get();
 diff --git a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-index 8e90ffa0d59ed708ab53c1b761a2c2a1a20a1e7b..33fb5a3036d04acdd6c70b843d2681367c83b114 100644
+index f57a17dc0ac36e4ffefd847698509990c9af1deb..6c18ce29e69038a28b6cbce1e6fcad3aedf923ba 100644
 --- a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 @@ -256,7 +256,7 @@ public class ServerGamePacketListenerImpl implements ServerPlayerConnection, Tic
@@ -92,7 +92,7 @@ index 8e90ffa0d59ed708ab53c1b761a2c2a1a20a1e7b..33fb5a3036d04acdd6c70b843d268136
          }
          // Fiddle end - client perspective - send resource pack
          // Paper end
-@@ -3500,6 +3500,7 @@ public class ServerGamePacketListenerImpl implements ServerPlayerConnection, Tic
+@@ -3507,6 +3507,7 @@ public class ServerGamePacketListenerImpl implements ServerPlayerConnection, Tic
          }
          // Paper end - do not accept invalid information
          this.player.updateOptions(packet);
