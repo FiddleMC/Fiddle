@@ -312,76 +312,21 @@ index 0000000000000000000000000000000000000000..87badfe3a0034c76c3b0d10032fd6560
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/mapcolor/SingleMapColorDefinition.java b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/mapcolor/SingleMapColorDefinition.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..6e4533d8b1a234e6c4450e7722a450f74c3e78a5
+index 0000000000000000000000000000000000000000..37a8d5af764cc2f96e39d1fa79ddf07854ab1535
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/mapcolor/SingleMapColorDefinition.java
-@@ -0,0 +1,67 @@
+@@ -0,0 +1,12 @@
 +// Fiddle - read packs - blocks - model - map color
 +
 +package org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.block.mapcolor;
 +
-+import net.minecraft.resources.ResourceLocation;
 +import net.minecraft.world.level.material.MapColor;
-+import org.fiddlemc.fiddle.pack.exception.PackException;
-+import org.fiddlemc.fiddle.pack.read.namedjson.NamedJsonElement;
-+import org.fiddlemc.fiddle.pack.read.namedjson.NamedJsonPrimitive;
-+
-+import java.lang.reflect.Modifier;
-+import java.util.Arrays;
-+import java.util.Locale;
 +
 +/**
 + * A {@link MapColorDefinition} that specifies one {@link MapColor}.
 + */
 +public record SingleMapColorDefinition(MapColor mapColor)
 +    implements MapColorDefinition {
-+
-+    public static SingleMapColorDefinition fromJson(NamedJsonPrimitive json) throws PackException {
-+        MapColor mapColor;
-+        if (json.isNumber()) {
-+            var id = json.asInt(0, (primitive, value, min) -> {
-+                throw new PackException("Map color " + primitive.mapNameOr(name -> "at '" + name + "' ", "") +
-+                    "is invalid (id too low): " + value);
-+            }, MapColor.MATERIAL_COLORS.length, (primitive, value, max) -> {
-+                throw new PackException("Map color " + primitive.mapNameOr(name -> "at '" + name + "' ", "") +
-+                    "is invalid (id too high): " + value);
-+            });
-+            mapColor = MapColor.byId(id);
-+        } else if (json.isString()) {
-+            var mapColorString = json.asString(true, NamedJsonElement.BlankStringParseResult.THROW_EXCEPTION, null);
-+            ResourceLocation mapColorResourceLocation = new ResourceLocation(mapColorString);
-+            if (!mapColorResourceLocation.getNamespace()
-+                .equals(ResourceLocation.DEFAULT_NAMESPACE)) {
-+                throw new PackException("The namespace of " + json.mapNameOr(name -> "'" + name + "' ", "a map color") +
-+                    "is invalid, it must be '" + ResourceLocation.DEFAULT_NAMESPACE + "'");
-+            }
-+            if (!mapColorResourceLocation.getPath()
-+                .equals(mapColorResourceLocation.getPath().toLowerCase(Locale.ROOT))) {
-+                throw new PackException("The path of " + json.mapNameOr(name -> "'" + name + "' ", "a map color") +
-+                    "is invalid, it must only contain lowercase characters");
-+            }
-+            var mapColorField = Arrays.stream(MapColor.class.getDeclaredFields())
-+                .filter(field -> Modifier.isStatic(field.getModifiers()))
-+                .filter(field -> field.getType() == MapColor.class)
-+                .filter(field -> field.getName().equals(mapColorResourceLocation.getPath().toUpperCase(Locale.ROOT)))
-+                .findFirst().orElse(null);
-+            if (mapColorField == null) {
-+                throw new PackException("Map color " + json.mapNameOr(name -> "'" + name + "' ", "") +
-+                    "is invalid (does not exist): " + mapColorString);
-+            }
-+            try {
-+                mapColor = (MapColor) mapColorField.get(null);
-+            } catch (IllegalAccessException e) {
-+                throw new PackException("Unable to get value of " + MapColor.class.getSimpleName() + "." +
-+                    mapColorField.getName(), e);
-+            }
-+        } else {
-+            throw new PackException(json.mapNameOr(name -> "'" + name + "'", "A map color") +
-+                " is of the wrong JSON type: " + json.unnamed().getClass().getSimpleName());
-+        }
-+        return new SingleMapColorDefinition(mapColor);
-+    }
-+
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/parent/BlockDefinitionBase.java b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/parent/BlockDefinitionBase.java
 new file mode 100644

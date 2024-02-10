@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
-Date: Thu, 4 Jan 2024 17:21:44 +0100
+Date: Wed, 3 Jan 2024 21:04:16 +0100
 Subject: [PATCH] Client perspective - Level event data value replacements -
  Store connection explicitly in level event packets
 
@@ -8,14 +8,48 @@ Makes instances of `ClientboundLevelEventPacket` potentially bound to a particul
 This is done by making them a subclass of `CloningPacketWithExplicitTargetClientConnection`.
 
 Note that the level event packets can still be sent to multiple target clients.
-This is okay, because the packet is cloned when adapting for a client.
-This is notwithstanding the possibility in a subsequent patch for `ClientboundLevelEventPacket` to implement `canSkipCloning` to skip the cloning if it is unnecessary.
+This is okay, because the packet is cloned when adapting for a client when needed.
+By default, it is assumed that the data is the same for each player, and as such, `canSkipCloning` is overridden to always return true.
+This is notwithstanding the possibility in a subsequent patch for `ClientboundLevelEventPacket` to add implementation to `canSkipCloning` to skip the cloning if it is unnecessary.
 
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
+diff --git a/src/main/java/net/minecraft/network/FriendlyByteBuf.java b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
+index b759e92e920a14028937c24dda61b18c644684a8..f64c58d0decb751ad191ca0db48be7df9483ea94 100644
+--- a/src/main/java/net/minecraft/network/FriendlyByteBuf.java
++++ b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
+@@ -177,6 +177,28 @@ public class FriendlyByteBuf extends ByteBuf {
+         }
+     }
+ 
++    // Fiddle start - client perspective - base ids on perspective - provide - block state
++    /**
++     * Writes the given block state to this buffer, taking into account the client perspective of the target client
++     * when translating the block state to an id.
++     * <p>
++     *     This is based on {@link org.fiddlemc.fiddle.packet.ClientPerspective#getPacketBlockStateId}
++     *     and {@link #writeId(IdMap, Object)}.
++     * </p>
++     *
++     * @param value A {@linkplain net.minecraft.world.level.block.state.BlockState block state}.
++     */
++    public void writeBlockState(net.minecraft.world.level.block.state.BlockState value) {
++        var perspective = this.getExplicitTargetClientPerspective();
++        int i = perspective.getPacketBlockStateId(value);
++        if (i == -1) {
++            throw new IllegalArgumentException("Can't find id for '" + value + "' in map " + perspective.getPacketBlockStateIdMap());
++        } else {
++            this.writeVarInt(i);
++        }
++    }
++    // Fiddle end - client perspective - base ids on perspective - provide - block state
++
+     public <T> void writeId(IdMap<Holder<T>> registryEntries, Holder<T> entry, FriendlyByteBuf.Writer<T> writer) {
+         switch (entry.kind()) {
+             case REFERENCE:
 diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelEventPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelEventPacket.java
-index 7b822a682d45aacffa93862452e9590a8628aa65..b3fb1241fe5bc228bedd12469f05f03ec5f19169 100644
+index 7b822a682d45aacffa93862452e9590a8628aa65..dc5d118ff78137339335dceef9fb1d123bd96411 100644
 --- a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelEventPacket.java
 +++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelEventPacket.java
 @@ -4,13 +4,14 @@ import net.minecraft.core.BlockPos;
@@ -34,7 +68,7 @@ index 7b822a682d45aacffa93862452e9590a8628aa65..b3fb1241fe5bc228bedd12469f05f03e
          this.type = eventId;
          this.pos = pos.immutable();
          this.data = data;
-@@ -18,12 +19,20 @@ public class ClientboundLevelEventPacket implements Packet<ClientGamePacketListe
+@@ -18,12 +19,26 @@ public class ClientboundLevelEventPacket implements Packet<ClientGamePacketListe
      }
  
      public ClientboundLevelEventPacket(FriendlyByteBuf buf) {
@@ -50,8 +84,65 @@ index 7b822a682d45aacffa93862452e9590a8628aa65..b3fb1241fe5bc228bedd12469f05f03e
 +    final protected ClientboundLevelEventPacket makeClone() {
 +        return new ClientboundLevelEventPacket(this.type, this.pos, this.data, this.globalEvent);
 +    }
++
++    @Override
++    protected boolean canSkipCloning() {
++        // The same data (an integer that doesn't represent anything replaceable) will be sent to everyone, so we can skip cloning
++        return true;
++    }
 +    // Fiddle end - client perspective - level event data value replacements - store connection explicitly
 +
      @Override
      public void write(FriendlyByteBuf buf) {
          buf.writeInt(this.type);
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/ClientPerspective.java b/src/main/java/org/fiddlemc/fiddle/packet/ClientPerspective.java
+index 39110113ec5189bdef3378b6e65dd1a18bf79ba5..9a6df5fca4a8750b819bbbefeb092fa26d6b71eb 100644
+--- a/src/main/java/org/fiddlemc/fiddle/packet/ClientPerspective.java
++++ b/src/main/java/org/fiddlemc/fiddle/packet/ClientPerspective.java
+@@ -8,6 +8,7 @@ import net.minecraft.world.item.Item;
+ import net.minecraft.world.item.Items;
+ import net.minecraft.world.level.block.Block;
+ import net.minecraft.world.level.block.Blocks;
++import net.minecraft.world.level.block.state.BlockState;
+ import org.jetbrains.annotations.NotNull;
+ import org.jetbrains.annotations.Nullable;
+ 
+@@ -132,6 +133,38 @@ public class ClientPerspective {
+     }
+     // Fiddle end - client perspective - base ids on perspective - provide - item
+ 
++    // Fiddle start - client perspective - base ids on perspective - provide - block state
++    /**
++     * The {@link IdMap} that {@linkplain IdMap#getId provides} the ids for {@linkplain BlockState block states}
++     * that a client with this perspective interprets correctly.
++     */
++    public IdMap<BlockState> getPacketBlockStateIdMap() {
++        return understandsServerSideItemsAndBlocks ? Block.BLOCK_STATE_REGISTRY : Block.VANILLA_ONLY_BLOCK_STATE_REGISTRY;
++    }
++
++    /**
++     * The id provided by this perspective's {@link #getPacketBlockStateIdMap()}, for the given {@link BlockState}.
++     * A null value will be interpreted as the {@linkplain Block#defaultBlockState()} of {@link Blocks#AIR}.
++     * <p>
++     *     This is based on {@link #getPacketBlockStateIdMap()}, but uses the cached id for optimization instead.
++     * </p>
++     */
++    public int getPacketBlockStateId(@Nullable BlockState state) {
++        var stateToQuery = state == null ? Blocks.AIR.defaultBlockState() : state;
++        return understandsServerSideItemsAndBlocks ? stateToQuery.indexInBlockStateRegistry : stateToQuery.indexInVanillaOnlyBlockStateRegistry;
++    }
++
++    /**
++     * @return The single {@link #getPacketBlockStateId} value for the given {@link BlockState}, if it is the same
++     * for all possible perspectives, or -1 otherwise.
++     */
++    public static int getSinglePacketBlockStateId(@Nullable BlockState state) {
++        var stateToQuery = state == null ? Blocks.AIR.defaultBlockState() : state;
++        int potentialSingleIndex = stateToQuery.indexInBlockStateRegistry;
++        return potentialSingleIndex == stateToQuery.indexInVanillaOnlyBlockStateRegistry ? potentialSingleIndex : -1;
++    }
++    // Fiddle end - client perspective - base ids on perspective - provide - block state
++
+     @Override
+     public int hashCode() {
+         return this.category.ordinal();

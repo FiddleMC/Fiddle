@@ -13,10 +13,12 @@ Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/NoteBlockInstrumentsByResourceLocation.java b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/NoteBlockInstrumentsByResourceLocation.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..fe50aa0fea68104b095cb76bca3db436928c51eb
+index 0000000000000000000000000000000000000000..8e5a165326633501584193382c6c29064e7f1790
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/NoteBlockInstrumentsByResourceLocation.java
-@@ -0,0 +1,37 @@
+@@ -0,0 +1,39 @@
++// Fiddle - read packs - blocks - get note block instrument by ResourceLocation
++
 +package org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.block;
 +
 +import net.minecraft.resources.ResourceLocation;
@@ -44,7 +46,7 @@ index 0000000000000000000000000000000000000000..fe50aa0fea68104b095cb76bca3db436
 +    static {
 +        var values = NoteBlockInstrument.values();
 +        BY_RESOURCE_LOCATION = new HashMap<>(values.length);
-+        for (NoteBlockInstrument instrument : NoteBlockInstrument.values()) {
++        for (var instrument : values) {
 +            BY_RESOURCE_LOCATION.put(new ResourceLocation(ResourceLocation.DEFAULT_NAMESPACE, instrument.getSerializedName()), instrument);
 +        }
 +    }

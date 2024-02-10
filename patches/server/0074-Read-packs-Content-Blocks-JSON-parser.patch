@@ -4,7 +4,8 @@ Date: Sat, 27 Jan 2024 14:07:16 +0100
 Subject: [PATCH] Read packs - Content - Blocks - JSON parser
 
 Adds the `BlockDefinitionParser` class, that can parse JSON into `BlockDefinition` instances.
-This also includes the `BlockDefinitionParser` class, that can parse JSON into corresponding `BlockPropertiesDefinition` instances.
+This also includes the `BlockDefinitionParser` class, that can parse JSON into corresponding `BlockPropertiesDefinition` instances,
+and auxiliar map color parsers.
 
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
@@ -80,10 +81,10 @@ index 0000000000000000000000000000000000000000..71f71e05589964c529ecdaaaae8eef54
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/BlockPropertiesDefinitionParser.java b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/BlockPropertiesDefinitionParser.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..230c4ccc13721b61f733f77f1bbc3783272fa689
+index 0000000000000000000000000000000000000000..7495d8addebe9a04b085d48e2042eb879b55a4b3
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/BlockPropertiesDefinitionParser.java
-@@ -0,0 +1,111 @@
+@@ -0,0 +1,112 @@
 +// Fiddle - read packs - blocks - JSON parser
 +
 +package org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.block;
@@ -92,7 +93,7 @@ index 0000000000000000000000000000000000000000..230c4ccc13721b61f733f77f1bbc3783
 +import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 +import org.fiddlemc.fiddle.pack.exception.PackException;
 +import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.block.mapcolor.MapColorDefinition;
-+import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.block.mapcolor.SingleMapColorDefinition;
++import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.block.mapcolor.MapColorDefinitionParser;
 +import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.blockoritem.BlockOrItemPropertiesDefinitionParser;
 +import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.withparent.FiddleContentDefinitionKeyParent;
 +import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.withparent.FiddleContentDefinitionParent;
@@ -143,8 +144,9 @@ index 0000000000000000000000000000000000000000..230c4ccc13721b61f733f77f1bbc3783
 +            // Read the map color
 +            var mapColorJson = propertiesJson.getOrNull(mapColorJsonKey);
 +            if (mapColorJson != null) {
-+                if (mapColorJson.isJsonPrimitive()) {
-+                    mapColor = SingleMapColorDefinition.fromJson(mapColorJson.asJsonPrimitive());
++                var readMapColor = MapColorDefinitionParser.INSTANCE.parse(mapColorJson);
++                if (readMapColor != null) {
++                    mapColor = readMapColor;
 +                }
 +            }
 +
@@ -192,6 +194,107 @@ index 0000000000000000000000000000000000000000..230c4ccc13721b61f733f77f1bbc3783
 +            ignitedByLava,
 +            instrument
 +        );
++    }
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/mapcolor/MapColorDefinitionParser.java b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/mapcolor/MapColorDefinitionParser.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..75d40f1c15e1af5baa1b9f20d4b14c5f74f51efb
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/mapcolor/MapColorDefinitionParser.java
+@@ -0,0 +1,23 @@
++// Fiddle - read packs - blocks - JSON parser
++
++package org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.block.mapcolor;
++
++import org.fiddlemc.fiddle.pack.exception.PackException;
++import org.fiddlemc.fiddle.pack.read.namedjson.NamedJsonElement;
++
++public final class MapColorDefinitionParser {
++
++    public static final MapColorDefinitionParser INSTANCE = new MapColorDefinitionParser();
++
++    private MapColorDefinitionParser() {
++    }
++
++    public MapColorDefinition parse(NamedJsonElement<?> json) throws PackException {
++        if (json.isJsonPrimitive()) {
++            return SingleMapColorDefinitionParser.INSTANCE.parse(json.asJsonPrimitive());
++        }
++        // TODO parse ConditionalMapColorDefinition
++        return null;
++    }
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/mapcolor/MapColorParser.java b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/mapcolor/MapColorParser.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..5f2b283d24f5cbc5f10918738baec430e1d47acb
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/mapcolor/MapColorParser.java
+@@ -0,0 +1,41 @@
++// Fiddle - read packs - blocks - JSON parser
++
++package org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.block.mapcolor;
++
++import net.minecraft.resources.ResourceLocation;
++import net.minecraft.world.level.material.MapColor;
++import org.fiddlemc.fiddle.pack.exception.PackException;
++import org.fiddlemc.fiddle.pack.read.namedjson.NamedJsonElement;
++import org.fiddlemc.fiddle.pack.read.namedjson.NamedJsonPrimitive;
++
++public final class MapColorParser {
++
++    public static final MapColorParser INSTANCE = new MapColorParser();
++
++    private MapColorParser() {
++    }
++
++    public MapColor parse(NamedJsonPrimitive json) throws PackException {
++        if (json.isNumber()) {
++            var id = json.asInt(0, (primitive, value, min) -> {
++                throw new PackException("Map color " + primitive.mapNameOr(name -> "at '" + name + "' ", "") +
++                    "is invalid (id too low): " + value);
++            }, MapColor.MATERIAL_COLORS.length, (primitive, value, max) -> {
++                throw new PackException("Map color " + primitive.mapNameOr(name -> "at '" + name + "' ", "") +
++                    "is invalid (id too high): " + value);
++            });
++            return MapColor.byId(id);
++        }
++        if (json.isString()) {
++            var mapColorString = json.asString(true, NamedJsonElement.BlankStringParseResult.THROW_EXCEPTION, null);
++            var readMapColor = MapColorsByResourceLocation.get(new ResourceLocation(mapColorString));
++            if (readMapColor == null) {
++                throw json.invalidValueException("a valid map color");
++            }
++            return readMapColor;
++        }
++        throw new PackException(json.mapNameOr(name -> "'" + name + "'", "A map color") +
++            " is of the wrong JSON type: " + json.unnamed().getClass().getSimpleName());
++    }
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/mapcolor/SingleMapColorDefinitionParser.java b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/mapcolor/SingleMapColorDefinitionParser.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..b9ae0cdc9de27723b97ccd39fcab7f725ad95a45
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/mapcolor/SingleMapColorDefinitionParser.java
+@@ -0,0 +1,19 @@
++// Fiddle - read packs - blocks - JSON parser
++
++package org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.block.mapcolor;
++
++import org.fiddlemc.fiddle.pack.exception.PackException;
++import org.fiddlemc.fiddle.pack.read.namedjson.NamedJsonPrimitive;
++
++public final class SingleMapColorDefinitionParser {
++
++    public static final SingleMapColorDefinitionParser INSTANCE = new SingleMapColorDefinitionParser();
++
++    private SingleMapColorDefinitionParser() {
++    }
++
++    public SingleMapColorDefinition parse(NamedJsonPrimitive json) throws PackException {
++        return new SingleMapColorDefinition(MapColorParser.INSTANCE.parse(json));
 +    }
 +
 +}
