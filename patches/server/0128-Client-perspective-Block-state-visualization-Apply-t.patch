@@ -32,10 +32,10 @@ index 924539d4ac50c70178ba220424ffacd6ff277c8b..e56177a6bae4c191a8826235e26c96bb
  
          private final SingleUserAreaMap<PlayerChunkLoaderData> broadcastMap = new SingleUserAreaMap<>(this) {
 diff --git a/src/main/java/net/minecraft/server/level/ChunkMap.java b/src/main/java/net/minecraft/server/level/ChunkMap.java
-index 9209b598d7168b82574e4800056b8b9f84265dd0..e632a7e6fcb37ff5ad6d6ae15c98f9b851796dba 100644
+index 65d947df910d60f478e7a449eb161e5105e2c0c9..3d051881af0c02e21e5a60c6d0764e8ba6c3357c 100644
 --- a/src/main/java/net/minecraft/server/level/ChunkMap.java
 +++ b/src/main/java/net/minecraft/server/level/ChunkMap.java
-@@ -832,7 +832,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+@@ -851,7 +851,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
  
      }
  
@@ -44,7 +44,7 @@ index 9209b598d7168b82574e4800056b8b9f84265dd0..e632a7e6fcb37ff5ad6d6ae15c98f9b8
          io.papermc.paper.util.TickThread.ensureTickThread(this.level, pos, "May not update chunk tracking for chunk async"); // Paper - replace chunk loader system
          io.papermc.paper.util.TickThread.ensureTickThread(player, "May not update chunk tracking for player async"); // Paper - replace chunk loader system
          if (player.level() == this.level) {
-@@ -845,7 +845,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+@@ -864,7 +864,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
  
                      if (chunk != null) {
                          playerchunk.addPlayer(player); // Paper - replace chunk loader system
@@ -53,7 +53,7 @@ index 9209b598d7168b82574e4800056b8b9f84265dd0..e632a7e6fcb37ff5ad6d6ae15c98f9b8
                      }
  
                      DebugPackets.sendPoiPacketsForChunk(this.level, pos);
-@@ -1374,15 +1374,12 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+@@ -1393,15 +1393,12 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
      }
  
      // Paper start - Anti-Xray - Bypass
@@ -76,7 +76,7 @@ index 9209b598d7168b82574e4800056b8b9f84265dd0..e632a7e6fcb37ff5ad6d6ae15c98f9b8
          DebugPackets.sendPoiPacketsForChunk(this.level, chunk.getPos());
          // Paper - no longer needed - this was used to account for clients bugging out since they needed a chunk to store entities, but they no longer need a chunk
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
-index 06d752df0dec5eeaf4a4a8f44dddca34a4f265f3..7279c3441ef1deca4eaafb0201df27c9e89aae5e 100644
+index c2c912154e091251e9cda4f9c296d193fa960b44..8d8e90b30820cd98cf1bff32d76f6db987ef84d6 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
 @@ -515,14 +515,14 @@ public class CraftWorld extends CraftRegionAccessor implements World {

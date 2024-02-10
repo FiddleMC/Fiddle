@@ -20,10 +20,10 @@ index 818289e831e3dad29345c43265e2efd7689bc500..a761bd833776c43c6fd8b7eea3f8a893
          // Paper start - Configurable rcon ip
          final String rconIp = this.getStringRaw("rcon.ip");
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index dc5fda83a66afbfeb7897fc20b4742899d8aca08..1f489745d318bf44696fa9bee99076c95c6517cb 100644
+index b382da838acc04a1c5d89064b4fa43bcdd38ae71..4ca33d52015796b4d17d7f685408ef5e22e1eeb9 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-@@ -281,6 +281,8 @@ public class ServerPlayer extends Player {
+@@ -282,6 +282,8 @@ public class ServerPlayer extends Player {
      private final java.util.concurrent.atomic.AtomicReference<io.papermc.paper.chunk.system.RegionizedPlayerChunkLoader.ViewDistances> viewDistances = new java.util.concurrent.atomic.AtomicReference<>(new io.papermc.paper.chunk.system.RegionizedPlayerChunkLoader.ViewDistances(-1, -1, -1));
      public io.papermc.paper.chunk.system.RegionizedPlayerChunkLoader.PlayerChunkLoaderData chunkLoader;
  
@@ -33,10 +33,10 @@ index dc5fda83a66afbfeb7897fc20b4742899d8aca08..1f489745d318bf44696fa9bee99076c9
          return this.viewDistances.get();
      }
 diff --git a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-index e8923befdee3514be5346c6e6c8e7236e7e6e668..e80578315dd7ac1fc518be0e640f7af92fd408e6 100644
+index 3c0651fa5a5db880202c9a3805a6455269c5f16d..18185ed51fc513b7ed7d3ec55b6b71b89da650ac 100644
 --- a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-@@ -2117,14 +2117,15 @@ public class ServerGamePacketListenerImpl implements ServerPlayerConnection, Tic
+@@ -2124,14 +2124,15 @@ public class ServerGamePacketListenerImpl implements ServerPlayerConnection, Tic
      @Override
      public void handleResourcePackResponse(ServerboundResourcePackPacket packet) {
          PacketUtils.ensureRunningOnSameThread(packet, this, this.player.serverLevel());
@@ -57,7 +57,7 @@ index e8923befdee3514be5346c6e6c8e7236e7e6e668..e80578315dd7ac1fc518be0e640f7af9
      }
  
 diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
-index 3ce9a867c3d3c46b22a1e2c33eb3dee9872f9ac5..95f13270d55bd14d12a0e79a617e09adc71ae4e9 100644
+index be37a11c6acd201ccb55a158a800812230bd25dd..0c88d69ef02ffe8ffab3c44f9e14ea164fd21d98 100644
 --- a/src/main/java/net/minecraft/server/players/PlayerList.java
 +++ b/src/main/java/net/minecraft/server/players/PlayerList.java
 @@ -189,6 +189,19 @@ public abstract class PlayerList {
@@ -88,7 +88,7 @@ index 3ce9a867c3d3c46b22a1e2c33eb3dee9872f9ac5..95f13270d55bd14d12a0e79a617e09ad
          GameRules gamerules = worldserver1.getGameRules();
          boolean flag = gamerules.getBoolean(GameRules.RULE_DO_IMMEDIATE_RESPAWN);
          boolean flag1 = gamerules.getBoolean(GameRules.RULE_REDUCEDDEBUGINFO);
-@@ -395,6 +407,7 @@ public abstract class PlayerList {
+@@ -403,6 +415,7 @@ public abstract class PlayerList {
          worldserver1 = player.serverLevel(); // CraftBukkit - Update in case join event changed it
          // CraftBukkit end
          this.server.getServerResourcePack().ifPresent((minecraftserver_serverresourcepackinfo) -> {
@@ -97,10 +97,10 @@ index 3ce9a867c3d3c46b22a1e2c33eb3dee9872f9ac5..95f13270d55bd14d12a0e79a617e09ad
          });
          Iterator iterator = player.getActiveEffects().iterator();
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index c9e4a2635c421df192f62c0903659347bce677f9..d1e8b8c4fbf76c2f78bae4d510603fc6bf0b8dcf 100644
+index 4e6fea7cf11b1e29ae7c7098a6f5d06bb5f93cc2..06992d5e312e1cbeeeee923796cca1cac6b6b28f 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -2236,56 +2236,51 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -2281,56 +2281,51 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
          }
      }
  

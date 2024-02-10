@@ -8,10 +8,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index 84cbb6d687486ac3459b38a1b229dfcc72f5ed2f..04621375f58cdfd44a13d6469b9fb389fc2c6c66 100644
+index c421231b61b3203a0c0ff184454a62e5e6955608..ef3f5177e4fe1bf61f694fb989febd69aee8a2b5 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-@@ -2040,12 +2040,20 @@ public class ServerPlayer extends Player {
+@@ -2046,12 +2046,20 @@ public class ServerPlayer extends Player {
              PlayerChangedMainHandEvent event = new PlayerChangedMainHandEvent(this.getBukkitEntity(), getMainArm() == HumanoidArm.LEFT ? MainHand.LEFT : MainHand.RIGHT);
              this.server.server.getPluginManager().callEvent(event);
          }

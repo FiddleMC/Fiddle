@@ -10,13 +10,13 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/block/data/CraftBlockData.java b/src/main/java/org/bukkit/craftbukkit/block/data/CraftBlockData.java
-index 78dc524549be9373a04df905deab85d41e7f7870..9abfacbf024eec80c9dac2af4e9338eb2a790128 100644
+index 86fb50f946ff57d66c561ba0ee6f1116f63479fb..aafcd65ba2e952b26bba3dfa43e3b4f898060f35 100644
 --- a/src/main/java/org/bukkit/craftbukkit/block/data/CraftBlockData.java
 +++ b/src/main/java/org/bukkit/craftbukkit/block/data/CraftBlockData.java
-@@ -695,4 +695,12 @@ public class CraftBlockData implements BlockData {
+@@ -710,4 +710,12 @@ public class CraftBlockData implements BlockData {
          return this.state.isRandomlyTicking();
      }
-     // Paper end
+     // Paper end - Block tick API
 +
 +    // Fiddle start - flags for vanilla content - API - block state
 +    @Override

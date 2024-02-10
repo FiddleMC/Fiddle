@@ -93,10 +93,10 @@ index 3f4e55bb9a4134e54adddca3c662285164068d95..deb0e7b7228b625490078601fa218d1d
          case AIR:
              return null;
 diff --git a/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemStack.java b/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemStack.java
-index f62ef038af2dfe7525e72c8b8e30a3fa9ce2b451..06213590b1bc763fc57a123b8fe870556672a284 100644
+index 0e5abd2a8694b24d4077a602a544e9c2b4c31822..4a6adc179f964b041ef6597e0d94782171414de6 100644
 --- a/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemStack.java
 +++ b/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemStack.java
-@@ -657,7 +657,7 @@ public final class CraftItemStack extends ItemStack {
+@@ -678,7 +678,7 @@ public final class CraftItemStack extends ItemStack {
          if (this.handle == null || that.handle == null) {
              return false;
          }
@@ -169,7 +169,7 @@ index c8dde75de231b5fdde88f5bc111c21883d9c3f49..c788b24c8030a69f1428b751d218e250
  
      public static Material[] modern_values() {
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-index 404ab414215bcd4833016d4fac6ed1dd5937277f..315c4642926dffdfac06f6939f83a477af7e8a9e 100644
+index 1d2bb7789aef09c2096d1b284e321f7a7b5d87f2..e77dcbd04360782c0d7739fc86dd8b25733c3404 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 @@ -194,7 +194,7 @@ public final class CraftMagicNumbers implements UnsafeValues {

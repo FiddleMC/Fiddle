@@ -37,7 +37,7 @@ index ea29e07a105f3ba6a878bdccf36e7eaf66280280..da1c6e55b38f4afa27b845830b81fc2c
                      handler.accept((Recipe) optional.get());
                  }
 diff --git a/src/main/java/net/minecraft/world/item/crafting/RecipeManager.java b/src/main/java/net/minecraft/world/item/crafting/RecipeManager.java
-index ab6dc3449a1d3b7acf1d7bf5ac1c24224cc252c7..9fbc4dd813e94fcf5f6639cdc7c4b5c89f9908b7 100644
+index 9ffb6999171f602f0b113dac40e0130410cad870..c31f7dc19952ff962f74972533ce5e91590786c9 100644
 --- a/src/main/java/net/minecraft/world/item/crafting/RecipeManager.java
 +++ b/src/main/java/net/minecraft/world/item/crafting/RecipeManager.java
 @@ -81,19 +81,588 @@ public class RecipeManager extends SimpleJsonResourceReloadListener {
@@ -629,7 +629,7 @@ index ab6dc3449a1d3b7acf1d7bf5ac1c24224cc252c7..9fbc4dd813e94fcf5f6639cdc7c4b5c8
          }
      }
      // CraftBukkit end
-@@ -205,6 +774,7 @@ public class RecipeManager extends SimpleJsonResourceReloadListener {
+@@ -213,6 +782,7 @@ public class RecipeManager extends SimpleJsonResourceReloadListener {
          });
          this.recipes = ImmutableMap.copyOf(map);
          this.byName = Maps.newHashMap(builder.build()); // CraftBukkit
@@ -637,7 +637,7 @@ index ab6dc3449a1d3b7acf1d7bf5ac1c24224cc252c7..9fbc4dd813e94fcf5f6639cdc7c4b5c8
      }
  
      // CraftBukkit start
-@@ -224,6 +794,7 @@ public class RecipeManager extends SimpleJsonResourceReloadListener {
+@@ -232,6 +802,7 @@ public class RecipeManager extends SimpleJsonResourceReloadListener {
          }
  
          this.byName = Maps.newHashMap();

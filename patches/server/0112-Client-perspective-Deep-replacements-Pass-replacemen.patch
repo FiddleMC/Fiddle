@@ -401,10 +401,10 @@ index 4ebe22ac20f1a98694cc3bec570ef5bbf06f00aa..fac77b5912b652af52ae042459d7c1d6
              buf.writeComponent(this.playerPrefix);
              buf.writeComponent(this.playerSuffix);
 diff --git a/src/main/java/net/minecraft/world/item/crafting/ShapedRecipe.java b/src/main/java/net/minecraft/world/item/crafting/ShapedRecipe.java
-index 9c1285e31d947f92e0b00149e342e793898e0d7c..b485f87778a93de3a993259b06d2e5962a537441 100644
+index 6693dd51440da3f0fc338c4e2cb67d3222eed182..b0da38e94baf439bbfc4642e89c7bbca898cfe87 100644
 --- a/src/main/java/net/minecraft/world/item/crafting/ShapedRecipe.java
 +++ b/src/main/java/net/minecraft/world/item/crafting/ShapedRecipe.java
-@@ -422,7 +422,7 @@ public class ShapedRecipe implements CraftingRecipe {
+@@ -423,7 +423,7 @@ public class ShapedRecipe extends io.papermc.paper.inventory.recipe.RecipeBookEx
          public void toNetwork(FriendlyByteBuf buf, ShapedRecipe recipe) {
              buf.writeVarInt(recipe.width);
              buf.writeVarInt(recipe.height);

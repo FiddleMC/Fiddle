@@ -65,13 +65,13 @@ index de36dab37d3af249cf51573d163731c12346066a..b5a6bf8de49a7a42b253f6a27d842550
 +
  }
 diff --git a/src/main/java/org/bukkit/block/data/BlockData.java b/src/main/java/org/bukkit/block/data/BlockData.java
-index c6b17605090f2f284e6536567ddf0e0977eeaaf8..44b0a1a92c6ff1d099fb107099cd46d77dfafd7f 100644
+index 31111cea5ffd018c3c011c1f3b8befbbd33db5e5..f43cf447c19c2c37dc4dbdb6c34f172c3dd9ec03 100644
 --- a/src/main/java/org/bukkit/block/data/BlockData.java
 +++ b/src/main/java/org/bukkit/block/data/BlockData.java
-@@ -257,4 +257,12 @@ public interface BlockData extends Cloneable {
+@@ -282,4 +282,12 @@ public interface BlockData extends Cloneable {
       */
      boolean isRandomlyTicked();
-     // Paper end
+     // Paper end - Tick API
 +
 +    // Fiddle start - flags for vanilla content - API - block state
 +    /**
