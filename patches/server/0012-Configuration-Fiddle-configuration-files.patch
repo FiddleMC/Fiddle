@@ -135,10 +135,10 @@ index a0aa1f1a7adf986d500a2135aa42e138aa3c4f08..367ab2f7a7b1f7f2b49a64522a65f849
      }
  }
 diff --git a/src/main/java/io/papermc/paper/configuration/PaperConfigurations.java b/src/main/java/io/papermc/paper/configuration/PaperConfigurations.java
-index ad2177cdbc61a6f41c7e2ed81af262d4ffe7d861..51244ab08cab2c060a9146bfc7ef188dcca4a84f 100644
+index e471960e0443392f6f54732b052a4debf2a8fd97..0c37635e3b105de2718bd5b76de9e6e83ef34522 100644
 --- a/src/main/java/io/papermc/paper/configuration/PaperConfigurations.java
 +++ b/src/main/java/io/papermc/paper/configuration/PaperConfigurations.java
-@@ -68,16 +68,29 @@ import java.util.function.Supplier;
+@@ -69,16 +69,29 @@ import java.util.function.Supplier;
  import static com.google.common.base.Preconditions.checkState;
  import static io.leangen.geantyref.GenericTypeReflector.erase;
  
@@ -170,7 +170,7 @@ index ad2177cdbc61a6f41c7e2ed81af262d4ffe7d861..51244ab08cab2c060a9146bfc7ef188d
      private static final String GLOBAL_HEADER = String.format("""
              This is the global configuration file for Paper.
              As you can see, there's a lot to configure. Some options may impact gameplay, so use
-@@ -113,12 +126,16 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+@@ -114,12 +127,16 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
          This file may start empty but can be filled with settings to override ones in the %s/%s
          
          World: %s (%s)""",
@@ -189,7 +189,7 @@ index ad2177cdbc61a6f41c7e2ed81af262d4ffe7d861..51244ab08cab2c060a9146bfc7ef188d
      private static final String MOVED_NOTICE = """
          The global and world default configuration files have moved to %s
          and the world-specific configuration file has been moved inside
-@@ -127,6 +144,17 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+@@ -128,6 +145,17 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
          See https://docs.papermc.io/paper/configuration for more information.
          """;
  
@@ -207,7 +207,7 @@ index ad2177cdbc61a6f41c7e2ed81af262d4ffe7d861..51244ab08cab2c060a9146bfc7ef188d
      @VisibleForTesting
      public static final Supplier<SpigotWorldConfig> SPIGOT_WORLD_DEFAULTS = Suppliers.memoize(() -> new SpigotWorldConfig(RandomStringUtils.randomAlphabetic(255)) {
          @Override // override to ensure "verbose" is false
-@@ -137,8 +165,32 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+@@ -138,8 +166,32 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
      static final ContextKey<Supplier<SpigotWorldConfig>> SPIGOT_WORLD_CONFIG_CONTEXT_KEY = new ContextKey<>(new TypeToken<Supplier<SpigotWorldConfig>>() {}, "spigot world config");
  
  
@@ -242,7 +242,7 @@ index ad2177cdbc61a6f41c7e2ed81af262d4ffe7d861..51244ab08cab2c060a9146bfc7ef188d
      }
  
      @Override
-@@ -167,10 +219,16 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+@@ -168,10 +220,16 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
      @Override
      protected YamlConfigurationLoader.Builder createGlobalLoaderBuilder() {
          return super.createGlobalLoaderBuilder()
@@ -261,7 +261,7 @@ index ad2177cdbc61a6f41c7e2ed81af262d4ffe7d861..51244ab08cab2c060a9146bfc7ef188d
          return options
              .header(GLOBAL_HEADER)
              .serializers(builder -> builder.register(new PacketClassSerializer()));
-@@ -179,7 +237,15 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+@@ -180,7 +238,15 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
      @Override
      public GlobalConfiguration initializeGlobalConfiguration() throws ConfigurateException {
          GlobalConfiguration configuration = super.initializeGlobalConfiguration();
@@ -278,7 +278,7 @@ index ad2177cdbc61a6f41c7e2ed81af262d4ffe7d861..51244ab08cab2c060a9146bfc7ef188d
          return configuration;
      }
  
-@@ -194,7 +260,7 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+@@ -195,7 +261,7 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
          return super.createWorldObjectMapperFactoryBuilder(contextMap)
              .addNodeResolver(new RequiresSpigotInitialization.Factory(contextMap.require(SPIGOT_WORLD_CONFIG_CONTEXT_KEY).get()))
              .addNodeResolver(new NestedSetting.Factory())
@@ -287,7 +287,7 @@ index ad2177cdbc61a6f41c7e2ed81af262d4ffe7d861..51244ab08cab2c060a9146bfc7ef188d
      }
  
      @Override
-@@ -228,15 +294,26 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+@@ -230,15 +296,26 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
          final ConfigurationNode version = node.node(Configuration.VERSION_FIELD);
          final String world = contextMap.require(WORLD_NAME);
          if (version.virtual()) {
@@ -317,7 +317,7 @@ index ad2177cdbc61a6f41c7e2ed81af262d4ffe7d861..51244ab08cab2c060a9146bfc7ef188d
          final ConfigurationTransformation.VersionedBuilder versionedBuilder = Transformations.versionedBuilder();
          V29_ZeroWorldHeight.apply(versionedBuilder);
          V30_RenameFilterNbtFromSpawnEgg.apply(versionedBuilder);
-@@ -246,15 +323,23 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+@@ -248,15 +325,23 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
  
      @Override
      protected void applyGlobalConfigTransformations(ConfigurationNode node) throws ConfigurateException {
@@ -343,7 +343,7 @@ index ad2177cdbc61a6f41c7e2ed81af262d4ffe7d861..51244ab08cab2c060a9146bfc7ef188d
  
      @Override
      protected void applyDefaultsAwareWorldConfigTransformations(final ContextMap contextMap, final ConfigurationNode worldNode, final ConfigurationNode defaultsNode) throws ConfigurateException {
-@@ -277,7 +362,7 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+@@ -279,7 +364,7 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
          try {
              return super.createWorldConfig(contextMap);
          } catch (IOException exception) {
@@ -352,7 +352,7 @@ index ad2177cdbc61a6f41c7e2ed81af262d4ffe7d861..51244ab08cab2c060a9146bfc7ef188d
          }
      }
  
-@@ -288,17 +373,17 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+@@ -290,17 +375,17 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
  
      public void reloadConfigs(MinecraftServer server) {
          try {
@@ -374,7 +374,7 @@ index ad2177cdbc61a6f41c7e2ed81af262d4ffe7d861..51244ab08cab2c060a9146bfc7ef188d
          return createWorldContextMap(level.convertable.levelDirectory.path(), level.serverLevelData.getLevelName(), level.dimension().location(), level.spigotConfig);
      }
  
-@@ -311,7 +396,7 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+@@ -313,7 +398,7 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
              .build();
      }
  
@@ -383,7 +383,7 @@ index ad2177cdbc61a6f41c7e2ed81af262d4ffe7d861..51244ab08cab2c060a9146bfc7ef188d
          final Path legacy = Files.isSymbolicLink(legacyConfig) ? Files.readSymbolicLink(legacyConfig) : legacyConfig;
          if (needsConverting(legacyConfig)) {
              final String legacyFileName = legacyConfig.getFileName().toString();
-@@ -345,13 +430,18 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+@@ -347,13 +432,18 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
          }
          try {
              createDirectoriesSymlinkAware(configDir);
@@ -403,7 +403,7 @@ index ad2177cdbc61a6f41c7e2ed81af262d4ffe7d861..51244ab08cab2c060a9146bfc7ef188d
          createDirectoriesSymlinkAware(configDir);
  
          final YamlConfigurationLoader legacyLoader = ConfigurationLoaders.naturallySortedWithoutHeader(legacyConfig);
-@@ -399,17 +489,6 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+@@ -401,17 +491,6 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
          return Files.exists(legacyConfig) && Files.isRegularFile(legacyConfig);
      }
  
@@ -421,7 +421,7 @@ index ad2177cdbc61a6f41c7e2ed81af262d4ffe7d861..51244ab08cab2c060a9146bfc7ef188d
      @Deprecated
      public static YamlConfiguration loadLegacyConfigFile(File configFile) throws Exception {
          YamlConfiguration config = new YamlConfiguration();
-@@ -426,15 +505,90 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+@@ -428,15 +507,90 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
      @VisibleForTesting
      static ConfigurationNode createForTesting() {
          ObjectMapper.Factory factory = defaultGlobalFactoryBuilder(ObjectMapper.factoryBuilder()).build();
@@ -531,7 +531,7 @@ index dae36c6452ccd57a436dd918547b64d59957ab0a..37cdb4be04251e14118e71d939a6d73a
              Bootstrap.bootStrap();
              Bootstrap.validate();
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index a63427a119b0e45d83c723cc9e51883f641e1bd1..9c30d4836601c4852ff56605da0688f98530ccc4 100644
+index 2fe388f548eb4f3ffcf983a0d20b893545395fa7..3b3a0362b4d0e604b464cdc1fad1bf55ad27f332 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -305,7 +305,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
@@ -644,7 +644,7 @@ index f39ab10c5b0b8d86b579a5b683491204c51db70b..13187b7b56b9873bb9e2f2ac9d39b7c3
          this.world = new CraftWorld((ServerLevel) this, gen, biomeProvider, env);
  
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index bdd749c2c85db8e7e273db012ead20aef7e84c79..2ff1531d5a8eab5fd88cdef4f70edd951eb778fe 100644
+index 697ea4da1ea034f196bf221b19f7a8d437cb11bc..fe84a871c8db6ea9cf13e37d583bcd8cf01dca7e 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 @@ -1057,6 +1057,7 @@ public final class CraftServer implements Server {

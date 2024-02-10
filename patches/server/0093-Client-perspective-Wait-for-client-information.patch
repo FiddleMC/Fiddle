@@ -71,7 +71,7 @@ index 1f489745d318bf44696fa9bee99076c95c6517cb..0234647686f51925e7ba0b9cfd8b5618
      public io.papermc.paper.chunk.system.RegionizedPlayerChunkLoader.ViewDistances getViewDistances() {
          return this.viewDistances.get();
 diff --git a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-index 886f0b40dfa3cba212afa747175681c635c1c23d..b3fdc989e6e87765ce6b3da9e6c29a5e5ecdd6b1 100644
+index e80578315dd7ac1fc518be0e640f7af92fd408e6..3f9001d896e707aeb4e0505ef49407238eaffa9d 100644
 --- a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 @@ -258,7 +258,7 @@ public class ServerGamePacketListenerImpl implements ServerPlayerConnection, Tic
@@ -83,7 +83,7 @@ index 886f0b40dfa3cba212afa747175681c635c1c23d..b3fdc989e6e87765ce6b3da9e6c29a5e
      public ServerPlayer player;
      private int tickCount;
      private int ackBlockChangesUpTo = -1;
-@@ -2077,7 +2077,7 @@ public class ServerGamePacketListenerImpl implements ServerPlayerConnection, Tic
+@@ -2123,7 +2123,7 @@ public class ServerGamePacketListenerImpl implements ServerPlayerConnection, Tic
          this.cserver.getPluginManager().callEvent(new PlayerResourcePackStatusEvent(this.getCraftPlayer(), packStatus)); // CraftBukkit
          // Fiddle start - client perspective - send resource pack
          if (packStatus != PlayerResourcePackStatusEvent.Status.ACCEPTED) { // Do not do anything for ACCEPTED because it just an intermediate status; all the other statuses are final
@@ -92,7 +92,7 @@ index 886f0b40dfa3cba212afa747175681c635c1c23d..b3fdc989e6e87765ce6b3da9e6c29a5e
          }
          // Fiddle end - client perspective - send resource pack
          // Paper end
-@@ -3533,6 +3533,7 @@ public class ServerGamePacketListenerImpl implements ServerPlayerConnection, Tic
+@@ -3580,6 +3580,7 @@ public class ServerGamePacketListenerImpl implements ServerPlayerConnection, Tic
          }
          // Paper end - do not accept invalid information
          this.player.updateOptions(packet);

@@ -49,7 +49,7 @@ index bd3a4db2db5232a28f43c9ea3ce5446960b0c5ce..57133abd0052203e147f15542e88ef1c
  
      public static void main(String[] args) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-index 3c953382dd35e9639a0cb4c350ca7d38f246cc10..528411d4b8d4fdd452678b624405ff7f45bdecb7 100644
+index 7e22e1a806bf412e59559ba2cbbba9414dada291..88cda68dd2c74eb1199cc72132fa2072208b8195 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 @@ -75,6 +75,33 @@ public final class CraftMagicNumbers implements UnsafeValues {
@@ -86,7 +86,7 @@ index 3c953382dd35e9639a0cb4c350ca7d38f246cc10..528411d4b8d4fdd452678b624405ff7f
      // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
      private final CachedMaterialBooleanProperty isBlockCache = new CachedMaterialBooleanProperty(material -> {
          if (material.isLegacy()) {
-@@ -789,6 +816,20 @@ public final class CraftMagicNumbers implements UnsafeValues {
+@@ -795,6 +822,20 @@ public final class CraftMagicNumbers implements UnsafeValues {
          public static final int TAG_ANY_NUMBER = 99;
      }
  

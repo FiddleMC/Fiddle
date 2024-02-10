@@ -33,10 +33,10 @@ index dc5fda83a66afbfeb7897fc20b4742899d8aca08..1f489745d318bf44696fa9bee99076c9
          return this.viewDistances.get();
      }
 diff --git a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-index 75bd92e1d40588d3bc40fa7837943eec9f2062a6..886f0b40dfa3cba212afa747175681c635c1c23d 100644
+index e8923befdee3514be5346c6e6c8e7236e7e6e668..e80578315dd7ac1fc518be0e640f7af92fd408e6 100644
 --- a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-@@ -2071,14 +2071,15 @@ public class ServerGamePacketListenerImpl implements ServerPlayerConnection, Tic
+@@ -2117,14 +2117,15 @@ public class ServerGamePacketListenerImpl implements ServerPlayerConnection, Tic
      @Override
      public void handleResourcePackResponse(ServerboundResourcePackPacket packet) {
          PacketUtils.ensureRunningOnSameThread(packet, this, this.player.serverLevel());
@@ -97,10 +97,10 @@ index 3ce9a867c3d3c46b22a1e2c33eb3dee9872f9ac5..95f13270d55bd14d12a0e79a617e09ad
          });
          Iterator iterator = player.getActiveEffects().iterator();
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index 5bbded65095dccfadaf7576fc41b5f62974878b4..c3786db6d8ccede0f0a245b563131ece1abe04ea 100644
+index c9e4a2635c421df192f62c0903659347bce677f9..d1e8b8c4fbf76c2f78bae4d510603fc6bf0b8dcf 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -2221,56 +2221,51 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -2236,56 +2236,51 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
          }
      }
  

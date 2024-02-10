@@ -127,7 +127,7 @@ index 5dfb35117c285e0b202dc9c088ad5848beb8d054..b8603e5424449f34d443d8acdb4229e8
          }
  
 diff --git a/src/main/java/net/minecraft/server/level/ServerEntity.java b/src/main/java/net/minecraft/server/level/ServerEntity.java
-index d934d07ad761319f338d4386536f68fde211c041..94d09c1b93fae544f6c0023bd45d9c47f46bd9b6 100644
+index 196280f54e397c69d32bd4d1f6ae666efdd93773..9a22f98a1a853f10f07db871568b56d345c7f678 100644
 --- a/src/main/java/net/minecraft/server/level/ServerEntity.java
 +++ b/src/main/java/net/minecraft/server/level/ServerEntity.java
 @@ -300,7 +300,7 @@ public class ServerEntity {
@@ -149,10 +149,10 @@ index d934d07ad761319f338d4386536f68fde211c041..94d09c1b93fae544f6c0023bd45d9c47
  
          if (this.entity instanceof LivingEntity) {
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index f189629f03503fc06b790729bd407b663a48e0db..f5de0b6b2534953d507567e18cab5f72b7ced4d8 100644
+index 2edab21bb271405f200de5a19e9c748bb14aba7d..bb1313af8a5cfe6f9d22c257b9617cd2d16f9b44 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
-@@ -4788,4 +4788,11 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
+@@ -4793,4 +4793,11 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
          return ((net.minecraft.server.level.ServerChunkCache) level.getChunkSource()).isPositionTicking(this);
      }
      // Paper end
@@ -165,10 +165,10 @@ index f189629f03503fc06b790729bd407b663a48e0db..f5de0b6b2534953d507567e18cab5f72
 +
  }
 diff --git a/src/main/java/net/minecraft/world/entity/decoration/ItemFrame.java b/src/main/java/net/minecraft/world/entity/decoration/ItemFrame.java
-index dcf245387f59ce730cb2cfb5fc0e837a20d3dfe5..028431f45a2ab06056cb8e0114dd578dba84236d 100644
+index 759ecd79534a7706f7d4a63eb9dacbefcfe54674..4fc14bd0e0e4fed05baa27f876805e46027dfe57 100644
 --- a/src/main/java/net/minecraft/world/entity/decoration/ItemFrame.java
 +++ b/src/main/java/net/minecraft/world/entity/decoration/ItemFrame.java
-@@ -547,4 +547,12 @@ public class ItemFrame extends HangingEntity {
+@@ -549,4 +549,12 @@ public class ItemFrame extends HangingEntity {
  
          return (float) Mth.wrapDegrees(180 + enumdirection.get2DDataValue() * 90 + this.getRotation() * 45 + i);
      }

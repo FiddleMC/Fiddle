@@ -35,10 +35,10 @@ index 66ab22ec884cc5bc4d02080943fa5e210578e463..82b19d461cc167101a113fd1f58de0f2
       * Checks if this Material is a placable block
       *
 diff --git a/src/main/java/org/bukkit/UnsafeValues.java b/src/main/java/org/bukkit/UnsafeValues.java
-index 114073f7068438a149600e9b48c8d2008a822083..0cb9983a47001964305ea1e66a9cc0bb334eee54 100644
+index 1a94e5b5af18604599348255096f4150f498e0a0..007c257de466d034d44de53cfc79e03ad3b83423 100644
 --- a/src/main/java/org/bukkit/UnsafeValues.java
 +++ b/src/main/java/org/bukkit/UnsafeValues.java
-@@ -286,6 +286,8 @@ public interface UnsafeValues {
+@@ -288,6 +288,8 @@ public interface UnsafeValues {
  
      short getMaxDurability(Material material); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - durability
  

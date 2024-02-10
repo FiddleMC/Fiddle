@@ -39,12 +39,12 @@ index 039d8152639b22fbb6af9dfbcc7eb38466ef0f6a..4be53e8527558d180627fda7967f2a7b
 +
  }
 diff --git a/src/main/java/org/bukkit/UnsafeValues.java b/src/main/java/org/bukkit/UnsafeValues.java
-index c661eab343ae76488de701630424e2d589f44fc0..e4c0862a848aaa99c174afde43ad46202b46435c 100644
+index de36dab37d3af249cf51573d163731c12346066a..b5a6bf8de49a7a42b253f6a27d84255021c8dd96 100644
 --- a/src/main/java/org/bukkit/UnsafeValues.java
 +++ b/src/main/java/org/bukkit/UnsafeValues.java
-@@ -250,4 +250,21 @@ public interface UnsafeValues {
-      */
-     void setBiomeKey(RegionAccessor accessor, int x, int y, int z, NamespacedKey biomeKey);
+@@ -252,4 +252,21 @@ public interface UnsafeValues {
+ 
+     String getStatisticCriteriaKey(@NotNull org.bukkit.Statistic statistic);
      // Paper end
 +
 +    // Fiddle start - flags for vanilla content - API - block
