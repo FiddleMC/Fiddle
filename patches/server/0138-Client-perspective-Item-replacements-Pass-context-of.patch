@@ -127,7 +127,7 @@ index 5dfb35117c285e0b202dc9c088ad5848beb8d054..b8603e5424449f34d443d8acdb4229e8
          }
  
 diff --git a/src/main/java/net/minecraft/server/level/ServerEntity.java b/src/main/java/net/minecraft/server/level/ServerEntity.java
-index 81d0b2933040a451441f660f9e46199ae3b111e3..a604fb849c5c880233b416f95c57ebb060a3fe2e 100644
+index d934d07ad761319f338d4386536f68fde211c041..94d09c1b93fae544f6c0023bd45d9c47f46bd9b6 100644
 --- a/src/main/java/net/minecraft/server/level/ServerEntity.java
 +++ b/src/main/java/net/minecraft/server/level/ServerEntity.java
 @@ -300,7 +300,7 @@ public class ServerEntity {
@@ -139,7 +139,7 @@ index 81d0b2933040a451441f660f9e46199ae3b111e3..a604fb849c5c880233b416f95c57ebb0
          }
  
          boolean flag = this.trackDelta;
-@@ -375,7 +375,7 @@ public class ServerEntity {
+@@ -381,7 +381,7 @@ public class ServerEntity {
  
          if (list != null) {
              this.trackedDataValues = datawatcher.getNonDefaultValues();
@@ -149,10 +149,10 @@ index 81d0b2933040a451441f660f9e46199ae3b111e3..a604fb849c5c880233b416f95c57ebb0
  
          if (this.entity instanceof LivingEntity) {
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index 305b43071aa1cf8feee75fae757bb7734ae33771..8eab98754d520d74c3f960fa2170bd510f87b23c 100644
+index f189629f03503fc06b790729bd407b663a48e0db..f5de0b6b2534953d507567e18cab5f72b7ced4d8 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
-@@ -4789,4 +4789,11 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
+@@ -4788,4 +4788,11 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
          return ((net.minecraft.server.level.ServerChunkCache) level.getChunkSource()).isPositionTicking(this);
      }
      // Paper end

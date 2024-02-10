@@ -71,10 +71,10 @@ index 471ae4458e7ea7c29d7551b32cec98180fbccd4e..01a1282b595ba368026affaee0dc0b34
          for (int i = 0; i < items.length; i++) {
              if (items[i] != null && items[i].getType() == material) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemFactory.java b/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemFactory.java
-index b4850f4da500771e890247d9ed7f7d027460a718..daef69005557e8906caea3d53e00dcdc0de1696f 100644
+index 3f4e55bb9a4134e54adddca3c662285164068d95..deb0e7b7228b625490078601fa218d1d874b86c7 100644
 --- a/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemFactory.java
 +++ b/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemFactory.java
-@@ -37,7 +37,7 @@ public final class CraftItemFactory implements ItemFactory {
+@@ -41,7 +41,7 @@ public final class CraftItemFactory implements ItemFactory {
  
      @Override
      public boolean isApplicable(ItemMeta meta, Material type) {
@@ -83,7 +83,7 @@ index b4850f4da500771e890247d9ed7f7d027460a718..daef69005557e8906caea3d53e00dcdc
          if (type == null || meta == null) {
              return false;
          }
-@@ -54,7 +54,7 @@ public final class CraftItemFactory implements ItemFactory {
+@@ -58,7 +58,7 @@ public final class CraftItemFactory implements ItemFactory {
      }
  
      private ItemMeta getItemMeta(Material material, CraftMetaItem meta) {
