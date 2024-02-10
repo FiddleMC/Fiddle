@@ -19,7 +19,7 @@ Licensed (except for image files) under: GPL-3.0 (https://www.gnu.org/licenses/g
 Gale - https://galemc.org
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 24f306fb265dd3f0a2462d38186d45a60f0d45b5..d2a812790c8beef86ef200285f0b443424a09c65 100644
+index c3522a466f0505e4110bece7512a8ec4126a9305..c282972e94469ec1749b1c80bb18427009e9381f 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -90,7 +90,7 @@ tasks.jar {
@@ -45,10 +45,10 @@ index c5d5648f4ca603ef2b1df723b58f9caf4dd3c722..67027b528f12874b37138d149c859c49
                  .completer(new ConsoleCommandCompleter(this.server))
                  .option(LineReader.Option.COMPLETE_IN_WORD, true);
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 3238cbcba567b1242c77e41f6b6f19a8d157fb4e..a63427a119b0e45d83c723cc9e51883f641e1bd1 100644
+index 67ee3a4ca8a6cdeb275653d492a1fea8037c51fb..d2e429932dc2fde75d49182b3da8db0bdab3eae5 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -921,7 +921,13 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -920,7 +920,13 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          shutdownThread = Thread.currentThread();
          org.spigotmc.WatchdogThread.doStop(); // Paper
          if (!isSameThread()) {
@@ -63,7 +63,7 @@ index 3238cbcba567b1242c77e41f6b6f19a8d157fb4e..a63427a119b0e45d83c723cc9e51883f
              while (this.getRunningThread().isAlive()) {
                  this.getRunningThread().stop();
                  try {
-@@ -1693,7 +1699,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1692,7 +1698,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
      @DontObfuscate
      public String getServerModName() {
@@ -73,7 +73,7 @@ index 3238cbcba567b1242c77e41f6b6f19a8d157fb4e..a63427a119b0e45d83c723cc9e51883f
  
      public SystemReport fillSystemReport(SystemReport details) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 54f27d91f941235a99e341ed84531ad7f0840728..bdd749c2c85db8e7e273db012ead20aef7e84c79 100644
+index 74d06790de674cbd230a0b14ac9a6b614c9f84ef..1697e2ba0192e43447474439500f7edc70840189 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 @@ -265,7 +265,7 @@ import javax.annotation.Nullable; // Paper
@@ -99,7 +99,7 @@ index d7ce4971d9271dbeff4adb9d852e4e7bdf60bf03..78db923735044534003dff89b82341ed
                  // (async tasks must live with race-conditions if they attempt to cancel between these few lines of code)
              }
 diff --git a/src/main/java/org/spigotmc/WatchdogThread.java b/src/main/java/org/spigotmc/WatchdogThread.java
-index 98fba0288be9ed2cb18ffba5cf81148157dd4fcf..7149d588ae45ae6697fa4f0bf0c67c582504e92a 100644
+index 50c72e5db369a180f425eaaa0411cb8871bc3463..83dab13934af1c805e20b68a90084e0f32d93dda 100644
 --- a/src/main/java/org/spigotmc/WatchdogThread.java
 +++ b/src/main/java/org/spigotmc/WatchdogThread.java
 @@ -155,14 +155,20 @@ public final class WatchdogThread extends io.papermc.paper.util.TickThread // Pa

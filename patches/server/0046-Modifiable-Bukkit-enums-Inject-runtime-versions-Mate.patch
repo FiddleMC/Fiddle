@@ -7,7 +7,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index a319d548072cbfb3d89ed64cffac1e69a09e8d72..362cb55321fb9f72a73042e3f974c20fbd0f090b 100644
+index 127f59a06591b03b86422f9d9052a4597f0ed895..e59a59cc61a9237a0aeae34ec494988aa80d9019 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
 @@ -79,6 +79,54 @@ public class Main {
@@ -65,7 +65,7 @@ index a319d548072cbfb3d89ed64cffac1e69a09e8d72..362cb55321fb9f72a73042e3f974c20f
      @DontObfuscate
      public static void main(final OptionSet optionset) { // CraftBukkit - replaces main(String[] astring)
          SharedConstants.tryDetectVersion();
-@@ -175,6 +223,63 @@ public class Main {
+@@ -186,6 +234,63 @@ public class Main {
              var injectRuntimeClassVersionHelper = new InjectRuntimeClassVersionHelper();
              // Fiddle end - modifiable Bukkit enums - inject runtime versions - common utilities
  

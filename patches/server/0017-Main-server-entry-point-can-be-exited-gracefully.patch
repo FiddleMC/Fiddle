@@ -17,10 +17,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/Main.java b/src/main/java/org/bukkit/craftbukkit/Main.java
-index daed278d1bcf84ee42749f24e311b22b70015d79..9dea698c1c4b07231ae8eb47b91ca53430ea5660 100644
+index 7c29d92362a82330440dff151bcf421f15c68f71..e6221d742d5726437b9fc119e5737d168bdacdb5 100644
 --- a/src/main/java/org/bukkit/craftbukkit/Main.java
 +++ b/src/main/java/org/bukkit/craftbukkit/Main.java
-@@ -317,6 +317,7 @@ public class Main {
+@@ -325,6 +325,7 @@ public class Main {
              } catch (Throwable t) {
                  t.printStackTrace();
              }
@@ -28,7 +28,7 @@ index daed278d1bcf84ee42749f24e311b22b70015d79..9dea698c1c4b07231ae8eb47b91ca534
              // Paper start
              // load some required classes to avoid errors during shutdown if jar is replaced
              // also to guarantee our version loads over plugins
-@@ -361,6 +362,10 @@ public class Main {
+@@ -369,6 +370,10 @@ public class Main {
              tryPreloadClass(net.minecraft.util.ExceptionCollector.class.getName());
              tryPreloadClass(io.papermc.paper.chunk.system.RegionizedPlayerChunkLoader.PlayerChunkLoaderData.class.getName());
              // Paper end

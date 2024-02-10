@@ -5802,22 +5802,22 @@ index d1ca826aa4081ce7766c5ad705a3e772c2683860..068ff2f4d8511bc4744e569a499df261
 +
  }
 diff --git a/src/test/java/org/bukkit/scoreboard/CriteriaTest.java b/src/test/java/org/bukkit/scoreboard/CriteriaTest.java
-index a93f28e2f987a36e2c7e4f7d31506b750bdb222b..7ab5a717eb3a16e99b63efc3828c80b003125e3e 100644
+index 025ec8d6379c386bcef2295f2b358df1ccd00802..c52141ed037e3fe4348d72d8ca452f07dcc14ed3 100644
 --- a/src/test/java/org/bukkit/scoreboard/CriteriaTest.java
 +++ b/src/test/java/org/bukkit/scoreboard/CriteriaTest.java
-@@ -5,19 +5,37 @@ import org.bukkit.Statistic;
- import org.bukkit.entity.EntityType;
+@@ -6,17 +6,36 @@ import org.bukkit.entity.EntityType;
+ import org.bukkit.support.AbstractTestingBase;
  import org.junit.Assert;
  import org.junit.Test;
 +import org.mockito.MockMakers;
 +
 +import static org.mockito.Mockito.*;
  
- public class CriteriaTest {
+ public class CriteriaTest extends AbstractTestingBase {
  
      @Test
      public void testStatistic() {
-         io.papermc.paper.testing.TestServer.setup(); // Paper
+-        Assert.assertThrows(IllegalArgumentException.class, () -> Criteria.statistic(Statistic.AVIATE_ONE_CM, Material.STONE)); // Generic statistic with block
 +        // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
 +        var nonBlockEnumValue = mock(Material.class, withSettings().mockMaker(MockMakers.INLINE)); // Used to be Material.DIAMOND_SWORD
 +        when(nonBlockEnumValue.isItem()).thenReturn(true);
@@ -5832,8 +5832,7 @@ index a93f28e2f987a36e2c7e4f7d31506b750bdb222b..7ab5a717eb3a16e99b63efc3828c80b0
 +        when(nonEntityButBlockEnumValue.isItem()).thenReturn(true);
 +        when(nonEntityButBlockEnumValue.isBlock()).thenReturn(true);
 +        var arbitraryMaterialValue = nonEntityButBlockEnumValue; // Used to be Material.STONE
- 
--        Assert.assertThrows(IllegalArgumentException.class, () -> Criteria.statistic(Statistic.AVIATE_ONE_CM, Material.STONE)); // Generic statistic with block
++
 +        Assert.assertThrows(IllegalArgumentException.class, () -> Criteria.statistic(Statistic.AVIATE_ONE_CM, arbitraryMaterialValue)); // Generic statistic with block
          Assert.assertThrows(IllegalArgumentException.class, () -> Criteria.statistic(Statistic.AVIATE_ONE_CM, EntityType.CREEPER)); // Generic statistic with entity type
  

@@ -10,13 +10,13 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/resources/ResourceLocation.java b/src/main/java/net/minecraft/resources/ResourceLocation.java
-index fa9b84b604659a6b35262fbe5acbee0fdb20a56d..fa8f87b839ae42955ce8bd30b6fa55d7ac3036d3 100644
+index 8921b1bc2c870222d145c73bac765169099763f1..ad8a5547b9aada223c5e87166c691dfd2be5552b 100644
 --- a/src/main/java/net/minecraft/resources/ResourceLocation.java
 +++ b/src/main/java/net/minecraft/resources/ResourceLocation.java
-@@ -26,6 +26,14 @@ public class ResourceLocation implements Comparable<ResourceLocation> {
-     public static final char NAMESPACE_SEPARATOR = ':';
+@@ -27,6 +27,14 @@ public class ResourceLocation implements Comparable<ResourceLocation> {
      public static final String DEFAULT_NAMESPACE = "minecraft";
      public static final String REALMS_NAMESPACE = "realms";
+     public static final String PAPER_NAMESPACE = "paper"; // Paper
 +    // Fiddle start - define Fiddle namespace
 +    /**
 +     * The namespace for Fiddle {@link ResourceLocation}s.

@@ -21,12 +21,12 @@ Licensed (except for image files) under: GPL-3.0 (https://www.gnu.org/licenses/g
 Gale - https://galemc.org
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index f4e6c46c85850d16153f348e00534cef426c36b4..8acbf54dfb857a63b3228214af1d44fca55e3312 100644
+index c282972e94469ec1749b1c80bb18427009e9381f..c56687f3e6831146d587057ae1999ccb7d9f2fcc 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
-@@ -220,3 +220,22 @@ tasks.registerRunTask("runDev") {
-     description = "Spin up a non-relocated Mojang-mapped test server"
-     classpath(sourceSets.main.map { it.runtimeClasspath })
+@@ -227,3 +227,22 @@ tasks.registerRunTask("runDev") {
+     classpath(runtimeClasspathForRunDev)
+     jvmArgs("-DPaper.isRunDev=true")
  }
 +
 +// Fiddle start - branding changes - license - package into jar

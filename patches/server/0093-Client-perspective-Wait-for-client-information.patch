@@ -13,7 +13,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/network/Connection.java b/src/main/java/net/minecraft/network/Connection.java
-index cf20f0983fc25b26cf92b9d3a28746b1909fc56b..885e38c0cc8fb5258c7d80e5e750763a52677934 100644
+index 52cb6476604c98465f81ff9e8d8344d7536a8868..935d4e731c5d934ac6cba15ec5dfa5c0272f9c5c 100644
 --- a/src/main/java/net/minecraft/network/Connection.java
 +++ b/src/main/java/net/minecraft/network/Connection.java
 @@ -175,6 +175,11 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
@@ -71,7 +71,7 @@ index 4ca33d52015796b4d17d7f685408ef5e22e1eeb9..41dfa24b5b6bb70be26cd9175b45f093
      public io.papermc.paper.chunk.system.RegionizedPlayerChunkLoader.ViewDistances getViewDistances() {
          return this.viewDistances.get();
 diff --git a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-index 18185ed51fc513b7ed7d3ec55b6b71b89da650ac..9af15341d09a422c620053eb8a9dc40ba9a9973e 100644
+index 63d560c751b9aaaceed2f86950a69681249873ea..b693426718e797c5f58f0052e586aa4bfbb010fb 100644
 --- a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 @@ -258,7 +258,7 @@ public class ServerGamePacketListenerImpl implements ServerPlayerConnection, Tic
@@ -92,7 +92,7 @@ index 18185ed51fc513b7ed7d3ec55b6b71b89da650ac..9af15341d09a422c620053eb8a9dc40b
          }
          // Fiddle end - client perspective - send resource pack
          // Paper end
-@@ -3587,6 +3587,7 @@ public class ServerGamePacketListenerImpl implements ServerPlayerConnection, Tic
+@@ -3566,6 +3566,7 @@ public class ServerGamePacketListenerImpl implements ServerPlayerConnection, Tic
          }
          // Paper end - do not accept invalid information
          this.player.updateOptions(packet);

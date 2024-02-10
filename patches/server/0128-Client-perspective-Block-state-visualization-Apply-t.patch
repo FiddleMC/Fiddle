@@ -32,10 +32,10 @@ index 924539d4ac50c70178ba220424ffacd6ff277c8b..e56177a6bae4c191a8826235e26c96bb
  
          private final SingleUserAreaMap<PlayerChunkLoaderData> broadcastMap = new SingleUserAreaMap<>(this) {
 diff --git a/src/main/java/net/minecraft/server/level/ChunkMap.java b/src/main/java/net/minecraft/server/level/ChunkMap.java
-index 65d947df910d60f478e7a449eb161e5105e2c0c9..3d051881af0c02e21e5a60c6d0764e8ba6c3357c 100644
+index fb6cbcc4839aef7dc4bd4a49613f892b07aab353..b506c13fa0be44ea2c541585a008d1cdb907c86f 100644
 --- a/src/main/java/net/minecraft/server/level/ChunkMap.java
 +++ b/src/main/java/net/minecraft/server/level/ChunkMap.java
-@@ -851,7 +851,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+@@ -854,7 +854,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
  
      }
  
@@ -44,7 +44,7 @@ index 65d947df910d60f478e7a449eb161e5105e2c0c9..3d051881af0c02e21e5a60c6d0764e8b
          io.papermc.paper.util.TickThread.ensureTickThread(this.level, pos, "May not update chunk tracking for chunk async"); // Paper - replace chunk loader system
          io.papermc.paper.util.TickThread.ensureTickThread(player, "May not update chunk tracking for player async"); // Paper - replace chunk loader system
          if (player.level() == this.level) {
-@@ -864,7 +864,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+@@ -867,7 +867,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
  
                      if (chunk != null) {
                          playerchunk.addPlayer(player); // Paper - replace chunk loader system
@@ -53,7 +53,7 @@ index 65d947df910d60f478e7a449eb161e5105e2c0c9..3d051881af0c02e21e5a60c6d0764e8b
                      }
  
                      DebugPackets.sendPoiPacketsForChunk(this.level, pos);
-@@ -1393,15 +1393,12 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+@@ -1396,15 +1396,12 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
      }
  
      // Paper start - Anti-Xray - Bypass

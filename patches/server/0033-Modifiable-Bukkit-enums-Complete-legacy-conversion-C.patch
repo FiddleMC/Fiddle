@@ -93,10 +93,10 @@ index 3f4e55bb9a4134e54adddca3c662285164068d95..deb0e7b7228b625490078601fa218d1d
          case AIR:
              return null;
 diff --git a/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemStack.java b/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemStack.java
-index 0e5abd2a8694b24d4077a602a544e9c2b4c31822..4a6adc179f964b041ef6597e0d94782171414de6 100644
+index 6556d7ab09826bb5a99f11385eddc26b67e44d68..20174f6706e4d80d7c252911d814000e4aba9cec 100644
 --- a/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemStack.java
 +++ b/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemStack.java
-@@ -678,7 +678,7 @@ public final class CraftItemStack extends ItemStack {
+@@ -685,7 +685,7 @@ public final class CraftItemStack extends ItemStack {
          if (this.handle == null || that.handle == null) {
              return false;
          }

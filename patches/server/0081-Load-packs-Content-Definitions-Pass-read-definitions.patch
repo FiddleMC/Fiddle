@@ -33,10 +33,10 @@ index df6752b5c77bc88a4fcf1ffe918b24d41cd30ad4..4307af2e7d8d50c146802fa5278c3f05
              // CraftBukkit start
              /*String name = Bootstrap.class.getSimpleName(); // Paper
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index 59996098175200bfd023bed498a8bf9707eaafa3..c5d8d185d7ec1c4dc64222f59d618f780ef4f431 100644
+index 31c8b68aa3640662f1aeb6d2d23ac449a1dea2b7..d65f02c90f0c8b6ee34b47a3a2a3ae173c595a55 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
-@@ -206,7 +206,7 @@ public class Main {
+@@ -217,7 +217,7 @@ public class Main {
              // Fiddle end - read packs - content definitions - read before bootstrap
  
              io.papermc.paper.plugin.PluginInitializerManager.load(optionset); // Paper
