@@ -29,15 +29,16 @@ index 8dbcc1b3a70b6bbea3bd2d15b6d66cc4f9cd53f8..655c065a30db9b0aab4a169702b8c890
          this.send(new ClientboundUpdateTagsPacket(TagNetworkSerialization.serializeTagsToNetwork(layeredregistryaccess)));
          this.addOptionalTasks();
 diff --git a/src/main/java/org/fiddlemc/fiddle/configuration/FiddleGlobalConfiguration.java b/src/main/java/org/fiddlemc/fiddle/configuration/FiddleGlobalConfiguration.java
-index 3ab7163a0389ef22ab683e41630c3499705ba9c0..ee3dd1e3383989ccb17318b4c412f4bfe8b6eb28 100644
+index 3ab7163a0389ef22ab683e41630c3499705ba9c0..c8060a0b175447c1a83dae5a109ffd550c5343b0 100644
 --- a/src/main/java/org/fiddlemc/fiddle/configuration/FiddleGlobalConfiguration.java
 +++ b/src/main/java/org/fiddlemc/fiddle/configuration/FiddleGlobalConfiguration.java
-@@ -5,9 +5,14 @@ package org.fiddlemc.fiddle.configuration;
+@@ -5,9 +5,15 @@ package org.fiddlemc.fiddle.configuration;
  import com.mojang.logging.LogUtils;
  import io.papermc.paper.configuration.Configuration;
  import io.papermc.paper.configuration.ConfigurationPart;
 +import net.minecraft.resources.ResourceLocation;
  import org.slf4j.Logger;
++import org.spongepowered.configurate.objectmapping.meta.PostProcess;
  import org.spongepowered.configurate.objectmapping.meta.Setting;
  
 +import java.util.HashSet;
@@ -47,13 +48,13 @@ index 3ab7163a0389ef22ab683e41630c3499705ba9c0..ee3dd1e3383989ccb17318b4c412f4bf
  @SuppressWarnings({"CanBeFinal", "FieldCanBeLocal", "FieldMayBeFinal", "NotNullFieldNotInitialized", "InnerClassMayBeStatic"})
  public class FiddleGlobalConfiguration extends ConfigurationPart {
  
-@@ -25,4 +30,49 @@ public class FiddleGlobalConfiguration extends ConfigurationPart {
+@@ -25,4 +31,49 @@ public class FiddleGlobalConfiguration extends ConfigurationPart {
      @Setting(Configuration.VERSION_FIELD)
      public int version = CURRENT_VERSION;
  
 +    // Fiddle start - override sent feature flags
 +    public SendFeatureFlagsToClients sendFeatureFlagsToClients;
-+    public class SendFeatureFlagsToClients extends ConfigurationPart.Post {
++    public class SendFeatureFlagsToClients extends ConfigurationPart {
 +
 +        public List<String> always = List.of();
 +        public List<String> never = List.of();
@@ -82,7 +83,7 @@ index 3ab7163a0389ef22ab683e41630c3499705ba9c0..ee3dd1e3383989ccb17318b4c412f4bf
 +            return processed;
 +        }
 +
-+        @Override
++        @PostProcess
 +        public void postProcess() {
 +            alwaysResourceLocations = processElements("always", always);
 +            neverResourceLocations = processElements("never", never);

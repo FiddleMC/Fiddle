@@ -33,9 +33,11 @@ if (!file(".git").exists()) {
     error(errorText)
 }
 
-rootProject.name = "fiddle" // Fiddle - build changes
+// Fiddle start - build changes
+rootProject.name = "fiddle"
 
-for (name in listOf("fiddle-api", "fiddle-server")) { // Fiddle - build changes
+for (name in listOf("fiddle-api", "fiddle-server")) {
+    // Fiddle end - build changes
     val projName = name.lowercase(Locale.ENGLISH)
     include(projName)
     findProject(":$projName")!!.projectDir = file(name)

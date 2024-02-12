@@ -30,18 +30,6 @@ By: Jake Potrebic <jake.m.potrebic@gmail.com>
 As part of: Paper (https://github.com/PaperMC/Paper)
 Licensed under: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 
-diff --git a/src/main/java/io/papermc/paper/configuration/ConfigurationPart.java b/src/main/java/io/papermc/paper/configuration/ConfigurationPart.java
-index 7a4a7a654fe2516ed894a68f2657344df9d70f4c..aecf60a2c08bb977df2d4a2d10ba399d5150f6ba 100644
---- a/src/main/java/io/papermc/paper/configuration/ConfigurationPart.java
-+++ b/src/main/java/io/papermc/paper/configuration/ConfigurationPart.java
-@@ -1,6 +1,6 @@
- package io.papermc.paper.configuration;
- 
--abstract class ConfigurationPart {
-+public abstract class ConfigurationPart { // Fiddle - Fiddle configuration
- 
-     public static abstract class Post extends ConfigurationPart {
- 
 diff --git a/src/main/java/io/papermc/paper/configuration/Configurations.java b/src/main/java/io/papermc/paper/configuration/Configurations.java
 index 9ef6712c70fcd8912a79f3f61e351aac09572cf3..f0c86f75e89b5acd20f69a5a7dac5cc90b1406fd 100644
 --- a/src/main/java/io/papermc/paper/configuration/Configurations.java
@@ -99,46 +87,11 @@ index 9ef6712c70fcd8912a79f3f61e351aac09572cf3..f0c86f75e89b5acd20f69a5a7dac5cc9
 +    // Fiddle end - Fiddle configuration
 +
  }
-diff --git a/src/main/java/io/papermc/paper/configuration/InnerClassFieldDiscoverer.java b/src/main/java/io/papermc/paper/configuration/InnerClassFieldDiscoverer.java
-index a0aa1f1a7adf986d500a2135aa42e138aa3c4f08..367ab2f7a7b1f7f2b49a64522a65f849818dd478 100644
---- a/src/main/java/io/papermc/paper/configuration/InnerClassFieldDiscoverer.java
-+++ b/src/main/java/io/papermc/paper/configuration/InnerClassFieldDiscoverer.java
-@@ -17,7 +17,7 @@ import java.util.Map;
- 
- import static io.leangen.geantyref.GenericTypeReflector.erase;
- 
--final class InnerClassFieldDiscoverer implements FieldDiscoverer<Map<Field, Object>> {
-+public final class InnerClassFieldDiscoverer implements FieldDiscoverer<Map<Field, Object>> { // Fiddle - Fiddle configuration
- 
-     private final Map<Class<?>, Object> instanceMap = new HashMap<>();
-     private final Map<Class<?>, Object> overrides;
-@@ -136,7 +136,20 @@ final class InnerClassFieldDiscoverer implements FieldDiscoverer<Map<Field, Obje
-         return new InnerClassFieldDiscoverer(overrides);
-     }
- 
--    static FieldDiscoverer<?> globalConfig() {
-+    // Fiddle start - Fiddle configuration
-+    public static FieldDiscoverer<?> fiddleWorldConfig(Configurations.ContextMap contextMap) {
-+        final Map<Class<?>, Object> overrides = Map.of(
-+            org.fiddlemc.fiddle.configuration.FiddleWorldConfiguration.class,
-+            new org.fiddlemc.fiddle.configuration.FiddleWorldConfiguration(
-+                contextMap.require(PaperConfigurations.SPIGOT_WORLD_CONFIG_CONTEXT_KEY).get(),
-+                contextMap.require(Configurations.WORLD_KEY)
-+            )
-+        );
-+        return new InnerClassFieldDiscoverer(overrides);
-+    }
-+    // Fiddle end - Fiddle configuration
-+
-+    public static FieldDiscoverer<?> globalConfig() { // Fiddle - Fiddle configuration
-         return new InnerClassFieldDiscoverer(Collections.emptyMap());
-     }
- }
 diff --git a/src/main/java/io/papermc/paper/configuration/PaperConfigurations.java b/src/main/java/io/papermc/paper/configuration/PaperConfigurations.java
-index 9b5c2abaa28fa60cedd9f0111e5eb018f93a0561..2e46e071c9b554365205abf4e8e3937e02f6ac17 100644
+index 9e8b8de907654050c51400286af971caca87d6bd..cd823f52ed25b44724554c6b127238181e8d61c0 100644
 --- a/src/main/java/io/papermc/paper/configuration/PaperConfigurations.java
 +++ b/src/main/java/io/papermc/paper/configuration/PaperConfigurations.java
-@@ -70,16 +70,29 @@ import java.util.function.Supplier;
+@@ -70,16 +70,29 @@ import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
  import static com.google.common.base.Preconditions.checkState;
  import static io.leangen.geantyref.GenericTypeReflector.erase;
  
@@ -208,7 +161,7 @@ index 9b5c2abaa28fa60cedd9f0111e5eb018f93a0561..2e46e071c9b554365205abf4e8e3937e
      public static final Supplier<SpigotWorldConfig> SPIGOT_WORLD_DEFAULTS = Suppliers.memoize(() -> new SpigotWorldConfig(RandomStringUtils.randomAlphabetic(255)) {
          @Override // override to ensure "verbose" is false
 @@ -139,8 +167,32 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
-     static final ContextKey<Supplier<SpigotWorldConfig>> SPIGOT_WORLD_CONFIG_CONTEXT_KEY = new ContextKey<>(new TypeToken<Supplier<SpigotWorldConfig>>() {}, "spigot world config");
+     public static final ContextKey<Supplier<SpigotWorldConfig>> SPIGOT_WORLD_CONFIG_CONTEXT_KEY = new ContextKey<>(new TypeToken<Supplier<SpigotWorldConfig>>() {}, "spigot world config");
  
  
 -    public PaperConfigurations(final Path globalFolder) {
@@ -278,16 +231,28 @@ index 9b5c2abaa28fa60cedd9f0111e5eb018f93a0561..2e46e071c9b554365205abf4e8e3937e
          return configuration;
      }
  
-@@ -199,7 +265,7 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+@@ -199,11 +265,17 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
          return super.createWorldObjectMapperFactoryBuilder(contextMap)
              .addNodeResolver(new RequiresSpigotInitialization.Factory(contextMap.require(SPIGOT_WORLD_CONFIG_CONTEXT_KEY).get()))
              .addNodeResolver(new NestedSetting.Factory())
--            .addDiscoverer(InnerClassFieldDiscoverer.worldConfig(contextMap));
+-            .addDiscoverer(InnerClassFieldDiscoverer.worldConfig(createWorldConfigInstance(contextMap)));
 +            .addDiscoverer(this.createInnerClassFieldDiscoverer(contextMap)); // Fiddle - Fiddle configuration
++    }
++
++    // Fiddle start - Fiddle configuration
++    protected org.spongepowered.configurate.objectmapping.FieldDiscoverer<?> createInnerClassFieldDiscoverer(ContextMap contextMap) {
++        return InnerClassFieldDiscoverer.worldConfig(createWorldConfigInstance(contextMap));
      }
  
-     @Override
-@@ -234,15 +300,26 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+-    private static WorldConfiguration createWorldConfigInstance(ContextMap contextMap) {
+-        return new WorldConfiguration(
++    private static io.papermc.paper.configuration.WorldConfiguration createWorldConfigInstance(ContextMap contextMap) {
++        return new io.papermc.paper.configuration.WorldConfiguration(
++            // Fiddle end - Fiddle configuration
+             contextMap.require(PaperConfigurations.SPIGOT_WORLD_CONFIG_CONTEXT_KEY).get(),
+             contextMap.require(Configurations.WORLD_KEY)
+         );
+@@ -241,15 +313,26 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
          final ConfigurationNode version = node.node(Configuration.VERSION_FIELD);
          final String world = contextMap.require(WORLD_NAME);
          if (version.virtual()) {
@@ -317,7 +282,7 @@ index 9b5c2abaa28fa60cedd9f0111e5eb018f93a0561..2e46e071c9b554365205abf4e8e3937e
          final ConfigurationTransformation.VersionedBuilder versionedBuilder = Transformations.versionedBuilder();
          V29_ZeroWorldHeight.apply(versionedBuilder);
          V30_RenameFilterNbtFromSpawnEgg.apply(versionedBuilder);
-@@ -252,19 +329,33 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+@@ -259,19 +342,33 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
  
      @Override
      protected void applyGlobalConfigTransformations(ConfigurationNode node) throws ConfigurateException {
@@ -330,10 +295,10 @@ index 9b5c2abaa28fa60cedd9f0111e5eb018f93a0561..2e46e071c9b554365205abf4e8e3937e
          builder.build().apply(node);
 +        // Fiddle start - Fiddle configuration
 +        }
- 
++
 +        this.applyVersionedGlobalConfigTransformations(node);
 +    }
-+
+ 
 +    protected void applyVersionedGlobalConfigTransformations(final ConfigurationNode node) throws ConfigurateException {
 +        // Fiddle end - Fiddle configuration
          final ConfigurationTransformation.VersionedBuilder versionedBuilder = Transformations.versionedBuilder();
@@ -352,7 +317,7 @@ index 9b5c2abaa28fa60cedd9f0111e5eb018f93a0561..2e46e071c9b554365205abf4e8e3937e
  
      @Override
      protected void applyDefaultsAwareWorldConfigTransformations(final ContextMap contextMap, final ConfigurationNode worldNode, final ConfigurationNode defaultsNode) throws ConfigurateException {
-@@ -287,7 +378,7 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+@@ -294,7 +391,7 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
          try {
              return super.createWorldConfig(contextMap);
          } catch (IOException exception) {
@@ -361,7 +326,7 @@ index 9b5c2abaa28fa60cedd9f0111e5eb018f93a0561..2e46e071c9b554365205abf4e8e3937e
          }
      }
  
-@@ -298,17 +389,17 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+@@ -305,17 +402,17 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
  
      public void reloadConfigs(MinecraftServer server) {
          try {
@@ -383,7 +348,7 @@ index 9b5c2abaa28fa60cedd9f0111e5eb018f93a0561..2e46e071c9b554365205abf4e8e3937e
          return createWorldContextMap(level.convertable.levelDirectory.path(), level.serverLevelData.getLevelName(), level.dimension().location(), level.spigotConfig);
      }
  
-@@ -321,7 +412,7 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+@@ -328,7 +425,7 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
              .build();
      }
  
@@ -392,7 +357,7 @@ index 9b5c2abaa28fa60cedd9f0111e5eb018f93a0561..2e46e071c9b554365205abf4e8e3937e
          final Path legacy = Files.isSymbolicLink(legacyConfig) ? Files.readSymbolicLink(legacyConfig) : legacyConfig;
          if (needsConverting(legacyConfig)) {
              final String legacyFileName = legacyConfig.getFileName().toString();
-@@ -355,13 +446,18 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+@@ -362,13 +459,18 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
          }
          try {
              createDirectoriesSymlinkAware(configDir);
@@ -412,7 +377,7 @@ index 9b5c2abaa28fa60cedd9f0111e5eb018f93a0561..2e46e071c9b554365205abf4e8e3937e
          createDirectoriesSymlinkAware(configDir);
  
          final YamlConfigurationLoader legacyLoader = ConfigurationLoaders.naturallySortedWithoutHeader(legacyConfig);
-@@ -409,17 +505,6 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+@@ -416,17 +518,6 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
          return Files.exists(legacyConfig) && Files.isRegularFile(legacyConfig);
      }
  
@@ -430,7 +395,7 @@ index 9b5c2abaa28fa60cedd9f0111e5eb018f93a0561..2e46e071c9b554365205abf4e8e3937e
      @Deprecated
      public static YamlConfiguration loadLegacyConfigFile(File configFile) throws Exception {
          YamlConfiguration config = new YamlConfiguration();
-@@ -436,15 +521,90 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+@@ -443,15 +534,83 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
      @VisibleForTesting
      static ConfigurationNode createForTesting() {
          ObjectMapper.Factory factory = defaultGlobalFactoryBuilder(ObjectMapper.factoryBuilder()).build();
@@ -476,8 +441,6 @@ index 9b5c2abaa28fa60cedd9f0111e5eb018f93a0561..2e46e071c9b554365205abf4e8e3937e
 +
 +    public abstract WorldConfiguration getConfigForLevel(ServerLevel level);
 +
-+    protected abstract org.spongepowered.configurate.objectmapping.FieldDiscoverer<?> createInnerClassFieldDiscoverer(ContextMap contextMap);
-+
 +    /**
 +     * The original configurations for Paper.
 +     */
@@ -514,15 +477,34 @@ index 9b5c2abaa28fa60cedd9f0111e5eb018f93a0561..2e46e071c9b554365205abf4e8e3937e
 +            return level.paperConfig();
 +        }
 +
-+        @Override
-+        protected org.spongepowered.configurate.objectmapping.FieldDiscoverer<?> createInnerClassFieldDiscoverer(ContextMap contextMap) {
-+            return InnerClassFieldDiscoverer.worldConfig(contextMap);
-+        }
-+
 +    }
 +    // Fiddle end - Fiddle configuration
 +
  }
+diff --git a/src/main/java/io/papermc/paper/configuration/mapping/InnerClassFieldDiscoverer.java b/src/main/java/io/papermc/paper/configuration/mapping/InnerClassFieldDiscoverer.java
+index 8f23276796037d048eb114952891a01a40971b3e..f48e783fe810ac57510f8e9dcfeaa02ceffa0ccf 100644
+--- a/src/main/java/io/papermc/paper/configuration/mapping/InnerClassFieldDiscoverer.java
++++ b/src/main/java/io/papermc/paper/configuration/mapping/InnerClassFieldDiscoverer.java
+@@ -48,6 +48,19 @@ public final class InnerClassFieldDiscoverer implements FieldDiscoverer<Map<Fiel
+         return new InnerClassFieldDiscoverer(overrides);
+     }
+ 
++    // Fiddle start - Fiddle configuration
++    public static FieldDiscoverer<?> fiddleWorldConfig(Configurations.ContextMap contextMap) {
++        final Map<Class<?>, Object> overrides = Map.of(
++            org.fiddlemc.fiddle.configuration.FiddleWorldConfiguration.class,
++            new org.fiddlemc.fiddle.configuration.FiddleWorldConfiguration(
++                contextMap.require(PaperConfigurations.SPIGOT_WORLD_CONFIG_CONTEXT_KEY).get(),
++                contextMap.require(Configurations.WORLD_KEY)
++            )
++        );
++        return new InnerClassFieldDiscoverer(overrides);
++    }
++    // Fiddle end - Fiddle configuration
++
+     public static FieldDiscoverer<?> globalConfig() {
+         return new InnerClassFieldDiscoverer(Collections.emptyMap());
+     }
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
 index ec268189b19b6fa5c4521f96ce211a531db35ec5..dc8d3f1d2c4d37331802cc21903775cc0d4f57d0 100644
 --- a/src/main/java/net/minecraft/server/Main.java
@@ -666,15 +648,16 @@ index 55cd66a2ff5e1bc175bccf676c17b9a564f6d57f..6800d7fa8818f5f39de6ff041f3e628e
              world.setSpawnSettings(world.serverLevelData.getDifficulty() != Difficulty.PEACEFUL && config.spawnMonsters, config.spawnAnimals); // Paper - per level difficulty (from MinecraftServer#setDifficulty(ServerLevel, Difficulty, boolean))
 diff --git a/src/main/java/org/fiddlemc/fiddle/configuration/FiddleConfigurations.java b/src/main/java/org/fiddlemc/fiddle/configuration/FiddleConfigurations.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..cabba43d671ef758b48260e2e12a02d3674363b6
+index 0000000000000000000000000000000000000000..1579e257e6a9b81f924aad97cae85895b44f3ef7
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/configuration/FiddleConfigurations.java
-@@ -0,0 +1,141 @@
+@@ -0,0 +1,142 @@
 +// Fiddle - Fiddle configuration
 +
 +package org.fiddlemc.fiddle.configuration;
 +
 +import io.papermc.paper.configuration.*;
++import io.papermc.paper.configuration.mapping.InnerClassFieldDiscoverer;
 +import joptsimple.OptionSet;
 +import net.minecraft.server.Services;
 +import net.minecraft.server.level.ServerLevel;

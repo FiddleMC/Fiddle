@@ -683,20 +683,21 @@ index 76d1839b140e6e3ef385b54d68ed2b305d137f12..2e55d00756bfa52daeff7324d3056516
 +
  }
 diff --git a/src/main/java/org/fiddlemc/fiddle/configuration/FiddleGlobalConfiguration.java b/src/main/java/org/fiddlemc/fiddle/configuration/FiddleGlobalConfiguration.java
-index ee3dd1e3383989ccb17318b4c412f4bfe8b6eb28..37bcf19a56e50f1aba9a25424ffbe23ceaa7f5ef 100644
+index c8060a0b175447c1a83dae5a109ffd550c5343b0..a2151ec7c384342ff30ba38984a8ecc0a00e5fa6 100644
 --- a/src/main/java/org/fiddlemc/fiddle/configuration/FiddleGlobalConfiguration.java
 +++ b/src/main/java/org/fiddlemc/fiddle/configuration/FiddleGlobalConfiguration.java
-@@ -6,7 +6,9 @@ import com.mojang.logging.LogUtils;
+@@ -6,8 +6,10 @@ import com.mojang.logging.LogUtils;
  import io.papermc.paper.configuration.Configuration;
  import io.papermc.paper.configuration.ConfigurationPart;
  import net.minecraft.resources.ResourceLocation;
 +import org.jetbrains.annotations.Nullable;
  import org.slf4j.Logger;
+ import org.spongepowered.configurate.objectmapping.meta.PostProcess;
 +import org.spongepowered.configurate.objectmapping.ConfigSerializable;
  import org.spongepowered.configurate.objectmapping.meta.Setting;
  
  import java.util.HashSet;
-@@ -75,4 +77,63 @@ public class FiddleGlobalConfiguration extends ConfigurationPart {
+@@ -76,4 +78,63 @@ public class FiddleGlobalConfiguration extends ConfigurationPart {
      }
      // Fiddle end - override sent feature flags
  

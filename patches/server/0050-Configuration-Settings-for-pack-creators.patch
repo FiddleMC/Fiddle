@@ -7,10 +7,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/fiddlemc/fiddle/configuration/FiddleGlobalConfiguration.java b/src/main/java/org/fiddlemc/fiddle/configuration/FiddleGlobalConfiguration.java
-index 37bcf19a56e50f1aba9a25424ffbe23ceaa7f5ef..0c66450706696105c38b45f7553301153f238465 100644
+index a2151ec7c384342ff30ba38984a8ecc0a00e5fa6..1a50960a80d429f0c649b277d2fc184ec238319c 100644
 --- a/src/main/java/org/fiddlemc/fiddle/configuration/FiddleGlobalConfiguration.java
 +++ b/src/main/java/org/fiddlemc/fiddle/configuration/FiddleGlobalConfiguration.java
-@@ -136,4 +136,15 @@ public class FiddleGlobalConfiguration extends ConfigurationPart {
+@@ -137,4 +137,15 @@ public class FiddleGlobalConfiguration extends ConfigurationPart {
      }
      // Fiddle end - gameplay mechanics settings
  
