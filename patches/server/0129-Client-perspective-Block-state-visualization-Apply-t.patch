@@ -46,10 +46,10 @@ index 52d2e2b744f91914802506e52a07161729bbcf3a..061041006c88ba0a7583c60e0dffac93
      }
  
 diff --git a/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketBlockControllerAntiXray.java b/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketBlockControllerAntiXray.java
-index 42fdce97d99618a53f2e9c51804ff2205b574f69..2437d7ba59e1f730a38aac0d63667679353f91df 100644
+index e7fe98ea30ae6d0baea3ec1f9f98a89502a49a12..9367e1e6c5a7db16f4398d2d7475dd7d1b056e96 100644
 --- a/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketBlockControllerAntiXray.java
 +++ b/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketBlockControllerAntiXray.java
-@@ -169,14 +169,16 @@ public final class ChunkPacketBlockControllerAntiXray extends ChunkPacketBlockCo
+@@ -173,14 +173,16 @@ public final class ChunkPacketBlockControllerAntiXray extends ChunkPacketBlockCo
      }
  
      @Override

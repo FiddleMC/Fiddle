@@ -11,7 +11,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index dc8d3f1d2c4d37331802cc21903775cc0d4f57d0..db4b647f2a76519b753e168a3a540f7a380c7a81 100644
+index c8ca16713e9f88a0b82e9736d58ca5d8d8c9c581..e5424569c292552a6f2f1ed273a1c3af46dd691e 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
 @@ -131,6 +131,11 @@ public class Main {
@@ -25,7 +25,7 @@ index dc8d3f1d2c4d37331802cc21903775cc0d4f57d0..db4b647f2a76519b753e168a3a540f7a
 +
              // Fiddle start - Fiddle configuration - load Fiddle global configuration before bootstrap
              var fiddleConfigurations = org.fiddlemc.fiddle.configuration.FiddleConfigurations.get(optionset);
-             fiddleConfigurations.initializeGlobalConfiguration();
+             fiddleConfigurations.initializeGlobalConfiguration(null);
 @@ -144,8 +149,6 @@ public class Main {
              DedicatedServerSettings dedicatedserversettings = new DedicatedServerSettings(optionset); // CraftBukkit - CLI argument support
  

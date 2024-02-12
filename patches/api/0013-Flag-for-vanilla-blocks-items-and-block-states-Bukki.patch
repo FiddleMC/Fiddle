@@ -11,10 +11,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index d95a42900399af3dd6775f4d9690eb08a96fa6bf..8469cd2b8414fee9d06577bd5ee8379321d053f1 100644
+index 056f8ca81c4b5c697bce1042962722da535efa56..a335c4830ae19306ffdf333d4da90496ee5e2447 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -11077,4 +11077,23 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -11081,4 +11081,23 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      public boolean isEnabledByFeature(@NotNull World world) {
          return Bukkit.getDataPackManager().isEnabledByFeature(this, world);
      }
@@ -65,10 +65,10 @@ index a4b38f284d4fea7df7f9df9bf44e4f68fefaf20f..715c5e27d9448d7e44cb12e843bf3403
 +
  }
 diff --git a/src/main/java/org/bukkit/block/data/BlockData.java b/src/main/java/org/bukkit/block/data/BlockData.java
-index 31111cea5ffd018c3c011c1f3b8befbbd33db5e5..f43cf447c19c2c37dc4dbdb6c34f172c3dd9ec03 100644
+index 66903e0fa65052ede789a163dad723ba05a2cc8c..b557017620a9e71780a33735a6166996fc83dfc9 100644
 --- a/src/main/java/org/bukkit/block/data/BlockData.java
 +++ b/src/main/java/org/bukkit/block/data/BlockData.java
-@@ -282,4 +282,12 @@ public interface BlockData extends Cloneable {
+@@ -295,4 +295,12 @@ public interface BlockData extends Cloneable {
       */
      boolean isRandomlyTicked();
      // Paper end - Tick API

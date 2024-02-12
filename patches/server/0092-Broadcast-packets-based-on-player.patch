@@ -11,10 +11,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
-index 48d1444fbad1c57738807d0128b94160a5a17a4d..6301c90bb6d3049b933f5ba08a163ac6fcfce4b0 100644
+index 33abcf12b4426572b74ca4c813e4392c823494bc..31b75994664d8f16467d1d680b50d92ff6293ef2 100644
 --- a/src/main/java/net/minecraft/server/players/PlayerList.java
 +++ b/src/main/java/net/minecraft/server/players/PlayerList.java
-@@ -1182,6 +1182,12 @@ public abstract class PlayerList {
+@@ -1203,6 +1203,12 @@ public abstract class PlayerList {
      }
  
      public void broadcast(@Nullable net.minecraft.world.entity.player.Player player, double x, double y, double z, double distance, ResourceKey<Level> worldKey, Packet<?> packet) {
@@ -27,7 +27,7 @@ index 48d1444fbad1c57738807d0128b94160a5a17a4d..6301c90bb6d3049b933f5ba08a163ac6
          for (int i = 0; i < this.players.size(); ++i) {
              ServerPlayer entityplayer = (ServerPlayer) this.players.get(i);
  
-@@ -1197,7 +1203,7 @@ public abstract class PlayerList {
+@@ -1218,7 +1224,7 @@ public abstract class PlayerList {
                  double d6 = z - entityplayer.getZ();
  
                  if (d4 * d4 + d5 * d5 + d6 * d6 < distance * distance) {

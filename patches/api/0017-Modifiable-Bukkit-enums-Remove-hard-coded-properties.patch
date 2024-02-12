@@ -33,7 +33,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 8469cd2b8414fee9d06577bd5ee8379321d053f1..258e2301efeb2facae185cc980fe0862ce246f81 100644
+index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e8660b44392 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
 @@ -4397,7 +4397,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
@@ -3442,9 +3442,9 @@ index 8469cd2b8414fee9d06577bd5ee8379321d053f1..258e2301efeb2facae185cc980fe0862
      }
  
      /**
-@@ -8765,331 +5700,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
-      * @return true if this material can be interacted with.
+@@ -8769,331 +5704,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       */
+     @Deprecated // Paper
      public boolean isInteractable() {
 -        switch (this) {
 -            // <editor-fold defaultstate="collapsed" desc="isInteractable">
@@ -3775,7 +3775,7 @@ index 8469cd2b8414fee9d06577bd5ee8379321d053f1..258e2301efeb2facae185cc980fe0862
      }
  
      /**
-@@ -9102,886 +5713,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -9106,886 +5717,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return the hardness of that material.
       */
      public float getHardness() {
@@ -4663,7 +4663,7 @@ index 8469cd2b8414fee9d06577bd5ee8379321d053f1..258e2301efeb2facae185cc980fe0862
      }
  
      /**
-@@ -9995,885 +5727,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -9999,885 +5731,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return the blast resistance of that material.
       */
      public float getBlastResistance() {
@@ -5550,7 +5550,7 @@ index 8469cd2b8414fee9d06577bd5ee8379321d053f1..258e2301efeb2facae185cc980fe0862
      }
  
      /**
-@@ -10889,21 +5743,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -10893,21 +5747,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return the slipperiness of this block
       */
      public float getSlipperiness() {
@@ -5573,7 +5573,7 @@ index 8469cd2b8414fee9d06577bd5ee8379321d053f1..258e2301efeb2facae185cc980fe0862
      }
  
      /**
-@@ -10916,20 +5756,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -10920,20 +5760,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       */
      @Nullable
      public Material getCraftingRemainingItem() {
@@ -5595,7 +5595,7 @@ index 8469cd2b8414fee9d06577bd5ee8379321d053f1..258e2301efeb2facae185cc980fe0862
      }
  
      /**
-@@ -10941,53 +5768,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -10945,53 +5772,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       */
      @NotNull
      public EquipmentSlot getEquipmentSlot() {

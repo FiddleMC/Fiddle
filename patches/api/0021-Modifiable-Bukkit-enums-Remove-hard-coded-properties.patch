@@ -12,7 +12,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index b3e1b2565e71cc40342541cf36348bd68530f44c..6f51b6feb20db71e1e3b4d4630f3ba2dd20fb962 100644
+index 988bc9e0bfa0b0a232bc2c57efe20a5d2d15fa38..979284a6e7020c63258e2d892d255543e055d68f 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
 @@ -4387,7 +4387,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
@@ -42,7 +42,7 @@ index b3e1b2565e71cc40342541cf36348bd68530f44c..6f51b6feb20db71e1e3b4d4630f3ba2d
              if (MaterialData.class.isAssignableFrom(data)) {
 @@ -4504,7 +4502,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       */
-     @Deprecated
+     @org.jetbrains.annotations.ApiStatus.Internal // Paper
      public int getId() {
 -        Preconditions.checkArgument(legacy, "Cannot get ID of Modern Material");
 +        Preconditions.checkArgument(this.isLegacy(), "Cannot get ID of Modern Material"); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - is legacy

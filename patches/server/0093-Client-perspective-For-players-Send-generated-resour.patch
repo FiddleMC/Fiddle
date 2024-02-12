@@ -92,10 +92,10 @@ index 655c065a30db9b0aab4a169702b8c8907d075514..f544959972b9b881231bcf9833b1ca18
  
      }
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index 4f237880cf53ec2eb4e7c93dccc168bbb682f473..4aa60f7cbe2844391d0c0cb4a4ecf680ff749105 100644
+index 83aaf3e6e377d731ce02f779f80b7bf5db46f89f..6e5c102c3123e97156e050bcf2aad018da5c4d9e 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -2297,34 +2297,48 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -2287,34 +2287,48 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
          this.getHandle().connection.send(packet);
      }
  
@@ -149,7 +149,7 @@ index 4f237880cf53ec2eb4e7c93dccc168bbb682f473..4aa60f7cbe2844391d0c0cb4a4ecf680
  
          if (hash != null) {
              Preconditions.checkArgument(hash.length == 20, "Resource pack hash should be 20 bytes long but was %s", hash.length);
-@@ -2339,6 +2353,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -2329,6 +2343,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
      @Override
      public void setResourcePack(String url, byte[] hashBytes, net.kyori.adventure.text.Component prompt, boolean force) {
          Preconditions.checkArgument(url != null, "Resource pack URL cannot be null");

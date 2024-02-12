@@ -8,7 +8,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index b132a518b0429cb41b36ad9ccaf5dc023987b680..40061a2a1295116d4c7e792448354bfa73024dc2 100644
+index b132a518b0429cb41b36ad9ccaf5dc023987b680..70caff0834ad34af8dc76563f3d835c0d37d6a84 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
 @@ -2048,7 +2048,10 @@ public class ServerPlayer extends Player {
@@ -23,11 +23,12 @@ index b132a518b0429cb41b36ad9ccaf5dc023987b680..40061a2a1295116d4c7e792448354bfa
              PlayerLocaleChangeEvent event = new PlayerLocaleChangeEvent(this.getBukkitEntity(), clientOptions.language());
              this.server.server.getPluginManager().callEvent(event);
              this.server.server.getPluginManager().callEvent(new com.destroystokyo.paper.event.player.PlayerLocaleChangeEvent(this.getBukkitEntity(), this.language, clientOptions.language())); // Paper
-@@ -2060,6 +2063,11 @@ public class ServerPlayer extends Player {
+@@ -2060,6 +2063,12 @@ public class ServerPlayer extends Player {
      public void updateOptionsNoEvents(ClientInformation clientOptions) {
          // Paper end
          this.language = clientOptions.language();
 +        // Fiddle start - client perspective - localization - send update packets for replaceables after locale change
++        boolean localeChanged = this.language == null || !this.language.equals(clientOptions.language()); // Paper
 +        if (localeChanged) {
 +            this.sendUpdatesForDeepReplaceableContent(true, true);
 +        }

@@ -17,10 +17,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
-index b243db56756c67cd2c41d7768898d01539f9260a..8a093a5720b79c45f648504b780a286d546d28d3 100644
+index 884902cb7f86c0b56594ccafc7d05c6c7a23ab53..f9d79e339f7c9124832d661ce85e9a344b3599cc 100644
 --- a/src/main/java/org/bukkit/Bukkit.java
 +++ b/src/main/java/org/bukkit/Bukkit.java
-@@ -106,6 +106,20 @@ public final class Bukkit {
+@@ -107,6 +107,20 @@ public final class Bukkit {
          }
  
          Bukkit.server = server;

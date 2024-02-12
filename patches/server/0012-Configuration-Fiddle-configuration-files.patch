@@ -31,10 +31,29 @@ As part of: Paper (https://github.com/PaperMC/Paper)
 Licensed under: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 
 diff --git a/src/main/java/io/papermc/paper/configuration/Configurations.java b/src/main/java/io/papermc/paper/configuration/Configurations.java
-index 9ef6712c70fcd8912a79f3f61e351aac09572cf3..f0c86f75e89b5acd20f69a5a7dac5cc90b1406fd 100644
+index c01b4393439838976965823298f12e4762e72eff..c6afbe8d889a7c2d7c33aa2eb2a913985ee95c50 100644
 --- a/src/main/java/io/papermc/paper/configuration/Configurations.java
 +++ b/src/main/java/io/papermc/paper/configuration/Configurations.java
-@@ -88,7 +88,7 @@ public abstract class Configurations<G, W> {
+@@ -42,7 +42,10 @@ public abstract class Configurations<G, W> {
+     protected final String defaultWorldConfigFileName;
+     protected final String worldConfigFileName;
+ 
++    public final String brand; // Fiddle - Fiddle configuration
++
+     public Configurations(
++        final String brand, // Fiddle - Fiddle configuration
+         final Path globalFolder,
+         final Class<G> globalConfigType,
+         final Class<W> worldConfigClass,
+@@ -50,6 +53,7 @@ public abstract class Configurations<G, W> {
+         final String defaultWorldConfigFileName,
+         final String worldConfigFileName
+     ) {
++        this.brand = brand; // Fiddle - Fiddle configuration
+         this.globalFolder = globalFolder;
+         this.globalConfigClass = globalConfigType;
+         this.worldConfigClass = worldConfigClass;
+@@ -93,7 +97,7 @@ public abstract class Configurations<G, W> {
          };
      }
  
@@ -43,31 +62,48 @@ index 9ef6712c70fcd8912a79f3f61e351aac09572cf3..f0c86f75e89b5acd20f69a5a7dac5cc9
          return node -> {
              ObjectMapper.Factory factory = (ObjectMapper.Factory) Objects.requireNonNull(node.options().serializers().get(type));
              ObjectMapper.Mutable<T> mutable = (ObjectMapper.Mutable<T>) factory.get(type);
-@@ -148,7 +148,7 @@ public abstract class Configurations<G, W> {
-         final YamlConfigurationLoader loader = result.loader();
-         final ConfigurationNode node = loader.load();
-         if (result.isNewFile()) { // add version to new files
--            node.node(Configuration.VERSION_FIELD).raw(WorldConfiguration.CURRENT_VERSION);
-+            node.node(Configuration.VERSION_FIELD).raw(getWorldConfigurationCurrentVersion()); // Fiddle - Fiddle configuration
+@@ -139,10 +143,10 @@ public abstract class Configurations<G, W> {
+     protected void verifyGlobalConfigVersion(final ConfigurationNode globalNode) {
+         final ConfigurationNode version = globalNode.node(Configuration.VERSION_FIELD);
+         if (version.virtual()) {
+-            LOGGER.warn("The global config file didn't have a version set, assuming latest");
++            LOGGER.warn("The " + this.brand + " global config file didn't have a version set, assuming latest"); // Fiddle - Fiddle configuration
+             version.raw(this.globalConfigVersion());
+         } else if (version.getInt() > this.globalConfigVersion()) {
+-            LOGGER.error("Loading a newer configuration than is supported ({} > {})! You may have to backup & delete your global config file to start the server.", version.getInt(), this.globalConfigVersion());
++            LOGGER.error("Loading a newer " + this.brand + " global configuration than is supported ({} > {})! You may have to backup & delete your " + this.brand + " global config file to start the server.", version.getInt(), this.globalConfigVersion()); // Fiddle - Fiddle configuration
          }
-         this.applyWorldConfigTransformations(contextMap, node);
-         final W instance = node.require(this.worldConfigClass);
-@@ -207,7 +207,7 @@ public abstract class Configurations<G, W> {
-             .build();
-         final ConfigurationNode worldNode = worldLoader.load();
-         if (newFile) { // set the version field if new file
--            worldNode.node(Configuration.VERSION_FIELD).set(WorldConfiguration.CURRENT_VERSION);
-+            worldNode.node(Configuration.VERSION_FIELD).set(getWorldConfigurationCurrentVersion()); // Fiddle - Fiddle configuration
+     }
+ 
+@@ -243,17 +247,17 @@ public abstract class Configurations<G, W> {
+         final String worldName = contextMap.require(WORLD_NAME);
+         if (version.virtual()) {
+             if (worldName.equals(WORLD_DEFAULTS)) {
+-                LOGGER.warn("The world defaults config file didn't have a version set, assuming latest");
++                LOGGER.warn("The " + this.brand + " world defaults config file didn't have a version set, assuming latest"); // Fiddle - Fiddle configuration
+             } else {
+-                LOGGER.warn("The world config file for " + worldName + " didn't have a version set, assuming latest");
++                LOGGER.warn("The " + this.brand + " world config file for " + worldName + " didn't have a version set, assuming latest"); // Fiddle - Fiddle configuration
+             }
+             version.raw(this.worldConfigVersion());
+         } else if (version.getInt() > this.worldConfigVersion()) {
+-            String msg = "Loading a newer configuration than is supported ({} > {})! ";
++            String msg = "Loading a newer " + this.brand + " world configuration than is supported ({} > {})! "; // Fiddle - Fiddle configuration
+             if (worldName.equals(WORLD_DEFAULTS)) {
+-                msg += "You may have to backup & delete the world defaults config file to start the server.";
++                msg += "You may have to backup & delete the " + this.brand + " world defaults config file to start the server."; // Fiddle - Fiddle configuration
+             } else {
+-                msg += "You may have to backup & delete the " + worldName + " config file to start the server.";
++                msg += "You may have to backup & delete the " + this.brand + " world config file for the world '" + worldName + "' to start the server."; // Fiddle - Fiddle configuration
+             }
+             LOGGER.error(msg, version.getInt(), this.worldConfigVersion());
          }
-         this.applyWorldConfigTransformations(contextMap, worldNode);
-         this.applyDefaultsAwareWorldConfigTransformations(contextMap, worldNode, defaultsNode);
-@@ -308,4 +308,25 @@ public abstract class Configurations<G, W> {
+@@ -352,4 +356,21 @@ public abstract class Configurations<G, W> {
              return "ContextKey{" + this.name + "}";
          }
      }
 +
 +    // Fiddle start - Fiddle configuration
-+
 +    public static final String legacyWorldsSectionKey = "__________WORLDS__________";
 +    public static final String legacyWorldDefaultsSectionKey = "__defaults__";
 +
@@ -81,17 +117,14 @@ index 9ef6712c70fcd8912a79f3f61e351aac09572cf3..f0c86f75e89b5acd20f69a5a7dac5cc9
 +        }
 +        return global;
 +    }
-+
-+    public abstract int getWorldConfigurationCurrentVersion();
-+
 +    // Fiddle end - Fiddle configuration
 +
  }
 diff --git a/src/main/java/io/papermc/paper/configuration/PaperConfigurations.java b/src/main/java/io/papermc/paper/configuration/PaperConfigurations.java
-index 9e8b8de907654050c51400286af971caca87d6bd..cd823f52ed25b44724554c6b127238181e8d61c0 100644
+index fa1c0aee8c3a4d0868482cf5c703bbfd08e09874..40da4b76ce46b8c72cfc6e492c1224a55e4b7ba9 100644
 --- a/src/main/java/io/papermc/paper/configuration/PaperConfigurations.java
 +++ b/src/main/java/io/papermc/paper/configuration/PaperConfigurations.java
-@@ -70,16 +70,29 @@ import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
+@@ -72,16 +72,29 @@ import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
  import static com.google.common.base.Preconditions.checkState;
  import static io.leangen.geantyref.GenericTypeReflector.erase;
  
@@ -123,7 +156,7 @@ index 9e8b8de907654050c51400286af971caca87d6bd..cd823f52ed25b44724554c6b12723818
      private static final String GLOBAL_HEADER = String.format("""
              This is the global configuration file for Paper.
              As you can see, there's a lot to configure. Some options may impact gameplay, so use
-@@ -115,12 +128,16 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+@@ -117,12 +130,16 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
          This file may start empty but can be filled with settings to override ones in the %s/%s
          
          World: %s (%s)""",
@@ -142,7 +175,7 @@ index 9e8b8de907654050c51400286af971caca87d6bd..cd823f52ed25b44724554c6b12723818
      private static final String MOVED_NOTICE = """
          The global and world default configuration files have moved to %s
          and the world-specific configuration file has been moved inside
-@@ -129,6 +146,17 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+@@ -131,6 +148,15 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
          See https://docs.papermc.io/paper/configuration for more information.
          """;
  
@@ -153,14 +186,12 @@ index 9e8b8de907654050c51400286af971caca87d6bd..cd823f52ed25b44724554c6b12723818
 +    private final String GLOBAL_HEADER;
 +    private final String WORLD_DEFAULTS_HEADER;
 +    private final Function<ContextMap, String> WORLD_HEADER;
-+
-+    private final String brand;
 +    // Fiddle end - Fiddle configuration
 +
      @VisibleForTesting
      public static final Supplier<SpigotWorldConfig> SPIGOT_WORLD_DEFAULTS = Suppliers.memoize(() -> new SpigotWorldConfig(RandomStringUtils.randomAlphabetic(255)) {
          @Override // override to ensure "verbose" is false
-@@ -139,8 +167,32 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+@@ -141,18 +167,57 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
      public static final ContextKey<Supplier<SpigotWorldConfig>> SPIGOT_WORLD_CONFIG_CONTEXT_KEY = new ContextKey<>(new TypeToken<Supplier<SpigotWorldConfig>>() {}, "spigot world config");
  
  
@@ -181,7 +212,7 @@ index 9e8b8de907654050c51400286af971caca87d6bd..cd823f52ed25b44724554c6b12723818
 +        Class<WorldConfiguration> worldConfigurationClass
 +    ) {
 +        // Fiddle end - Fiddle configuration
-+        super(globalFolder, globalConfigurationClass, worldConfigurationClass, GLOBAL_CONFIG_FILE_NAME, WORLD_DEFAULTS_CONFIG_FILE_NAME, WORLD_CONFIG_FILE_NAME);
++        super(brand, globalFolder, globalConfigurationClass, worldConfigurationClass, GLOBAL_CONFIG_FILE_NAME, WORLD_DEFAULTS_CONFIG_FILE_NAME, WORLD_CONFIG_FILE_NAME);
 +        // Fiddle start - Fiddle configuration
 +        this.GLOBAL_CONFIG_FILE_NAME = GLOBAL_CONFIG_FILE_NAME;
 +        this.WORLD_DEFAULTS_CONFIG_FILE_NAME = WORLD_DEFAULTS_CONFIG_FILE_NAME;
@@ -190,12 +221,39 @@ index 9e8b8de907654050c51400286af971caca87d6bd..cd823f52ed25b44724554c6b12723818
 +        this.WORLD_DEFAULTS_HEADER = WORLD_DEFAULTS_HEADER;
 +        this.WORLD_HEADER = WORLD_HEADER;
 +        this.DEFAULT_AWARE_TRANSFORMATIONS = DEFAULT_AWARE_TRANSFORMATIONS;
-+        this.brand = brand;
 +        // Fiddle end - Fiddle configuration
      }
  
      @Override
-@@ -169,10 +221,16 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+     protected int globalConfigVersion() {
+-        return GlobalConfiguration.CURRENT_VERSION;
++        // Fiddle start - Fiddle configuration
++        try {
++            var versionField = this.globalConfigClass.getDeclaredField("CURRENT_VERSION");
++            versionField.trySetAccessible();
++            return (int) versionField.get(null);
++        } catch (Exception e) {
++            throw new RuntimeException(e);
++        }
++        // Fiddle end - Fiddle configuration
+     }
+ 
+     @Override
+     protected int worldConfigVersion() {
+-        return WorldConfiguration.CURRENT_VERSION;
++        // Fiddle start - Fiddle configuration
++        try {
++            var versionField = this.worldConfigClass.getDeclaredField("CURRENT_VERSION");
++            versionField.trySetAccessible();
++            return (int) versionField.get(null);
++        } catch (Exception e) {
++            throw new RuntimeException(e);
++        }
++        // Fiddle end - Fiddle configuration
+     }
+ 
+     @Override
+@@ -181,10 +246,16 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
      @Override
      protected YamlConfigurationLoader.Builder createGlobalLoaderBuilder() {
          return super.createGlobalLoaderBuilder()
@@ -214,10 +272,10 @@ index 9e8b8de907654050c51400286af971caca87d6bd..cd823f52ed25b44724554c6b12723818
          return options
              .header(GLOBAL_HEADER)
              .serializers(builder -> builder
-@@ -184,7 +242,15 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+@@ -196,7 +267,15 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
      @Override
-     public GlobalConfiguration initializeGlobalConfiguration() throws ConfigurateException {
-         GlobalConfiguration configuration = super.initializeGlobalConfiguration();
+     public GlobalConfiguration initializeGlobalConfiguration(final RegistryAccess registryAccess) throws ConfigurateException {
+         GlobalConfiguration configuration = super.initializeGlobalConfiguration(registryAccess);
 -        GlobalConfiguration.set(configuration);
 +        // Fiddle start - Fiddle configuration
 +        try {
@@ -231,38 +289,31 @@ index 9e8b8de907654050c51400286af971caca87d6bd..cd823f52ed25b44724554c6b12723818
          return configuration;
      }
  
-@@ -199,11 +265,17 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+@@ -211,11 +290,17 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
          return super.createWorldObjectMapperFactoryBuilder(contextMap)
              .addNodeResolver(new RequiresSpigotInitialization.Factory(contextMap.require(SPIGOT_WORLD_CONFIG_CONTEXT_KEY).get()))
              .addNodeResolver(new NestedSetting.Factory())
 -            .addDiscoverer(InnerClassFieldDiscoverer.worldConfig(createWorldConfigInstance(contextMap)));
 +            .addDiscoverer(this.createInnerClassFieldDiscoverer(contextMap)); // Fiddle - Fiddle configuration
-+    }
-+
-+    // Fiddle start - Fiddle configuration
-+    protected org.spongepowered.configurate.objectmapping.FieldDiscoverer<?> createInnerClassFieldDiscoverer(ContextMap contextMap) {
-+        return InnerClassFieldDiscoverer.worldConfig(createWorldConfigInstance(contextMap));
      }
  
 -    private static WorldConfiguration createWorldConfigInstance(ContextMap contextMap) {
 -        return new WorldConfiguration(
++    // Fiddle start - Fiddle configuration
++    protected org.spongepowered.configurate.objectmapping.FieldDiscoverer<?> createInnerClassFieldDiscoverer(ContextMap contextMap) {
++        return InnerClassFieldDiscoverer.worldConfig(createWorldConfigInstance(contextMap));
++    }
++
 +    private static io.papermc.paper.configuration.WorldConfiguration createWorldConfigInstance(ContextMap contextMap) {
 +        return new io.papermc.paper.configuration.WorldConfiguration(
 +            // Fiddle end - Fiddle configuration
              contextMap.require(PaperConfigurations.SPIGOT_WORLD_CONFIG_CONTEXT_KEY).get(),
              contextMap.require(Configurations.WORLD_KEY)
          );
-@@ -241,15 +313,26 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
-         final ConfigurationNode version = node.node(Configuration.VERSION_FIELD);
-         final String world = contextMap.require(WORLD_NAME);
-         if (version.virtual()) {
--            LOGGER.warn("The world config file for " + world + " didn't have a version set, assuming latest");
--            version.raw(WorldConfiguration.CURRENT_VERSION);
-+            // Fiddle start - Fiddle configuration
-+            LOGGER.warn("The " + this.brand + " world config file for " + world + " didn't have a version set, assuming latest");
-+            version.raw(this.getWorldConfigurationCurrentVersion());
-+            // Fiddle end - Fiddle configuration
-         }
+@@ -251,12 +336,21 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+ 
+     @Override
+     protected void applyWorldConfigTransformations(final ContextMap contextMap, final ConfigurationNode node) throws ConfigurateException {
 +        if (this.getRemovedWorldPaths().length > 0) { // Fiddle - Fiddle configuration
          ConfigurationTransformation.Builder builder = ConfigurationTransformation.builder();
 -        for (NodePath path : RemovedConfigurations.REMOVED_WORLD_PATHS) {
@@ -282,7 +333,7 @@ index 9e8b8de907654050c51400286af971caca87d6bd..cd823f52ed25b44724554c6b12723818
          final ConfigurationTransformation.VersionedBuilder versionedBuilder = Transformations.versionedBuilder();
          V29_ZeroWorldHeight.apply(versionedBuilder);
          V30_RenameFilterNbtFromSpawnEgg.apply(versionedBuilder);
-@@ -259,19 +342,33 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+@@ -266,19 +360,33 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
  
      @Override
      protected void applyGlobalConfigTransformations(ConfigurationNode node) throws ConfigurateException {
@@ -295,10 +346,10 @@ index 9e8b8de907654050c51400286af971caca87d6bd..cd823f52ed25b44724554c6b12723818
          builder.build().apply(node);
 +        // Fiddle start - Fiddle configuration
 +        }
-+
+ 
 +        this.applyVersionedGlobalConfigTransformations(node);
 +    }
- 
++
 +    protected void applyVersionedGlobalConfigTransformations(final ConfigurationNode node) throws ConfigurateException {
 +        // Fiddle end - Fiddle configuration
          final ConfigurationTransformation.VersionedBuilder versionedBuilder = Transformations.versionedBuilder();
@@ -317,7 +368,7 @@ index 9e8b8de907654050c51400286af971caca87d6bd..cd823f52ed25b44724554c6b12723818
  
      @Override
      protected void applyDefaultsAwareWorldConfigTransformations(final ContextMap contextMap, final ConfigurationNode worldNode, final ConfigurationNode defaultsNode) throws ConfigurateException {
-@@ -294,7 +391,7 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+@@ -301,7 +409,7 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
          try {
              return super.createWorldConfig(contextMap);
          } catch (IOException exception) {
@@ -326,13 +377,13 @@ index 9e8b8de907654050c51400286af971caca87d6bd..cd823f52ed25b44724554c6b12723818
          }
      }
  
-@@ -305,17 +402,17 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+@@ -312,17 +420,17 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
  
      public void reloadConfigs(MinecraftServer server) {
          try {
 -            this.initializeGlobalConfiguration(reloader(this.globalConfigClass, GlobalConfiguration.get()));
 +            this.initializeGlobalConfiguration(reloader(this.globalConfigClass, this.getGlobalConfig())); // Fiddle - Fiddle configuration
-             this.initializeWorldDefaultsConfiguration();
+             this.initializeWorldDefaultsConfiguration(server.registryAccess());
              for (ServerLevel level : server.getAllLevels()) {
 -                this.createWorldConfig(createWorldContextMap(level), reloader(this.worldConfigClass, level.paperConfig()));
 +                this.createWorldConfig(createWorldContextMap(level), reloader(this.worldConfigClass, this.getConfigForLevel(level))); // Fiddle - Fiddle configuration
@@ -344,11 +395,11 @@ index 9e8b8de907654050c51400286af971caca87d6bd..cd823f52ed25b44724554c6b12723818
      }
  
 -    private static ContextMap createWorldContextMap(ServerLevel level) {
-+    public static ContextMap createWorldContextMap(ServerLevel level) { // Fiddle - Fiddle configuration
-         return createWorldContextMap(level.convertable.levelDirectory.path(), level.serverLevelData.getLevelName(), level.dimension().location(), level.spigotConfig);
++    public static ContextMap createWorldContextMap(ServerLevel level) { // Fiddle - Fiddle configuration - private -> public
+         return createWorldContextMap(level.convertable.levelDirectory.path(), level.serverLevelData.getLevelName(), level.dimension().location(), level.spigotConfig, level.registryAccess());
      }
  
-@@ -328,7 +425,7 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+@@ -336,7 +444,7 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
              .build();
      }
  
@@ -357,7 +408,7 @@ index 9e8b8de907654050c51400286af971caca87d6bd..cd823f52ed25b44724554c6b12723818
          final Path legacy = Files.isSymbolicLink(legacyConfig) ? Files.readSymbolicLink(legacyConfig) : legacyConfig;
          if (needsConverting(legacyConfig)) {
              final String legacyFileName = legacyConfig.getFileName().toString();
-@@ -362,13 +459,18 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+@@ -370,13 +478,18 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
          }
          try {
              createDirectoriesSymlinkAware(configDir);
@@ -377,7 +428,7 @@ index 9e8b8de907654050c51400286af971caca87d6bd..cd823f52ed25b44724554c6b12723818
          createDirectoriesSymlinkAware(configDir);
  
          final YamlConfigurationLoader legacyLoader = ConfigurationLoaders.naturallySortedWithoutHeader(legacyConfig);
-@@ -416,17 +518,6 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+@@ -424,17 +537,6 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
          return Files.exists(legacyConfig) && Files.isRegularFile(legacyConfig);
      }
  
@@ -395,7 +446,7 @@ index 9e8b8de907654050c51400286af971caca87d6bd..cd823f52ed25b44724554c6b12723818
      @Deprecated
      public static YamlConfiguration loadLegacyConfigFile(File configFile) throws Exception {
          YamlConfiguration config = new YamlConfiguration();
-@@ -443,15 +534,83 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
+@@ -451,15 +553,72 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
      @VisibleForTesting
      static ConfigurationNode createForTesting() {
          ObjectMapper.Factory factory = defaultGlobalFactoryBuilder(ObjectMapper.factoryBuilder()).build();
@@ -414,17 +465,6 @@ index 9e8b8de907654050c51400286af971caca87d6bd..cd823f52ed25b44724554c6b12723818
      }
 +
 +    // Fiddle start - Fiddle configuration
-+    @Override
-+    public int getWorldConfigurationCurrentVersion() {
-+        try {
-+            var versionField = this.worldConfigClass.getDeclaredField("CURRENT_VERSION");
-+            versionField.trySetAccessible();
-+            return (int) versionField.get(null);
-+        } catch (Exception e) {
-+            throw new RuntimeException(e);
-+        }
-+    }
-+
 +    public abstract NodePath[] getRemovedWorldPaths();
 +
 +    public abstract NodePath[] getRemovedGlobalPaths();
@@ -506,7 +546,7 @@ index 8f23276796037d048eb114952891a01a40971b3e..f48e783fe810ac57510f8e9dcfeaa02c
          return new InnerClassFieldDiscoverer(Collections.emptyMap());
      }
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index ec268189b19b6fa5c4521f96ce211a531db35ec5..dc8d3f1d2c4d37331802cc21903775cc0d4f57d0 100644
+index ec268189b19b6fa5c4521f96ce211a531db35ec5..c8ca16713e9f88a0b82e9736d58ca5d8d8c9c581 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
 @@ -131,6 +131,11 @@ public class Main {
@@ -515,7 +555,7 @@ index ec268189b19b6fa5c4521f96ce211a531db35ec5..dc8d3f1d2c4d37331802cc21903775cc
  
 +            // Fiddle start - Fiddle configuration - load Fiddle global configuration before bootstrap
 +            var fiddleConfigurations = org.fiddlemc.fiddle.configuration.FiddleConfigurations.get(optionset);
-+            fiddleConfigurations.initializeGlobalConfiguration();
++            fiddleConfigurations.initializeGlobalConfiguration(null);
 +            // Fiddle end - Fiddle configuration - load Fiddle global configuration before bootstrap
 +
              io.papermc.paper.plugin.PluginInitializerManager.load(optionset); // Paper
@@ -579,29 +619,29 @@ index a9b2c8cd4dcd3f884e4306bebee9334d3848fce5..9dbd17f5f587fca1cc33b14af36eb45b
 +
  }
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-index 2b5d82fbf4e7ec32d0c53dd3e8207b1dba708bbd..8935ebc8cbf7d8a01b1713d69a9c5fa12350a282 100644
+index 1c9742ad81f04052d2c3bc18c7636f45b2fc5160..66d5138c678cb6b263e950c7e1bcf7ca57d600bd 100644
 --- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 @@ -208,6 +208,9 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
          io.papermc.paper.util.ObfHelper.INSTANCE.getClass(); // Paper - load mappings for stacktrace deobf and etc.
-         paperConfigurations.initializeGlobalConfiguration();
-         paperConfigurations.initializeWorldDefaultsConfiguration();
+         paperConfigurations.initializeGlobalConfiguration(this.registryAccess());
+         paperConfigurations.initializeWorldDefaultsConfiguration(this.registryAccess());
 +        // Fiddle start - Fiddle configuration
-+        org.fiddlemc.fiddle.configuration.FiddleConfigurations.get(this.options).initializeWorldDefaultsConfiguration();
++        org.fiddlemc.fiddle.configuration.FiddleConfigurations.get(this.options).initializeWorldDefaultsConfiguration(this.registryAccess());
 +        // Fiddle end - Fiddle configuration
          // Paper start - moved up to right after PlayerList creation but before file load/save
          if (this.convertOldUsers()) {
              this.getProfileCache().save(false); // Paper
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index 584a768f2ce1c98a1de7749060c47f21721f9055..f60ad1b920ac4a3a8ca4fedac778bb84e0cf8c35 100644
+index c88d5b9125f6ee43bf2be60fd1745d836f271b78..5b19c92ad7dfdcc457e1fab1d93fc0fbb04d489c 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
 @@ -691,7 +691,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
          // Holder holder = worlddimension.type(); // CraftBukkit - decompile error
  
          // Objects.requireNonNull(minecraftserver); // CraftBukkit - decompile error
--        super(iworlddataserver, resourcekey, minecraftserver.registryAccess(), worlddimension.type(), minecraftserver::getProfiler, false, flag, i, minecraftserver.getMaxChainedNeighborUpdates(), gen, biomeProvider, env, spigotConfig -> minecraftserver.paperConfigurations.createWorldConfig(io.papermc.paper.configuration.PaperConfigurations.createWorldContextMap(convertable_conversionsession.levelDirectory.path(), iworlddataserver.getLevelName(), resourcekey.location(), spigotConfig)), executor); // Paper - Async-Anti-Xray - Pass executor
-+        super(iworlddataserver, resourcekey, minecraftserver.registryAccess(), worlddimension.type(), minecraftserver::getProfiler, false, flag, i, minecraftserver.getMaxChainedNeighborUpdates(), gen, biomeProvider, env, spigotConfig -> minecraftserver.paperConfigurations.createWorldConfig(io.papermc.paper.configuration.PaperConfigurations.createWorldContextMap(convertable_conversionsession.levelDirectory.path(), iworlddataserver.getLevelName(), resourcekey.location(), spigotConfig)), spigotConfig -> org.fiddlemc.fiddle.configuration.FiddleConfigurations.get(null).createWorldConfig(io.papermc.paper.configuration.PaperConfigurations.createWorldContextMap(convertable_conversionsession.levelDirectory.path(), iworlddataserver.getLevelName(), resourcekey.location(), spigotConfig)), executor); // Paper - Async-Anti-Xray - Pass executor // Fiddle - Fiddle configuration
+-        super(iworlddataserver, resourcekey, minecraftserver.registryAccess(), worlddimension.type(), minecraftserver::getProfiler, false, flag, i, minecraftserver.getMaxChainedNeighborUpdates(), gen, biomeProvider, env, spigotConfig -> minecraftserver.paperConfigurations.createWorldConfig(io.papermc.paper.configuration.PaperConfigurations.createWorldContextMap(convertable_conversionsession.levelDirectory.path(), iworlddataserver.getLevelName(), resourcekey.location(), spigotConfig, minecraftserver.registryAccess())), executor); // Paper - Async-Anti-Xray - Pass executor
++        super(iworlddataserver, resourcekey, minecraftserver.registryAccess(), worlddimension.type(), minecraftserver::getProfiler, false, flag, i, minecraftserver.getMaxChainedNeighborUpdates(), gen, biomeProvider, env, spigotConfig -> minecraftserver.paperConfigurations.createWorldConfig(io.papermc.paper.configuration.PaperConfigurations.createWorldContextMap(convertable_conversionsession.levelDirectory.path(), iworlddataserver.getLevelName(), resourcekey.location(), spigotConfig, minecraftserver.registryAccess())), spigotConfig -> org.fiddlemc.fiddle.configuration.FiddleConfigurations.get(null).createWorldConfig(io.papermc.paper.configuration.PaperConfigurations.createWorldContextMap(convertable_conversionsession.levelDirectory.path(), iworlddataserver.getLevelName(), resourcekey.location(), spigotConfig, minecraftserver.registryAccess())), executor); // Paper - Async-Anti-Xray - Pass executor // Fiddle - Fiddle configuration
          this.pvpMode = minecraftserver.isPvpAllowed();
          this.convertable = convertable_conversionsession;
          this.uuid = WorldUUID.getUUID(convertable_conversionsession.levelDirectory.path().toFile());
@@ -635,10 +675,10 @@ index 2354a0e5d15e9be633d9fe3a1a9feefe7b9b7782..5f4e816235d096432f6acc15cbdd50c9
          this.world = new CraftWorld((ServerLevel) this, gen, biomeProvider, env);
  
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 93891f11a9abab43405ba86eb35a8fa3b93335c2..62024145ea669e46cfe0d64c78faac3ba07bb191 100644
+index 4bc245db11caa520a08ea4ee3c7a5e58f734c8b3..348fdc9c175562d50740c763455955c18a2ac3b0 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -1039,6 +1039,7 @@ public final class CraftServer implements Server {
+@@ -1041,6 +1041,7 @@ public final class CraftServer implements Server {
  
          org.spigotmc.SpigotConfig.init((File) this.console.options.valueOf("spigot-settings")); // Spigot
          this.console.paperConfigurations.reloadConfigs(this.console);

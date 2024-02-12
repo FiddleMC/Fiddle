@@ -23,10 +23,10 @@ index 061041006c88ba0a7583c60e0dffac93a711f01f..35eb6be651f3795ab899f39ec746a772
  
      public void onBlockChange(Level level, BlockPos blockPos, BlockState newBlockState, BlockState oldBlockState, int flags, int maxUpdateDepth) {
 diff --git a/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketBlockControllerAntiXray.java b/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketBlockControllerAntiXray.java
-index 2437d7ba59e1f730a38aac0d63667679353f91df..d8143c876deecfbf1e81ca922985211c13a5942d 100644
+index 9367e1e6c5a7db16f4398d2d7475dd7d1b056e96..14e18e504cfd1a9ecc89f10f09cd9b3a2bb1acdb 100644
 --- a/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketBlockControllerAntiXray.java
 +++ b/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketBlockControllerAntiXray.java
-@@ -179,7 +179,7 @@ public final class ChunkPacketBlockControllerAntiXray extends ChunkPacketBlockCo
+@@ -183,7 +183,7 @@ public final class ChunkPacketBlockControllerAntiXray extends ChunkPacketBlockCo
      public void modifyBlocks(ClientboundLevelChunkWithLightPacket chunkPacket, @org.jetbrains.annotations.Nullable ChunkPacketInfoAntiXray chunkPacketInfo) { // If and only if the given info instance is non-null, anti-x-ray will be applied (it may be null for packets sent to players that are exempt for anti-x-ray)
          if (chunkPacketInfo == null || !chunkPacketInfo.applyAntiXray) {
              // Fiddle end - client perspective - block state visualization - apply to chunk packets - every ChunkPacketInfo is ChunkPacketInfoAntiXray
@@ -35,7 +35,7 @@ index 2437d7ba59e1f730a38aac0d63667679353f91df..d8143c876deecfbf1e81ca922985211c
              return;
          }
  
-@@ -379,7 +379,7 @@ public final class ChunkPacketBlockControllerAntiXray extends ChunkPacketBlockCo
+@@ -383,7 +383,7 @@ public final class ChunkPacketBlockControllerAntiXray extends ChunkPacketBlockCo
              }
          }
  
