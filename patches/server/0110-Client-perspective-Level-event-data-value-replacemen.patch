@@ -11,7 +11,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftEffect.java b/src/main/java/org/bukkit/craftbukkit/CraftEffect.java
-index 63f9735d356dafd579cee4423d3037eb4ed9b2c6..e5aa7c3062d41270ba7bcc44bc549ccc6ba32704 100644
+index 4ce0e1e557a844fb3add866a257a8424885f7d43..875debd9d15a83c3d296bac1a47b25ac7a1a3f7a 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftEffect.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftEffect.java
 @@ -12,8 +12,10 @@ import org.bukkit.craftbukkit.util.CraftMagicNumbers;
@@ -26,7 +26,7 @@ index 63f9735d356dafd579cee4423d3037eb4ed9b2c6..e5aa7c3062d41270ba7bcc44bc549ccc
 +        // Fiddle end - client perspective - level event data value replacements - craft effect data value can be generic
          switch (effect) {
          case PARTICLES_SCULK_CHARGE: // Paper - add missing effects
-         case VILLAGER_PLANT_GROW:
+         case TRIAL_SPAWNER_DETECT_PLAYER: // Paper - add missing effects
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
 index e1fad381b861471a17529c246bb8a4a9c7646420..57bd15679316f5a8358ae3a162e3de1dbe060110 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java

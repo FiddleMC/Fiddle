@@ -2,9 +2,9 @@ From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
 Date: Mon, 10 Jul 2023 22:05:08 +0200
 Subject: [PATCH] Modifiable Bukkit enums - Remove hard-coded properties -
- Material - Is legacy
+ Material - Key
 
-Modifies the `Material` property `isLegacy()` so that it is no longer computed in `Material`, but based on a function defined and implemented in `MaterialLegacyNameChecker`.
+Modifies the `Material` property `getKey()` so that it is no longer computed in `Material`, but based on a function defined and implemented in `MaterialNameAndKeyConversion`.
 
 The property values are cached after being computed, for performant access.
 
@@ -12,145 +12,93 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index aec7d1f3246a0ea4c93b438a3dcfab3293c59f80..1faa2020068583e5fc7367f10e42a244c8e9799e 100644
+index baa3c57f76491ffeecb676514e30cbe24c88009d..aec7d1f3246a0ea4c93b438a3dcfab3293c59f80 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -4633,7 +4633,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
-     //</editor-fold>
- 
-     @Deprecated
--    public static final String LEGACY_PREFIX = "LEGACY_";
-+    public static final String LEGACY_PREFIX = org.fiddlemc.fiddle.material.MaterialLegacyNameChecker.LEGACY_MATERIAL_PREFIX; // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - is legacy
- 
-     private final int id;
-     private final Constructor<? extends MaterialData> ctor;
-@@ -4641,7 +4641,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
-     private final int maxStackHardcoded;
+@@ -4642,7 +4642,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      private final short durabilityHardcoded;
      public final Class<?> data;
--    private final boolean legacy;
+     private final boolean legacy;
+-    private final NamespacedKey key;
  
      private Material(final int id) {
          this(id, 64);
-@@ -4668,7 +4667,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
-         this.durabilityHardcoded = (short) durability;
+@@ -4670,7 +4669,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
          this.maxStackHardcoded = stack;
          this.data = data;
--        this.legacy = this.name().startsWith(LEGACY_PREFIX);
+         this.legacy = this.name().startsWith(LEGACY_PREFIX);
+-        this.key = NamespacedKey.minecraft(this.name().toLowerCase(Locale.ROOT));
          // try to cache the constructor for this material
          try {
              if (MaterialData.class.isAssignableFrom(data)) {
-@@ -4750,7 +4748,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
-      */
-     @org.jetbrains.annotations.ApiStatus.Internal // Paper
-     public int getId() {
--        Preconditions.checkArgument(legacy, "Cannot get ID of Modern Material");
-+        Preconditions.checkArgument(this.isLegacy(), "Cannot get ID of Modern Material"); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - is legacy
-         return id;
+@@ -4769,8 +4767,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+     @NotNull
+     @Override
+     public NamespacedKey getKey() {
+-        Preconditions.checkArgument(!legacy, "Cannot get key of Legacy Material");
+-        return key;
++        return org.fiddlemc.fiddle.material.MaterialNameAndKeyConversion.getKey(this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - key
      }
  
-@@ -4761,7 +4759,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
-      */
-     // @Deprecated // Paper - this is useful, don't deprecate
-     public boolean isLegacy() {
--        return legacy;
-+        return org.fiddlemc.fiddle.material.MaterialDefaultImplementations.isLegacy(this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - is legacy
-     }
+     /**
+diff --git a/src/main/java/org/fiddlemc/fiddle/material/MaterialNameAndKeyConversion.java b/src/main/java/org/fiddlemc/fiddle/material/MaterialNameAndKeyConversion.java
+index db0b953c6aacd29817dcb0bd5069346ac7116b80..b600f06d62ea4b045590d72626d8029be82e89f2 100644
+--- a/src/main/java/org/fiddlemc/fiddle/material/MaterialNameAndKeyConversion.java
++++ b/src/main/java/org/fiddlemc/fiddle/material/MaterialNameAndKeyConversion.java
+@@ -2,7 +2,12 @@
  
-     @NotNull
-@@ -4866,7 +4864,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
-     @NotNull
-     @Deprecated // Paper
-     public Class<? extends MaterialData> getData() {
--        Preconditions.checkArgument(legacy, "Cannot get data class of Modern Material");
-+        Preconditions.checkArgument(this.isLegacy(), "Cannot get data class of Modern Material"); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - is legacy
-         return ctor.getDeclaringClass();
-     }
+ package org.fiddlemc.fiddle.material;
  
-@@ -4881,7 +4879,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
-     @Deprecated
-     @NotNull
-     public MaterialData getNewData(final byte raw) {
--        Preconditions.checkArgument(legacy, "Cannot get new data of Modern Material");
-+        Preconditions.checkArgument(this.isLegacy(), "Cannot get new data of Modern Material"); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - is legacy
-         try {
-             return ctor.newInstance(this, raw);
-         } catch (InstantiationException ex) {
-@@ -4990,7 +4988,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
-      * Attempts to get the Material with the given name.
-      * <p>
-      * This is a normal lookup, names must be the precise name they are given in
--     * the enum (but optionally including the LEGACY_PREFIX if legacyName is
-+     * the enum (but optionally including the {@link org.fiddlemc.fiddle.material.MaterialLegacyNameChecker#LEGACY_MATERIAL_PREFIX} if legacyName is <!-- // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - is legacy -->
-      * true).
-      * <p>
-      * If legacyName is true, then the lookup will be against legacy materials,
-diff --git a/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java b/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
-index 6157337d6da3ce508b9a4a989c4a138a9bf9961b..8c1a9e038002168dafe8b566b6964812e97c05e0 100644
---- a/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
-+++ b/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
-@@ -18,6 +18,22 @@ public final class MaterialDefaultImplementations {
++import com.google.common.base.Preconditions;
+ import org.bukkit.Material;
++import org.bukkit.NamespacedKey;
++import org.jetbrains.annotations.NotNull;
++
++import java.util.Locale;
+ 
+ /**
+  * This class provides a number of implementations for the conversion of names and keys
+@@ -17,4 +22,20 @@ public final class MaterialNameAndKeyConversion {
          throw new RuntimeException();
      }
  
-+    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - is legacy
-+    private static final CachedMaterialBooleanProperty isLegacyCache = new CachedMaterialBooleanProperty(material -> {
++    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - key
++    private static final CachedMaterialProperty<NamespacedKey> keyCache = new CachedMaterialProperty<>(
++        NamespacedKey[]::new,
 +        // Based on the original org.bukkit.Material constructor
-+        return MaterialLegacyNameChecker.isMaterialNameLegacy(material.name());
-+    }) {
++        material -> NamespacedKey.minecraft(material.name().toLowerCase(Locale.ROOT))
++    );
 +
-+        @Override
-+        public boolean get(@NotNull Material material) {
-+            // Prevent this method referencing itself
-+            this.initializeIfNecessary(true);
-+            return this.cache[material.ordinal()];
-+        }
++    /**
++     * @throws IllegalArgumentException If the given {@code material} is {@linkplain Material#isLegacy() legacy}.
++     */
++    public static @NotNull NamespacedKey getKey(Material material) {
++        Preconditions.checkArgument(!material.isLegacy(), "Cannot get key of Legacy Material");
++        return keyCache.get(material);
++    }
++    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - key
 +
-+    };
-+    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - is legacy
-+
-     // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - is empty
-     public static boolean isEmpty(Material material) {
-         // Based on the original org.bukkit.Material#isEmpty()
-@@ -28,6 +44,12 @@ public final class MaterialDefaultImplementations {
+ }
+diff --git a/src/test/java/org/bukkit/MaterialTest.java b/src/test/java/org/bukkit/MaterialTest.java
+index 818aa21d3b6d59a65d91ab69d96e91d7eabaed08..3e771faab580e11625d264e70d6c5ca50dcada3d 100644
+--- a/src/test/java/org/bukkit/MaterialTest.java
++++ b/src/test/java/org/bukkit/MaterialTest.java
+@@ -53,6 +53,18 @@ public class MaterialTest {
+         }
      }
-     // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - is empty
  
-+    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - is legacy
-+    public static boolean isLegacy(Material material) {
-+        return isLegacyCache.get(material);
++    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - key
++    @Test
++    public void matchMaterialByKeyPath() {
++        for (Material material : Material.values()) {
++            if (material.isLegacy()) {
++                continue;
++            }
++            assertThat(Material.matchMaterial(material.getKey().getKey()), is(material));
++        }
 +    }
-+    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - is legacy
++    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - key
 +
-     // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - durability
-     public static boolean hasNonZeroMaxDurability(Material material) {
-         return material.getMaxDurability() != 0;
-diff --git a/src/main/java/org/fiddlemc/fiddle/material/MaterialLegacyNameChecker.java b/src/main/java/org/fiddlemc/fiddle/material/MaterialLegacyNameChecker.java
-new file mode 100644
-index 0000000000000000000000000000000000000000..019265a6382a5f5a67ceeb7c198c3e0d7c024da5
---- /dev/null
-+++ b/src/main/java/org/fiddlemc/fiddle/material/MaterialLegacyNameChecker.java
-@@ -0,0 +1,23 @@
-+// Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - is legacy
-+
-+package org.fiddlemc.fiddle.material;
-+
-+import org.jetbrains.annotations.NotNull;
-+
-+/**
-+ * Utility class providing the {@link #isMaterialNameLegacy(String)} method.
-+ */
-+public final class MaterialLegacyNameChecker {
-+
-+    @Deprecated
-+    public static final String LEGACY_MATERIAL_PREFIX = "LEGACY_";
-+
-+    private MaterialLegacyNameChecker() {
-+        throw new RuntimeException();
-+    }
-+
-+    public static boolean isMaterialNameLegacy(@NotNull String materialName) {
-+        return materialName.startsWith(LEGACY_MATERIAL_PREFIX);
-+    }
-+
-+}
+     @Test
+     public void matchMaterialByWrongNamespace() {
+         for (Material material : Material.values()) {

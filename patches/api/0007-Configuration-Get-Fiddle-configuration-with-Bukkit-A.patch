@@ -27,7 +27,7 @@ As part of: Paper (https://github.com/PaperMC/Paper)
 Licensed under: MIT (https://opensource.org/licenses/MIT)
 
 diff --git a/src/main/java/org/bukkit/Server.java b/src/main/java/org/bukkit/Server.java
-index d0c634629aa0b6bac0da93655dd86ad3aea0ce30..88ff8dbc5ed4a5b43f1b53d45475ffb2ca6cdd66 100644
+index f1fa97d12f97baf97beb92ca0719cf3cf906b225..4fc5140507163d5abb5a3e0fcbc10e41cfe25aa7 100644
 --- a/src/main/java/org/bukkit/Server.java
 +++ b/src/main/java/org/bukkit/Server.java
 @@ -2188,6 +2188,15 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi

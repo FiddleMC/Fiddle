@@ -37,10 +37,10 @@ index 4103ddf16164e3992fef0765d368282572537e29..71856beb8430b0d70960715633cfac04
                      handler.accept((RecipeHolder) optional.get());
                  }
 diff --git a/src/main/java/net/minecraft/world/item/crafting/RecipeManager.java b/src/main/java/net/minecraft/world/item/crafting/RecipeManager.java
-index b81e1802c8dcc8ebdef96d70088c18379598a66b..13834970938019d908a1263bfd254483fbcd526c 100644
+index b81e1802c8dcc8ebdef96d70088c18379598a66b..4f96102b3dba7c5617763bf68bfac2d3f947369f 100644
 --- a/src/main/java/net/minecraft/world/item/crafting/RecipeManager.java
 +++ b/src/main/java/net/minecraft/world/item/crafting/RecipeManager.java
-@@ -84,19 +84,596 @@ public class RecipeManager extends SimpleJsonResourceReloadListener {
+@@ -84,19 +84,607 @@ public class RecipeManager extends SimpleJsonResourceReloadListener {
              return entry1.getValue(); // CraftBukkit // Paper - decompile fix - *shrugs internally* // todo: is this needed anymore?
          }));
          this.byName = Maps.newHashMap(builder.build()); // CraftBukkit
@@ -49,6 +49,15 @@ index b81e1802c8dcc8ebdef96d70088c18379598a66b..13834970938019d908a1263bfd254483
      }
  
 +    // Fiddle start - gameplay mechanics - automatically extend stonecutter recipes
++    /**
++     * @return The configuration for extending stonecutter recipes,
++     * or null if this run is not a real server (for example, during unit tests).
++     */
++    private static @Nullable org.fiddlemc.fiddle.configuration.FiddleGlobalConfiguration.GameplayMechanics.AddStonecutterRecipes getAddStonecutterRecipesConfiguration() {
++        var globalConfiguration = org.fiddlemc.fiddle.configuration.FiddleGlobalConfiguration.get();
++        return globalConfiguration == null ? null : globalConfiguration.gameplayMechanics.addStonecutterRecipes;
++    }
++
 +    private static class StonecutterRecipeWrapper {
 +
 +        RecipeHolder<StonecutterRecipe> recipe;
@@ -63,8 +72,9 @@ index b81e1802c8dcc8ebdef96d70088c18379598a66b..13834970938019d908a1263bfd254483
 +            this.setOutputAmount(outputAmount);
 +            this.isViaUnaddedNonReversibleAmountInverseRecipe = isViaUnaddedNonReversibleAmountInverseRecipe;
 +            this.isViaUnaddedDifferentlyShapedInverseRecipe = isViaUnaddedDifferentlyShapedInverseRecipe;
-+            this.furtherInverseRecipesAreExcluded = furtherInverseRecipesAreExcluded || anyExcludesMatch(this, org.fiddlemc.fiddle.configuration.FiddleGlobalConfiguration.get().gameplayMechanics.addStonecutterRecipes.excludedOrigins) || anyExcludesMatch(this, org.fiddlemc.fiddle.configuration.FiddleGlobalConfiguration.get().gameplayMechanics.addStonecutterRecipes.inverse.excludedOrigins) || anyExcludesMatch(RecipeManager.getOutput(recipe), RecipeManager.getInput(recipe), org.fiddlemc.fiddle.configuration.FiddleGlobalConfiguration.get().gameplayMechanics.addStonecutterRecipes.excludedResults) || anyExcludesMatch(RecipeManager.getOutput(recipe), RecipeManager.getInput(recipe), org.fiddlemc.fiddle.configuration.FiddleGlobalConfiguration.get().gameplayMechanics.addStonecutterRecipes.inverse.excludedResults);
-+            this.furtherTransitiveRecipesAreExcluded = furtherTransitiveRecipesAreExcluded || anyExcludesMatch(this, org.fiddlemc.fiddle.configuration.FiddleGlobalConfiguration.get().gameplayMechanics.addStonecutterRecipes.excludedOrigins) || anyExcludesMatch(this, org.fiddlemc.fiddle.configuration.FiddleGlobalConfiguration.get().gameplayMechanics.addStonecutterRecipes.transitive.excludedOrigins);
++            var configuration = getAddStonecutterRecipesConfiguration();
++            this.furtherInverseRecipesAreExcluded = furtherInverseRecipesAreExcluded || anyExcludesMatch(this, configuration.excludedOrigins) || anyExcludesMatch(this, configuration.excludedOrigins) || anyExcludesMatch(RecipeManager.getOutput(recipe), RecipeManager.getInput(recipe), configuration.excludedResults) || anyExcludesMatch(RecipeManager.getOutput(recipe), RecipeManager.getInput(recipe), configuration.inverse.excludedResults);
++            this.furtherTransitiveRecipesAreExcluded = furtherTransitiveRecipesAreExcluded || anyExcludesMatch(this, configuration.excludedOrigins) || anyExcludesMatch(this, configuration.transitive.excludedOrigins);
 +        }
 +
 +        ItemStack getInput() {
@@ -84,8 +94,9 @@ index b81e1802c8dcc8ebdef96d70088c18379598a66b..13834970938019d908a1263bfd254483
 +        }
 +
 +        boolean canBeConsideredForTransitiveRecipes() {
-+            return (!this.isViaUnaddedNonReversibleAmountInverseRecipe || org.fiddlemc.fiddle.configuration.FiddleGlobalConfiguration.get().gameplayMechanics.addStonecutterRecipes.transitive.viaUnaddedInverseRecipes.nonReversibleAmount) &&
-+                (!this.isViaUnaddedDifferentlyShapedInverseRecipe || org.fiddlemc.fiddle.configuration.FiddleGlobalConfiguration.get().gameplayMechanics.addStonecutterRecipes.transitive.viaUnaddedInverseRecipes.differentlyShaped);
++            var configuration = getAddStonecutterRecipesConfiguration();
++            return (!this.isViaUnaddedNonReversibleAmountInverseRecipe || configuration.transitive.viaUnaddedInverseRecipes.nonReversibleAmount) &&
++                (!this.isViaUnaddedDifferentlyShapedInverseRecipe || configuration.transitive.viaUnaddedInverseRecipes.differentlyShaped);
 +        }
 +
 +        void updateRecipeOutputAmount() {
@@ -109,7 +120,7 @@ index b81e1802c8dcc8ebdef96d70088c18379598a66b..13834970938019d908a1263bfd254483
 +
 +        @Override
 +        public String toString() {
-+            return this.recipe.id() + " @ " + this.getInput().getItem().keyInItemRegistry + " -> " + this.outputAmount.getFirst() + (this.outputAmount.getSecond() == 1 ? "" : " / " + this.outputAmount.getSecond()) + " " + this.getOutput().getItem().keyInItemRegistry + " (" + this.isViaUnaddedNonReversibleAmountInverseRecipe + "," + this.isViaUnaddedDifferentlyShapedInverseRecipe + "," + this.furtherInverseRecipesAreExcluded + "," + this.furtherTransitiveRecipesAreExcluded + ")";
++            return this.recipe.id() + " @ " + BuiltInRegistries.ITEM.getKey(this.getInput().getItem()) + " -> " + this.outputAmount.getFirst() + (this.outputAmount.getSecond() == 1 ? "" : " / " + this.outputAmount.getSecond()) + " " + BuiltInRegistries.ITEM.getKey(this.getOutput().getItem()) + " (" + this.isViaUnaddedNonReversibleAmountInverseRecipe + "," + this.isViaUnaddedDifferentlyShapedInverseRecipe + "," + this.furtherInverseRecipesAreExcluded + "," + this.furtherTransitiveRecipesAreExcluded + ")";
 +        }
 +
 +        static StonecutterRecipeWrapper fromExternal(RecipeHolder<StonecutterRecipe> recipe) {
@@ -191,7 +202,7 @@ index b81e1802c8dcc8ebdef96d70088c18379598a66b..13834970938019d908a1263bfd254483
 +            // Skip this exclude if the input does not match
 +            if (exclude.input() != null) {
 +                try {
-+                    if (!exclude.inputResourceLocation().equals(input.getItem().keyInItemRegistry)) {
++                    if (!exclude.inputResourceLocation().equals(BuiltInRegistries.ITEM.getKey(input.getItem()))) {
 +                        continue;
 +                    }
 +                } catch (Exception ignored) {
@@ -201,7 +212,7 @@ index b81e1802c8dcc8ebdef96d70088c18379598a66b..13834970938019d908a1263bfd254483
 +            // Skip this exclude if the output does not match
 +            if (exclude.output() != null) {
 +                try {
-+                    if (!exclude.outputResourceLocation().equals(output.getItem().keyInItemRegistry)) {
++                    if (!exclude.outputResourceLocation().equals(BuiltInRegistries.ITEM.getKey(output.getItem()))) {
 +                        continue;
 +                    }
 +                } catch (Exception ignored) {
@@ -307,8 +318,8 @@ index b81e1802c8dcc8ebdef96d70088c18379598a66b..13834970938019d908a1263bfd254483
 +    }
 +
 +    private static ResourceLocation createNewRecipeResourceLocation(String type, ItemStack input, ItemStack output) {
-+        var inputKey = input.getItem().keyInItemRegistry;
-+        var outputKey = output.getItem().keyInItemRegistry;
++        var inputKey = BuiltInRegistries.ITEM.getKey(input.getItem());
++        var outputKey = BuiltInRegistries.ITEM.getKey(output.getItem());
 +        return new net.minecraft.resources.ResourceLocation(net.minecraft.resources.ResourceLocation.FIDDLE_NAMESPACE, type + "/" + getUnderscoreSeparatedString(inputKey) + "/" + getUnderscoreSeparatedString(outputKey));
 +    }
 +
@@ -328,8 +339,8 @@ index b81e1802c8dcc8ebdef96d70088c18379598a66b..13834970938019d908a1263bfd254483
 +        }
 +
 +        // Check if adding additional recipes is enabled
-+        var configuration = org.fiddlemc.fiddle.configuration.FiddleGlobalConfiguration.get().gameplayMechanics.addStonecutterRecipes;
-+        if (!(configuration.inverse.enabled || configuration.transitive.enabled)) {
++        var configuration = getAddStonecutterRecipesConfiguration();
++        if (configuration == null || !(configuration.inverse.enabled || configuration.transitive.enabled)) {
 +            return;
 +        }
 +
@@ -543,7 +554,7 @@ index b81e1802c8dcc8ebdef96d70088c18379598a66b..13834970938019d908a1263bfd254483
 +    }
 +
 +    private boolean addRecipeWrapper(StonecutterRecipeWrapper wrapper) {
-+        var bucket = wrapper.getInput().getItem().indexInItemRegistry * BuiltInRegistries.ITEM.size() + wrapper.getOutput().getItem().indexInItemRegistry;
++        var bucket = BuiltInRegistries.ITEM.getId(wrapper.getInput().getItem()) * BuiltInRegistries.ITEM.size() + BuiltInRegistries.ITEM.getId(wrapper.getOutput().getItem());
 +        var wrapperList = this.recipeWrappers.computeIfAbsent(bucket, $ -> new java.util.ArrayList<>(1));
 +        var inputItem = wrapper.getInput().getItem();
 +        var outputItem = wrapper.getOutput().getItem();
@@ -637,7 +648,7 @@ index b81e1802c8dcc8ebdef96d70088c18379598a66b..13834970938019d908a1263bfd254483
          }
      }
      // CraftBukkit end
-@@ -214,6 +791,7 @@ public class RecipeManager extends SimpleJsonResourceReloadListener {
+@@ -214,6 +802,7 @@ public class RecipeManager extends SimpleJsonResourceReloadListener {
          });
          this.recipes = ImmutableMap.copyOf(map);
          this.byName = Maps.newHashMap(builder.build()); // CraftBukkit
@@ -645,7 +656,7 @@ index b81e1802c8dcc8ebdef96d70088c18379598a66b..13834970938019d908a1263bfd254483
      }
  
      // CraftBukkit start
-@@ -233,6 +811,7 @@ public class RecipeManager extends SimpleJsonResourceReloadListener {
+@@ -233,6 +822,7 @@ public class RecipeManager extends SimpleJsonResourceReloadListener {
          }
  
          this.byName = Maps.newHashMap();

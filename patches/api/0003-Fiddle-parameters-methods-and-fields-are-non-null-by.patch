@@ -1,0 +1,52 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Mon, 12 Feb 2024 20:04:02 +0100
+Subject: [PATCH] Fiddle parameters, methods and fields are non-null by default
+
+Adds a `package-info.java` for every Fiddle package, that declares all parameters, methods and fields to be non-null by default.
+
+This patch has an analogous patch in `fiddle-server` with the same name.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/fiddlemc/fiddle/material/package-info.java b/src/main/java/org/fiddlemc/fiddle/material/package-info.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..e0972f48c084b68099d38e2d0ee0b9dbac79cc94
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/material/package-info.java
+@@ -0,0 +1,4 @@
++@ParametersAreNonnullByDefault
++package org.fiddlemc.fiddle.material;
++
++import javax.annotation.ParametersAreNonnullByDefault;
+diff --git a/src/main/java/org/fiddlemc/fiddle/package-info.java b/src/main/java/org/fiddlemc/fiddle/package-info.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..e3cf3df0ded6e8996c80564e77482caf06f8189a
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/package-info.java
+@@ -0,0 +1,4 @@
++@ParametersAreNonnullByDefault
++package org.fiddlemc.fiddle;
++
++import javax.annotation.ParametersAreNonnullByDefault;
+diff --git a/src/test/java/org/fiddlemc/fiddle/material/package-info.java b/src/test/java/org/fiddlemc/fiddle/material/package-info.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..e0972f48c084b68099d38e2d0ee0b9dbac79cc94
+--- /dev/null
++++ b/src/test/java/org/fiddlemc/fiddle/material/package-info.java
+@@ -0,0 +1,4 @@
++@ParametersAreNonnullByDefault
++package org.fiddlemc.fiddle.material;
++
++import javax.annotation.ParametersAreNonnullByDefault;
+diff --git a/src/test/java/org/fiddlemc/fiddle/package-info.java b/src/test/java/org/fiddlemc/fiddle/package-info.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..e3cf3df0ded6e8996c80564e77482caf06f8189a
+--- /dev/null
++++ b/src/test/java/org/fiddlemc/fiddle/package-info.java
+@@ -0,0 +1,4 @@
++@ParametersAreNonnullByDefault
++package org.fiddlemc.fiddle;
++
++import javax.annotation.ParametersAreNonnullByDefault;

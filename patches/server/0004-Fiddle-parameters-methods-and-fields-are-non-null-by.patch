@@ -5,6 +5,8 @@ Subject: [PATCH] Fiddle parameters, methods and fields are non-null by default
 
 Adds a `package-info.java` for every Fiddle package, that declares all parameters, methods and fields to be non-null by default.
 
+This patch has an analogous patch in `fiddle-api` with the same name.
+
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
@@ -528,6 +530,81 @@ index 0000000000000000000000000000000000000000..c6cdcdf1a9b78e74cbeb093d346c9b7e
 +@MethodsReturnNonnullByDefault
 +@FieldsAreNonnullByDefault
 +package org.fiddlemc.fiddle.version;
++
++import net.minecraft.FieldsAreNonnullByDefault;
++import net.minecraft.MethodsReturnNonnullByDefault;
++
++import javax.annotation.ParametersAreNonnullByDefault;
+diff --git a/src/test/java/org/fiddlemc/fiddle/block/package-info.java b/src/test/java/org/fiddlemc/fiddle/block/package-info.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..cbb13e6bd7c232efd47cbbec3e8fcecf055c09a8
+--- /dev/null
++++ b/src/test/java/org/fiddlemc/fiddle/block/package-info.java
+@@ -0,0 +1,9 @@
++@ParametersAreNonnullByDefault
++@MethodsReturnNonnullByDefault
++@FieldsAreNonnullByDefault
++package org.fiddlemc.fiddle.block;
++
++import net.minecraft.FieldsAreNonnullByDefault;
++import net.minecraft.MethodsReturnNonnullByDefault;
++
++import javax.annotation.ParametersAreNonnullByDefault;
+diff --git a/src/test/java/org/fiddlemc/fiddle/item/package-info.java b/src/test/java/org/fiddlemc/fiddle/item/package-info.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..4758df573b604b508809cd1e906958578559d82b
+--- /dev/null
++++ b/src/test/java/org/fiddlemc/fiddle/item/package-info.java
+@@ -0,0 +1,9 @@
++@ParametersAreNonnullByDefault
++@MethodsReturnNonnullByDefault
++@FieldsAreNonnullByDefault
++package org.fiddlemc.fiddle.item;
++
++import net.minecraft.FieldsAreNonnullByDefault;
++import net.minecraft.MethodsReturnNonnullByDefault;
++
++import javax.annotation.ParametersAreNonnullByDefault;
+diff --git a/src/test/java/org/fiddlemc/fiddle/material/legacy/package-info.java b/src/test/java/org/fiddlemc/fiddle/material/legacy/package-info.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..67bcd1557d407db4dcd16a82d4fe62fd8c1108c8
+--- /dev/null
++++ b/src/test/java/org/fiddlemc/fiddle/material/legacy/package-info.java
+@@ -0,0 +1,9 @@
++@ParametersAreNonnullByDefault
++@MethodsReturnNonnullByDefault
++@FieldsAreNonnullByDefault
++package org.fiddlemc.fiddle.material.legacy;
++
++import net.minecraft.FieldsAreNonnullByDefault;
++import net.minecraft.MethodsReturnNonnullByDefault;
++
++import javax.annotation.ParametersAreNonnullByDefault;
+diff --git a/src/test/java/org/fiddlemc/fiddle/material/package-info.java b/src/test/java/org/fiddlemc/fiddle/material/package-info.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..8dd49d29c24739e6081280478f75fa71c7f18ba9
+--- /dev/null
++++ b/src/test/java/org/fiddlemc/fiddle/material/package-info.java
+@@ -0,0 +1,9 @@
++@ParametersAreNonnullByDefault
++@MethodsReturnNonnullByDefault
++@FieldsAreNonnullByDefault
++package org.fiddlemc.fiddle.material;
++
++import net.minecraft.FieldsAreNonnullByDefault;
++import net.minecraft.MethodsReturnNonnullByDefault;
++
++import javax.annotation.ParametersAreNonnullByDefault;
+diff --git a/src/test/java/org/fiddlemc/fiddle/package-info.java b/src/test/java/org/fiddlemc/fiddle/package-info.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..336193b8d9409d91f6ce2445f2eb62327b7d899c
+--- /dev/null
++++ b/src/test/java/org/fiddlemc/fiddle/package-info.java
+@@ -0,0 +1,9 @@
++@ParametersAreNonnullByDefault
++@MethodsReturnNonnullByDefault
++@FieldsAreNonnullByDefault
++package org.fiddlemc.fiddle;
 +
 +import net.minecraft.FieldsAreNonnullByDefault;
 +import net.minecraft.MethodsReturnNonnullByDefault;
