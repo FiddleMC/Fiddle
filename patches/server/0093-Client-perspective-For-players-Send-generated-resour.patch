@@ -32,7 +32,7 @@ index c5598adb8cbcbcf7277c2fd4dd72c243d44d9700..1fd4f4e205480c7d8ea9a26108199696
          // Paper start - Configurable rcon ip
          final String rconIp = this.getStringRaw("rcon.ip");
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index f71a4a8307fb092d33545e12d253e0b80c884168..c6bfc4ea2531a7732f2b1aefeeca9313d2c93b79 100644
+index 907c8f15f5247f9972c6677ff0f9e1aa22764a04..c7160ec4c0436a5a0b660b13d87edefa188befce 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
 @@ -279,6 +279,8 @@ public class ServerPlayer extends Player {
@@ -92,10 +92,10 @@ index 655c065a30db9b0aab4a169702b8c8907d075514..f544959972b9b881231bcf9833b1ca18
  
      }
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index 83aaf3e6e377d731ce02f779f80b7bf5db46f89f..6e5c102c3123e97156e050bcf2aad018da5c4d9e 100644
+index 3a792ddc31e76038b84e8f87088c4cd94c349138..f9d1727c9f286c9cc26e0f315385621c6279a837 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -2287,34 +2287,48 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -2303,34 +2303,48 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
          this.getHandle().connection.send(packet);
      }
  
@@ -149,7 +149,7 @@ index 83aaf3e6e377d731ce02f779f80b7bf5db46f89f..6e5c102c3123e97156e050bcf2aad018
  
          if (hash != null) {
              Preconditions.checkArgument(hash.length == 20, "Resource pack hash should be 20 bytes long but was %s", hash.length);
-@@ -2329,6 +2343,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -2345,6 +2359,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
      @Override
      public void setResourcePack(String url, byte[] hashBytes, net.kyori.adventure.text.Component prompt, boolean force) {
          Preconditions.checkArgument(url != null, "Resource pack URL cannot be null");

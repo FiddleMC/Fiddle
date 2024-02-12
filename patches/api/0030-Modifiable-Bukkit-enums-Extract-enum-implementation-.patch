@@ -18,7 +18,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 93917a92e8a9d10101c5cba7e488d39600f39e79..675b03d932996ad44542f462056eb86ae9975a73 100644
+index 6884bf5b4422c399ca4729e0a8872e789477d3fd..37a57268d6f97a6a139c7267f14175c77fd71da4 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
 @@ -4387,9 +4387,6 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
@@ -186,7 +186,7 @@ index 93917a92e8a9d10101c5cba7e488d39600f39e79..675b03d932996ad44542f462056eb86a
       */
 +    @Override // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
      @NotNull
-     public BlockData createBlockData(@Nullable Consumer<BlockData> consumer) {
+     public BlockData createBlockData(@Nullable Consumer<? super BlockData> consumer) {
 -        return Bukkit.createBlockData(this, consumer);
 +        return AbstractMaterial.super.createBlockData(consumer); // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
      }
@@ -642,7 +642,7 @@ index 93917a92e8a9d10101c5cba7e488d39600f39e79..675b03d932996ad44542f462056eb86a
      // Fiddle end - flags for vanilla content - API - item
  
 diff --git a/src/main/java/org/fiddlemc/fiddle/material/AbstractMaterial.java b/src/main/java/org/fiddlemc/fiddle/material/AbstractMaterial.java
-index c5232856b5537b21751f93d3b5d48c17c3fe9e83..b461c8b126f010eeeeccf3fa3fd075ed31c419b0 100644
+index c5232856b5537b21751f93d3b5d48c17c3fe9e83..44e274d086a938e01970bc2de1e1488f361e069a 100644
 --- a/src/main/java/org/fiddlemc/fiddle/material/AbstractMaterial.java
 +++ b/src/main/java/org/fiddlemc/fiddle/material/AbstractMaterial.java
 @@ -5,7 +5,19 @@ package org.fiddlemc.fiddle.material;
@@ -739,7 +739,7 @@ index c5232856b5537b21751f93d3b5d48c17c3fe9e83..b461c8b126f010eeeeccf3fa3fd075ed
 +    }
 +
 +    @NotNull
-+    default BlockData createBlockData(@Nullable Consumer<BlockData> consumer) {
++    default BlockData createBlockData(@Nullable Consumer<? super BlockData> consumer) {
 +        return Bukkit.createBlockData((Material) this, consumer);
 +    }
 +

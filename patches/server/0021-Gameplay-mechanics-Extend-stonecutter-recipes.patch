@@ -11,7 +11,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index 921e02c2ffcd1c9fc1db69bc6dea171cacb05317..8e0404177a73cd318106bdeaae37ff0f5a7df199 100644
+index 2f69540ccf23739743fd063513cb1be54a084b6b..17b9d5d8728dfcfe35583f8111f56b2be904ad51 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
 @@ -320,6 +320,7 @@ public class Main {
@@ -37,7 +37,7 @@ index 4103ddf16164e3992fef0765d368282572537e29..71856beb8430b0d70960715633cfac04
                      handler.accept((RecipeHolder) optional.get());
                  }
 diff --git a/src/main/java/net/minecraft/world/item/crafting/RecipeManager.java b/src/main/java/net/minecraft/world/item/crafting/RecipeManager.java
-index 666fc85bc2079cb367b340f2605f29fe002f4d22..3394da1fd5ae9fb9f9d49575f1f2f365acc1718c 100644
+index 388363948595247471fa4c3c6801fc493d61c0d0..14f70eca591a8eddeec5f457d876daacd33386c5 100644
 --- a/src/main/java/net/minecraft/world/item/crafting/RecipeManager.java
 +++ b/src/main/java/net/minecraft/world/item/crafting/RecipeManager.java
 @@ -84,19 +84,596 @@ public class RecipeManager extends SimpleJsonResourceReloadListener {
@@ -45,7 +45,7 @@ index 666fc85bc2079cb367b340f2605f29fe002f4d22..3394da1fd5ae9fb9f9d49575f1f2f365
          }));
          this.byName = Maps.newHashMap(builder.build()); // CraftBukkit
 +        this.byNameWasSet(); // Fiddle - gameplay mechanics - automatically extend stonecutter recipes
-         RecipeManager.LOGGER.info("Loaded {} recipes", map1.size());
+         RecipeManager.LOGGER.info("Loaded {} recipes", this.byName.size()); // Paper - log correct number of recipes
      }
  
 +    // Fiddle start - gameplay mechanics - automatically extend stonecutter recipes

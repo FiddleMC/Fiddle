@@ -149,10 +149,10 @@ index 35674f92a67f93382103c2766df4b678ba5c862f..250d529ed8043b69e7eebbf9c73bcc92
  
          if (this.entity instanceof LivingEntity) {
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index c655c6fee393c62ba79301f76baa72f9b1154a9a..7425bff641b6678a117504204f4ee3f2e88a1e92 100644
+index fece91254b10b59474056aa730fd420f90cd7bec..e77ed0f3ca6a6e30ef6f0d7d70591b76700159e6 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
-@@ -4848,4 +4848,11 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
+@@ -4874,4 +4874,11 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
          return ((net.minecraft.server.level.ServerChunkCache) level.getChunkSource()).isPositionTicking(this);
      }
      // Paper end
