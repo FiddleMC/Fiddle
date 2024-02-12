@@ -8,7 +8,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/network/FriendlyByteBuf.java b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
-index 730c351a62ed483a32618fb9e7002c7223e54653..b5901e219a56a14c90b56e5b786f204ef02b0784 100644
+index 9df85af48978e8b3a690b5415502be5a3efb2029..15100226d5eab17f5be39651eeb2cbbf565807d1 100644
 --- a/src/main/java/net/minecraft/network/FriendlyByteBuf.java
 +++ b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
 @@ -78,6 +78,7 @@ import net.minecraft.world.level.ChunkPos;
@@ -28,7 +28,7 @@ index 730c351a62ed483a32618fb9e7002c7223e54653..b5901e219a56a14c90b56e5b786f204e
      public FriendlyByteBuf(ByteBuf parent) {
          this.source = parent;
      }
-@@ -1751,4 +1754,13 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -1754,4 +1757,13 @@ public class FriendlyByteBuf extends ByteBuf {
      }
      // Fiddle end - client perspective - packets are modifiable - expose target client properties - can be used by FriendlyByteBuf
  

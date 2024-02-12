@@ -8,11 +8,11 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/SevenZipSupport.java b/src/main/java/org/fiddlemc/fiddle/pack/read/SevenZipSupport.java
-index e1a71a3c758153967b5512b76d75cfa9f48dbcfc..ee2d830fccbdd6710706e2191028b4137b20d469 100644
---- a/src/main/java/org/fiddlemc/fiddle/pack/read/SevenZipSupport.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..ee2d830fccbdd6710706e2191028b4137b20d469
+--- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/read/SevenZipSupport.java
-@@ -1,2 +1,27 @@
--package org.fiddlemc.fiddle.pack.read;public class SevenZipSupport {
+@@ -0,0 +1,27 @@
 +package org.fiddlemc.fiddle.pack.read;
 +
 +import net.sf.sevenzipjbinding.SevenZip;
@@ -39,7 +39,7 @@ index e1a71a3c758153967b5512b76d75cfa9f48dbcfc..ee2d830fccbdd6710706e2191028b413
 +        return is7ZipAvailable;
 +    }
 +
- }
++}
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/filesprovider/archive/ArchiveFileFiddlePackFilesProvider.java b/src/main/java/org/fiddlemc/fiddle/pack/read/filesprovider/archive/ArchiveFileFiddlePackFilesProvider.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..08be3133ecc9f7404be9ffeaaa2e43cf5ea00088

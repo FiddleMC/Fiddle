@@ -23,10 +23,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Gale - https://galemc.org
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index e827ee211e3c65dc68ac5867fd8476639df63645..6b635e05a8486bedd521752968c459302f02ad00 100644
+index 9d817bf3f26ffd484945a00a6538970eca22ee20..86be891db21065934d5daa740c0db8503b011cec 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
-@@ -106,6 +106,15 @@ val generateApiVersioningFile by tasks.registering {
+@@ -109,6 +109,15 @@ val generateApiVersioningFile by tasks.registering {
      }
  }
  

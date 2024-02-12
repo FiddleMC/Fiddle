@@ -92,10 +92,10 @@ index ea8053c90601cb15d53a1e8fec2b4bcd12a9e1c4..af978eae8064fc0eda51edbc38eada59
  
      }
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index ed41decbf0522c516b3608569d5719687105e25b..43a1b1bca7fbfc5925e090d2f3ee379d94d91a3e 100644
+index fd84786f3e72875e79df46416f47f3403876cef3..38de6781dd8a0a387c16df239f3de452af9a010e 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -2315,34 +2315,48 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -2311,34 +2311,48 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
          this.getHandle().connection.send(packet);
      }
  
@@ -149,9 +149,9 @@ index ed41decbf0522c516b3608569d5719687105e25b..43a1b1bca7fbfc5925e090d2f3ee379d
  
          this.setResourcePack(UUID.nameUUIDFromBytes(url.getBytes(StandardCharsets.UTF_8)), url, hash, prompt, force);
      }
-@@ -2365,6 +2379,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
-     @Override
-     public void setResourcePack(String url, byte[] hashBytes, net.kyori.adventure.text.Component prompt, boolean force) {
+@@ -2363,6 +2377,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+     public void setResourcePack(final UUID uuid, final String url, final byte[] hashBytes, final net.kyori.adventure.text.Component prompt, final boolean force) {
+         Preconditions.checkArgument(uuid != null, "Resource pack UUID cannot be null");
          Preconditions.checkArgument(url != null, "Resource pack URL cannot be null");
 +        logAttemptToSendResourcePackWarning(url, this); // Fiddle - client perspective - send resource pack - do not send plugin resource packs
          final String hash;

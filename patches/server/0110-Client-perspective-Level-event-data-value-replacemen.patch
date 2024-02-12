@@ -41,10 +41,10 @@ index e1fad381b861471a17529c246bb8a4a9c7646420..57bd15679316f5a8358ae3a162e3de1d
      }
  
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index 43a1b1bca7fbfc5925e090d2f3ee379d94d91a3e..7809a6c9720023d216c08fb4d20f5e17a3caa67e 100644
+index 38de6781dd8a0a387c16df239f3de452af9a010e..1733f8d25ad0975e117584d08216d990c988b590 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -894,7 +894,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -890,7 +890,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
              Preconditions.checkArgument(effect.getData() == null || effect == Effect.ELECTRIC_SPARK, "Wrong kind of data for the %s effect", effect);
          }
  

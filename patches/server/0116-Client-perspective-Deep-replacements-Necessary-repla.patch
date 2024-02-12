@@ -62,67 +62,40 @@ index 3bfc92dbe12b0800a55e486818d8bf17c105cf92..5706937cef8f5b990f64bf769df35160
          output.writeUTF(this.data);
      }
 diff --git a/src/main/java/net/minecraft/network/FriendlyByteBuf.java b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
-index 2155989f46d431ae0712da0b9255fda59b0c4317..f357a6a94a8fc67f4f51993cbcc4c830e55d44bf 100644
+index b6835bed161aaacf129e029bd0a5deb863ae01fc..87365b1b649344bc4457c2a059ffc7ab3dd5cc47 100644
 --- a/src/main/java/net/minecraft/network/FriendlyByteBuf.java
 +++ b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
-@@ -80,6 +80,7 @@ import net.minecraft.world.phys.BlockHitResult;
- import net.minecraft.world.phys.Vec3;
- import org.fiddlemc.fiddle.packet.deepreplacement.ClientPerspectiveAndSettingsSupplier;
- import org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope;
-+import org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacer;
- import org.fiddlemc.fiddle.packet.item.ItemStackInPacketContext;
- import org.jetbrains.annotations.NotNull;
- import org.joml.Quaternionf;
-@@ -618,6 +619,12 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -600,6 +600,12 @@ public class FriendlyByteBuf extends ByteBuf {
      }
  
      public FriendlyByteBuf writeComponent(Component text, @NotNull ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, @NotNull DeepReplacementScope replacementScope) {
 +        // Fiddle start - client perspective - deep replacements - hooks for replacements - insert hook in FriendlyByteBuf#writeComponent
 +        replacementScope = replacementScope.withoutUnnecessaryReplacements(clientPerspectiveAndSettings); // Remove unnecessary replacements
 +        if (replacementScope != DeepReplacementScope.NOTHING) {
-+            return this.writeComponent(DeepReplacer.replaceComponent(text, clientPerspectiveAndSettings, replacementScope), clientPerspectiveAndSettings, DeepReplacementScope.NOTHING);
++            return this.writeComponent(org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacer.replaceComponent(text, clientPerspectiveAndSettings, replacementScope), clientPerspectiveAndSettings, DeepReplacementScope.NOTHING);
 +        }
 +        // Fiddle end - client perspective - deep replacements - hooks for replacements - insert hook in FriendlyByteBuf#writeComponent
          // Fiddle end - client perspective - deep replacements - pass scope
-         // TODO this.adventure$locale
-         return this.writeWithCodec(NbtOps.INSTANCE, ComponentSerialization.CODEC, text, clientPerspectiveAndSettings, replacementScope); // Fiddle - client perspective - deep replacements - pass scope
-@@ -744,6 +751,12 @@ public class FriendlyByteBuf extends ByteBuf {
+         if (text instanceof io.papermc.paper.adventure.AdventureComponent adv) {
+             return this.writeComponent(adv.adventure$component());
+@@ -747,6 +753,12 @@ public class FriendlyByteBuf extends ByteBuf {
          if (stack.isEmpty() || stack.getItem() == null) { // CraftBukkit - NPE fix itemstack.getItem()
              this.writeBoolean(false);
          } else {
 +            // Fiddle start - client perspective - deep replacements - hooks for replacements - insert hook in FriendlyByteBuf#writeItem
 +            replacementScope = replacementScope.withoutUnnecessaryReplacements(clientPerspectiveAndSettings); // Remove unnecessary replacements
 +            if (replacementScope != DeepReplacementScope.NOTHING) {
-+                return this.writeItem(DeepReplacer.replaceItemStack(stack, itemStackInPackContext, clientPerspectiveAndSettings, replacementScope), itemStackInPackContext, clientPerspectiveAndSettings, DeepReplacementScope.NOTHING);
++                return this.writeItem(org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacer.replaceItemStack(stack, itemStackInPackContext, clientPerspectiveAndSettings, replacementScope), itemStackInPackContext, clientPerspectiveAndSettings, DeepReplacementScope.NOTHING);
 +            }
 +            // Fiddle end - client perspective - deep replacements - hooks for replacements - insert hook in FriendlyByteBuf#writeItem
              this.writeBoolean(true);
              Item item = stack.getItem();
  
-@@ -819,6 +832,10 @@ public class FriendlyByteBuf extends ByteBuf {
-         return this;
-     }
- 
-+    private static int getMaxEncodedUtfLength(int decodedLength) {
-+        return decodedLength * 3;
-+    }
-+
-     public ResourceLocation readResourceLocation() {
-         return new ResourceLocation(this.readUtf(32767));
-     }
 diff --git a/src/main/java/net/minecraft/network/Utf8String.java b/src/main/java/net/minecraft/network/Utf8String.java
-index 3d5c67dc255684b60c2676f83fa4958a3ab5bf18..67a2a3897a8e00c8efa17e5e36942afa13b84e04 100644
+index 3d5c67dc255684b60c2676f83fa4958a3ab5bf18..f26f8ac006a28ee9d5390ce0de3ab04ceec3dfd5 100644
 --- a/src/main/java/net/minecraft/network/Utf8String.java
 +++ b/src/main/java/net/minecraft/network/Utf8String.java
-@@ -6,6 +6,7 @@ import io.netty.handler.codec.DecoderException;
- import io.netty.handler.codec.EncoderException;
- import org.fiddlemc.fiddle.packet.deepreplacement.ClientPerspectiveAndSettingsSupplier;
- import org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope;
-+import org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacer;
- import org.jetbrains.annotations.NotNull;
- 
- import java.nio.charset.StandardCharsets;
-@@ -34,7 +35,28 @@ public class Utf8String {
+@@ -34,7 +34,28 @@ public class Utf8String {
          }
      }
  
@@ -134,13 +107,13 @@ index 3d5c67dc255684b60c2676f83fa4958a3ab5bf18..67a2a3897a8e00c8efa17e5e36942afa
 +            String modifiedString;
 +            if (canBeRawJsonText) {
 +                if (canBeSNBT) {
-+                    modifiedString = DeepReplacer.replaceRawJSONTextOrSNBT(string, clientPerspectiveAndSettings, replacementScope);
++                    modifiedString = org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacer.replaceRawJSONTextOrSNBT(string, clientPerspectiveAndSettings, replacementScope);
 +                } else {
-+                    modifiedString = DeepReplacer.replaceRawJSONText(string, clientPerspectiveAndSettings, replacementScope);
++                    modifiedString = org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacer.replaceRawJSONText(string, clientPerspectiveAndSettings, replacementScope);
 +                }
 +            } else {
 +                if (canBeSNBT) {
-+                    modifiedString = DeepReplacer.replaceSNBT(string, clientPerspectiveAndSettings, replacementScope);
++                    modifiedString = org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacer.replaceSNBT(string, clientPerspectiveAndSettings, replacementScope);
 +                } else {
 +                    modifiedString = string;
 +                }
@@ -153,10 +126,10 @@ index 3d5c67dc255684b60c2676f83fa4958a3ab5bf18..67a2a3897a8e00c8efa17e5e36942afa
              throw new EncoderException("String too big (was " + string.length() + " characters, max " + length + ")");
          } else {
 diff --git a/src/main/java/net/minecraft/network/chat/Component.java b/src/main/java/net/minecraft/network/chat/Component.java
-index e0037b99838519eee5fb6f7e95ffaad252f08baf..a9f72e7f8b529345f07225783a6fbb541a993a96 100644
+index d3a80d0a23be762c05931ae8001d98e43cab2b4a..aa9eb198f3bb5223fec7bbf010d43666f5a59d90 100644
 --- a/src/main/java/net/minecraft/network/chat/Component.java
 +++ b/src/main/java/net/minecraft/network/chat/Component.java
-@@ -102,6 +102,12 @@ public interface Component extends Message, FormattedText, Iterable<Component> {
+@@ -101,6 +101,12 @@ public interface Component extends Message, FormattedText, Iterable<Component> {
          return new MutableComponent(this.getContents(), new ArrayList(this.getSiblings()), this.getStyle());
      }
  

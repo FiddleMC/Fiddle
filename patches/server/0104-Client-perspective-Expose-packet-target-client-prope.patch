@@ -8,7 +8,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/network/FriendlyByteBuf.java b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
-index ff794499df6a2b65db2ca5956d2b98317592057f..f167a08581d44668f43c8644427ba885c7e300c5 100644
+index b13bc90b28b02f5e80d935bfcba727f92c5e4c4f..d6386a235d5275226aebb0eb9bd16fe1f27d4012 100644
 --- a/src/main/java/net/minecraft/network/FriendlyByteBuf.java
 +++ b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
 @@ -78,6 +78,7 @@ import net.minecraft.world.level.ChunkPos;
@@ -33,7 +33,7 @@ index ff794499df6a2b65db2ca5956d2b98317592057f..f167a08581d44668f43c8644427ba885
      public FriendlyByteBuf(ByteBuf parent) {
          this.source = parent;
      }
-@@ -1667,4 +1675,58 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -1670,4 +1678,58 @@ public class FriendlyByteBuf extends ByteBuf {
              };
          }
      }
@@ -67,7 +67,7 @@ index ff794499df6a2b65db2ca5956d2b98317592057f..f167a08581d44668f43c8644427ba885
 +    }
 +
 +    /**
-+     * @return The explicit {@link net.minecraft.server.level.ServerPlayer#locale}
++     * @return The explicit {@link net.minecraft.server.level.ServerPlayer#language}
 +     * of the target client of a packet that is writing its contents to this {@link FriendlyByteBuf}.
 +     * This method always return a nullable value or throws an exception, and it must never actually throw
 +     * such an exception (if there is a possibility of an exception being thrown,

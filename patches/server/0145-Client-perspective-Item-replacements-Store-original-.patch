@@ -13,10 +13,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/network/FriendlyByteBuf.java b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
-index f357a6a94a8fc67f4f51993cbcc4c830e55d44bf..6ef5caa68262361fa4d1b49785d90be826484ef2 100644
+index 87365b1b649344bc4457c2a059ffc7ab3dd5cc47..64fcac659073c043d12649b89cb775cd2524afa4 100644
 --- a/src/main/java/net/minecraft/network/FriendlyByteBuf.java
 +++ b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
-@@ -787,6 +787,12 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -789,6 +789,12 @@ public class FriendlyByteBuf extends ByteBuf {
              ItemStack itemstack = new ItemStack(item, b0);
  
              itemstack.setTag(this.readNbt());

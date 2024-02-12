@@ -21,10 +21,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Gale - https://galemc.org
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 804c2da84b136d77771d7a73f875806630bc645b..d347c60ea69d791a9996e4767b3cb9eecd8a5537 100644
+index 86be891db21065934d5daa740c0db8503b011cec..f4a10acc733570f8eee1590e2223b5d5da2c7119 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
-@@ -172,6 +172,8 @@ tasks.withType<Javadoc> {
+@@ -175,6 +175,8 @@ tasks.withType<Javadoc> {
              into("build/docs/javadoc")
          }
      }

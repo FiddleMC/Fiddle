@@ -772,11 +772,3 @@ index c8060a0b175447c1a83dae5a109ffd550c5343b0..a2151ec7c384342ff30ba38984a8ecc0
 +    // Fiddle end - gameplay mechanics settings
 +
  }
-diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/SevenZipSupport.java b/src/main/java/org/fiddlemc/fiddle/pack/read/SevenZipSupport.java
-new file mode 100644
-index 0000000000000000000000000000000000000000..e1a71a3c758153967b5512b76d75cfa9f48dbcfc
---- /dev/null
-+++ b/src/main/java/org/fiddlemc/fiddle/pack/read/SevenZipSupport.java
-@@ -0,0 +1,2 @@
-+package org.fiddlemc.fiddle.pack.read;public class SevenZipSupport {
-+}

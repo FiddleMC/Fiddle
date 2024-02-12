@@ -18,7 +18,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 2d3a1709c5c0b1dc5b43113971e19ac7e601edfc..f57161873323ba301e6090ec54dd7c05de19b95f 100644
+index 2d3a1709c5c0b1dc5b43113971e19ac7e601edfc..124468e2f24c127d233190fa008df67ebf320ae9 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
 @@ -4633,9 +4633,6 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
@@ -105,7 +105,7 @@ index 2d3a1709c5c0b1dc5b43113971e19ac7e601edfc..f57161873323ba301e6090ec54dd7c05
       */
      @Deprecated(forRemoval = true)
      public int getIdLegacy() {
-@@ -4754,8 +4752,9 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+@@ -4754,14 +4752,15 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
       * @return legacy status
       */
      // @Deprecated // Paper - this is useful, don't deprecate
@@ -116,6 +116,13 @@ index 2d3a1709c5c0b1dc5b43113971e19ac7e601edfc..f57161873323ba301e6090ec54dd7c05
      }
  
      @NotNull
+     @Override
+     public NamespacedKey getKey() {
+-        return org.fiddlemc.fiddle.material.MaterialNameAndKeyConversion.getKey(this); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - key
++        return AbstractMaterial.super.getKey(); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - key // Fiddle - modifiable Bukkit enums - move implementations to corresponding interfaces - Material
+     }
+ 
+     /**
 @@ -4769,13 +4768,15 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
       *
       * @return Maximum stack size for this material

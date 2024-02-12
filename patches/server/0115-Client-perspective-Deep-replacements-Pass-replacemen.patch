@@ -159,7 +159,7 @@ index 0c3fb39dfff42cc322b82c6da885d39f866aee41..6d872e6e764a58ee398f524f781bedb0
      String toString();
  
 diff --git a/src/main/java/net/minecraft/network/FriendlyByteBuf.java b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
-index b5901e219a56a14c90b56e5b786f204ef02b0784..2155989f46d431ae0712da0b9255fda59b0c4317 100644
+index 15100226d5eab17f5be39651eeb2cbbf565807d1..b6835bed161aaacf129e029bd0a5deb863ae01fc 100644
 --- a/src/main/java/net/minecraft/network/FriendlyByteBuf.java
 +++ b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
 @@ -79,6 +79,8 @@ import net.minecraft.world.level.Level;
@@ -195,10 +195,11 @@ index b5901e219a56a14c90b56e5b786f204ef02b0784..2155989f46d431ae0712da0b9255fda5
          return this;
      }
  
-@@ -562,19 +575,52 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -562,21 +575,54 @@ public class FriendlyByteBuf extends ByteBuf {
  
-     // Paper start
+     // Paper start - adventure
      public FriendlyByteBuf writeComponent(final net.kyori.adventure.text.Component component) {
+-        return this.writeWithCodec(NbtOps.INSTANCE, io.papermc.paper.adventure.PaperAdventure.localizedCodec(this.adventure$locale), component);
 +        // Fiddle start - client perspective - deep replacements - pass scope
 +        // By default, we assume all replacements should be made
 +        return this.writeComponent(component, DeepReplacementScope.EVERYTHING);
@@ -209,29 +210,9 @@ index b5901e219a56a14c90b56e5b786f204ef02b0784..2155989f46d431ae0712da0b9255fda5
 +    }
 +
 +    public FriendlyByteBuf writeComponent(final net.kyori.adventure.text.Component component, @NotNull ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, @NotNull DeepReplacementScope replacementScope) {
-+        // Fiddle end - client perspective - deep replacements - pass scope
-         // TODO this.adventure$locale
--        return this.writeWithCodec(NbtOps.INSTANCE, ComponentSerialization.CODEC, io.papermc.paper.adventure.PaperAdventure.asVanilla(component));
-+        return this.writeWithCodec(NbtOps.INSTANCE, ComponentSerialization.CODEC, io.papermc.paper.adventure.PaperAdventure.asVanilla(component), clientPerspectiveAndSettings, replacementScope); // Fiddle - client perspective - deep replacements - pass scope
-     }
- 
-     @Deprecated
-     public FriendlyByteBuf writeComponent(final net.md_5.bungee.api.chat.BaseComponent[] component) {
--        return this.writeUtf(net.md_5.bungee.chat.ComponentSerializer.toString(component), 262144);
-+        // Fiddle start - client perspective - deep replacements - pass scope
-+        // By default, we assume all replacements should be made
-+        return this.writeComponent(component, DeepReplacementScope.EVERYTHING);
-+    }
-+
-+    public FriendlyByteBuf writeComponent(final net.md_5.bungee.api.chat.BaseComponent[] component, @NotNull DeepReplacementScope replacementScope) {
-+        return this.writeComponent(component, this.getClientPerspectiveAndSettingsSupplierUnlessScopeIsNothing(replacementScope), replacementScope);
-+    }
-+
-+    public FriendlyByteBuf writeComponent(final net.md_5.bungee.api.chat.BaseComponent[] component, @NotNull ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, @NotNull DeepReplacementScope replacementScope) {
-+        return this.writeUtf(net.md_5.bungee.chat.ComponentSerializer.toString(component), 262144, true, false, clientPerspectiveAndSettings, replacementScope);
++        return this.writeWithCodec(NbtOps.INSTANCE, io.papermc.paper.adventure.PaperAdventure.localizedCodec(this.adventure$locale), component, clientPerspectiveAndSettings, replacementScope);
 +        // Fiddle end - client perspective - deep replacements - pass scope
      }
-     // Paper end
  
      public FriendlyByteBuf writeComponent(Component text) {
 +        // Fiddle start - client perspective - deep replacements - pass scope
@@ -245,13 +226,34 @@ index b5901e219a56a14c90b56e5b786f204ef02b0784..2155989f46d431ae0712da0b9255fda5
 +
 +    public FriendlyByteBuf writeComponent(Component text, @NotNull ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, @NotNull DeepReplacementScope replacementScope) {
 +        // Fiddle end - client perspective - deep replacements - pass scope
-         // TODO this.adventure$locale
--        return this.writeWithCodec(NbtOps.INSTANCE, ComponentSerialization.CODEC, text);
-+        return this.writeWithCodec(NbtOps.INSTANCE, ComponentSerialization.CODEC, text, clientPerspectiveAndSettings, replacementScope); // Fiddle - client perspective - deep replacements - pass scope
-     }
+         if (text instanceof io.papermc.paper.adventure.AdventureComponent adv) {
+             return this.writeComponent(adv.adventure$component());
+         }
  
-     public <T extends Enum<T>> T readEnum(Class<T> enumClass) {
-@@ -626,12 +672,23 @@ public class FriendlyByteBuf extends ByteBuf {
+-        return this.writeWithCodec(NbtOps.INSTANCE, ComponentSerialization.localizedCodec(this.adventure$locale), text);
++        return this.writeWithCodec(NbtOps.INSTANCE, ComponentSerialization.localizedCodec(this.adventure$locale), text, clientPerspectiveAndSettings, replacementScope); // Fiddle - client perspective - deep replacements - pass scope
+         // Paper end - adventure
+     }
+     // Paper start - deprecated Tab List & Title APIs
+     @Deprecated
+     public FriendlyByteBuf writeComponent(final net.md_5.bungee.api.chat.BaseComponent[] component) {
+-        return this.writeComponent(java.util.Objects.requireNonNull(Component.Serializer.fromJson(net.md_5.bungee.chat.ComponentSerializer.toString(component))));
++        // Fiddle start - client perspective - deep replacements - pass scope
++        // By default, we assume all replacements should be made
++        return this.writeComponent(component, DeepReplacementScope.EVERYTHING);
++    }
++
++    public FriendlyByteBuf writeComponent(final net.md_5.bungee.api.chat.BaseComponent[] component, @NotNull DeepReplacementScope replacementScope) {
++        return this.writeComponent(component, this.getClientPerspectiveAndSettingsSupplierUnlessScopeIsNothing(replacementScope), replacementScope);
++    }
++
++    public FriendlyByteBuf writeComponent(final net.md_5.bungee.api.chat.BaseComponent[] component, @NotNull ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, @NotNull DeepReplacementScope replacementScope) {
++        return this.writeComponent(java.util.Objects.requireNonNull(Component.Serializer.fromJson(net.md_5.bungee.chat.ComponentSerializer.toString(component))), clientPerspectiveAndSettings, replacementScope);
++        // Fiddle end - client perspective - deep replacements - pass scope
+     }
+     // Paper end - deprecated Tab List & Title APIs
+ 
+@@ -629,12 +675,23 @@ public class FriendlyByteBuf extends ByteBuf {
      }
  
      public FriendlyByteBuf writeNbt(@Nullable Tag nbt) {
@@ -276,7 +278,7 @@ index b5901e219a56a14c90b56e5b786f204ef02b0784..2155989f46d431ae0712da0b9255fda5
              return this;
          } catch (Exception ioexception) { // CraftBukkit - IOException -> Exception
              throw new EncoderException(ioexception);
-@@ -661,6 +718,29 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -664,6 +721,29 @@ public class FriendlyByteBuf extends ByteBuf {
      }
  
      public FriendlyByteBuf writeItem(ItemStack stack) {
@@ -306,7 +308,7 @@ index b5901e219a56a14c90b56e5b786f204ef02b0784..2155989f46d431ae0712da0b9255fda5
          if (stack.isEmpty() || stack.getItem() == null) { // CraftBukkit - NPE fix itemstack.getItem()
              this.writeBoolean(false);
          } else {
-@@ -679,7 +759,7 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -682,7 +762,7 @@ public class FriendlyByteBuf extends ByteBuf {
                  nbttagcompound = stack.getTag();
              }
  
@@ -315,7 +317,7 @@ index b5901e219a56a14c90b56e5b786f204ef02b0784..2155989f46d431ae0712da0b9255fda5
          }
  
          return this;
-@@ -716,7 +796,26 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -719,7 +799,26 @@ public class FriendlyByteBuf extends ByteBuf {
      }
  
      public FriendlyByteBuf writeUtf(String s, int maxLength) {
@@ -343,7 +345,7 @@ index b5901e219a56a14c90b56e5b786f204ef02b0784..2155989f46d431ae0712da0b9255fda5
          return this;
      }
  
-@@ -725,7 +824,7 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -728,7 +827,7 @@ public class FriendlyByteBuf extends ByteBuf {
      }
  
      public FriendlyByteBuf writeResourceLocation(ResourceLocation id) {
@@ -352,7 +354,7 @@ index b5901e219a56a14c90b56e5b786f204ef02b0784..2155989f46d431ae0712da0b9255fda5
          return this;
      }
  
-@@ -837,7 +936,7 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -840,7 +939,7 @@ public class FriendlyByteBuf extends ByteBuf {
  
      public void writeGameProfile(GameProfile gameProfile) {
          this.writeUUID(gameProfile.getId());
@@ -361,7 +363,7 @@ index b5901e219a56a14c90b56e5b786f204ef02b0784..2155989f46d431ae0712da0b9255fda5
          this.writeGameProfileProperties(gameProfile.getProperties());
      }
  
-@@ -865,9 +964,11 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -868,9 +967,11 @@ public class FriendlyByteBuf extends ByteBuf {
      }
  
      public void writeProperty(Property property) {
@@ -376,7 +378,7 @@ index b5901e219a56a14c90b56e5b786f204ef02b0784..2155989f46d431ae0712da0b9255fda5
      }
  
      public boolean isContiguous() {
-@@ -1763,4 +1864,15 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -1766,4 +1867,15 @@ public class FriendlyByteBuf extends ByteBuf {
      }
      // Fiddle end - client perspective - deep replacements - perspective and settings supplier - cache in FriendlyByteBuf
  

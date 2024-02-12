@@ -21,10 +21,10 @@ Licensed (except for image files) under: GPL-3.0 (https://www.gnu.org/licenses/g
 Gale - https://galemc.org
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 804a6cfddd4f262559405c9db8f781efd22e6f66..8e3543e1c351d74cf8c992e0751a9c92f6fde209 100644
+index f4a10acc733570f8eee1590e2223b5d5da2c7119..88ea1f3ef379916c034f45b346afc7d447aa870c 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
-@@ -124,6 +124,12 @@ tasks.jar {
+@@ -127,6 +127,12 @@ tasks.jar {
              "Automatic-Module-Name" to "org.bukkit"
          )
      }
