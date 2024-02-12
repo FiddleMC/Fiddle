@@ -14,10 +14,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index ca5e93c404abf0970ffb5dac611b9732a743bfaf..f67bf29828e1d61abaf55ef9a310a2fadcf8fbfc 100644
+index 3893974cf5f472b7f9d26c7f19d330b7a836466c..baa3c57f76491ffeecb676514e30cbe24c88009d 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -4443,15 +4443,13 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4689,15 +4689,13 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
  
      /**
       * @return If the type is either AIR, CAVE_AIR or VOID_AIR
@@ -38,7 +38,7 @@ index ca5e93c404abf0970ffb5dac611b9732a743bfaf..f67bf29828e1d61abaf55ef9a310a2fa
      }
  
      @Override
-@@ -5089,142 +5087,22 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -5335,142 +5333,22 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material is a block and does not block any light
       * @deprecated currently does not have an implementation which is well
       * linked to the underlying server. Contributions welcome.
@@ -99,7 +99,6 @@ index ca5e93c404abf0970ffb5dac611b9732a743bfaf..f67bf29828e1d61abaf55ef9a310a2fa
 -            case FERN:
 -            case FIRE:
 -            case FLOWER_POT:
--            case GRASS:
 -            case GRAY_CARPET:
 -            case GREEN_CARPET:
 -            case JUNGLE_BUTTON:
@@ -163,6 +162,7 @@ index ca5e93c404abf0970ffb5dac611b9732a743bfaf..f67bf29828e1d61abaf55ef9a310a2fa
 -            case RED_TULIP:
 -            case REPEATER:
 -            case ROSE_BUSH:
+-            case SHORT_GRASS:
 -            case SKELETON_SKULL:
 -            case SKELETON_WALL_SKULL:
 -            case SNOW:

@@ -11,10 +11,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/world/item/Items.java b/src/main/java/net/minecraft/world/item/Items.java
-index 581c01f64939c23fda4cbf98e871de672aabe636..1225c28aa72ac54ac103c72a5eb92e7349e9c94d 100644
+index 1cc0c79ea3df283a1713eb5ed24d47090b8613df..6f2e493b6cf06fcb17e2f0ae3117043bfdfdf454 100644
 --- a/src/main/java/net/minecraft/world/item/Items.java
 +++ b/src/main/java/net/minecraft/world/item/Items.java
-@@ -1306,10 +1306,6 @@ public class Items {
+@@ -1364,10 +1364,6 @@ public class Items {
  
      public static Item registerItem(ResourceKey<Item> key, Item item) {
          item.setVanilla(); // Fiddle - flags for vanilla content - item

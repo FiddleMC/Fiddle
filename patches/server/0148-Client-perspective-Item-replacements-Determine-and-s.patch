@@ -8,10 +8,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index d02ef74c9dcc735a8bf241a347a43edd60efe691..fd53b807302e6e874ef9eae3efedb72f098b1311 100644
+index ce5f7a7b993af8beec47b693e1a1e1181fd20e07..6cd6a0eff06af2c424d717b078fe78998f14a2e9 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
-@@ -222,6 +222,7 @@ public class Main {
+@@ -219,6 +219,7 @@ public class Main {
  
              org.fiddlemc.fiddle.pack.load.fiddlecontent.block.BlockStateVisualizationLoader.determineAndStore(); // Fiddle - client perspective - block state visualization - determine and store desired setuppers
              org.fiddlemc.fiddle.pack.load.assets.lang.TranslationLoader.registerServerSideTranslations(); // Fiddle - client perspective - localization - register server-side translations

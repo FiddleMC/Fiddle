@@ -8,15 +8,15 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/packs/repository/ServerPacksSource.java b/src/main/java/net/minecraft/server/packs/repository/ServerPacksSource.java
-index 4ed8f38ba9c7b075b99a0da0e213a1e9d03ac717..690f6fa2162cdb6da3139732ec61f38c592e7b08 100644
+index d92cd89373f8373c367ce422328b9836de09096d..f8fd49e16eb96e679017a296d614d0ca510f9ad8 100644
 --- a/src/main/java/net/minecraft/server/packs/repository/ServerPacksSource.java
 +++ b/src/main/java/net/minecraft/server/packs/repository/ServerPacksSource.java
 @@ -53,7 +53,7 @@ public class ServerPacksSource extends BuiltInPackSource {
      }
  
-     public static PackRepository createPackRepository(Path dataPacksPath, DirectoryValidator directoryValidator) {
--        return new PackRepository(new ServerPacksSource(directoryValidator), new FolderRepositorySource(dataPacksPath, PackType.SERVER_DATA, PackSource.WORLD, directoryValidator));
-+        return new PackRepository(new ServerPacksSource(directoryValidator), new org.fiddlemc.fiddle.pack.load.data.FiddleRepositorySource(), new FolderRepositorySource(dataPacksPath, PackType.SERVER_DATA, PackSource.WORLD, directoryValidator)); // Fiddle - load packs - data packs - repository source - include in pack repository
+     public static PackRepository createPackRepository(Path dataPacksPath, DirectoryValidator symlinkFinder) {
+-        return new PackRepository(new ServerPacksSource(symlinkFinder), new FolderRepositorySource(dataPacksPath, PackType.SERVER_DATA, PackSource.WORLD, symlinkFinder));
++        return new PackRepository(new ServerPacksSource(symlinkFinder), new org.fiddlemc.fiddle.pack.load.data.FiddleRepositorySource(), new FolderRepositorySource(dataPacksPath, PackType.SERVER_DATA, PackSource.WORLD, symlinkFinder)); // Fiddle - load packs - data packs - repository source - include in pack repository
      }
  
      public static PackRepository createVanillaTrustedRepository() {

@@ -8,10 +8,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/nbt/CompoundTag.java b/src/main/java/net/minecraft/nbt/CompoundTag.java
-index caa609116c5ae2175c99c3e1be4be4f080c21234..d4ae0bd5abbf4befc4b924c9f2112081463a2808 100644
+index e1d968e0a9a2e0e4f42287b9639211a9a72eea42..1cf9d4bc6d94892b9739910f59f53f90c1ba6fcd 100644
 --- a/src/main/java/net/minecraft/nbt/CompoundTag.java
 +++ b/src/main/java/net/minecraft/nbt/CompoundTag.java
-@@ -178,6 +178,13 @@ public class CompoundTag implements Tag {
+@@ -182,6 +182,13 @@ public class CompoundTag implements Tag {
  
      @Override
      public void write(DataOutput output, @org.jetbrains.annotations.Nullable org.fiddlemc.fiddle.packet.deepreplacement.ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, @org.jetbrains.annotations.NotNull org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope replacementScope) throws IOException {
@@ -26,7 +26,7 @@ index caa609116c5ae2175c99c3e1be4be4f080c21234..d4ae0bd5abbf4befc4b924c9f2112081
          for(String string : this.tags.keySet()) {
              Tag tag = this.tags.get(string);
 diff --git a/src/main/java/net/minecraft/nbt/ListTag.java b/src/main/java/net/minecraft/nbt/ListTag.java
-index 2130091f021844e145c7ee152806a68db0b464e1..7a61e2501eb200a6cff176f358c6a35642fc0f89 100644
+index b055c59629d7606a24b4be446e777013d6489721..3295729f82ae9759557a825437db8153b9c3746c 100644
 --- a/src/main/java/net/minecraft/nbt/ListTag.java
 +++ b/src/main/java/net/minecraft/nbt/ListTag.java
 @@ -154,6 +154,13 @@ public class ListTag extends CollectionTag<Tag> {
@@ -44,10 +44,10 @@ index 2130091f021844e145c7ee152806a68db0b464e1..7a61e2501eb200a6cff176f358c6a356
          if (this.list.isEmpty()) {
              this.type = 0;
 diff --git a/src/main/java/net/minecraft/nbt/StringTag.java b/src/main/java/net/minecraft/nbt/StringTag.java
-index c42bad629faab9fcf1ea971a7b4d6d3e77636279..d6090dc81ef05ae8d8e71a6f355ed6cb287b5707 100644
+index 3bfc92dbe12b0800a55e486818d8bf17c105cf92..5706937cef8f5b990f64bf769df35160417f9e86 100644
 --- a/src/main/java/net/minecraft/nbt/StringTag.java
 +++ b/src/main/java/net/minecraft/nbt/StringTag.java
-@@ -75,6 +75,13 @@ public class StringTag implements Tag {
+@@ -73,6 +73,13 @@ public class StringTag implements Tag {
  
      @Override
      public void write(DataOutput output, @org.jetbrains.annotations.Nullable org.fiddlemc.fiddle.packet.deepreplacement.ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, @org.jetbrains.annotations.NotNull org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope replacementScope) throws IOException {
@@ -59,13 +59,13 @@ index c42bad629faab9fcf1ea971a7b4d6d3e77636279..d6090dc81ef05ae8d8e71a6f355ed6cb
 +        }
 +        // Fiddle end - client perspective - deep replacements - hooks for replacements - insert hook in StringTag#write
          // Fiddle end - client perspective - deep replacements - pass scope
-         try {
-             output.writeUTF(this.data);
+         output.writeUTF(this.data);
+     }
 diff --git a/src/main/java/net/minecraft/network/FriendlyByteBuf.java b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
-index 2c643b92d9f279a172cb49986a64a2db4f837f2c..b016b48607664f8abdc8bff45df3753d8141e501 100644
+index 2155989f46d431ae0712da0b9255fda59b0c4317..f357a6a94a8fc67f4f51993cbcc4c830e55d44bf 100644
 --- a/src/main/java/net/minecraft/network/FriendlyByteBuf.java
 +++ b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
-@@ -79,6 +79,7 @@ import net.minecraft.world.phys.BlockHitResult;
+@@ -80,6 +80,7 @@ import net.minecraft.world.phys.BlockHitResult;
  import net.minecraft.world.phys.Vec3;
  import org.fiddlemc.fiddle.packet.deepreplacement.ClientPerspectiveAndSettingsSupplier;
  import org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope;
@@ -73,7 +73,7 @@ index 2c643b92d9f279a172cb49986a64a2db4f837f2c..b016b48607664f8abdc8bff45df3753d
  import org.fiddlemc.fiddle.packet.item.ItemStackInPacketContext;
  import org.jetbrains.annotations.NotNull;
  import org.joml.Quaternionf;
-@@ -607,6 +608,12 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -618,6 +619,12 @@ public class FriendlyByteBuf extends ByteBuf {
      }
  
      public FriendlyByteBuf writeComponent(Component text, @NotNull ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, @NotNull DeepReplacementScope replacementScope) {
@@ -84,9 +84,9 @@ index 2c643b92d9f279a172cb49986a64a2db4f837f2c..b016b48607664f8abdc8bff45df3753d
 +        }
 +        // Fiddle end - client perspective - deep replacements - hooks for replacements - insert hook in FriendlyByteBuf#writeComponent
          // Fiddle end - client perspective - deep replacements - pass scope
-         //return this.a(IChatBaseComponent.ChatSerializer.a(ichatbasecomponent), 262144); // Paper - comment
-         return this.writeUtf(io.papermc.paper.adventure.PaperAdventure.asJsonString(text, this.adventure$locale), 262144, true, false, clientPerspectiveAndSettings, replacementScope); // Paper // Fiddle - client perspective - deep replacements - pass scope
-@@ -733,6 +740,12 @@ public class FriendlyByteBuf extends ByteBuf {
+         // TODO this.adventure$locale
+         return this.writeWithCodec(NbtOps.INSTANCE, ComponentSerialization.CODEC, text, clientPerspectiveAndSettings, replacementScope); // Fiddle - client perspective - deep replacements - pass scope
+@@ -744,6 +751,12 @@ public class FriendlyByteBuf extends ByteBuf {
          if (stack.isEmpty() || stack.getItem() == null) { // CraftBukkit - NPE fix itemstack.getItem()
              this.writeBoolean(false);
          } else {
@@ -99,7 +99,7 @@ index 2c643b92d9f279a172cb49986a64a2db4f837f2c..b016b48607664f8abdc8bff45df3753d
              this.writeBoolean(true);
              Item item = stack.getItem();
  
-@@ -808,6 +821,10 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -819,6 +832,10 @@ public class FriendlyByteBuf extends ByteBuf {
          return this;
      }
  
@@ -153,10 +153,10 @@ index 3d5c67dc255684b60c2676f83fa4958a3ab5bf18..67a2a3897a8e00c8efa17e5e36942afa
              throw new EncoderException("String too big (was " + string.length() + " characters, max " + length + ")");
          } else {
 diff --git a/src/main/java/net/minecraft/network/chat/Component.java b/src/main/java/net/minecraft/network/chat/Component.java
-index b540ce21c65ad52ad7e94d2ca2b3926c0875bee1..bd634f77039de1fcc3b4779cc19e60bc7ec30197 100644
+index e0037b99838519eee5fb6f7e95ffaad252f08baf..a9f72e7f8b529345f07225783a6fbb541a993a96 100644
 --- a/src/main/java/net/minecraft/network/chat/Component.java
 +++ b/src/main/java/net/minecraft/network/chat/Component.java
-@@ -94,6 +94,12 @@ public interface Component extends Message, FormattedText, Iterable<Component> {
+@@ -102,6 +102,12 @@ public interface Component extends Message, FormattedText, Iterable<Component> {
          return new MutableComponent(this.getContents(), new ArrayList(this.getSiblings()), this.getStyle());
      }
  
@@ -171,10 +171,10 @@ index b540ce21c65ad52ad7e94d2ca2b3926c0875bee1..bd634f77039de1fcc3b4779cc19e60bc
      @Override
 diff --git a/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacer.java b/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacer.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..176518b57b491e5a1bfafcfaa81af1fd1db16611
+index 0000000000000000000000000000000000000000..c558ce8183e54dd10da8a86849944b49db14769e
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacer.java
-@@ -0,0 +1,432 @@
+@@ -0,0 +1,433 @@
 +// Fiddle - client perspective - deep replacements - hooks for replacements
 +
 +package org.fiddlemc.fiddle.packet.deepreplacement;
@@ -340,10 +340,11 @@ index 0000000000000000000000000000000000000000..176518b57b491e5a1bfafcfaa81af1fd
 +                    // Replace the entity, which is incomplete SNBT that only potentially requires replacements in the name
 +                    var showEntityValue = hoverEvent.getValue(HoverEvent.Action.SHOW_ENTITY);
 +                    if (showEntityValue != null) {
-+                        if (showEntityValue.name != null) {
++                        if (showEntityValue.name != null && showEntityValue.name.isPresent()) {
++                            var showEntityValueName = showEntityValue.name.get();
 +                            // Note that we never have to transitively replace in hover events, and thereby also do not have to replace any nested items or blocks
-+                            var modifiedName = replaceComponent(showEntityValue.name, clientPerspectiveAndSettings, replacementScope.withoutAttemptToReplaceItemsAndBlocks().withoutAttemptToReplaceInHoverEvents());
-+                            if (modifiedName != showEntityValue.name) {
++                            var modifiedName = replaceComponent(showEntityValueName, clientPerspectiveAndSettings, replacementScope.withoutAttemptToReplaceItemsAndBlocks().withoutAttemptToReplaceInHoverEvents());
++                            if (modifiedName != showEntityValueName) {
 +                                modifiedHoverEvent = new HoverEvent(HoverEvent.Action.SHOW_ENTITY, new HoverEvent.EntityTooltipInfo(showEntityValue.type, showEntityValue.id, modifiedName));
 +                            }
 +                        }

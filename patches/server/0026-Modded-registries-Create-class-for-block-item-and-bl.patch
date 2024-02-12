@@ -19,10 +19,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/core/registries/BuiltInRegistries.java b/src/main/java/net/minecraft/core/registries/BuiltInRegistries.java
-index b899e2e896f5062afc314557ffc4d8250b1643ef..7f2e85acf1b3b24f9da33787ffd16f0b49317252 100644
+index 3a5827ee8faa73695e66bb2f6d95db67b1416957..41dab11cd3322773c765f91707697600c1cdebb9 100644
 --- a/src/main/java/net/minecraft/core/registries/BuiltInRegistries.java
 +++ b/src/main/java/net/minecraft/core/registries/BuiltInRegistries.java
-@@ -125,7 +125,7 @@ public class BuiltInRegistries {
+@@ -133,7 +133,7 @@ public class BuiltInRegistries {
      });
      public static final DefaultedRegistry<Block> BLOCK = registerDefaultedWithIntrusiveHolders(Registries.BLOCK, "air", (registry) -> {
          return Blocks.AIR;
@@ -31,7 +31,7 @@ index b899e2e896f5062afc314557ffc4d8250b1643ef..7f2e85acf1b3b24f9da33787ffd16f0b
      public static final Registry<Enchantment> ENCHANTMENT = registerSimpleWithIntrusiveHolders(Registries.ENCHANTMENT, (registry) -> {
          return Enchantments.BLOCK_FORTUNE;
      });
-@@ -134,7 +134,7 @@ public class BuiltInRegistries {
+@@ -142,7 +142,7 @@ public class BuiltInRegistries {
      });
      public static final DefaultedRegistry<Item> ITEM = registerDefaultedWithIntrusiveHolders(Registries.ITEM, "air", (registry) -> {
          return Items.AIR;
@@ -41,11 +41,11 @@ index b899e2e896f5062afc314557ffc4d8250b1643ef..7f2e85acf1b3b24f9da33787ffd16f0b
          return Potions.EMPTY;
      });
 diff --git a/src/main/java/net/minecraft/world/level/block/Block.java b/src/main/java/net/minecraft/world/level/block/Block.java
-index 95b8e8396e76c6cc992d0a9bf740a791990a527f..e4f159bd937db5097b9cbf7aee6f216fe5b32d01 100644
+index 1cf54034251c5f9cb7e936a0ffd25a38f8b01c06..512906b5d977bddd0a218d70479279d7eeeb18e4 100644
 --- a/src/main/java/net/minecraft/world/level/block/Block.java
 +++ b/src/main/java/net/minecraft/world/level/block/Block.java
-@@ -66,7 +66,7 @@ public class Block extends BlockBehaviour implements ItemLike {
- 
+@@ -68,7 +68,7 @@ public class Block extends BlockBehaviour implements ItemLike {
+     public static final MapCodec<Block> CODEC = simpleCodec(Block::new);
      private static final Logger LOGGER = LogUtils.getLogger();
      private final Holder.Reference<Block> builtInRegistryHolder;
 -    public static final IdMapper<BlockState> BLOCK_STATE_REGISTRY = new IdMapper<>();

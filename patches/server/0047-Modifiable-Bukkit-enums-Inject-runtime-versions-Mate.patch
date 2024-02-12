@@ -7,10 +7,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index c8bb6745ca98c74640f1c1be8e9aa35ecbf35a45..60478ca391c0cc10c35c3a49633c160d3d290286 100644
+index 95f0f4da39786f4ed097628496c9edd18c9242d2..97bb0a847beddde90af8d69b9db50751bbf8e40f 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
-@@ -77,6 +77,54 @@ public class Main {
+@@ -74,6 +74,54 @@ public class Main {
  
      public Main() {}
  
@@ -65,7 +65,7 @@ index c8bb6745ca98c74640f1c1be8e9aa35ecbf35a45..60478ca391c0cc10c35c3a49633c160d
      @DontObfuscate
      public static void main(final OptionSet optionset) { // CraftBukkit - replaces main(String[] astring)
          SharedConstants.tryDetectVersion();
-@@ -183,6 +231,63 @@ public class Main {
+@@ -180,6 +228,63 @@ public class Main {
              var injectRuntimeClassVersionHelper = new InjectRuntimeClassVersionHelper();
              // Fiddle end - modifiable Bukkit enums - inject runtime versions - common utilities
  
@@ -83,12 +83,12 @@ index c8bb6745ca98c74640f1c1be8e9aa35ecbf35a45..60478ca391c0cc10c35c3a49633c160d
 +                    .filter(holder -> !holder.value().isVanilla())
 +            ).map(holder -> holder.key().location()).distinct().map(resourceLocation -> {
 +                var fiddleEnumName = org.fiddlemc.fiddle.material.FiddleEnumNamePrefix.PREFIX + resourceLocation.getNamespace().toUpperCase(java.util.Locale.ROOT) + "_" + resourceLocation.getPath().toUpperCase(java.util.Locale.ROOT);
-+                return Pair.of(fiddleEnumName, resourceLocation);
++                return it.unimi.dsi.fastutil.Pair.of(fiddleEnumName, resourceLocation);
 +            }).toList();
 +            LOGGER.info("Adding Fiddle enums: " + fiddleEnumNames);
 +            var enumNames = com.google.common.collect.Streams.concat(
 +                vanillaEnumNames.stream().filter(java.util.function.Predicate.not(org.fiddlemc.fiddle.material.MaterialLegacyNameChecker::isMaterialNameLegacy)),
-+                fiddleEnumNames.stream().map(Pair::getFirst),
++                fiddleEnumNames.stream().map(it.unimi.dsi.fastutil.Pair::left),
 +                vanillaEnumNames.stream().filter(org.fiddlemc.fiddle.material.MaterialLegacyNameChecker::isMaterialNameLegacy)
 +            ).toList();
 +            new net.bytebuddy.ByteBuddy()

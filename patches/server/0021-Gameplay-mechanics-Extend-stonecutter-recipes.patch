@@ -11,10 +11,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index 2f69540ccf23739743fd063513cb1be54a084b6b..17b9d5d8728dfcfe35583f8111f56b2be904ad51 100644
+index de4b523766e3359194656bc768cec6ea542fe117..98e71be556be6dc40cf307b1a1741ca2fea0be42 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
-@@ -320,6 +320,7 @@ public class Main {
+@@ -345,6 +345,7 @@ public class Main {
              Class.forName(net.minecraft.world.entity.npc.VillagerTrades.class.getName());// Paper - load this sync so it won't fail later async
              final DedicatedServer dedicatedserver = (DedicatedServer) MinecraftServer.spin((thread) -> {
                  DedicatedServer dedicatedserver1 = new DedicatedServer(optionset, worldLoader.get(), thread, convertable_conversionsession, resourcepackrepository, worldstem, dedicatedserversettings, DataFixers.getDataFixer(), services, LoggerChunkProgressListener::new);
@@ -37,7 +37,7 @@ index 4103ddf16164e3992fef0765d368282572537e29..71856beb8430b0d70960715633cfac04
                      handler.accept((RecipeHolder) optional.get());
                  }
 diff --git a/src/main/java/net/minecraft/world/item/crafting/RecipeManager.java b/src/main/java/net/minecraft/world/item/crafting/RecipeManager.java
-index 388363948595247471fa4c3c6801fc493d61c0d0..14f70eca591a8eddeec5f457d876daacd33386c5 100644
+index b81e1802c8dcc8ebdef96d70088c18379598a66b..13834970938019d908a1263bfd254483fbcd526c 100644
 --- a/src/main/java/net/minecraft/world/item/crafting/RecipeManager.java
 +++ b/src/main/java/net/minecraft/world/item/crafting/RecipeManager.java
 @@ -84,19 +84,596 @@ public class RecipeManager extends SimpleJsonResourceReloadListener {
@@ -637,7 +637,7 @@ index 388363948595247471fa4c3c6801fc493d61c0d0..14f70eca591a8eddeec5f457d876daac
          }
      }
      // CraftBukkit end
-@@ -218,6 +795,7 @@ public class RecipeManager extends SimpleJsonResourceReloadListener {
+@@ -214,6 +791,7 @@ public class RecipeManager extends SimpleJsonResourceReloadListener {
          });
          this.recipes = ImmutableMap.copyOf(map);
          this.byName = Maps.newHashMap(builder.build()); // CraftBukkit
@@ -645,7 +645,7 @@ index 388363948595247471fa4c3c6801fc493d61c0d0..14f70eca591a8eddeec5f457d876daac
      }
  
      // CraftBukkit start
-@@ -237,6 +815,7 @@ public class RecipeManager extends SimpleJsonResourceReloadListener {
+@@ -233,6 +811,7 @@ public class RecipeManager extends SimpleJsonResourceReloadListener {
          }
  
          this.byName = Maps.newHashMap();
@@ -654,10 +654,10 @@ index 388363948595247471fa4c3c6801fc493d61c0d0..14f70eca591a8eddeec5f457d876daac
      // CraftBukkit end
  
 diff --git a/src/main/java/net/minecraft/world/item/crafting/SingleItemRecipe.java b/src/main/java/net/minecraft/world/item/crafting/SingleItemRecipe.java
-index 006d247c5bf66197bab3de7af6dd56b4e9561be3..7393bda80f6653458669ba19bc8ae65f1070f9dd 100644
+index f9363f7cc74a5b7c69c7a35d1d1f741dde9214b9..fe8fccedbc775e0066084fb25978ceee8cc0c73a 100644
 --- a/src/main/java/net/minecraft/world/item/crafting/SingleItemRecipe.java
 +++ b/src/main/java/net/minecraft/world/item/crafting/SingleItemRecipe.java
-@@ -13,7 +13,7 @@ import net.minecraft.world.item.ItemStack;
+@@ -11,7 +11,7 @@ import net.minecraft.world.item.ItemStack;
  
  public abstract class SingleItemRecipe implements Recipe<Container> {
      protected final Ingredient ingredient;

@@ -8,10 +8,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/network/FriendlyByteBuf.java b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
-index 3a6534bd5a2371c1dcd3b501dbb8323bfea07a3f..06bf0c768dd74172e31a2c16ed0aa824d1b243d5 100644
+index 730c351a62ed483a32618fb9e7002c7223e54653..b5901e219a56a14c90b56e5b786f204ef02b0784 100644
 --- a/src/main/java/net/minecraft/network/FriendlyByteBuf.java
 +++ b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
-@@ -77,6 +77,7 @@ import net.minecraft.world.level.ChunkPos;
+@@ -78,6 +78,7 @@ import net.minecraft.world.level.ChunkPos;
  import net.minecraft.world.level.Level;
  import net.minecraft.world.phys.BlockHitResult;
  import net.minecraft.world.phys.Vec3;
@@ -19,7 +19,7 @@ index 3a6534bd5a2371c1dcd3b501dbb8323bfea07a3f..06bf0c768dd74172e31a2c16ed0aa824
  import org.jetbrains.annotations.NotNull;
  import org.joml.Quaternionf;
  import org.joml.Vector3f;
-@@ -102,6 +103,8 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -103,6 +104,8 @@ public class FriendlyByteBuf extends ByteBuf {
      public @Nullable java.lang.ref.WeakReference<net.minecraft.network.protocol.@NotNull Packet<?>> writingPacket;
      // Fiddle end - client perspective - packets are modifiable - store explicit perspective and locale - FriendlyByteBuf
  

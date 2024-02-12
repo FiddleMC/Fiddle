@@ -7,14 +7,14 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 74eae07f44e0078cbd920a5062355fd100754e9f..6b9614195d68541c72c05b78e004ff4b556959b3 100644
+index dfe34b4a273a4114cb13020d8e488ada1ce5cf33..c914d03bcbcafb8c4d889246e243292ba4f391a6 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
-@@ -73,6 +73,7 @@ dependencies {
+@@ -87,6 +87,7 @@ dependencies {
      implementation("net.sf.sevenzipjbinding:sevenzipjbinding-linux-armv6:16.02-2.01")
      implementation("net.sf.sevenzipjbinding:sevenzipjbinding-linux-armv71:16.02-2.01")
      // Fiddle end - read packs - depend on 7-Zip-JBinding
 +    implementation("com.github.junrar:junrar:7.5.5") // Fiddle - read packs - depend on Junrar
  }
  
- val craftbukkitPackageVersion = "1_20_R2" // Paper
+ val craftbukkitPackageVersion = "1_20_R3" // Paper

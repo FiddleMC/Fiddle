@@ -546,10 +546,10 @@ index 8f23276796037d048eb114952891a01a40971b3e..f48e783fe810ac57510f8e9dcfeaa02c
          return new InnerClassFieldDiscoverer(Collections.emptyMap());
      }
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index ec268189b19b6fa5c4521f96ce211a531db35ec5..c8ca16713e9f88a0b82e9736d58ca5d8d8c9c581 100644
+index 7573c12a77797146c51ef2dfe4b2a636df45e21a..fc6f1c7bff66c55bc9704b73fd7c432a43a4bb22 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
-@@ -131,6 +131,11 @@ public class Main {
+@@ -128,6 +128,11 @@ public class Main {
                  JvmProfiler.INSTANCE.start(Environment.SERVER);
              }
  
@@ -562,10 +562,10 @@ index ec268189b19b6fa5c4521f96ce211a531db35ec5..c8ca16713e9f88a0b82e9736d58ca5d8
              Bootstrap.bootStrap();
              Bootstrap.validate();
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index ab8689150820418854088594408a5f70488f3367..1a8d802dba1450642925d3bb21c585f614337358 100644
+index 4ba114a9301c3d35be6a97730421fee5b0e8a9c9..fd6284fa42ba9d388fa5ac92d501f4eb28eb5ec9 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -299,7 +299,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -305,7 +305,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      private static final int SAMPLE_INTERVAL = 20; // Paper
      public final double[] recentTps = new double[ 3 ];
      // Spigot end
@@ -575,7 +575,7 @@ index ab8689150820418854088594408a5f70488f3367..1a8d802dba1450642925d3bb21c585f6
  
      public volatile Thread shutdownThread; // Paper
 diff --git a/src/main/java/net/minecraft/server/Services.java b/src/main/java/net/minecraft/server/Services.java
-index a9b2c8cd4dcd3f884e4306bebee9334d3848fce5..9dbd17f5f587fca1cc33b14af36eb45b566ab8bb 100644
+index a5450eeeab5a6b0ab273810063806d11107d6b26..62be1f708f4c4d282536da159f648c1668b292d7 100644
 --- a/src/main/java/net/minecraft/server/Services.java
 +++ b/src/main/java/net/minecraft/server/Services.java
 @@ -11,14 +11,14 @@ import net.minecraft.server.players.GameProfileCache;
@@ -606,9 +606,9 @@ index a9b2c8cd4dcd3f884e4306bebee9334d3848fce5..9dbd17f5f587fca1cc33b14af36eb45b
          return new Services(minecraftSessionService, authenticationService.getServicesKeySet(), gameProfileRepository, gameProfileCache, paperConfigurations);
          // Paper end
      }
-@@ -40,4 +40,11 @@ public record Services(MinecraftSessionService sessionService, ServicesKeySet se
-     public SignatureValidator profileKeySignatureValidator() {
-         return SignatureValidator.from(this.servicesKeySet, ServicesKeyType.PROFILE_KEY);
+@@ -44,4 +44,11 @@ public record Services(MinecraftSessionService sessionService, ServicesKeySet se
+     public boolean canValidateProfileKeys() {
+         return !this.servicesKeySet.keys(ServicesKeyType.PROFILE_KEY).isEmpty();
      }
 +
 +    // Fiddle start - Fiddle configuration - load Fiddle global configuration before bootstrap
@@ -619,7 +619,7 @@ index a9b2c8cd4dcd3f884e4306bebee9334d3848fce5..9dbd17f5f587fca1cc33b14af36eb45b
 +
  }
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-index 1c9742ad81f04052d2c3bc18c7636f45b2fc5160..66d5138c678cb6b263e950c7e1bcf7ca57d600bd 100644
+index 58536aabf607015939a1326f80207c0a06eed8ff..04d5891abf7eef4d973d74c59d8826e860b4f020 100644
 --- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 @@ -208,6 +208,9 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
@@ -633,10 +633,10 @@ index 1c9742ad81f04052d2c3bc18c7636f45b2fc5160..66d5138c678cb6b263e950c7e1bcf7ca
          if (this.convertOldUsers()) {
              this.getProfileCache().save(false); // Paper
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index c88d5b9125f6ee43bf2be60fd1745d836f271b78..5b19c92ad7dfdcc457e1fab1d93fc0fbb04d489c 100644
+index f4d53d9bfe5b060158f69b5d9e4533a5b9869eed..761fdaba9afa3bdcb2a70c8bf6d5c950681fa9d9 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
-@@ -691,7 +691,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
+@@ -693,7 +693,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
          // Holder holder = worlddimension.type(); // CraftBukkit - decompile error
  
          // Objects.requireNonNull(minecraftserver); // CraftBukkit - decompile error
@@ -646,10 +646,10 @@ index c88d5b9125f6ee43bf2be60fd1745d836f271b78..5b19c92ad7dfdcc457e1fab1d93fc0fb
          this.convertable = convertable_conversionsession;
          this.uuid = WorldUUID.getUUID(convertable_conversionsession.levelDirectory.path().toFile());
 diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
-index 2354a0e5d15e9be633d9fe3a1a9feefe7b9b7782..5f4e816235d096432f6acc15cbdd50c9a7fce428 100644
+index 0b56e5f7f18fc4286992af22d402205b771165a3..85a7f8e4c1150a911639e07eb0b1ea3fde3070f2 100644
 --- a/src/main/java/net/minecraft/world/level/Level.java
 +++ b/src/main/java/net/minecraft/world/level/Level.java
-@@ -174,6 +174,12 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+@@ -177,6 +177,12 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
          return this.paperConfig;
      }
      // Paper end
@@ -662,7 +662,7 @@ index 2354a0e5d15e9be633d9fe3a1a9feefe7b9b7782..5f4e816235d096432f6acc15cbdd50c9
  
      public final com.destroystokyo.paper.antixray.ChunkPacketBlockController chunkPacketBlockController; // Paper - Anti-Xray
      public final co.aikar.timings.WorldTimingsHandler timings; // Paper
-@@ -210,9 +216,10 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+@@ -213,9 +219,10 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
  
      public abstract ResourceKey<LevelStem> getTypeKey();
  
@@ -675,10 +675,10 @@ index 2354a0e5d15e9be633d9fe3a1a9feefe7b9b7782..5f4e816235d096432f6acc15cbdd50c9
          this.world = new CraftWorld((ServerLevel) this, gen, biomeProvider, env);
  
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 4bc245db11caa520a08ea4ee3c7a5e58f734c8b3..348fdc9c175562d50740c763455955c18a2ac3b0 100644
+index 805000249535dba4534daf1b0d7842d281e203d6..913162d2461cab3d21b3c2ac8497b2f89ee53490 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -1041,6 +1041,7 @@ public final class CraftServer implements Server {
+@@ -1036,6 +1036,7 @@ public final class CraftServer implements Server {
  
          org.spigotmc.SpigotConfig.init((File) this.console.options.valueOf("spigot-settings")); // Spigot
          this.console.paperConfigurations.reloadConfigs(this.console);

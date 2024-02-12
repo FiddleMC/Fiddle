@@ -13,10 +13,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 2c039733344f4dfd453a600ca3c252fd47f49ae2..b073cff8f5bc7499b64117635773917d93e9b406 100644
+index f9c086a5c366ff79cc93156bc842903375267b77..ab83cdfb8bac264a32ca09b753ec55715b6810be 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -4489,7 +4489,16 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4735,7 +4735,16 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       */
      @org.jetbrains.annotations.ApiStatus.Internal // Paper
      public int getId() {

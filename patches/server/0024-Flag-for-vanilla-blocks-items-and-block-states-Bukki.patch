@@ -10,10 +10,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/block/data/CraftBlockData.java b/src/main/java/org/bukkit/craftbukkit/block/data/CraftBlockData.java
-index 2a9dba6d4a94f1488ef9d86ee4f60b7fd06419fb..40bdeecb958dc75a681ecde1e6ae705f9a01ef7a 100644
+index 7b4086240fad7eb3ef8eed9eb94ffeb79308e3da..02643405ee944efd0ab536a0aba3c1673797e587 100644
 --- a/src/main/java/org/bukkit/craftbukkit/block/data/CraftBlockData.java
 +++ b/src/main/java/org/bukkit/craftbukkit/block/data/CraftBlockData.java
-@@ -725,4 +725,12 @@ public class CraftBlockData implements BlockData {
+@@ -732,4 +732,12 @@ public class CraftBlockData implements BlockData {
          return this.state.isRandomlyTicking();
      }
      // Paper end - Block tick API
@@ -27,10 +27,10 @@ index 2a9dba6d4a94f1488ef9d86ee4f60b7fd06419fb..40bdeecb958dc75a681ecde1e6ae705f
 +
  }
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-index d07e540e2dc40a0bd1cebd7896d8031109604c3d..bee150e8c179ce6e33c44382a04bc06ae4be5257 100644
+index 06f8178adc74077476a964fe92768865d4774194..6feb2002c67fed8a5113644a50a53895d232b40c 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-@@ -645,6 +645,22 @@ public final class CraftMagicNumbers implements UnsafeValues {
+@@ -642,6 +642,22 @@ public final class CraftMagicNumbers implements UnsafeValues {
      }
      // Paper end
  

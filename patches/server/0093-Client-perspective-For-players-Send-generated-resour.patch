@@ -20,22 +20,22 @@ index c0ea20dcee8bb293df96bc6ee019e50ad6b383fd..3d650b96cc5e4b30d8bf82a8a7edda63
      // Paper start - add utility methods
      public final net.minecraft.server.level.ServerPlayer getPlayer() {
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServerProperties.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServerProperties.java
-index c5598adb8cbcbcf7277c2fd4dd72c243d44d9700..1fd4f4e205480c7d8ea9a26108199696d28d7abf 100644
+index 1643186bcb2caf5d29fd551afd35830726dbb80a..4a2c334768abc0c5bbd2f97db4bc71b2062f0b4b 100644
 --- a/src/main/java/net/minecraft/server/dedicated/DedicatedServerProperties.java
 +++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServerProperties.java
-@@ -168,6 +168,7 @@ public class DedicatedServerProperties extends Settings<DedicatedServerPropertie
+@@ -167,6 +167,7 @@ public class DedicatedServerProperties extends Settings<DedicatedServerPropertie
              return s1.toLowerCase(Locale.ROOT);
          }, WorldPresets.NORMAL.location().toString()));
-         this.serverResourcePackInfo = DedicatedServerProperties.getServerPackInfo(this.get("resource-pack", ""), this.get("resource-pack-sha1", ""), this.getLegacyString("resource-pack-hash"), this.get("require-resource-pack", false), this.get("resource-pack-prompt", ""));
+         this.serverResourcePackInfo = DedicatedServerProperties.getServerPackInfo(this.get("resource-pack-id", ""), this.get("resource-pack", ""), this.get("resource-pack-sha1", ""), this.getLegacyString("resource-pack-hash"), this.get("require-resource-pack", false), this.get("resource-pack-prompt", ""));
 +        this.serverResourcePackInfo.ifPresent(info -> LOGGER.warn("A server resource pack URL is set in server.properties (URL: " + info.url() + "). Some Fiddle models/textures may potentially be overridden.")); // Fiddle - client perspective - send resource pack - skip existing server resource pack // TODO add option to not log this, and reference that option in the warning
          this.initialDataPackConfiguration = DedicatedServerProperties.getDatapackConfig(this.get("initial-enabled-packs", String.join(",", WorldDataConfiguration.DEFAULT.dataPacks().getEnabled())), this.get("initial-disabled-packs", String.join(",", WorldDataConfiguration.DEFAULT.dataPacks().getDisabled())));
          // Paper start - Configurable rcon ip
          final String rconIp = this.getStringRaw("rcon.ip");
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index 907c8f15f5247f9972c6677ff0f9e1aa22764a04..c7160ec4c0436a5a0b660b13d87edefa188befce 100644
+index 8efbbd379244e3ed54d4aba199037cc20ccd096a..86dccdc9853c176d9cf7b3cf6f66b739601e5ab9 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-@@ -279,6 +279,8 @@ public class ServerPlayer extends Player {
+@@ -286,6 +286,8 @@ public class ServerPlayer extends Player {
      private final java.util.concurrent.atomic.AtomicReference<io.papermc.paper.chunk.system.RegionizedPlayerChunkLoader.ViewDistances> viewDistances = new java.util.concurrent.atomic.AtomicReference<>(new io.papermc.paper.chunk.system.RegionizedPlayerChunkLoader.ViewDistances(-1, -1, -1));
      public io.papermc.paper.chunk.system.RegionizedPlayerChunkLoader.PlayerChunkLoaderData chunkLoader;
  
@@ -45,7 +45,7 @@ index 907c8f15f5247f9972c6677ff0f9e1aa22764a04..c7160ec4c0436a5a0b660b13d87edefa
          return this.viewDistances.get();
      }
 diff --git a/src/main/java/net/minecraft/server/network/ServerConfigurationPacketListenerImpl.java b/src/main/java/net/minecraft/server/network/ServerConfigurationPacketListenerImpl.java
-index 655c065a30db9b0aab4a169702b8c8907d075514..f544959972b9b881231bcf9833b1ca18fd04ff45 100644
+index ea8053c90601cb15d53a1e8fec2b4bcd12a9e1c4..af978eae8064fc0eda51edbc38eada590d62918b 100644
 --- a/src/main/java/net/minecraft/server/network/ServerConfigurationPacketListenerImpl.java
 +++ b/src/main/java/net/minecraft/server/network/ServerConfigurationPacketListenerImpl.java
 @@ -43,6 +43,7 @@ public class ServerConfigurationPacketListenerImpl extends ServerCommonPacketLis
@@ -80,7 +80,7 @@ index 655c065a30db9b0aab4a169702b8c8907d075514..f544959972b9b881231bcf9833b1ca18
 @@ -104,7 +116,13 @@ public class ServerConfigurationPacketListenerImpl extends ServerCommonPacketLis
      public void handleResourcePackResponse(ServerboundResourcePackPacket packet) {
          super.handleResourcePackResponse(packet);
-         if (packet.getAction() != ServerboundResourcePackPacket.Action.ACCEPTED) {
+         if (packet.action().isTerminal()) {
 +            // Fiddle start - client perspective - send resource pack
 +            if (this.currentTask != null && this.currentTask.type() == org.fiddlemc.fiddle.packet.resourcepack.FiddleResourcePackConfigurationTask.TYPE) {
 +                this.finishCurrentTask(org.fiddlemc.fiddle.packet.resourcepack.FiddleResourcePackConfigurationTask.TYPE);
@@ -92,10 +92,10 @@ index 655c065a30db9b0aab4a169702b8c8907d075514..f544959972b9b881231bcf9833b1ca18
  
      }
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index 3a792ddc31e76038b84e8f87088c4cd94c349138..f9d1727c9f286c9cc26e0f315385621c6279a837 100644
+index ed41decbf0522c516b3608569d5719687105e25b..43a1b1bca7fbfc5925e090d2f3ee379d94d91a3e 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -2303,34 +2303,48 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -2315,34 +2315,48 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
          this.getHandle().connection.send(packet);
      }
  
@@ -147,9 +147,9 @@ index 3a792ddc31e76038b84e8f87088c4cd94c349138..f9d1727c9f286c9cc26e0f315385621c
          Preconditions.checkArgument(url != null, "Resource pack URL cannot be null");
 +        logAttemptToSendResourcePackWarning(url, this); // Fiddle - client perspective - send resource pack - do not send plugin resource packs
  
-         if (hash != null) {
-             Preconditions.checkArgument(hash.length == 20, "Resource pack hash should be 20 bytes long but was %s", hash.length);
-@@ -2345,6 +2359,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+         this.setResourcePack(UUID.nameUUIDFromBytes(url.getBytes(StandardCharsets.UTF_8)), url, hash, prompt, force);
+     }
+@@ -2365,6 +2379,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
      @Override
      public void setResourcePack(String url, byte[] hashBytes, net.kyori.adventure.text.Component prompt, boolean force) {
          Preconditions.checkArgument(url != null, "Resource pack URL cannot be null");
@@ -159,10 +159,10 @@ index 3a792ddc31e76038b84e8f87088c4cd94c349138..f9d1727c9f286c9cc26e0f315385621c
              Preconditions.checkArgument(hashBytes.length == 20, "Resource pack hash should be 20 bytes long but was " + hashBytes.length);
 diff --git a/src/main/java/org/fiddlemc/fiddle/packet/resourcepack/FiddleResourcePackConfigurationTask.java b/src/main/java/org/fiddlemc/fiddle/packet/resourcepack/FiddleResourcePackConfigurationTask.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..5e102d6e89a552c9c8449cb8a4ca6035a1e3c99d
+index 0000000000000000000000000000000000000000..e707245d4ec889ebd9ad4db683cbea3b63f0c504
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/packet/resourcepack/FiddleResourcePackConfigurationTask.java
-@@ -0,0 +1,36 @@
+@@ -0,0 +1,38 @@
 +// Fiddle - client perspective - send resource pack
 +
 +package org.fiddlemc.fiddle.packet.resourcepack;
@@ -174,6 +174,8 @@ index 0000000000000000000000000000000000000000..5e102d6e89a552c9c8449cb8a4ca6035
 +import net.minecraft.server.network.config.ServerResourcePackConfigurationTask;
 +
 +import java.lang.ref.WeakReference;
++import java.nio.charset.StandardCharsets;
++import java.util.UUID;
 +import java.util.function.Consumer;
 +
 +public class FiddleResourcePackConfigurationTask extends ServerResourcePackConfigurationTask {
@@ -183,7 +185,7 @@ index 0000000000000000000000000000000000000000..5e102d6e89a552c9c8449cb8a4ca6035
 +    private final WeakReference<Connection> connection;
 +
 +    public FiddleResourcePackConfigurationTask(Connection connection) {
-+        super(new MinecraftServer.ServerResourcePackInfo("https://www.fiddlemc.org/not-a-real-url.zip", com.google.common.io.BaseEncoding.base16().lowerCase().encode(new byte[20]), false, null)); // TODO fill this with something useful
++        super(new MinecraftServer.ServerResourcePackInfo(UUID.nameUUIDFromBytes("thisShouldBeTheUrl".getBytes(StandardCharsets.UTF_8)), "https://www.fiddlemc.org/not-a-real-url.zip", com.google.common.io.BaseEncoding.base16().lowerCase().encode(new byte[20]), false, null)); // TODO fill this with something useful
 +        this.connection = new WeakReference<>(connection);
 +    }
 +

@@ -9,10 +9,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 9f4d762e59273f6343678ef2e4d5294464821f30..1d7eb97886a5c4a0505ed261b17c2d4c3468be5f 100644
+index 9d64d46533ba18470210535294e88cee32c18178..27368dc623859eade5a01abe3033a5ff225e7f79 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -7056,6 +7056,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -7412,6 +7412,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
              case LEGACY_REDSTONE_COMPARATOR_OFF:
              case LEGACY_REDSTONE_COMPARATOR_ON:
              case LEGACY_ACTIVATOR_RAIL:

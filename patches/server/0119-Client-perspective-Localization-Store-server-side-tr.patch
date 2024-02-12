@@ -8,7 +8,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacer.java b/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacer.java
-index 176518b57b491e5a1bfafcfaa81af1fd1db16611..5fffbd4be2304164bf1fb2c5039803ba0ca7c16e 100644
+index c558ce8183e54dd10da8a86849944b49db14769e..1e49ee61c1143ab5a358becd18629d163c1ce3a9 100644
 --- a/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacer.java
 +++ b/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacer.java
 @@ -11,6 +11,7 @@ import net.minecraft.network.chat.MutableComponent;
@@ -19,7 +19,7 @@ index 176518b57b491e5a1bfafcfaa81af1fd1db16611..5fffbd4be2304164bf1fb2c5039803ba
  import org.jetbrains.annotations.NotNull;
  import org.jetbrains.annotations.Nullable;
  
-@@ -425,8 +426,7 @@ public final class DeepReplacer {
+@@ -426,8 +427,7 @@ public final class DeepReplacer {
      }
  
      private static @NotNull ComponentContents replaceTranslatableContents(@NotNull TranslatableContents value, @Nullable String locale) {
@@ -31,7 +31,7 @@ index 176518b57b491e5a1bfafcfaa81af1fd1db16611..5fffbd4be2304164bf1fb2c5039803ba
  }
 diff --git a/src/main/java/org/fiddlemc/fiddle/packet/locale/ServerSideTranslations.java b/src/main/java/org/fiddlemc/fiddle/packet/locale/ServerSideTranslations.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..615a9e4d6337ee14d3183c2f679354709ec08370
+index 0000000000000000000000000000000000000000..fc29efeb7344c1fbf41bbfa4d0b955ad5202e626
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/packet/locale/ServerSideTranslations.java
 @@ -0,0 +1,196 @@
@@ -41,7 +41,7 @@ index 0000000000000000000000000000000000000000..615a9e4d6337ee14d3183c2f67935470
 +
 +import net.minecraft.locale.Language;
 +import net.minecraft.network.chat.ComponentContents;
-+import net.minecraft.network.chat.contents.LiteralContents;
++import net.minecraft.network.chat.contents.PlainTextContents;
 +import net.minecraft.network.chat.contents.TranslatableContents;
 +import org.jetbrains.annotations.NotNull;
 +import org.jetbrains.annotations.Nullable;
@@ -172,8 +172,8 @@ index 0000000000000000000000000000000000000000..615a9e4d6337ee14d3183c2f67935470
 +     * <ul>
 +     *     <li>A {@link TranslatableContents} with a
 +     *     {@linkplain TranslatableContents#getFallback()} fallback set, or</li>
-+     *     <li>A {@link LiteralContents} with an appropriate replacement string as
-+     *     {@linkplain LiteralContents#text() text}, or</li>
++     *     <li>A {@link PlainTextContents} with an appropriate replacement string as
++     *     {@linkplain PlainTextContents.LiteralContents#text() plain text}, or</li>
 +     *     <li>The given {@code translatableContents},
 +     *     if no replacement could be determined at all, or if no better replacement could be found.</li>
 +     * </ul>
@@ -214,7 +214,7 @@ index 0000000000000000000000000000000000000000..615a9e4d6337ee14d3183c2f67935470
 +        if (translatableContents.getArgs().length > 0) {
 +            return new TranslatableContents(translatableContents.getKey(), replacementString, translatableContents.getArgs());
 +        }
-+        return new LiteralContents(replacementString);
++        return PlainTextContents.create(replacementString);
 +
 +    }
 +

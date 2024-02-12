@@ -14,10 +14,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 258e2301efeb2facae185cc980fe0862ce246f81..ca5e93c404abf0970ffb5dac611b9732a743bfaf 100644
+index 069d08b170a8da432c7776aac8dea4699b5a9507..3893974cf5f472b7f9d26c7f19d330b7a836466c 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -4392,8 +4392,8 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4638,8 +4638,8 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      private final int id;
      private final Constructor<? extends MaterialData> ctor;
      private static final Map<String, Material> BY_NAME = Maps.newHashMap();
@@ -28,7 +28,7 @@ index 258e2301efeb2facae185cc980fe0862ce246f81..ca5e93c404abf0970ffb5dac611b9732
      public final Class<?> data;
      private final boolean legacy;
      private final NamespacedKey key;
-@@ -4420,8 +4420,8 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4666,8 +4666,8 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
  
      private Material(final int id, final int stack, final int durability, /*@NotNull*/ final Class<?> data) {
          this.id = id;
@@ -39,7 +39,7 @@ index 258e2301efeb2facae185cc980fe0862ce246f81..ca5e93c404abf0970ffb5dac611b9732
          this.data = data;
          this.legacy = this.name().startsWith(LEGACY_PREFIX);
          this.key = NamespacedKey.minecraft(this.name().toLowerCase(Locale.ROOT));
-@@ -4535,7 +4535,17 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4781,7 +4781,17 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return Maximum stack size for this material
       */
      public int getMaxStackSize() {
@@ -58,7 +58,7 @@ index 258e2301efeb2facae185cc980fe0862ce246f81..ca5e93c404abf0970ffb5dac611b9732
      }
  
      /**
-@@ -4544,7 +4554,29 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4790,7 +4800,29 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return Maximum durability for this material
       */
      public short getMaxDurability() {

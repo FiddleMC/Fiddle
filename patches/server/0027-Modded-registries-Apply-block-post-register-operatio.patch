@@ -16,10 +16,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/world/level/block/Blocks.java b/src/main/java/net/minecraft/world/level/block/Blocks.java
-index 392678d4a3c30ccf9225bbbb8abbcddbe5fc8ac3..f017c78e0510f906a32ebd64be616b663cac47cd 100644
+index 473b6769c50b74ed01267cecb0c504c35f34cf46..f599f4cf574b77b3e9dbe3cc267a9a39127f547e 100644
 --- a/src/main/java/net/minecraft/world/level/block/Blocks.java
 +++ b/src/main/java/net/minecraft/world/level/block/Blocks.java
-@@ -1264,17 +1264,9 @@ public class Blocks {
+@@ -1312,17 +1312,9 @@ public class Blocks {
      static {
          for(Block block : BuiltInRegistries.BLOCK) {
              for(BlockState blockState : block.getStateDefinition().getPossibleStates()) {

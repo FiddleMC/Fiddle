@@ -8,10 +8,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index 8e0404177a73cd318106bdeaae37ff0f5a7df199..c8bb6745ca98c74640f1c1be8e9aa35ecbf35a45 100644
+index 98e71be556be6dc40cf307b1a1741ca2fea0be42..95f0f4da39786f4ed097628496c9edd18c9242d2 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
-@@ -155,6 +155,34 @@ public class Main {
+@@ -152,6 +152,34 @@ public class Main {
              Path path1 = Paths.get("server.properties");
              DedicatedServerSettings dedicatedserversettings = new DedicatedServerSettings(optionset); // CraftBukkit - CLI argument support
  

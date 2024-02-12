@@ -11,10 +11,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 056f8ca81c4b5c697bce1042962722da535efa56..a335c4830ae19306ffdf333d4da90496ee5e2447 100644
+index 56d5e6cb22e8ed4f4cdbbbe5299934fd43a5e63d..241deb7f3b5e37d09c78048317428316be4406f0 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -11081,4 +11081,23 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -11527,4 +11527,23 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      public boolean isEnabledByFeature(@NotNull World world) {
          return Bukkit.getDataPackManager().isEnabledByFeature(this, world);
      }

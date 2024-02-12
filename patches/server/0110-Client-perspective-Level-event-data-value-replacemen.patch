@@ -28,10 +28,10 @@ index 63f9735d356dafd579cee4423d3037eb4ed9b2c6..e5aa7c3062d41270ba7bcc44bc549ccc
          case PARTICLES_SCULK_CHARGE: // Paper - add missing effects
          case VILLAGER_PLANT_GROW:
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
-index 90c76ddcb8af13409490b8976263d27a71954668..8581db6a05247b69f826d7d834fc74db2456c0b2 100644
+index e1fad381b861471a17529c246bb8a4a9c7646420..57bd15679316f5a8358ae3a162e3de1dbe060110 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
-@@ -1408,7 +1408,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -1414,7 +1414,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
              Preconditions.checkArgument(effect.getData() == null || effect == Effect.ELECTRIC_SPARK, "Wrong kind of data for the %s effect", effect);
          }
  
@@ -41,10 +41,10 @@ index 90c76ddcb8af13409490b8976263d27a71954668..8581db6a05247b69f826d7d834fc74db
      }
  
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index f9d1727c9f286c9cc26e0f315385621c6279a837..504c63cef4b5a55cffedf1da3ba746d0dd099283 100644
+index 43a1b1bca7fbfc5925e090d2f3ee379d94d91a3e..7809a6c9720023d216c08fb4d20f5e17a3caa67e 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -882,7 +882,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -894,7 +894,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
              Preconditions.checkArgument(effect.getData() == null || effect == Effect.ELECTRIC_SPARK, "Wrong kind of data for the %s effect", effect);
          }
  

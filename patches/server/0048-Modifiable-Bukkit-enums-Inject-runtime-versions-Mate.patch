@@ -11,16 +11,16 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index 60478ca391c0cc10c35c3a49633c160d3d290286..22e53ba48965042864f812749f89e32fd0b4db7c 100644
+index 97bb0a847beddde90af8d69b9db50751bbf8e40f..1c7a11a8614eda03816d47c5c4461cbb0f085716 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
-@@ -286,6 +286,11 @@ public class Main {
+@@ -283,6 +283,11 @@ public class Main {
                  }).build())
                  .make()
                  .load(ClassLoader.getSystemClassLoader(), net.bytebuddy.dynamic.loading.ClassLoadingStrategy.Default.INJECTION);
 +            // Fiddle start - modifiable Bukkit enums - inject runtime versions - Material - keys for Fiddle values
 +            for (var fiddleEnumName : fiddleEnumNames) {
-+                org.fiddlemc.fiddle.material.MaterialNameAndKeyConversion.registerFiddleEnumNameToNamespacedKey(fiddleEnumName.getFirst(), fiddleEnumName.getSecond().getNamespace(), fiddleEnumName.getSecond().getPath());
++                org.fiddlemc.fiddle.material.MaterialNameAndKeyConversion.registerFiddleEnumNameToNamespacedKey(fiddleEnumName.left(), fiddleEnumName.right().getNamespace(), fiddleEnumName.right().getPath());
 +            }
 +            // Fiddle end - modifiable Bukkit enums - inject runtime versions - Material - keys for Fiddle values
              // Fiddle end - modifiable Bukkit enums - inject runtime versions - Material

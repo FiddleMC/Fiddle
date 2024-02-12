@@ -8,10 +8,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index 1f04b60727835b3ba5bef1cc5d1c6ca991e0becd..d02ef74c9dcc735a8bf241a347a43edd60efe691 100644
+index e6118d30220eccbacf70dbe3826ebcd0b4902469..ce5f7a7b993af8beec47b693e1a1e1181fd20e07 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
-@@ -221,6 +221,7 @@ public class Main {
+@@ -218,6 +218,7 @@ public class Main {
              DedicatedServerSettings dedicatedserversettings = new DedicatedServerSettings(optionset); // CraftBukkit - CLI argument support
  
              org.fiddlemc.fiddle.pack.load.fiddlecontent.block.BlockStateVisualizationLoader.determineAndStore(); // Fiddle - client perspective - block state visualization - determine and store desired setuppers

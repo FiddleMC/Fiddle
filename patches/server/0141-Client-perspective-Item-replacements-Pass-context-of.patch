@@ -54,13 +54,13 @@ index debb34a8f99c5b1356a3f742ae34a002c375f1e8..7cc4a5805b1e4f2df555b8ed4280123f
  
      @Override
 diff --git a/src/main/java/net/minecraft/network/syncher/EntityDataSerializers.java b/src/main/java/net/minecraft/network/syncher/EntityDataSerializers.java
-index 9ca897d92c5bdd2764d114c74d64c776674d6beb..10b6947ccda5abc4c696e9ee6fdc08964ff99b23 100644
+index 06498788c169133bd563c5a87192b71802c4d4df..638a9582d8a8f342999c0d20e15b9dc957c47c85 100644
 --- a/src/main/java/net/minecraft/network/syncher/EntityDataSerializers.java
 +++ b/src/main/java/net/minecraft/network/syncher/EntityDataSerializers.java
 @@ -39,10 +39,20 @@ public class EntityDataSerializers {
      public static final EntityDataSerializer<String> STRING = EntityDataSerializer.simple(FriendlyByteBuf::writeUtf, FriendlyByteBuf::readUtf);
-     public static final EntityDataSerializer<Component> COMPONENT = EntityDataSerializer.simple(FriendlyByteBuf::writeComponent, FriendlyByteBuf::readComponent);
-     public static final EntityDataSerializer<Optional<Component>> OPTIONAL_COMPONENT = EntityDataSerializer.optional(FriendlyByteBuf::writeComponent, FriendlyByteBuf::readComponent);
+     public static final EntityDataSerializer<Component> COMPONENT = EntityDataSerializer.simple(FriendlyByteBuf::writeComponent, FriendlyByteBuf::readComponentTrusted);
+     public static final EntityDataSerializer<Optional<Component>> OPTIONAL_COMPONENT = EntityDataSerializer.optional(FriendlyByteBuf::writeComponent, FriendlyByteBuf::readComponentTrusted);
 -    public static final EntityDataSerializer<ItemStack> ITEM_STACK = new EntityDataSerializer<ItemStack>() {
 +    // Fiddle start - client perspective - item replacements - pass context of items in item frames
 +    public static abstract class ItemStackEntityDataSerializer implements EntityDataSerializer<ItemStack> {
@@ -149,10 +149,10 @@ index 35674f92a67f93382103c2766df4b678ba5c862f..250d529ed8043b69e7eebbf9c73bcc92
  
          if (this.entity instanceof LivingEntity) {
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index fece91254b10b59474056aa730fd420f90cd7bec..e77ed0f3ca6a6e30ef6f0d7d70591b76700159e6 100644
+index 9abe817ae202edaa2d88cd59ae5c7db0b1c634be..35d95af7ff57b64ee91d900750d2ecf668a2e174 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
-@@ -4874,4 +4874,11 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
+@@ -4916,4 +4916,11 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
          return ((net.minecraft.server.level.ServerChunkCache) level.getChunkSource()).isPositionTicking(this);
      }
      // Paper end
@@ -165,10 +165,10 @@ index fece91254b10b59474056aa730fd420f90cd7bec..e77ed0f3ca6a6e30ef6f0d7d70591b76
 +
  }
 diff --git a/src/main/java/net/minecraft/world/entity/decoration/ItemFrame.java b/src/main/java/net/minecraft/world/entity/decoration/ItemFrame.java
-index 759ecd79534a7706f7d4a63eb9dacbefcfe54674..4fc14bd0e0e4fed05baa27f876805e46027dfe57 100644
+index 69912c5b300b67394dce3876d2d96872033cf156..38a14c82d327756c187c88ed678d90f6b910a7c7 100644
 --- a/src/main/java/net/minecraft/world/entity/decoration/ItemFrame.java
 +++ b/src/main/java/net/minecraft/world/entity/decoration/ItemFrame.java
-@@ -549,4 +549,12 @@ public class ItemFrame extends HangingEntity {
+@@ -544,4 +544,12 @@ public class ItemFrame extends HangingEntity {
  
          return (float) Mth.wrapDegrees(180 + enumdirection.get2DDataValue() * 90 + this.getRotation() * 45 + i);
      }

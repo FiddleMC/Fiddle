@@ -8,10 +8,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/inventory/CraftMetaItem.java b/src/main/java/org/bukkit/craftbukkit/inventory/CraftMetaItem.java
-index aeca803cc0434d9de9434987d6e43b70353e305b..195934520977cb1900c459b1899acdfe0263b87d 100644
+index ed87722957a0bd5f6348b91ac2ea9bb5ceb6d853..ee891342d8964f45117d11f52a4e7f69465098bd 100644
 --- a/src/main/java/org/bukkit/craftbukkit/inventory/CraftMetaItem.java
 +++ b/src/main/java/org/bukkit/craftbukkit/inventory/CraftMetaItem.java
-@@ -113,9 +113,11 @@ import java.util.Collections;
+@@ -114,9 +114,11 @@ import java.util.Collections;
   * <li> SerializableMeta.Deserializers deserializer()
   */
  @DelegateDeserialization(CraftMetaItem.SerializableMeta.class)
@@ -25,7 +25,7 @@ index aeca803cc0434d9de9434987d6e43b70353e305b..195934520977cb1900c459b1899acdfe
  
          @Retention(RetentionPolicy.SOURCE)
          @Target(ElementType.FIELD)
-@@ -129,7 +131,7 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
+@@ -130,7 +132,7 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
          }
  
          final String BUKKIT;
@@ -34,7 +34,7 @@ index aeca803cc0434d9de9434987d6e43b70353e305b..195934520977cb1900c459b1899acdfe
  
          ItemMetaKey(final String both) {
              this(both, both);
-@@ -242,12 +244,14 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
+@@ -243,12 +245,14 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
          }
      }
  
@@ -54,7 +54,7 @@ index aeca803cc0434d9de9434987d6e43b70353e305b..195934520977cb1900c459b1899acdfe
      @Specific(Specific.To.NBT)
      static final ItemMetaKey ENCHANTMENTS_ID = new ItemMetaKey("id");
 diff --git a/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacer.java b/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacer.java
-index 5fffbd4be2304164bf1fb2c5039803ba0ca7c16e..20fde382d7095b546f48e9133a2a46b66fb3138c 100644
+index 1e49ee61c1143ab5a358becd18629d163c1ce3a9..9d63ee3de41cd6e7d142ada85f490ad5aea24d82 100644
 --- a/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacer.java
 +++ b/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacer.java
 @@ -11,6 +11,7 @@ import net.minecraft.network.chat.MutableComponent;
@@ -65,7 +65,7 @@ index 5fffbd4be2304164bf1fb2c5039803ba0ca7c16e..20fde382d7095b546f48e9133a2a46b6
  import org.fiddlemc.fiddle.packet.locale.ServerSideTranslations;
  import org.jetbrains.annotations.NotNull;
  import org.jetbrains.annotations.Nullable;
-@@ -414,8 +415,7 @@ public final class DeepReplacer {
+@@ -415,8 +416,7 @@ public final class DeepReplacer {
      }
  
      public static @NotNull ItemStack replaceItemStack(@NotNull ItemStack value, @NotNull ItemStackInPacketContext itemStackInPacketContext, @NotNull ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, @NotNull DeepReplacementScope replacementScope) {

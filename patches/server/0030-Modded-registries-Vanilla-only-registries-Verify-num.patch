@@ -14,7 +14,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/WorldLoader.java b/src/main/java/net/minecraft/server/WorldLoader.java
-index 56533ed64026f8824a40057fdc488cd237a3187c..a5c7eeff07915f552ea3e9a411fc406397299378 100644
+index 56533ed64026f8824a40057fdc488cd237a3187c..9c6933a8a49cc20ddb31a2bc65e1135bbdb09bac 100644
 --- a/src/main/java/net/minecraft/server/WorldLoader.java
 +++ b/src/main/java/net/minecraft/server/WorldLoader.java
 @@ -35,6 +35,17 @@ public class WorldLoader {
@@ -22,13 +22,13 @@ index 56533ed64026f8824a40057fdc488cd237a3187c..a5c7eeff07915f552ea3e9a411fc4063
              LayeredRegistryAccess<RegistryLayer> layeredRegistryAccess3 = layeredRegistryAccess2.replaceFrom(RegistryLayer.DIMENSIONS, dataLoadOutput.finalDimensions);
              RegistryAccess.Frozen frozen3 = layeredRegistryAccess3.getAccessForLoading(RegistryLayer.RELOADABLE);
 +            // Fiddle start - modded registries - vanilla-only registries - verify number of vanilla blocks and items
-+            if (net.minecraft.world.level.block.Block.VANILLA_ONLY_BLOCK_REGISTRY.size() != 1003) {
++            if (net.minecraft.world.level.block.Block.VANILLA_ONLY_BLOCK_REGISTRY.size() != 1058) {
 +                throw new IllegalStateException("The number of registered vanilla blocks is incorrect. The following " + net.minecraft.world.level.block.Block.VANILLA_ONLY_BLOCK_REGISTRY.size() + " blocks were registered as vanilla: " + java.util.stream.StreamSupport.stream(net.minecraft.world.level.block.Block.VANILLA_ONLY_BLOCK_REGISTRY.spliterator(), false).toList());
 +            }
-+            if (net.minecraft.world.item.Item.VANILLA_ONLY_ITEM_REGISTRY.size() != 1255) {
++            if (net.minecraft.world.item.Item.VANILLA_ONLY_ITEM_REGISTRY.size() != 1312) {
 +                throw new IllegalStateException("The number of registered vanilla items is incorrect. The following " + net.minecraft.world.item.Item.VANILLA_ONLY_ITEM_REGISTRY.size() + " items were registered as vanilla: " + java.util.stream.StreamSupport.stream(net.minecraft.world.item.Item.VANILLA_ONLY_ITEM_REGISTRY.spliterator(), false).toList());
 +            }
-+            if (net.minecraft.world.level.block.Block.VANILLA_ONLY_BLOCK_STATE_REGISTRY.size() != 24276) {
++            if (net.minecraft.world.level.block.Block.VANILLA_ONLY_BLOCK_STATE_REGISTRY.size() != 26644) {
 +                throw new IllegalStateException("The number of registered vanilla block states is incorrect. The following " + net.minecraft.world.level.block.Block.VANILLA_ONLY_BLOCK_STATE_REGISTRY.size() + " block states were registered as vanilla: " + java.util.stream.StreamSupport.stream(net.minecraft.world.level.block.Block.VANILLA_ONLY_BLOCK_STATE_REGISTRY.spliterator(), false).toList());
 +            }
 +            // Fiddle end - modded registries - vanilla-only registries - verify number of vanilla blocks and items

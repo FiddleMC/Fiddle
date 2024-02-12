@@ -12,7 +12,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/world/item/Item.java b/src/main/java/net/minecraft/world/item/Item.java
-index 282d01b79854a6519332a7322cf11b755aa38c23..0c3dd5771738754f497fe044b06aa021386c23e8 100644
+index 7c7201393c49d2abc4ef7089f0caf1e19ce42894..f2cdd4c79bf8a415bfdb0e3533c7912cc9782585 100644
 --- a/src/main/java/net/minecraft/world/item/Item.java
 +++ b/src/main/java/net/minecraft/world/item/Item.java
 @@ -104,6 +104,22 @@ public class Item implements FeatureElement, ItemLike {
@@ -39,10 +39,10 @@ index 282d01b79854a6519332a7322cf11b755aa38c23..0c3dd5771738754f497fe044b06aa021
          return item == null ? 0 : BuiltInRegistries.ITEM.getId(item);
      }
 diff --git a/src/main/java/net/minecraft/world/level/block/Block.java b/src/main/java/net/minecraft/world/level/block/Block.java
-index 87fb852a06f17a88c35288105b58ce09cd4cc9cc..776bffc20cb01d21a82439971cf9044102a6e7fd 100644
+index a608ec6ac4eb34c0894095516aa63a1c44900121..2c8e0d2ad0d3f46456d9a9be844908cffc0e1ab2 100644
 --- a/src/main/java/net/minecraft/world/level/block/Block.java
 +++ b/src/main/java/net/minecraft/world/level/block/Block.java
-@@ -125,6 +125,22 @@ public class Block extends BlockBehaviour implements ItemLike {
+@@ -127,6 +127,22 @@ public class Block extends BlockBehaviour implements ItemLike {
      public @Nullable net.minecraft.resources.ResourceLocation keyInBlockRegistry = null;
      // Fiddle end - cache registry keys as fields - block
  

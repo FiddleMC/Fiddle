@@ -11,7 +11,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/world/item/Item.java b/src/main/java/net/minecraft/world/item/Item.java
-index d9ff8199a58fa59ab8d149838deda48cc15da777..282d01b79854a6519332a7322cf11b755aa38c23 100644
+index b163e80205ef3c44d8921c172844fc85219a9f81..7c7201393c49d2abc4ef7089f0caf1e19ce42894 100644
 --- a/src/main/java/net/minecraft/world/item/Item.java
 +++ b/src/main/java/net/minecraft/world/item/Item.java
 @@ -95,6 +95,15 @@ public class Item implements FeatureElement, ItemLike {
@@ -31,10 +31,10 @@ index d9ff8199a58fa59ab8d149838deda48cc15da777..282d01b79854a6519332a7322cf11b75
          return item == null ? 0 : BuiltInRegistries.ITEM.getId(item);
      }
 diff --git a/src/main/java/net/minecraft/world/level/block/Block.java b/src/main/java/net/minecraft/world/level/block/Block.java
-index ea1365e0f95aba5f37b78f2ef925c8ca1becbb94..87fb852a06f17a88c35288105b58ce09cd4cc9cc 100644
+index af60eff82fa914fd144b10bbeadbc00f59985732..a608ec6ac4eb34c0894095516aa63a1c44900121 100644
 --- a/src/main/java/net/minecraft/world/level/block/Block.java
 +++ b/src/main/java/net/minecraft/world/level/block/Block.java
-@@ -115,6 +115,16 @@ public class Block extends BlockBehaviour implements ItemLike {
+@@ -117,6 +117,16 @@ public class Block extends BlockBehaviour implements ItemLike {
      private String descriptionId;
      @Nullable
      private Item item;

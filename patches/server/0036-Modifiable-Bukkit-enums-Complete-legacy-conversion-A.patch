@@ -14,7 +14,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/legacy/CraftLegacy.java b/src/main/java/org/bukkit/craftbukkit/legacy/CraftLegacy.java
-index d9f731d605add107c0235c8f8db009bb924fb8a2..bd3a4db2db5232a28f43c9ea3ce5446960b0c5ce 100644
+index d9f731d605add107c0235c8f8db009bb924fb8a2..d8397264eadaae9ea5e0f6865d9a10ed450a36b6 100644
 --- a/src/main/java/org/bukkit/craftbukkit/legacy/CraftLegacy.java
 +++ b/src/main/java/org/bukkit/craftbukkit/legacy/CraftLegacy.java
 @@ -424,6 +424,67 @@ public final class CraftLegacy {
@@ -65,8 +65,8 @@ index d9f731d605add107c0235c8f8db009bb924fb8a2..bd3a4db2db5232a28f43c9ea3ce54469
 +            Block nonLegacyBlock;
 +            switch (data) {
 +                case 1 -> {
-+                    nonLegacyItem = Items.GRASS;
-+                    nonLegacyBlock = Blocks.GRASS;
++                    nonLegacyItem = Items.SHORT_GRASS;
++                    nonLegacyBlock = Blocks.SHORT_GRASS;
 +                }
 +                case 2 -> {
 +                    nonLegacyItem = Items.FERN;

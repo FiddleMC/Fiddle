@@ -7,10 +7,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index c3f1ab474cf564634e52ce4a76fdee1673c18559..a71e3e07d9b7eed16f1fef95c445a305cc2d83d6 100644
+index c7816095987677489f8414899b33ddf68a6a54a5..2cec876b56ae3ee5592584dfce8d115245971178 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
-@@ -196,6 +196,8 @@ public class Main {
+@@ -193,6 +193,8 @@ public class Main {
              }
              // Fiddle end - confirm Fiddle permanence
  
@@ -19,7 +19,7 @@ index c3f1ab474cf564634e52ce4a76fdee1673c18559..a71e3e07d9b7eed16f1fef95c445a305
              io.papermc.paper.plugin.PluginInitializerManager.load(optionset); // Paper
              Bootstrap.bootStrap();
              Bootstrap.validate();
-@@ -443,6 +445,15 @@ public class Main {
+@@ -468,6 +470,15 @@ public class Main {
              }
  
              org.fiddlemc.fiddle.pack.read.StartupPackLoadPhase.endStartupLoadPhase(); // Fiddle - read packs - startup load phase - end after initial read
@@ -36,7 +36,7 @@ index c3f1ab474cf564634e52ce4a76fdee1673c18559..a71e3e07d9b7eed16f1fef95c445a305
              /*
              IRegistryCustom.Dimension iregistrycustom_dimension = worldstem.registries().compositeAccess();
 diff --git a/src/main/java/org/bukkit/craftbukkit/Main.java b/src/main/java/org/bukkit/craftbukkit/Main.java
-index fd667ecf38e9b279154ab56227925fff345de583..fab6fab7cd2dc7bd0d45cab5a25ecf3fc297b2e5 100644
+index d8d15aae4719caeec9a3c5c31b06bddce710641b..b951b64f3cbc492f89999df0d86e512d41227220 100644
 --- a/src/main/java/org/bukkit/craftbukkit/Main.java
 +++ b/src/main/java/org/bukkit/craftbukkit/Main.java
 @@ -18,6 +18,13 @@ public class Main {

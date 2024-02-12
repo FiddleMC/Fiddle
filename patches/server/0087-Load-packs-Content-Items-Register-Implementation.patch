@@ -10,7 +10,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/world/item/Item.java b/src/main/java/net/minecraft/world/item/Item.java
-index 0c3dd5771738754f497fe044b06aa021386c23e8..3146c8319f140f7a2802b8b83cc5a48a1cfa4c14 100644
+index f2cdd4c79bf8a415bfdb0e3533c7912cc9782585..965144138d2764c4026cc7e90c87e8becd385f73 100644
 --- a/src/main/java/net/minecraft/world/item/Item.java
 +++ b/src/main/java/net/minecraft/world/item/Item.java
 @@ -60,17 +60,22 @@ public class Item implements FeatureElement, ItemLike {
@@ -70,7 +70,7 @@ index 0c3dd5771738754f497fe044b06aa021386c23e8..3146c8319f140f7a2802b8b83cc5a48a
          if (SharedConstants.IS_RUNNING_IN_IDE) {
              String string = this.getClass().getSimpleName();
              if (!string.endsWith("Item")) {
-@@ -419,15 +437,17 @@ public class Item implements FeatureElement, ItemLike {
+@@ -423,15 +441,17 @@ public class Item implements FeatureElement, ItemLike {
      }
  
      public static class Properties {
@@ -95,7 +95,7 @@ index 0c3dd5771738754f497fe044b06aa021386c23e8..3146c8319f140f7a2802b8b83cc5a48a
  
          public Item.Properties food(FoodProperties foodComponent) {
              this.foodProperties = foodComponent;
-@@ -464,7 +484,13 @@ public class Item implements FeatureElement, ItemLike {
+@@ -468,7 +488,13 @@ public class Item implements FeatureElement, ItemLike {
          }
  
          public Item.Properties fireResistant() {

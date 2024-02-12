@@ -10,7 +10,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/world/item/Item.java b/src/main/java/net/minecraft/world/item/Item.java
-index dd2f6c67533cc3344a171fe3ae9b3704796d8c50..fdcc7c24e61d78964c18fede55ab8013bd6e985f 100644
+index c072e3e9742f733aad0d13833fb700c42ca1c356..7c037da519a6e487128c0e49b43cea80ff38a281 100644
 --- a/src/main/java/net/minecraft/world/item/Item.java
 +++ b/src/main/java/net/minecraft/world/item/Item.java
 @@ -71,6 +71,29 @@ public class Item implements FeatureElement, ItemLike {
@@ -44,10 +44,10 @@ index dd2f6c67533cc3344a171fe3ae9b3704796d8c50..fdcc7c24e61d78964c18fede55ab8013
          return item == null ? 0 : BuiltInRegistries.ITEM.getId(item);
      }
 diff --git a/src/main/java/net/minecraft/world/item/Items.java b/src/main/java/net/minecraft/world/item/Items.java
-index 5f20e075c532f0f1d413242949d1738c0c152bf7..581c01f64939c23fda4cbf98e871de672aabe636 100644
+index f692149d91b525bda6dc79d489d7496ea24037e8..1cc0c79ea3df283a1713eb5ed24d47090b8613df 100644
 --- a/src/main/java/net/minecraft/world/item/Items.java
 +++ b/src/main/java/net/minecraft/world/item/Items.java
-@@ -1305,6 +1305,7 @@ public class Items {
+@@ -1363,6 +1363,7 @@ public class Items {
      }
  
      public static Item registerItem(ResourceKey<Item> key, Item item) {
@@ -56,12 +56,12 @@ index 5f20e075c532f0f1d413242949d1738c0c152bf7..581c01f64939c23fda4cbf98e871de67
              ((BlockItem)item).registerBlocks(Item.BY_BLOCK, item);
          }
 diff --git a/src/main/java/net/minecraft/world/level/block/Block.java b/src/main/java/net/minecraft/world/level/block/Block.java
-index d4cbff18adb62073a1dceb189043789620af6877..95b8e8396e76c6cc992d0a9bf740a791990a527f 100644
+index 4d50dd92a7f3187ee1d8edb926e7c273c8156549..1cf54034251c5f9cb7e936a0ffd25a38f8b01c06 100644
 --- a/src/main/java/net/minecraft/world/level/block/Block.java
 +++ b/src/main/java/net/minecraft/world/level/block/Block.java
-@@ -123,6 +123,32 @@ public class Block extends BlockBehaviour implements ItemLike {
-         return object2bytelinkedopenhashmap;
-     });
+@@ -130,6 +130,32 @@ public class Block extends BlockBehaviour implements ItemLike {
+         return Block.CODEC;
+     }
  
 +    // Fiddle start - flags for vanilla content - block
 +    /**
@@ -93,10 +93,10 @@ index d4cbff18adb62073a1dceb189043789620af6877..95b8e8396e76c6cc992d0a9bf740a791
          if (state == null) {
              return 0;
 diff --git a/src/main/java/net/minecraft/world/level/block/Blocks.java b/src/main/java/net/minecraft/world/level/block/Blocks.java
-index d8785f6adce58086f86ceee4bf628e3cedf85c02..392678d4a3c30ccf9225bbbb8abbcddbe5fc8ac3 100644
+index 4d5bc4d46fa90de1d89e15bd5dc053d22e07a3d9..473b6769c50b74ed01267cecb0c504c35f34cf46 100644
 --- a/src/main/java/net/minecraft/world/level/block/Blocks.java
 +++ b/src/main/java/net/minecraft/world/level/block/Blocks.java
-@@ -1249,6 +1249,7 @@ public class Blocks {
+@@ -1296,10 +1296,12 @@ public class Blocks {
      }
  
      public static Block register(String id, Block block) {
@@ -104,7 +104,12 @@ index d8785f6adce58086f86ceee4bf628e3cedf85c02..392678d4a3c30ccf9225bbbb8abbcddb
          return Registry.register(BuiltInRegistries.BLOCK, id, block);
      }
  
-@@ -1263,6 +1264,11 @@ public class Blocks {
+     public static Block register(ResourceKey<Block> key, Block block) {
++        block.setVanilla(); // Fiddle - flags for vanilla content - block
+         return Registry.register(BuiltInRegistries.BLOCK, key, block);
+     }
+ 
+@@ -1310,6 +1312,11 @@ public class Blocks {
      static {
          for(Block block : BuiltInRegistries.BLOCK) {
              for(BlockState blockState : block.getStateDefinition().getPossibleStates()) {

@@ -9,7 +9,7 @@ Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacementScope.java b/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacementScope.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..b54dbc4f3b5cfb4e63e8c4fbfce143f2ce37421d
+index 0000000000000000000000000000000000000000..caa54c23bf71da0d86c6ff8c08811c61cea0b78d
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacementScope.java
 @@ -0,0 +1,145 @@
@@ -18,8 +18,8 @@ index 0000000000000000000000000000000000000000..b54dbc4f3b5cfb4e63e8c4fbfce143f2
 +package org.fiddlemc.fiddle.packet.deepreplacement;
 +
 +import net.minecraft.network.chat.HoverEvent;
-+import net.minecraft.network.chat.contents.LiteralContents;
 +import net.minecraft.network.chat.contents.TranslatableContents;
++import net.minecraft.network.chat.contents.PlainTextContents;
 +import net.minecraft.world.item.ItemStack;
 +import org.jetbrains.annotations.NotNull;
 +import org.jetbrains.annotations.Nullable;
@@ -44,7 +44,7 @@ index 0000000000000000000000000000000000000000..b54dbc4f3b5cfb4e63e8c4fbfce143f2
 +    /**
 +     * Whether to attempt replacing {@linkplain TranslatableContents translatables} in raw JSON text,
 +     * typically either adding a {@linkplain TranslatableContents#getFallback() fallback value} or pre-translating
-+     * it into {@linkplain LiteralContents literal plain text}.
++     * it into {@linkplain PlainTextContents.LiteralContents literal plain text}.
 +     */
 +    public final boolean attemptToReplaceTranslatables;
 +

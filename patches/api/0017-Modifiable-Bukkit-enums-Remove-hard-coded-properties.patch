@@ -33,10 +33,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e8660b44392 100644
+index 241deb7f3b5e37d09c78048317428316be4406f0..069d08b170a8da432c7776aac8dea4699b5a9507 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -4397,7 +4397,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4643,7 +4643,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      public final Class<?> data;
      private final boolean legacy;
      private final NamespacedKey key;
@@ -44,7 +44,7 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
  
      private Material(final int id) {
          this(id, 64);
-@@ -4632,1021 +4631,17 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4878,1076 +4877,17 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return true if this material is a block
       */
      public boolean isBlock() {
@@ -241,6 +241,7 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case CHEST:
 -            case CHIPPED_ANVIL:
 -            case CHISELED_BOOKSHELF:
+-            case CHISELED_COPPER:
 -            case CHISELED_DEEPSLATE:
 -            case CHISELED_NETHER_BRICKS:
 -            case CHISELED_POLISHED_BLACKSTONE:
@@ -248,6 +249,8 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case CHISELED_RED_SANDSTONE:
 -            case CHISELED_SANDSTONE:
 -            case CHISELED_STONE_BRICKS:
+-            case CHISELED_TUFF:
+-            case CHISELED_TUFF_BRICKS:
 -            case CHORUS_FLOWER:
 -            case CHORUS_PLANT:
 -            case CLAY:
@@ -269,13 +272,18 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case COMPOSTER:
 -            case CONDUIT:
 -            case COPPER_BLOCK:
+-            case COPPER_BULB:
+-            case COPPER_DOOR:
+-            case COPPER_GRATE:
 -            case COPPER_ORE:
+-            case COPPER_TRAPDOOR:
 -            case CORNFLOWER:
 -            case CRACKED_DEEPSLATE_BRICKS:
 -            case CRACKED_DEEPSLATE_TILES:
 -            case CRACKED_NETHER_BRICKS:
 -            case CRACKED_POLISHED_BLACKSTONE_BRICKS:
 -            case CRACKED_STONE_BRICKS:
+-            case CRAFTER:
 -            case CRAFTING_TABLE:
 -            case CREEPER_HEAD:
 -            case CREEPER_WALL_HEAD:
@@ -410,7 +418,12 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case END_STONE_BRICK_SLAB:
 -            case END_STONE_BRICK_STAIRS:
 -            case END_STONE_BRICK_WALL:
+-            case EXPOSED_CHISELED_COPPER:
 -            case EXPOSED_COPPER:
+-            case EXPOSED_COPPER_BULB:
+-            case EXPOSED_COPPER_DOOR:
+-            case EXPOSED_COPPER_GRATE:
+-            case EXPOSED_COPPER_TRAPDOOR:
 -            case EXPOSED_CUT_COPPER:
 -            case EXPOSED_CUT_COPPER_SLAB:
 -            case EXPOSED_CUT_COPPER_STAIRS:
@@ -439,7 +452,6 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case GRANITE_SLAB:
 -            case GRANITE_STAIRS:
 -            case GRANITE_WALL:
--            case GRASS:
 -            case GRASS_BLOCK:
 -            case GRAVEL:
 -            case GRAY_BANNER:
@@ -681,7 +693,12 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case ORANGE_WALL_BANNER:
 -            case ORANGE_WOOL:
 -            case OXEYE_DAISY:
+-            case OXIDIZED_CHISELED_COPPER:
 -            case OXIDIZED_COPPER:
+-            case OXIDIZED_COPPER_BULB:
+-            case OXIDIZED_COPPER_DOOR:
+-            case OXIDIZED_COPPER_GRATE:
+-            case OXIDIZED_COPPER_TRAPDOOR:
 -            case OXIDIZED_CUT_COPPER:
 -            case OXIDIZED_CUT_COPPER_SLAB:
 -            case OXIDIZED_CUT_COPPER_STAIRS:
@@ -740,6 +757,10 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case POLISHED_GRANITE:
 -            case POLISHED_GRANITE_SLAB:
 -            case POLISHED_GRANITE_STAIRS:
+-            case POLISHED_TUFF:
+-            case POLISHED_TUFF_SLAB:
+-            case POLISHED_TUFF_STAIRS:
+-            case POLISHED_TUFF_WALL:
 -            case POPPY:
 -            case POTATOES:
 -            case POTTED_ACACIA_SAPLING:
@@ -867,6 +888,7 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case SEAGRASS:
 -            case SEA_LANTERN:
 -            case SEA_PICKLE:
+-            case SHORT_GRASS:
 -            case SHROOMLIGHT:
 -            case SHULKER_BOX:
 -            case SKELETON_SKULL:
@@ -967,6 +989,7 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case TORCHFLOWER:
 -            case TORCHFLOWER_CROP:
 -            case TRAPPED_CHEST:
+-            case TRIAL_SPAWNER:
 -            case TRIPWIRE:
 -            case TRIPWIRE_HOOK:
 -            case TUBE_CORAL:
@@ -974,6 +997,13 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case TUBE_CORAL_FAN:
 -            case TUBE_CORAL_WALL_FAN:
 -            case TUFF:
+-            case TUFF_BRICKS:
+-            case TUFF_BRICK_SLAB:
+-            case TUFF_BRICK_STAIRS:
+-            case TUFF_BRICK_WALL:
+-            case TUFF_SLAB:
+-            case TUFF_STAIRS:
+-            case TUFF_WALL:
 -            case TURTLE_EGG:
 -            case TWISTING_VINES:
 -            case TWISTING_VINES_PLANT:
@@ -1002,23 +1032,48 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case WARPED_WART_BLOCK:
 -            case WATER:
 -            case WATER_CAULDRON:
+-            case WAXED_CHISELED_COPPER:
 -            case WAXED_COPPER_BLOCK:
+-            case WAXED_COPPER_BULB:
+-            case WAXED_COPPER_DOOR:
+-            case WAXED_COPPER_GRATE:
+-            case WAXED_COPPER_TRAPDOOR:
 -            case WAXED_CUT_COPPER:
 -            case WAXED_CUT_COPPER_SLAB:
 -            case WAXED_CUT_COPPER_STAIRS:
+-            case WAXED_EXPOSED_CHISELED_COPPER:
 -            case WAXED_EXPOSED_COPPER:
+-            case WAXED_EXPOSED_COPPER_BULB:
+-            case WAXED_EXPOSED_COPPER_DOOR:
+-            case WAXED_EXPOSED_COPPER_GRATE:
+-            case WAXED_EXPOSED_COPPER_TRAPDOOR:
 -            case WAXED_EXPOSED_CUT_COPPER:
 -            case WAXED_EXPOSED_CUT_COPPER_SLAB:
 -            case WAXED_EXPOSED_CUT_COPPER_STAIRS:
+-            case WAXED_OXIDIZED_CHISELED_COPPER:
 -            case WAXED_OXIDIZED_COPPER:
+-            case WAXED_OXIDIZED_COPPER_BULB:
+-            case WAXED_OXIDIZED_COPPER_DOOR:
+-            case WAXED_OXIDIZED_COPPER_GRATE:
+-            case WAXED_OXIDIZED_COPPER_TRAPDOOR:
 -            case WAXED_OXIDIZED_CUT_COPPER:
 -            case WAXED_OXIDIZED_CUT_COPPER_SLAB:
 -            case WAXED_OXIDIZED_CUT_COPPER_STAIRS:
+-            case WAXED_WEATHERED_CHISELED_COPPER:
 -            case WAXED_WEATHERED_COPPER:
+-            case WAXED_WEATHERED_COPPER_BULB:
+-            case WAXED_WEATHERED_COPPER_DOOR:
+-            case WAXED_WEATHERED_COPPER_GRATE:
+-            case WAXED_WEATHERED_COPPER_TRAPDOOR:
 -            case WAXED_WEATHERED_CUT_COPPER:
 -            case WAXED_WEATHERED_CUT_COPPER_SLAB:
 -            case WAXED_WEATHERED_CUT_COPPER_STAIRS:
+-            case WEATHERED_CHISELED_COPPER:
 -            case WEATHERED_COPPER:
+-            case WEATHERED_COPPER_BULB:
+-            case WEATHERED_COPPER_DOOR:
+-            case WEATHERED_COPPER_GRATE:
+-            case WEATHERED_COPPER_TRAPDOOR:
 -            case WEATHERED_CUT_COPPER:
 -            case WEATHERED_CUT_COPPER_SLAB:
 -            case WEATHERED_CUT_COPPER_STAIRS:
@@ -1076,7 +1131,7 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
      }
  
      /**
-@@ -5655,49 +4650,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -5956,49 +4896,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return true if this Material is edible.
       */
      public boolean isEdible() {
@@ -1137,7 +1192,7 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
              case LEGACY_BREAD:
              case LEGACY_CARROT_ITEM:
              case LEGACY_BAKED_POTATO:
-@@ -5823,7 +4787,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -6124,7 +5033,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      static {
          for (Material material : values()) {
              BY_NAME.put(material.name(), material);
@@ -1145,7 +1200,7 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
          }
      }
  
-@@ -5831,29 +4794,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -6132,29 +5040,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material represents a playable music disk.
       */
      public boolean isRecord() {
@@ -1187,7 +1242,7 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
      }
  
      /**
-@@ -5862,790 +4814,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -6163,845 +5060,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material is a block and solid
       */
      public boolean isSolid() {
@@ -1351,6 +1406,7 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case CHEST:
 -            case CHIPPED_ANVIL:
 -            case CHISELED_BOOKSHELF:
+-            case CHISELED_COPPER:
 -            case CHISELED_DEEPSLATE:
 -            case CHISELED_NETHER_BRICKS:
 -            case CHISELED_POLISHED_BLACKSTONE:
@@ -1358,6 +1414,8 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case CHISELED_RED_SANDSTONE:
 -            case CHISELED_SANDSTONE:
 -            case CHISELED_STONE_BRICKS:
+-            case CHISELED_TUFF:
+-            case CHISELED_TUFF_BRICKS:
 -            case CLAY:
 -            case COAL_BLOCK:
 -            case COAL_ORE:
@@ -1374,12 +1432,17 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case COMPOSTER:
 -            case CONDUIT:
 -            case COPPER_BLOCK:
+-            case COPPER_BULB:
+-            case COPPER_DOOR:
+-            case COPPER_GRATE:
 -            case COPPER_ORE:
+-            case COPPER_TRAPDOOR:
 -            case CRACKED_DEEPSLATE_BRICKS:
 -            case CRACKED_DEEPSLATE_TILES:
 -            case CRACKED_NETHER_BRICKS:
 -            case CRACKED_POLISHED_BLACKSTONE_BRICKS:
 -            case CRACKED_STONE_BRICKS:
+-            case CRAFTER:
 -            case CRAFTING_TABLE:
 -            case CRIMSON_DOOR:
 -            case CRIMSON_FENCE:
@@ -1497,7 +1560,12 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case END_STONE_BRICK_SLAB:
 -            case END_STONE_BRICK_STAIRS:
 -            case END_STONE_BRICK_WALL:
+-            case EXPOSED_CHISELED_COPPER:
 -            case EXPOSED_COPPER:
+-            case EXPOSED_COPPER_BULB:
+-            case EXPOSED_COPPER_DOOR:
+-            case EXPOSED_COPPER_GRATE:
+-            case EXPOSED_COPPER_TRAPDOOR:
 -            case EXPOSED_CUT_COPPER:
 -            case EXPOSED_CUT_COPPER_SLAB:
 -            case EXPOSED_CUT_COPPER_STAIRS:
@@ -1717,7 +1785,12 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case ORANGE_TERRACOTTA:
 -            case ORANGE_WALL_BANNER:
 -            case ORANGE_WOOL:
+-            case OXIDIZED_CHISELED_COPPER:
 -            case OXIDIZED_COPPER:
+-            case OXIDIZED_COPPER_BULB:
+-            case OXIDIZED_COPPER_DOOR:
+-            case OXIDIZED_COPPER_GRATE:
+-            case OXIDIZED_COPPER_TRAPDOOR:
 -            case OXIDIZED_CUT_COPPER:
 -            case OXIDIZED_CUT_COPPER_SLAB:
 -            case OXIDIZED_CUT_COPPER_STAIRS:
@@ -1764,6 +1837,10 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case POLISHED_GRANITE:
 -            case POLISHED_GRANITE_SLAB:
 -            case POLISHED_GRANITE_STAIRS:
+-            case POLISHED_TUFF:
+-            case POLISHED_TUFF_SLAB:
+-            case POLISHED_TUFF_STAIRS:
+-            case POLISHED_TUFF_WALL:
 -            case POWDER_SNOW_CAULDRON:
 -            case PRISMARINE:
 -            case PRISMARINE_BRICKS:
@@ -1917,8 +1994,16 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case TINTED_GLASS:
 -            case TNT:
 -            case TRAPPED_CHEST:
+-            case TRIAL_SPAWNER:
 -            case TUBE_CORAL_BLOCK:
 -            case TUFF:
+-            case TUFF_BRICKS:
+-            case TUFF_BRICK_SLAB:
+-            case TUFF_BRICK_STAIRS:
+-            case TUFF_BRICK_WALL:
+-            case TUFF_SLAB:
+-            case TUFF_STAIRS:
+-            case TUFF_WALL:
 -            case TURTLE_EGG:
 -            case VERDANT_FROGLIGHT:
 -            case WARPED_DOOR:
@@ -1938,23 +2023,48 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case WARPED_WALL_SIGN:
 -            case WARPED_WART_BLOCK:
 -            case WATER_CAULDRON:
+-            case WAXED_CHISELED_COPPER:
 -            case WAXED_COPPER_BLOCK:
+-            case WAXED_COPPER_BULB:
+-            case WAXED_COPPER_DOOR:
+-            case WAXED_COPPER_GRATE:
+-            case WAXED_COPPER_TRAPDOOR:
 -            case WAXED_CUT_COPPER:
 -            case WAXED_CUT_COPPER_SLAB:
 -            case WAXED_CUT_COPPER_STAIRS:
+-            case WAXED_EXPOSED_CHISELED_COPPER:
 -            case WAXED_EXPOSED_COPPER:
+-            case WAXED_EXPOSED_COPPER_BULB:
+-            case WAXED_EXPOSED_COPPER_DOOR:
+-            case WAXED_EXPOSED_COPPER_GRATE:
+-            case WAXED_EXPOSED_COPPER_TRAPDOOR:
 -            case WAXED_EXPOSED_CUT_COPPER:
 -            case WAXED_EXPOSED_CUT_COPPER_SLAB:
 -            case WAXED_EXPOSED_CUT_COPPER_STAIRS:
+-            case WAXED_OXIDIZED_CHISELED_COPPER:
 -            case WAXED_OXIDIZED_COPPER:
+-            case WAXED_OXIDIZED_COPPER_BULB:
+-            case WAXED_OXIDIZED_COPPER_DOOR:
+-            case WAXED_OXIDIZED_COPPER_GRATE:
+-            case WAXED_OXIDIZED_COPPER_TRAPDOOR:
 -            case WAXED_OXIDIZED_CUT_COPPER:
 -            case WAXED_OXIDIZED_CUT_COPPER_SLAB:
 -            case WAXED_OXIDIZED_CUT_COPPER_STAIRS:
+-            case WAXED_WEATHERED_CHISELED_COPPER:
 -            case WAXED_WEATHERED_COPPER:
+-            case WAXED_WEATHERED_COPPER_BULB:
+-            case WAXED_WEATHERED_COPPER_DOOR:
+-            case WAXED_WEATHERED_COPPER_GRATE:
+-            case WAXED_WEATHERED_COPPER_TRAPDOOR:
 -            case WAXED_WEATHERED_CUT_COPPER:
 -            case WAXED_WEATHERED_CUT_COPPER_SLAB:
 -            case WAXED_WEATHERED_CUT_COPPER_STAIRS:
+-            case WEATHERED_CHISELED_COPPER:
 -            case WEATHERED_COPPER:
+-            case WEATHERED_COPPER_BULB:
+-            case WEATHERED_COPPER_DOOR:
+-            case WEATHERED_COPPER_GRATE:
+-            case WEATHERED_COPPER_TRAPDOOR:
 -            case WEATHERED_CUT_COPPER:
 -            case WEATHERED_CUT_COPPER_SLAB:
 -            case WEATHERED_CUT_COPPER_STAIRS:
@@ -1989,7 +2099,7 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
              case LEGACY_STONE:
              case LEGACY_GRASS:
              case LEGACY_DIRT:
-@@ -6858,18 +5038,17 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -7214,18 +5284,17 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material is an air block.
       */
      public boolean isAir() {
@@ -2019,7 +2129,7 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
      }
  
      /**
-@@ -7078,286 +5257,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -7434,286 +5503,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material is a block and can catch fire
       */
      public boolean isFlammable() {
@@ -2153,7 +2263,6 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case FLETCHING_TABLE:
 -            case FLOWERING_AZALEA_LEAVES:
 -            case GLOW_LICHEN:
--            case GRASS:
 -            case GRAY_BANNER:
 -            case GRAY_BED:
 -            case GRAY_CARPET:
@@ -2262,6 +2371,7 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case RED_WALL_BANNER:
 -            case RED_WOOL:
 -            case ROSE_BUSH:
+-            case SHORT_GRASS:
 -            case SMITHING_TABLE:
 -            case SOUL_CAMPFIRE:
 -            case SPRUCE_DOOR:
@@ -2317,7 +2427,7 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
              case LEGACY_WOOD:
              case LEGACY_LOG:
              case LEGACY_LEAVES:
-@@ -7426,186 +5337,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -7782,186 +5583,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material is a block and can burn away
       */
      public boolean isBurnable() {
@@ -2407,7 +2517,6 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case FLOWERING_AZALEA:
 -            case FLOWERING_AZALEA_LEAVES:
 -            case GLOW_LICHEN:
--            case GRASS:
 -            case GRAY_CARPET:
 -            case GRAY_WOOL:
 -            case GREEN_CARPET:
@@ -2469,6 +2578,7 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case RED_WOOL:
 -            case ROSE_BUSH:
 -            case SCAFFOLDING:
+-            case SHORT_GRASS:
 -            case SMALL_DRIPLEAF:
 -            case SPORE_BLOSSOM:
 -            case SPRUCE_FENCE:
@@ -2515,7 +2625,7 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
              case LEGACY_WOOD:
              case LEGACY_LOG:
              case LEGACY_LEAVES:
-@@ -7656,257 +5399,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -8012,257 +5645,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return true if this Material can be used as fuel.
       */
      public boolean isFuel() {
@@ -2784,7 +2894,7 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
              case LEGACY_LAVA_BUCKET:
              case LEGACY_COAL_BLOCK:
              case LEGACY_BLAZE_ROD:
-@@ -7997,368 +5501,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -8353,382 +5747,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material is a block and occludes light
       */
      public boolean isOccluding() {
@@ -2856,6 +2966,7 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case CHERRY_PLANKS:
 -            case CHERRY_WOOD:
 -            case CHISELED_BOOKSHELF:
+-            case CHISELED_COPPER:
 -            case CHISELED_DEEPSLATE:
 -            case CHISELED_NETHER_BRICKS:
 -            case CHISELED_POLISHED_BLACKSTONE:
@@ -2863,6 +2974,8 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case CHISELED_RED_SANDSTONE:
 -            case CHISELED_SANDSTONE:
 -            case CHISELED_STONE_BRICKS:
+-            case CHISELED_TUFF:
+-            case CHISELED_TUFF_BRICKS:
 -            case CLAY:
 -            case COAL_BLOCK:
 -            case COAL_ORE:
@@ -2877,6 +2990,7 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case CRACKED_NETHER_BRICKS:
 -            case CRACKED_POLISHED_BLACKSTONE_BRICKS:
 -            case CRACKED_STONE_BRICKS:
+-            case CRAFTER:
 -            case CRAFTING_TABLE:
 -            case CRIMSON_HYPHAE:
 -            case CRIMSON_NYLIUM:
@@ -2924,6 +3038,7 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case EMERALD_ORE:
 -            case END_STONE:
 -            case END_STONE_BRICKS:
+-            case EXPOSED_CHISELED_COPPER:
 -            case EXPOSED_COPPER:
 -            case EXPOSED_CUT_COPPER:
 -            case FIRE_CORAL_BLOCK:
@@ -3025,6 +3140,7 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case ORANGE_SHULKER_BOX:
 -            case ORANGE_TERRACOTTA:
 -            case ORANGE_WOOL:
+-            case OXIDIZED_CHISELED_COPPER:
 -            case OXIDIZED_COPPER:
 -            case OXIDIZED_CUT_COPPER:
 -            case PACKED_ICE:
@@ -3044,6 +3160,7 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case POLISHED_DEEPSLATE:
 -            case POLISHED_DIORITE:
 -            case POLISHED_GRANITE:
+-            case POLISHED_TUFF:
 -            case PRISMARINE:
 -            case PRISMARINE_BRICKS:
 -            case PUMPKIN:
@@ -3127,22 +3244,29 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case SUSPICIOUS_SAND:
 -            case TARGET:
 -            case TERRACOTTA:
+-            case TRIAL_SPAWNER:
 -            case TUBE_CORAL_BLOCK:
 -            case TUFF:
+-            case TUFF_BRICKS:
 -            case VERDANT_FROGLIGHT:
 -            case WARPED_HYPHAE:
 -            case WARPED_NYLIUM:
 -            case WARPED_PLANKS:
 -            case WARPED_STEM:
 -            case WARPED_WART_BLOCK:
+-            case WAXED_CHISELED_COPPER:
 -            case WAXED_COPPER_BLOCK:
 -            case WAXED_CUT_COPPER:
+-            case WAXED_EXPOSED_CHISELED_COPPER:
 -            case WAXED_EXPOSED_COPPER:
 -            case WAXED_EXPOSED_CUT_COPPER:
+-            case WAXED_OXIDIZED_CHISELED_COPPER:
 -            case WAXED_OXIDIZED_COPPER:
 -            case WAXED_OXIDIZED_CUT_COPPER:
+-            case WAXED_WEATHERED_CHISELED_COPPER:
 -            case WAXED_WEATHERED_COPPER:
 -            case WAXED_WEATHERED_CUT_COPPER:
+-            case WEATHERED_CHISELED_COPPER:
 -            case WEATHERED_COPPER:
 -            case WEATHERED_CUT_COPPER:
 -            case WET_SPONGE:
@@ -3164,7 +3288,7 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
              case LEGACY_STONE:
              case LEGACY_GRASS:
              case LEGACY_DIRT:
-@@ -8486,41 +5640,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -8856,41 +5886,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material is affected by gravity.
       */
      public boolean hasGravity() {
@@ -3217,7 +3341,7 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
              case LEGACY_SAND:
              case LEGACY_GRAVEL:
              case LEGACY_DRAGON_EGG: // Fiddle - add missing Material values with gravity
-@@ -8539,213 +5670,17 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -8909,213 +5916,17 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return true if this material is an item
       */
      public boolean isItem() {
@@ -3442,7 +3566,7 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
      }
  
      /**
-@@ -8769,331 +5704,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -9139,296 +5950,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       */
      @Deprecated // Paper
      public boolean isInteractable() {
@@ -3454,20 +3578,16 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case ACACIA_FENCE_GATE:
 -            case ACACIA_HANGING_SIGN:
 -            case ACACIA_SIGN:
--            case ACACIA_STAIRS:
 -            case ACACIA_TRAPDOOR:
 -            case ACACIA_WALL_HANGING_SIGN:
 -            case ACACIA_WALL_SIGN:
--            case ANDESITE_STAIRS:
 -            case ANVIL:
 -            case BAMBOO_BUTTON:
 -            case BAMBOO_DOOR:
 -            case BAMBOO_FENCE:
 -            case BAMBOO_FENCE_GATE:
 -            case BAMBOO_HANGING_SIGN:
--            case BAMBOO_MOSAIC_STAIRS:
 -            case BAMBOO_SIGN:
--            case BAMBOO_STAIRS:
 -            case BAMBOO_TRAPDOOR:
 -            case BAMBOO_WALL_HANGING_SIGN:
 -            case BAMBOO_WALL_SIGN:
@@ -3482,11 +3602,9 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case BIRCH_FENCE_GATE:
 -            case BIRCH_HANGING_SIGN:
 -            case BIRCH_SIGN:
--            case BIRCH_STAIRS:
 -            case BIRCH_TRAPDOOR:
 -            case BIRCH_WALL_HANGING_SIGN:
 -            case BIRCH_WALL_SIGN:
--            case BLACKSTONE_STAIRS:
 -            case BLACK_BED:
 -            case BLACK_CANDLE:
 -            case BLACK_CANDLE_CAKE:
@@ -3497,7 +3615,6 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case BLUE_CANDLE_CAKE:
 -            case BLUE_SHULKER_BOX:
 -            case BREWING_STAND:
--            case BRICK_STAIRS:
 -            case BROWN_BED:
 -            case BROWN_CANDLE:
 -            case BROWN_CANDLE_CAKE:
@@ -3517,18 +3634,18 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case CHERRY_FENCE_GATE:
 -            case CHERRY_HANGING_SIGN:
 -            case CHERRY_SIGN:
--            case CHERRY_STAIRS:
 -            case CHERRY_TRAPDOOR:
 -            case CHERRY_WALL_HANGING_SIGN:
 -            case CHERRY_WALL_SIGN:
 -            case CHEST:
 -            case CHIPPED_ANVIL:
 -            case CHISELED_BOOKSHELF:
--            case COBBLED_DEEPSLATE_STAIRS:
--            case COBBLESTONE_STAIRS:
 -            case COMMAND_BLOCK:
 -            case COMPARATOR:
 -            case COMPOSTER:
+-            case COPPER_DOOR:
+-            case COPPER_TRAPDOOR:
+-            case CRAFTER:
 -            case CRAFTING_TABLE:
 -            case CRIMSON_BUTTON:
 -            case CRIMSON_DOOR:
@@ -3536,11 +3653,9 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case CRIMSON_FENCE_GATE:
 -            case CRIMSON_HANGING_SIGN:
 -            case CRIMSON_SIGN:
--            case CRIMSON_STAIRS:
 -            case CRIMSON_TRAPDOOR:
 -            case CRIMSON_WALL_HANGING_SIGN:
 -            case CRIMSON_WALL_SIGN:
--            case CUT_COPPER_STAIRS:
 -            case CYAN_BED:
 -            case CYAN_CANDLE:
 -            case CYAN_CANDLE_CAKE:
@@ -3552,27 +3667,22 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case DARK_OAK_FENCE_GATE:
 -            case DARK_OAK_HANGING_SIGN:
 -            case DARK_OAK_SIGN:
--            case DARK_OAK_STAIRS:
 -            case DARK_OAK_TRAPDOOR:
 -            case DARK_OAK_WALL_HANGING_SIGN:
 -            case DARK_OAK_WALL_SIGN:
--            case DARK_PRISMARINE_STAIRS:
 -            case DAYLIGHT_DETECTOR:
--            case DEEPSLATE_BRICK_STAIRS:
+-            case DECORATED_POT:
 -            case DEEPSLATE_REDSTONE_ORE:
--            case DEEPSLATE_TILE_STAIRS:
--            case DIORITE_STAIRS:
 -            case DISPENSER:
 -            case DRAGON_EGG:
 -            case DROPPER:
 -            case ENCHANTING_TABLE:
 -            case ENDER_CHEST:
--            case END_STONE_BRICK_STAIRS:
--            case EXPOSED_CUT_COPPER_STAIRS:
+-            case EXPOSED_COPPER_DOOR:
+-            case EXPOSED_COPPER_TRAPDOOR:
 -            case FLETCHING_TABLE:
 -            case FLOWER_POT:
 -            case FURNACE:
--            case GRANITE_STAIRS:
 -            case GRAY_BED:
 -            case GRAY_CANDLE:
 -            case GRAY_CANDLE_CAKE:
@@ -3593,7 +3703,6 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case JUNGLE_FENCE_GATE:
 -            case JUNGLE_HANGING_SIGN:
 -            case JUNGLE_SIGN:
--            case JUNGLE_STAIRS:
 -            case JUNGLE_TRAPDOOR:
 -            case JUNGLE_WALL_HANGING_SIGN:
 -            case JUNGLE_WALL_SIGN:
@@ -3624,16 +3733,11 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case MANGROVE_FENCE_GATE:
 -            case MANGROVE_HANGING_SIGN:
 -            case MANGROVE_SIGN:
--            case MANGROVE_STAIRS:
 -            case MANGROVE_TRAPDOOR:
 -            case MANGROVE_WALL_HANGING_SIGN:
 -            case MANGROVE_WALL_SIGN:
--            case MOSSY_COBBLESTONE_STAIRS:
--            case MOSSY_STONE_BRICK_STAIRS:
 -            case MOVING_PISTON:
--            case MUD_BRICK_STAIRS:
 -            case NETHER_BRICK_FENCE:
--            case NETHER_BRICK_STAIRS:
 -            case NOTE_BLOCK:
 -            case OAK_BUTTON:
 -            case OAK_DOOR:
@@ -3641,7 +3745,6 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case OAK_FENCE_GATE:
 -            case OAK_HANGING_SIGN:
 -            case OAK_SIGN:
--            case OAK_STAIRS:
 -            case OAK_TRAPDOOR:
 -            case OAK_WALL_HANGING_SIGN:
 -            case OAK_WALL_SIGN:
@@ -3649,18 +3752,13 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case ORANGE_CANDLE:
 -            case ORANGE_CANDLE_CAKE:
 -            case ORANGE_SHULKER_BOX:
--            case OXIDIZED_CUT_COPPER_STAIRS:
+-            case OXIDIZED_COPPER_DOOR:
+-            case OXIDIZED_COPPER_TRAPDOOR:
 -            case PINK_BED:
 -            case PINK_CANDLE:
 -            case PINK_CANDLE_CAKE:
 -            case PINK_SHULKER_BOX:
--            case POLISHED_ANDESITE_STAIRS:
--            case POLISHED_BLACKSTONE_BRICK_STAIRS:
 -            case POLISHED_BLACKSTONE_BUTTON:
--            case POLISHED_BLACKSTONE_STAIRS:
--            case POLISHED_DEEPSLATE_STAIRS:
--            case POLISHED_DIORITE_STAIRS:
--            case POLISHED_GRANITE_STAIRS:
 -            case POTTED_ACACIA_SAPLING:
 -            case POTTED_ALLIUM:
 -            case POTTED_AZALEA_BUSH:
@@ -3696,33 +3794,23 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case POTTED_WHITE_TULIP:
 -            case POTTED_WITHER_ROSE:
 -            case POWDER_SNOW_CAULDRON:
--            case PRISMARINE_BRICK_STAIRS:
--            case PRISMARINE_STAIRS:
 -            case PUMPKIN:
 -            case PURPLE_BED:
 -            case PURPLE_CANDLE:
 -            case PURPLE_CANDLE_CAKE:
 -            case PURPLE_SHULKER_BOX:
--            case PURPUR_STAIRS:
--            case QUARTZ_STAIRS:
 -            case REDSTONE_ORE:
 -            case REDSTONE_WIRE:
 -            case RED_BED:
 -            case RED_CANDLE:
 -            case RED_CANDLE_CAKE:
--            case RED_NETHER_BRICK_STAIRS:
--            case RED_SANDSTONE_STAIRS:
 -            case RED_SHULKER_BOX:
 -            case REPEATER:
 -            case REPEATING_COMMAND_BLOCK:
 -            case RESPAWN_ANCHOR:
--            case SANDSTONE_STAIRS:
 -            case SHULKER_BOX:
 -            case SMITHING_TABLE:
 -            case SMOKER:
--            case SMOOTH_QUARTZ_STAIRS:
--            case SMOOTH_RED_SANDSTONE_STAIRS:
--            case SMOOTH_SANDSTONE_STAIRS:
 -            case SOUL_CAMPFIRE:
 -            case SPRUCE_BUTTON:
 -            case SPRUCE_DOOR:
@@ -3730,14 +3818,11 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case SPRUCE_FENCE_GATE:
 -            case SPRUCE_HANGING_SIGN:
 -            case SPRUCE_SIGN:
--            case SPRUCE_STAIRS:
 -            case SPRUCE_TRAPDOOR:
 -            case SPRUCE_WALL_HANGING_SIGN:
 -            case SPRUCE_WALL_SIGN:
 -            case STONECUTTER:
--            case STONE_BRICK_STAIRS:
 -            case STONE_BUTTON:
--            case STONE_STAIRS:
 -            case STRUCTURE_BLOCK:
 -            case SWEET_BERRY_BUSH:
 -            case TNT:
@@ -3748,16 +3833,20 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case WARPED_FENCE_GATE:
 -            case WARPED_HANGING_SIGN:
 -            case WARPED_SIGN:
--            case WARPED_STAIRS:
 -            case WARPED_TRAPDOOR:
 -            case WARPED_WALL_HANGING_SIGN:
 -            case WARPED_WALL_SIGN:
 -            case WATER_CAULDRON:
--            case WAXED_CUT_COPPER_STAIRS:
--            case WAXED_EXPOSED_CUT_COPPER_STAIRS:
--            case WAXED_OXIDIZED_CUT_COPPER_STAIRS:
--            case WAXED_WEATHERED_CUT_COPPER_STAIRS:
--            case WEATHERED_CUT_COPPER_STAIRS:
+-            case WAXED_COPPER_DOOR:
+-            case WAXED_COPPER_TRAPDOOR:
+-            case WAXED_EXPOSED_COPPER_DOOR:
+-            case WAXED_EXPOSED_COPPER_TRAPDOOR:
+-            case WAXED_OXIDIZED_COPPER_DOOR:
+-            case WAXED_OXIDIZED_COPPER_TRAPDOOR:
+-            case WAXED_WEATHERED_COPPER_DOOR:
+-            case WAXED_WEATHERED_COPPER_TRAPDOOR:
+-            case WEATHERED_COPPER_DOOR:
+-            case WEATHERED_COPPER_TRAPDOOR:
 -            case WHITE_BED:
 -            case WHITE_CANDLE:
 -            case WHITE_CANDLE_CAKE:
@@ -3775,7 +3864,7 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
      }
  
      /**
-@@ -9106,886 +5717,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -9441,941 +5963,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return the hardness of that material.
       */
      public float getHardness() {
@@ -4227,8 +4316,11 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case CHISELED_BOOKSHELF:
 -            case CHISELED_POLISHED_BLACKSTONE:
 -            case CHISELED_STONE_BRICKS:
+-            case CHISELED_TUFF:
+-            case CHISELED_TUFF_BRICKS:
 -            case CRACKED_POLISHED_BLACKSTONE_BRICKS:
 -            case CRACKED_STONE_BRICKS:
+-            case CRAFTER:
 -            case DARK_PRISMARINE:
 -            case DARK_PRISMARINE_SLAB:
 -            case DARK_PRISMARINE_STAIRS:
@@ -4275,6 +4367,10 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case POLISHED_GRANITE:
 -            case POLISHED_GRANITE_SLAB:
 -            case POLISHED_GRANITE_STAIRS:
+-            case POLISHED_TUFF:
+-            case POLISHED_TUFF_SLAB:
+-            case POLISHED_TUFF_STAIRS:
+-            case POLISHED_TUFF_WALL:
 -            case PRISMARINE:
 -            case PRISMARINE_BRICKS:
 -            case PRISMARINE_BRICK_SLAB:
@@ -4295,6 +4391,13 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case STONE_STAIRS:
 -            case TUBE_CORAL_BLOCK:
 -            case TUFF:
+-            case TUFF_BRICKS:
+-            case TUFF_BRICK_SLAB:
+-            case TUFF_BRICK_STAIRS:
+-            case TUFF_BRICK_WALL:
+-            case TUFF_SLAB:
+-            case TUFF_STAIRS:
+-            case TUFF_WALL:
 -                return 1.5F;
 -            case BLACK_CONCRETE:
 -            case BLUE_CONCRETE:
@@ -4510,10 +4613,15 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case BIRCH_TRAPDOOR:
 -            case CHERRY_DOOR:
 -            case CHERRY_TRAPDOOR:
+-            case CHISELED_COPPER:
 -            case COAL_ORE:
 -            case CONDUIT:
 -            case COPPER_BLOCK:
+-            case COPPER_BULB:
+-            case COPPER_DOOR:
+-            case COPPER_GRATE:
 -            case COPPER_ORE:
+-            case COPPER_TRAPDOOR:
 -            case CRIMSON_DOOR:
 -            case CRIMSON_TRAPDOOR:
 -            case CUT_COPPER:
@@ -4530,7 +4638,12 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case END_STONE_BRICK_SLAB:
 -            case END_STONE_BRICK_STAIRS:
 -            case END_STONE_BRICK_WALL:
+-            case EXPOSED_CHISELED_COPPER:
 -            case EXPOSED_COPPER:
+-            case EXPOSED_COPPER_BULB:
+-            case EXPOSED_COPPER_DOOR:
+-            case EXPOSED_COPPER_GRATE:
+-            case EXPOSED_COPPER_TRAPDOOR:
 -            case EXPOSED_CUT_COPPER:
 -            case EXPOSED_CUT_COPPER_SLAB:
 -            case EXPOSED_CUT_COPPER_STAIRS:
@@ -4550,7 +4663,12 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case OAK_DOOR:
 -            case OAK_TRAPDOOR:
 -            case OBSERVER:
+-            case OXIDIZED_CHISELED_COPPER:
 -            case OXIDIZED_COPPER:
+-            case OXIDIZED_COPPER_BULB:
+-            case OXIDIZED_COPPER_DOOR:
+-            case OXIDIZED_COPPER_GRATE:
+-            case OXIDIZED_COPPER_TRAPDOOR:
 -            case OXIDIZED_CUT_COPPER:
 -            case OXIDIZED_CUT_COPPER_SLAB:
 -            case OXIDIZED_CUT_COPPER_STAIRS:
@@ -4561,23 +4679,48 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case SPRUCE_TRAPDOOR:
 -            case WARPED_DOOR:
 -            case WARPED_TRAPDOOR:
+-            case WAXED_CHISELED_COPPER:
 -            case WAXED_COPPER_BLOCK:
+-            case WAXED_COPPER_BULB:
+-            case WAXED_COPPER_DOOR:
+-            case WAXED_COPPER_GRATE:
+-            case WAXED_COPPER_TRAPDOOR:
 -            case WAXED_CUT_COPPER:
 -            case WAXED_CUT_COPPER_SLAB:
 -            case WAXED_CUT_COPPER_STAIRS:
+-            case WAXED_EXPOSED_CHISELED_COPPER:
 -            case WAXED_EXPOSED_COPPER:
+-            case WAXED_EXPOSED_COPPER_BULB:
+-            case WAXED_EXPOSED_COPPER_DOOR:
+-            case WAXED_EXPOSED_COPPER_GRATE:
+-            case WAXED_EXPOSED_COPPER_TRAPDOOR:
 -            case WAXED_EXPOSED_CUT_COPPER:
 -            case WAXED_EXPOSED_CUT_COPPER_SLAB:
 -            case WAXED_EXPOSED_CUT_COPPER_STAIRS:
+-            case WAXED_OXIDIZED_CHISELED_COPPER:
 -            case WAXED_OXIDIZED_COPPER:
+-            case WAXED_OXIDIZED_COPPER_BULB:
+-            case WAXED_OXIDIZED_COPPER_DOOR:
+-            case WAXED_OXIDIZED_COPPER_GRATE:
+-            case WAXED_OXIDIZED_COPPER_TRAPDOOR:
 -            case WAXED_OXIDIZED_CUT_COPPER:
 -            case WAXED_OXIDIZED_CUT_COPPER_SLAB:
 -            case WAXED_OXIDIZED_CUT_COPPER_STAIRS:
+-            case WAXED_WEATHERED_CHISELED_COPPER:
 -            case WAXED_WEATHERED_COPPER:
+-            case WAXED_WEATHERED_COPPER_BULB:
+-            case WAXED_WEATHERED_COPPER_DOOR:
+-            case WAXED_WEATHERED_COPPER_GRATE:
+-            case WAXED_WEATHERED_COPPER_TRAPDOOR:
 -            case WAXED_WEATHERED_CUT_COPPER:
 -            case WAXED_WEATHERED_CUT_COPPER_SLAB:
 -            case WAXED_WEATHERED_CUT_COPPER_STAIRS:
+-            case WEATHERED_CHISELED_COPPER:
 -            case WEATHERED_COPPER:
+-            case WEATHERED_COPPER_BULB:
+-            case WEATHERED_COPPER_DOOR:
+-            case WEATHERED_COPPER_GRATE:
+-            case WEATHERED_COPPER_TRAPDOOR:
 -            case WEATHERED_CUT_COPPER:
 -            case WEATHERED_CUT_COPPER_SLAB:
 -            case WEATHERED_CUT_COPPER_STAIRS:
@@ -4649,6 +4792,7 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case NETHERITE_BLOCK:
 -            case OBSIDIAN:
 -            case RESPAWN_ANCHOR:
+-            case TRIAL_SPAWNER:
 -                return 50.0F;
 -            case REINFORCED_DEEPSLATE:
 -                return 55.0F;
@@ -4663,7 +4807,7 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
      }
  
      /**
-@@ -9999,885 +5731,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -10389,941 +5977,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return the blast resistance of that material.
       */
      public float getBlastResistance() {
@@ -5286,6 +5430,7 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case WARPED_TRAPDOOR:
 -                return 3.0F;
 -            case BLAST_FURNACE:
+-            case CRAFTER:
 -            case DISPENSER:
 -            case DROPPER:
 -            case FURNACE:
@@ -5340,10 +5485,13 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case BRICK_WALL:
 -            case BUBBLE_CORAL_BLOCK:
 -            case CHAIN:
+-            case CHISELED_COPPER:
 -            case CHISELED_DEEPSLATE:
 -            case CHISELED_NETHER_BRICKS:
 -            case CHISELED_POLISHED_BLACKSTONE:
 -            case CHISELED_STONE_BRICKS:
+-            case CHISELED_TUFF:
+-            case CHISELED_TUFF_BRICKS:
 -            case COAL_BLOCK:
 -            case COBBLED_DEEPSLATE:
 -            case COBBLED_DEEPSLATE_SLAB:
@@ -5354,6 +5502,10 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case COBBLESTONE_STAIRS:
 -            case COBBLESTONE_WALL:
 -            case COPPER_BLOCK:
+-            case COPPER_BULB:
+-            case COPPER_DOOR:
+-            case COPPER_GRATE:
+-            case COPPER_TRAPDOOR:
 -            case CRACKED_DEEPSLATE_BRICKS:
 -            case CRACKED_DEEPSLATE_TILES:
 -            case CRACKED_NETHER_BRICKS:
@@ -5387,7 +5539,12 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case DIORITE_STAIRS:
 -            case DIORITE_WALL:
 -            case EMERALD_BLOCK:
+-            case EXPOSED_CHISELED_COPPER:
 -            case EXPOSED_COPPER:
+-            case EXPOSED_COPPER_BULB:
+-            case EXPOSED_COPPER_DOOR:
+-            case EXPOSED_COPPER_GRATE:
+-            case EXPOSED_COPPER_TRAPDOOR:
 -            case EXPOSED_CUT_COPPER:
 -            case EXPOSED_CUT_COPPER_SLAB:
 -            case EXPOSED_CUT_COPPER_STAIRS:
@@ -5417,7 +5574,12 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case NETHER_BRICK_SLAB:
 -            case NETHER_BRICK_STAIRS:
 -            case NETHER_BRICK_WALL:
+-            case OXIDIZED_CHISELED_COPPER:
 -            case OXIDIZED_COPPER:
+-            case OXIDIZED_COPPER_BULB:
+-            case OXIDIZED_COPPER_DOOR:
+-            case OXIDIZED_COPPER_GRATE:
+-            case OXIDIZED_COPPER_TRAPDOOR:
 -            case OXIDIZED_CUT_COPPER:
 -            case OXIDIZED_CUT_COPPER_SLAB:
 -            case OXIDIZED_CUT_COPPER_STAIRS:
@@ -5443,6 +5605,10 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case POLISHED_GRANITE:
 -            case POLISHED_GRANITE_SLAB:
 -            case POLISHED_GRANITE_STAIRS:
+-            case POLISHED_TUFF:
+-            case POLISHED_TUFF_SLAB:
+-            case POLISHED_TUFF_STAIRS:
+-            case POLISHED_TUFF_WALL:
 -            case PRISMARINE:
 -            case PRISMARINE_BRICKS:
 -            case PRISMARINE_BRICK_SLAB:
@@ -5485,23 +5651,55 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case STONE_STAIRS:
 -            case TUBE_CORAL_BLOCK:
 -            case TUFF:
+-            case TUFF_BRICKS:
+-            case TUFF_BRICK_SLAB:
+-            case TUFF_BRICK_STAIRS:
+-            case TUFF_BRICK_WALL:
+-            case TUFF_SLAB:
+-            case TUFF_STAIRS:
+-            case TUFF_WALL:
+-            case WAXED_CHISELED_COPPER:
 -            case WAXED_COPPER_BLOCK:
+-            case WAXED_COPPER_BULB:
+-            case WAXED_COPPER_DOOR:
+-            case WAXED_COPPER_GRATE:
+-            case WAXED_COPPER_TRAPDOOR:
 -            case WAXED_CUT_COPPER:
 -            case WAXED_CUT_COPPER_SLAB:
 -            case WAXED_CUT_COPPER_STAIRS:
+-            case WAXED_EXPOSED_CHISELED_COPPER:
 -            case WAXED_EXPOSED_COPPER:
+-            case WAXED_EXPOSED_COPPER_BULB:
+-            case WAXED_EXPOSED_COPPER_DOOR:
+-            case WAXED_EXPOSED_COPPER_GRATE:
+-            case WAXED_EXPOSED_COPPER_TRAPDOOR:
 -            case WAXED_EXPOSED_CUT_COPPER:
 -            case WAXED_EXPOSED_CUT_COPPER_SLAB:
 -            case WAXED_EXPOSED_CUT_COPPER_STAIRS:
+-            case WAXED_OXIDIZED_CHISELED_COPPER:
 -            case WAXED_OXIDIZED_COPPER:
+-            case WAXED_OXIDIZED_COPPER_BULB:
+-            case WAXED_OXIDIZED_COPPER_DOOR:
+-            case WAXED_OXIDIZED_COPPER_GRATE:
+-            case WAXED_OXIDIZED_COPPER_TRAPDOOR:
 -            case WAXED_OXIDIZED_CUT_COPPER:
 -            case WAXED_OXIDIZED_CUT_COPPER_SLAB:
 -            case WAXED_OXIDIZED_CUT_COPPER_STAIRS:
+-            case WAXED_WEATHERED_CHISELED_COPPER:
 -            case WAXED_WEATHERED_COPPER:
+-            case WAXED_WEATHERED_COPPER_BULB:
+-            case WAXED_WEATHERED_COPPER_DOOR:
+-            case WAXED_WEATHERED_COPPER_GRATE:
+-            case WAXED_WEATHERED_COPPER_TRAPDOOR:
 -            case WAXED_WEATHERED_CUT_COPPER:
 -            case WAXED_WEATHERED_CUT_COPPER_SLAB:
 -            case WAXED_WEATHERED_CUT_COPPER_STAIRS:
+-            case WEATHERED_CHISELED_COPPER:
 -            case WEATHERED_COPPER:
+-            case WEATHERED_COPPER_BULB:
+-            case WEATHERED_COPPER_DOOR:
+-            case WEATHERED_COPPER_GRATE:
+-            case WEATHERED_COPPER_TRAPDOOR:
 -            case WEATHERED_CUT_COPPER:
 -            case WEATHERED_CUT_COPPER_SLAB:
 -            case WEATHERED_CUT_COPPER_STAIRS:
@@ -5513,6 +5711,8 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
 -            case END_STONE_BRICK_STAIRS:
 -            case END_STONE_BRICK_WALL:
 -                return 9.0F;
+-            case TRIAL_SPAWNER:
+-                return 50.0F;
 -            case LAVA:
 -            case WATER:
 -                return 100.0F;
@@ -5550,7 +5750,7 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
      }
  
      /**
-@@ -10893,21 +5747,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -11339,21 +5993,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return the slipperiness of this block
       */
      public float getSlipperiness() {
@@ -5573,7 +5773,7 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
      }
  
      /**
-@@ -10920,20 +5760,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -11366,20 +6006,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       */
      @Nullable
      public Material getCraftingRemainingItem() {
@@ -5595,7 +5795,7 @@ index a335c4830ae19306ffdf333d4da90496ee5e2447..ab0572b89cc94199fbe9072e06686e86
      }
  
      /**
-@@ -10945,53 +5772,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -11391,53 +6018,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       */
      @NotNull
      public EquipmentSlot getEquipmentSlot() {

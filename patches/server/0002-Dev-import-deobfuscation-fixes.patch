@@ -25,10 +25,10 @@ index ff6323bd5170359cf9c0d004aba68a792fa6a382..ddb04a1e7d50024ee2f3692bccf47150
      }
  }
 diff --git a/src/main/java/net/minecraft/world/level/block/Blocks.java b/src/main/java/net/minecraft/world/level/block/Blocks.java
-index d5654cfe37bd82f1290b280990a8502432491ae1..d8785f6adce58086f86ceee4bf628e3cedf85c02 100644
+index 9a2de546dc2af2ad4bf5d32ca6583f0e1f3f70d8..4d5bc4d46fa90de1d89e15bd5dc053d22e07a3d9 100644
 --- a/src/main/java/net/minecraft/world/level/block/Blocks.java
 +++ b/src/main/java/net/minecraft/world/level/block/Blocks.java
-@@ -1160,7 +1160,7 @@ public class Blocks {
+@@ -1215,7 +1215,7 @@ public class Blocks {
      }
  
      private static Boolean ocelotOrParrot(BlockState state, BlockGetter world, BlockPos pos, EntityType<?> type) {
@@ -36,4 +36,4 @@ index d5654cfe37bd82f1290b280990a8502432491ae1..d8785f6adce58086f86ceee4bf628e3c
 +        return type == EntityType.OCELOT || type == EntityType.PARROT; // Fiddle - dev import deobfuscation fixes
      }
  
-     private static BedBlock bed(DyeColor color) {
+     private static Block bed(DyeColor color) {

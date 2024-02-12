@@ -57,10 +57,10 @@ index 2c31c8d55d716b1660412218d5287da672ab45f6..11de2041b07914b2868a818acb756dc7
  
      public BlockPos getPos() {
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index f60ad1b920ac4a3a8ca4fedac778bb84e0cf8c35..24fe39a7c55aa7506c15d41ea2f69c21f5ac2fb9 100644
+index 761fdaba9afa3bdcb2a70c8bf6d5c950681fa9d9..9c4a5f00e1d9b998831ed6cf2f59cc878b654fd7 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
-@@ -1806,7 +1806,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
+@@ -1830,7 +1830,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
      }
  
      @Override
@@ -70,7 +70,7 @@ index f60ad1b920ac4a3a8ca4fedac778bb84e0cf8c35..24fe39a7c55aa7506c15d41ea2f69c21
      }
  
 diff --git a/src/main/java/net/minecraft/server/level/WorldGenRegion.java b/src/main/java/net/minecraft/server/level/WorldGenRegion.java
-index 50ed7cfe1ecef6d075ba484804827cec83ba2bf2..82ed30072fd2321d328238e7ca2160879e10719d 100644
+index 14a5492428eac823a295ef3746d0aca6fbdab4ec..7d0ec0741f4497aa27574802032abe6113bfd24a 100644
 --- a/src/main/java/net/minecraft/server/level/WorldGenRegion.java
 +++ b/src/main/java/net/minecraft/server/level/WorldGenRegion.java
 @@ -486,7 +486,7 @@ public class WorldGenRegion implements WorldGenLevel {
@@ -83,7 +83,7 @@ index 50ed7cfe1ecef6d075ba484804827cec83ba2bf2..82ed30072fd2321d328238e7ca216087
      @Override
      public void gameEvent(GameEvent event, Vec3 emitterPos, GameEvent.Context emitter) {}
 diff --git a/src/main/java/net/minecraft/world/level/LevelAccessor.java b/src/main/java/net/minecraft/world/level/LevelAccessor.java
-index 73d1adc5ddf0363966eac0c77c8dfbbb20a2b6a3..0819a15da53044f79a99e1a8c58c67dd42273be0 100644
+index bd9ac874b2d4333bc5c3a79657d63f1bd41fd8c8..2393a6636aa32da862d81c45d6050b9046d0038d 100644
 --- a/src/main/java/net/minecraft/world/level/LevelAccessor.java
 +++ b/src/main/java/net/minecraft/world/level/LevelAccessor.java
 @@ -95,12 +95,24 @@ public interface LevelAccessor extends CommonLevelAccessor, LevelTimeAccess {
@@ -114,7 +114,7 @@ index 73d1adc5ddf0363966eac0c77c8dfbbb20a2b6a3..0819a15da53044f79a99e1a8c58c67dd
  
      default void gameEvent(@Nullable Entity entity, GameEvent event, Vec3 pos) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/DelegatedGeneratorAccess.java b/src/main/java/org/bukkit/craftbukkit/util/DelegatedGeneratorAccess.java
-index cbedb6f002bc01daa16d349421c4ef04d4bcbcb2..c400213270d81b96467a53dbaa3ba412020169e7 100644
+index a650411e3fa7e2a045ac55502c77028be348acf1..65e2f2052ffac0029527854bc3275983e35a2a1c 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/DelegatedGeneratorAccess.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/DelegatedGeneratorAccess.java
 @@ -214,12 +214,12 @@ public abstract class DelegatedGeneratorAccess implements WorldGenLevel {
@@ -133,7 +133,7 @@ index cbedb6f002bc01daa16d349421c4ef04d4bcbcb2..c400213270d81b96467a53dbaa3ba412
      }
  
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/DummyGeneratorAccess.java b/src/main/java/org/bukkit/craftbukkit/util/DummyGeneratorAccess.java
-index 23ee60e8843a6a05e7ae6512248a57ec2a08321b..e619474819151945918e69a64ed06088082fcf7e 100644
+index a5e34c25e00e7f770bcb6e15ed0bbfe8f369a68a..72e9e9b332b0c5965d03814c04ea7a7765c81d6c 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/DummyGeneratorAccess.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/DummyGeneratorAccess.java
 @@ -114,7 +114,7 @@ public class DummyGeneratorAccess implements WorldGenLevel {

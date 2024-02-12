@@ -10,10 +10,10 @@ Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/PackFiddleContentDefinitionScanner.java b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/PackFiddleContentDefinitionScanner.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..6060cd11315c75d848ae28c885e8d50a53519de8
+index 0000000000000000000000000000000000000000..863be508edd7ad6ef086dc3d675fe974611d56b4
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/PackFiddleContentDefinitionScanner.java
-@@ -0,0 +1,103 @@
+@@ -0,0 +1,107 @@
 +// Fiddle - read packs - content definitions - scan from packs
 +
 +package org.fiddlemc.fiddle.pack.read.fiddlecontent.definition;
@@ -26,6 +26,7 @@ index 0000000000000000000000000000000000000000..6060cd11315c75d848ae28c885e8d50a
 +import org.fiddlemc.fiddle.pack.FiddlePack;
 +import org.fiddlemc.fiddle.pack.read.ContentNamespacedKeyValidation;
 +import org.fiddlemc.fiddle.pack.exception.PackException;
++import org.fiddlemc.fiddle.pack.read.SystemFiles;
 +import org.fiddlemc.fiddle.pack.read.filesprovider.RegularFileInPack;
 +import org.jetbrains.annotations.NotNull;
 +import org.slf4j.Logger;
@@ -61,6 +62,9 @@ index 0000000000000000000000000000000000000000..6060cd11315c75d848ae28c885e8d50a
 +        List<Pair<RegularFileInPack, String>> subNamespacedFolderFiles = new ArrayList<>(0);
 +        for (var namespaceFolder : contentFolder.getTopLevelDirectories()) {
 +            var namespace = namespaceFolder.getName();
++            if (SystemFiles.isSystemDirectory(namespace)) {
++                continue;
++            }
 +            if (!ContentNamespacedKeyValidation.isValidNamespace(namespace)) {
 +                LOGGER.warn("Ignored invalid namespace folder in Fiddle pack: {} in {}", contentFolderName + "/" + namespace, pack.filesProvider().getLocation());
 +                continue;

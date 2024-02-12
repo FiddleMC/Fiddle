@@ -26,7 +26,7 @@ index 4822f94ce183a99ad9e0d1bdc6c5708d958f6104..c1215d5a809b4c0b50e13cfa38611429
                  if (!Files.isDirectory(path2)) {
                      LOGGER.error("Invalid directory entry: {} in {}.", string, this.root, new java.nio.file.NotDirectoryException(string));
 diff --git a/src/main/java/net/minecraft/server/packs/repository/FolderRepositorySource.java b/src/main/java/net/minecraft/server/packs/repository/FolderRepositorySource.java
-index 36bc04fdb3da81283a1a85f7c649b0ceddd163ab..c5e431275e85596558475bd1c7467b4ba4386426 100644
+index 36bc04fdb3da81283a1a85f7c649b0ceddd163ab..fcc91d3a24a9b7527890acb5605eeb55c17f930c 100644
 --- a/src/main/java/net/minecraft/server/packs/repository/FolderRepositorySource.java
 +++ b/src/main/java/net/minecraft/server/packs/repository/FolderRepositorySource.java
 @@ -65,6 +65,12 @@ public class FolderRepositorySource implements RepositorySource {
@@ -34,8 +34,8 @@ index 36bc04fdb3da81283a1a85f7c649b0ceddd163ab..c5e431275e85596558475bd1c7467b4b
              for(Path path2 : directoryStream) {
                  try {
 +                    // Fiddle start - ignore system directories
-+                    var pathFilename = path.getFileName();
-+                    if (pathFilename != null && org.fiddlemc.fiddle.pack.read.SystemFiles.isSystemDirectory(pathFilename.toString())) {
++                    var path2Filename = path2.getFileName();
++                    if (path2Filename != null && org.fiddlemc.fiddle.pack.read.SystemFiles.isSystemDirectory(path2Filename.toString())) {
 +                        continue;
 +                    }
 +                    // Fiddle end - ignore system directories

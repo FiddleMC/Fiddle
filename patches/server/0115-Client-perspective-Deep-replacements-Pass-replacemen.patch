@@ -8,10 +8,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/nbt/CompoundTag.java b/src/main/java/net/minecraft/nbt/CompoundTag.java
-index 84fc2adf591f02a14862f7c1cd645c2efde55c3d..caa609116c5ae2175c99c3e1be4be4f080c21234 100644
+index e464ada187fd1f15efef29a0e5033aeb0c688059..e1d968e0a9a2e0e4f42287b9639211a9a72eea42 100644
 --- a/src/main/java/net/minecraft/nbt/CompoundTag.java
 +++ b/src/main/java/net/minecraft/nbt/CompoundTag.java
-@@ -172,9 +172,16 @@ public class CompoundTag implements Tag {
+@@ -176,9 +176,16 @@ public class CompoundTag implements Tag {
  
      @Override
      public void write(DataOutput output) throws IOException {
@@ -29,7 +29,7 @@ index 84fc2adf591f02a14862f7c1cd645c2efde55c3d..caa609116c5ae2175c99c3e1be4be4f0
          }
  
          output.writeByte(0);
-@@ -528,11 +535,11 @@ public class CompoundTag implements Tag {
+@@ -532,11 +539,11 @@ public class CompoundTag implements Tag {
          return this.tags.hashCode();
      }
  
@@ -44,7 +44,7 @@ index 84fc2adf591f02a14862f7c1cd645c2efde55c3d..caa609116c5ae2175c99c3e1be4be4f0
      }
  
 diff --git a/src/main/java/net/minecraft/nbt/ListTag.java b/src/main/java/net/minecraft/nbt/ListTag.java
-index 0ef36f5cfebf60c491d021b77b55c393f26feab5..2130091f021844e145c7ee152806a68db0b464e1 100644
+index c6877c7167dd5b1c61c776b0c7865d9064e69202..b055c59629d7606a24b4be446e777013d6489721 100644
 --- a/src/main/java/net/minecraft/nbt/ListTag.java
 +++ b/src/main/java/net/minecraft/nbt/ListTag.java
 @@ -148,6 +148,13 @@ public class ListTag extends CollectionTag<Tag> {
@@ -71,26 +71,26 @@ index 0ef36f5cfebf60c491d021b77b55c393f26feab5..2130091f021844e145c7ee152806a68d
  
      }
 diff --git a/src/main/java/net/minecraft/nbt/NbtIo.java b/src/main/java/net/minecraft/nbt/NbtIo.java
-index 88abb546421d936988bae363fcdc3747e515ef3f..416592debc8e25ea6ee56b8617386eed5a7b1d46 100644
+index c2044d2e8ce2d4747aa73ba90e5b975b1b7d2c19..1c22fdb7a537a3daba7c544913d71c1358c66a7d 100644
 --- a/src/main/java/net/minecraft/nbt/NbtIo.java
 +++ b/src/main/java/net/minecraft/nbt/NbtIo.java
-@@ -245,7 +245,14 @@ public class NbtIo {
+@@ -313,7 +313,14 @@ public class NbtIo {
      }
  
      public static void write(CompoundTag nbt, DataOutput output) throws IOException {
--        NbtIo.writeUnnamedTag(nbt, output);
+-        NbtIo.writeUnnamedTagWithFallback(nbt, output);
 +        // Fiddle start - client perspective - deep replacements - pass scope
 +        // The only occurrence of NbtIo#write that is network-related is in FriendlyByteBuf#writeNbt, so by default we assume that calls are not network-related and therefore do not need replacements
 +        write(nbt, output, null, org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope.NOTHING);
 +    }
 +
 +    public static void write(CompoundTag nbt, DataOutput output, @org.jetbrains.annotations.Nullable org.fiddlemc.fiddle.packet.deepreplacement.ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, @org.jetbrains.annotations.NotNull org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope replacementScope) throws IOException {
++        NbtIo.writeUnnamedTagWithFallback(nbt, output, clientPerspectiveAndSettings, replacementScope);
 +        // Fiddle end - client perspective - deep replacements - pass scope
-+        NbtIo.writeUnnamedTag(nbt, output, clientPerspectiveAndSettings, replacementScope); // Fiddle - client perspective - deep replacements - pass scope
      }
  
      public static void parse(DataInput input, StreamTagVisitor scanner, NbtAccounter tracker) throws IOException {
-@@ -279,18 +286,18 @@ public class NbtIo {
+@@ -347,23 +354,25 @@ public class NbtIo {
          return (Tag) (b0 == 0 ? EndTag.INSTANCE : NbtIo.readTagSafe(input, tracker, b0));
      }
  
@@ -113,11 +113,20 @@ index 88abb546421d936988bae363fcdc3747e515ef3f..416592debc8e25ea6ee56b8617386eed
          }
      }
  
+-    public static void writeUnnamedTagWithFallback(Tag nbt, DataOutput output) throws IOException {
+-        NbtIo.writeUnnamedTag(nbt, new NbtIo.StringFallbackDataOutput(output));
++    // Fiddle start - client perspective - deep replacements - pass scope
++    public static void writeUnnamedTagWithFallback(Tag nbt, DataOutput output, @org.jetbrains.annotations.Nullable org.fiddlemc.fiddle.packet.deepreplacement.ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, @org.jetbrains.annotations.NotNull org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope replacementScope) throws IOException {
++        NbtIo.writeUnnamedTag(nbt, new NbtIo.StringFallbackDataOutput(output), clientPerspectiveAndSettings, replacementScope);
++        // Fiddle end - client perspective - deep replacements - pass scope
+     }
+ 
+     private static Tag readUnnamedTag(DataInput input, NbtAccounter tracker) throws IOException {
 diff --git a/src/main/java/net/minecraft/nbt/StringTag.java b/src/main/java/net/minecraft/nbt/StringTag.java
-index 8e5c030e38d07275561c69c24b1a735dcf25a90a..c42bad629faab9fcf1ea971a7b4d6d3e77636279 100644
+index dab0920dcd21dc67796d9464a10c53512bd28792..3bfc92dbe12b0800a55e486818d8bf17c105cf92 100644
 --- a/src/main/java/net/minecraft/nbt/StringTag.java
 +++ b/src/main/java/net/minecraft/nbt/StringTag.java
-@@ -69,6 +69,13 @@ public class StringTag implements Tag {
+@@ -67,6 +67,13 @@ public class StringTag implements Tag {
  
      @Override
      public void write(DataOutput output) throws IOException {
@@ -128,9 +137,9 @@ index 8e5c030e38d07275561c69c24b1a735dcf25a90a..c42bad629faab9fcf1ea971a7b4d6d3e
 +    @Override
 +    public void write(DataOutput output, @org.jetbrains.annotations.Nullable org.fiddlemc.fiddle.packet.deepreplacement.ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, @org.jetbrains.annotations.NotNull org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope replacementScope) throws IOException {
 +        // Fiddle end - client perspective - deep replacements - pass scope
-         try {
-             output.writeUTF(this.data);
-         } catch (UTFDataFormatException var3) {
+         output.writeUTF(this.data);
+     }
+ 
 diff --git a/src/main/java/net/minecraft/nbt/Tag.java b/src/main/java/net/minecraft/nbt/Tag.java
 index 0c3fb39dfff42cc322b82c6da885d39f866aee41..6d872e6e764a58ee398f524f781bedb0911422ee 100644
 --- a/src/main/java/net/minecraft/nbt/Tag.java
@@ -150,10 +159,10 @@ index 0c3fb39dfff42cc322b82c6da885d39f866aee41..6d872e6e764a58ee398f524f781bedb0
      String toString();
  
 diff --git a/src/main/java/net/minecraft/network/FriendlyByteBuf.java b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
-index 06bf0c768dd74172e31a2c16ed0aa824d1b243d5..2c643b92d9f279a172cb49986a64a2db4f837f2c 100644
+index b5901e219a56a14c90b56e5b786f204ef02b0784..2155989f46d431ae0712da0b9255fda59b0c4317 100644
 --- a/src/main/java/net/minecraft/network/FriendlyByteBuf.java
 +++ b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
-@@ -78,6 +78,8 @@ import net.minecraft.world.level.Level;
+@@ -79,6 +79,8 @@ import net.minecraft.world.level.Level;
  import net.minecraft.world.phys.BlockHitResult;
  import net.minecraft.world.phys.Vec3;
  import org.fiddlemc.fiddle.packet.deepreplacement.ClientPerspectiveAndSettingsSupplier;
@@ -162,11 +171,34 @@ index 06bf0c768dd74172e31a2c16ed0aa824d1b243d5..2c643b92d9f279a172cb49986a64a2db
  import org.jetbrains.annotations.NotNull;
  import org.joml.Quaternionf;
  import org.joml.Vector3f;
-@@ -563,18 +565,51 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -129,11 +131,22 @@ public class FriendlyByteBuf extends ByteBuf {
+     /** @deprecated */
+     @Deprecated
+     public <T> FriendlyByteBuf writeWithCodec(DynamicOps<Tag> ops, Codec<T> codec, T value) {
++        // Fiddle start - client perspective - deep replacements - pass scope
++        // By default, we assume all replacements should be made
++        return this.writeWithCodec(ops, codec, value, DeepReplacementScope.EVERYTHING);
++    }
++
++    public <T> FriendlyByteBuf writeWithCodec(DynamicOps<Tag> ops, Codec<T> codec, T value, @NotNull DeepReplacementScope replacementScope) {
++        return this.writeWithCodec(ops, codec, value, this.getClientPerspectiveAndSettingsSupplierUnlessScopeIsNothing(replacementScope), replacementScope);
++    }
++
++    public <T> FriendlyByteBuf writeWithCodec(DynamicOps<Tag> ops, Codec<T> codec, T value, @NotNull ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, @NotNull DeepReplacementScope replacementScope) {
++        // Fiddle end - client perspective - deep replacements - pass scope
+         Tag nbtbase = (Tag) Util.getOrThrow(codec.encodeStart(ops, value), (s) -> {
+             return new EncoderException("Failed to encode: " + s + " " + value);
+         });
+ 
+-        this.writeNbt(nbtbase);
++        this.writeNbt(nbtbase, clientPerspectiveAndSettings, replacementScope); // Fiddle - client perspective - deep replacements - pass scope
+         return this;
+     }
+ 
+@@ -562,19 +575,52 @@ public class FriendlyByteBuf extends ByteBuf {
  
      // Paper start
      public FriendlyByteBuf writeComponent(final net.kyori.adventure.text.Component component) {
--        return this.writeUtf(io.papermc.paper.adventure.PaperAdventure.asJsonString(component, this.adventure$locale), 262144);
 +        // Fiddle start - client perspective - deep replacements - pass scope
 +        // By default, we assume all replacements should be made
 +        return this.writeComponent(component, DeepReplacementScope.EVERYTHING);
@@ -177,8 +209,10 @@ index 06bf0c768dd74172e31a2c16ed0aa824d1b243d5..2c643b92d9f279a172cb49986a64a2db
 +    }
 +
 +    public FriendlyByteBuf writeComponent(final net.kyori.adventure.text.Component component, @NotNull ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, @NotNull DeepReplacementScope replacementScope) {
-+        return this.writeUtf(io.papermc.paper.adventure.PaperAdventure.asJsonString(component, this.adventure$locale), 262144, true, false, clientPerspectiveAndSettings, replacementScope);
 +        // Fiddle end - client perspective - deep replacements - pass scope
+         // TODO this.adventure$locale
+-        return this.writeWithCodec(NbtOps.INSTANCE, ComponentSerialization.CODEC, io.papermc.paper.adventure.PaperAdventure.asVanilla(component));
++        return this.writeWithCodec(NbtOps.INSTANCE, ComponentSerialization.CODEC, io.papermc.paper.adventure.PaperAdventure.asVanilla(component), clientPerspectiveAndSettings, replacementScope); // Fiddle - client perspective - deep replacements - pass scope
      }
  
      @Deprecated
@@ -211,13 +245,13 @@ index 06bf0c768dd74172e31a2c16ed0aa824d1b243d5..2c643b92d9f279a172cb49986a64a2db
 +
 +    public FriendlyByteBuf writeComponent(Component text, @NotNull ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, @NotNull DeepReplacementScope replacementScope) {
 +        // Fiddle end - client perspective - deep replacements - pass scope
-         //return this.a(IChatBaseComponent.ChatSerializer.a(ichatbasecomponent), 262144); // Paper - comment
--        return this.writeUtf(io.papermc.paper.adventure.PaperAdventure.asJsonString(text, this.adventure$locale), 262144); // Paper
-+        return this.writeUtf(io.papermc.paper.adventure.PaperAdventure.asJsonString(text, this.adventure$locale), 262144, true, false, clientPerspectiveAndSettings, replacementScope); // Paper // Fiddle - client perspective - deep replacements - pass scope
+         // TODO this.adventure$locale
+-        return this.writeWithCodec(NbtOps.INSTANCE, ComponentSerialization.CODEC, text);
++        return this.writeWithCodec(NbtOps.INSTANCE, ComponentSerialization.CODEC, text, clientPerspectiveAndSettings, replacementScope); // Fiddle - client perspective - deep replacements - pass scope
      }
  
      public <T extends Enum<T>> T readEnum(Class<T> enumClass) {
-@@ -626,12 +661,23 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -626,12 +672,23 @@ public class FriendlyByteBuf extends ByteBuf {
      }
  
      public FriendlyByteBuf writeNbt(@Nullable Tag nbt) {
@@ -242,7 +276,7 @@ index 06bf0c768dd74172e31a2c16ed0aa824d1b243d5..2c643b92d9f279a172cb49986a64a2db
              return this;
          } catch (Exception ioexception) { // CraftBukkit - IOException -> Exception
              throw new EncoderException(ioexception);
-@@ -661,6 +707,29 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -661,6 +718,29 @@ public class FriendlyByteBuf extends ByteBuf {
      }
  
      public FriendlyByteBuf writeItem(ItemStack stack) {
@@ -272,7 +306,7 @@ index 06bf0c768dd74172e31a2c16ed0aa824d1b243d5..2c643b92d9f279a172cb49986a64a2db
          if (stack.isEmpty() || stack.getItem() == null) { // CraftBukkit - NPE fix itemstack.getItem()
              this.writeBoolean(false);
          } else {
-@@ -679,7 +748,7 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -679,7 +759,7 @@ public class FriendlyByteBuf extends ByteBuf {
                  nbttagcompound = stack.getTag();
              }
  
@@ -281,7 +315,7 @@ index 06bf0c768dd74172e31a2c16ed0aa824d1b243d5..2c643b92d9f279a172cb49986a64a2db
          }
  
          return this;
-@@ -716,7 +785,26 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -716,7 +796,26 @@ public class FriendlyByteBuf extends ByteBuf {
      }
  
      public FriendlyByteBuf writeUtf(String s, int maxLength) {
@@ -309,7 +343,7 @@ index 06bf0c768dd74172e31a2c16ed0aa824d1b243d5..2c643b92d9f279a172cb49986a64a2db
          return this;
      }
  
-@@ -725,7 +813,7 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -725,7 +824,7 @@ public class FriendlyByteBuf extends ByteBuf {
      }
  
      public FriendlyByteBuf writeResourceLocation(ResourceLocation id) {
@@ -318,7 +352,7 @@ index 06bf0c768dd74172e31a2c16ed0aa824d1b243d5..2c643b92d9f279a172cb49986a64a2db
          return this;
      }
  
-@@ -837,7 +925,7 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -837,7 +936,7 @@ public class FriendlyByteBuf extends ByteBuf {
  
      public void writeGameProfile(GameProfile gameProfile) {
          this.writeUUID(gameProfile.getId());
@@ -327,7 +361,7 @@ index 06bf0c768dd74172e31a2c16ed0aa824d1b243d5..2c643b92d9f279a172cb49986a64a2db
          this.writeGameProfileProperties(gameProfile.getProperties());
      }
  
-@@ -865,9 +953,11 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -865,9 +964,11 @@ public class FriendlyByteBuf extends ByteBuf {
      }
  
      public void writeProperty(Property property) {
@@ -342,7 +376,7 @@ index 06bf0c768dd74172e31a2c16ed0aa824d1b243d5..2c643b92d9f279a172cb49986a64a2db
      }
  
      public boolean isContiguous() {
-@@ -1763,4 +1853,15 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -1763,4 +1864,15 @@ public class FriendlyByteBuf extends ByteBuf {
      }
      // Fiddle end - client perspective - deep replacements - perspective and settings supplier - cache in FriendlyByteBuf
  
@@ -383,7 +417,7 @@ index 7b39060cde0ec31c4adf36960b33cefcd5138527..3d5c67dc255684b60c2676f83fa4958a
              throw new EncoderException("String too big (was " + string.length() + " characters, max " + length + ")");
          } else {
 diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundCommandSuggestionsPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundCommandSuggestionsPacket.java
-index b8c008a311edebe90256bd8482a2402d12ffd0db..0e0692dd4244c02ee4f972df90d9d1471bf52e1d 100644
+index dda43b6dba01fca4caee3278e8537f1906823678..8f62c67e28cad5cb240f8a9328e92fbea71c1725 100644
 --- a/src/main/java/net/minecraft/network/protocol/game/ClientboundCommandSuggestionsPacket.java
 +++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundCommandSuggestionsPacket.java
 @@ -37,7 +37,7 @@ public class ClientboundCommandSuggestionsPacket implements Packet<ClientGamePac
@@ -409,7 +443,7 @@ index 51e24105facfe71ce9f2757c6c881a21b58dacfd..6fea470456059b21982ad1f35d5a2a2e
          buf.writeBytes(this.buffer);
          buf.writeCollection(this.blockEntitiesData, (buf2, entry) -> {
 diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundSetPlayerTeamPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundSetPlayerTeamPacket.java
-index 4ebe22ac20f1a98694cc3bec570ef5bbf06f00aa..d03c7100e48b015a3f6d9b619f43a2d7ddf2583e 100644
+index b25f0e0a4ea12de2606d273e7c1ee534002c8d5a..0a0a6708c89b1cce5db476a48c70762329663bf3 100644
 --- a/src/main/java/net/minecraft/network/protocol/game/ClientboundSetPlayerTeamPacket.java
 +++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundSetPlayerTeamPacket.java
 @@ -76,7 +76,7 @@ public class ClientboundSetPlayerTeamPacket implements Packet<ClientGamePacketLi
@@ -435,15 +469,15 @@ index 4ebe22ac20f1a98694cc3bec570ef5bbf06f00aa..d03c7100e48b015a3f6d9b619f43a2d7
              buf.writeComponent(this.playerPrefix);
              buf.writeComponent(this.playerSuffix);
 diff --git a/src/main/java/net/minecraft/world/item/crafting/ShapedRecipe.java b/src/main/java/net/minecraft/world/item/crafting/ShapedRecipe.java
-index 17bef91546fa85d401b263c3a69fbf464f290eca..3c7c04b7f95ed8001a1ba4012233b1533b0d4336 100644
+index d772cf80fa3831e1c79d601ea09a073da089e2c5..40c97c360dcf0031266ce38299caf47e643524a6 100644
 --- a/src/main/java/net/minecraft/world/item/crafting/ShapedRecipe.java
 +++ b/src/main/java/net/minecraft/world/item/crafting/ShapedRecipe.java
-@@ -377,7 +377,7 @@ public class ShapedRecipe extends io.papermc.paper.inventory.recipe.RecipeBookEx
+@@ -197,7 +197,7 @@ public class ShapedRecipe extends io.papermc.paper.inventory.recipe.RecipeBookEx
+         }
+ 
          public void toNetwork(FriendlyByteBuf buf, ShapedRecipe recipe) {
-             buf.writeVarInt(recipe.width);
-             buf.writeVarInt(recipe.height);
 -            buf.writeUtf(recipe.group);
 +            buf.writeUtf(recipe.group, false, false, org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope.NOTHING); // Fiddle - client perspective - deep replacements - pass scope - this never contains replaceables
              buf.writeEnum(recipe.category);
-             Iterator iterator = recipe.recipeItems.iterator();
- 
+             recipe.pattern.toNetwork(buf);
+             buf.writeItem(recipe.result);

@@ -18,10 +18,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index ada94b91c1d4c899ad3c5db937dbf2c0118c18b6..715ff6a1a6e1d24856bf7d0f73232c132c5567c3 100644
+index 0f9c7dfd2caa7b579cf08c068d232b3c682857c0..c6e61b9f8a899ac8f82c743fa3d2f75f930fd384 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -112,6 +112,7 @@ import org.bukkit.block.data.type.WallSign;
+@@ -115,6 +115,7 @@ import org.bukkit.block.data.type.WallSign;
  import org.bukkit.inventory.CreativeCategory;
  import org.bukkit.inventory.EquipmentSlot;
  import org.bukkit.material.MaterialData;
@@ -29,7 +29,7 @@ index ada94b91c1d4c899ad3c5db937dbf2c0118c18b6..715ff6a1a6e1d24856bf7d0f73232c13
  import org.jetbrains.annotations.NotNull;
  import org.jetbrains.annotations.Nullable;
  
-@@ -119,7 +120,7 @@ import org.jetbrains.annotations.Nullable;
+@@ -122,7 +123,7 @@ import org.jetbrains.annotations.Nullable;
   * An enum of all material IDs accepted by the official server and client
   */
  @SuppressWarnings({"DeprecatedIsStillUsed", "deprecation"}) // Paper

@@ -11,7 +11,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Bootstrap.java b/src/main/java/net/minecraft/server/Bootstrap.java
-index df6752b5c77bc88a4fcf1ffe918b24d41cd30ad4..4307af2e7d8d50c146802fa5278c3f053dad1608 100644
+index 5816998cde8504d58732e63eb2179a5d828f35bb..b884cca03877b03c3eb10d573ea25935ee68532d 100644
 --- a/src/main/java/net/minecraft/server/Bootstrap.java
 +++ b/src/main/java/net/minecraft/server/Bootstrap.java
 @@ -43,6 +43,17 @@ public class Bootstrap {
@@ -33,10 +33,10 @@ index df6752b5c77bc88a4fcf1ffe918b24d41cd30ad4..4307af2e7d8d50c146802fa5278c3f05
              // CraftBukkit start
              /*String name = Bootstrap.class.getSimpleName(); // Paper
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index e82030dafcec0af7d7aca859f34150fb1a488540..15dffbc7464655dfbaa817a14509125feffc5dee 100644
+index c88336f4d2590387dbe4dc2f78f1283743275461..347d255f2f780f77d437bddda06f50c61968df91 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
-@@ -214,7 +214,7 @@ public class Main {
+@@ -211,7 +211,7 @@ public class Main {
              // Fiddle end - read packs - content definitions - read before bootstrap
  
              io.papermc.paper.plugin.PluginInitializerManager.load(optionset); // Paper

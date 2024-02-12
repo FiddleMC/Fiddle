@@ -11,11 +11,11 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/core/registries/BuiltInRegistries.java b/src/main/java/net/minecraft/core/registries/BuiltInRegistries.java
-index 98ef159b7091e53298838ae3723909be6d38b4ba..b899e2e896f5062afc314557ffc4d8250b1643ef 100644
+index b366389fd1aed47e04884e9e495df83ec7398ca3..3a5827ee8faa73695e66bb2f6d95db67b1416957 100644
 --- a/src/main/java/net/minecraft/core/registries/BuiltInRegistries.java
 +++ b/src/main/java/net/minecraft/core/registries/BuiltInRegistries.java
-@@ -285,6 +285,37 @@ public class BuiltInRegistries {
-     public static final Registry<CreativeModeTab> CREATIVE_MODE_TAB = registerSimple(Registries.CREATIVE_MODE_TAB, CreativeModeTabs::bootstrap);
+@@ -297,6 +297,37 @@ public class BuiltInRegistries {
+     public static final Registry<NumberFormatType<?>> NUMBER_FORMAT_TYPE = registerSimple(Registries.NUMBER_FORMAT_TYPE, NumberFormatTypes::bootstrap);
      public static final Registry<? extends Registry<?>> REGISTRY = WRITABLE_REGISTRY;
  
 +    // Fiddle start - modded registries - support passing custom registry constructor
@@ -52,7 +52,7 @@ index 98ef159b7091e53298838ae3723909be6d38b4ba..b899e2e896f5062afc314557ffc4d825
      private static <T> Registry<T> registerSimple(ResourceKey<? extends Registry<T>> key, BuiltInRegistries.RegistryBootstrap<T> initializer) {
          return registerSimple(key, Lifecycle.stable(), initializer);
      }
-@@ -293,24 +324,60 @@ public class BuiltInRegistries {
+@@ -305,24 +336,60 @@ public class BuiltInRegistries {
          return internalRegister(key, new MappedRegistry<>(key, Lifecycle.stable(), true), initializer, Lifecycle.stable());
      }
  

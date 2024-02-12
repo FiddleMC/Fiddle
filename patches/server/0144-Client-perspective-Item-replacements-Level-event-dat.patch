@@ -35,19 +35,19 @@ index eb32b2a6ef814c354dc193a1b6c017f6faf1a144..dde3c225477fe903fece08d34b3d4f2a
      // Fiddle end - client perspective - block state visualization - level event data - data can be Item or ItemStack
      private final int type;
 diff --git a/src/main/java/net/minecraft/world/level/block/entity/JukeboxBlockEntity.java b/src/main/java/net/minecraft/world/level/block/entity/JukeboxBlockEntity.java
-index 2c1edc6dfc7fd1a8af977919ce31913365cf3ddd..59a572be7f249dff31d0c59ba68b479673dc51f9 100644
+index 77276515d6ab8155a7cff80cf3cec76e93c415ca..c95579a7ab7ad38aaa42e94c225cb63b5a72dd49 100644
 --- a/src/main/java/net/minecraft/world/level/block/entity/JukeboxBlockEntity.java
 +++ b/src/main/java/net/minecraft/world/level/block/entity/JukeboxBlockEntity.java
-@@ -122,7 +122,7 @@ public class JukeboxBlockEntity extends BlockEntity implements Clearable, Contai
+@@ -121,7 +121,7 @@ public class JukeboxBlockEntity extends BlockEntity implements Clearable, Contai
          this.recordStartedTick = this.tickCount;
          this.isPlaying = true;
          this.level.updateNeighborsAt(this.getBlockPos(), this.getBlockState().getBlock());
--        this.level.levelEvent((Player) null, 1010, this.getBlockPos(), Item.getId(this.getFirstItem().getItem()));
-+        this.level.levelEvent((Player) null, 1010, this.getBlockPos(), this.getFirstItem()); // Fiddle - client perspective - item replacements - level event data - play jukebox sound
+-        this.level.levelEvent((Player) null, 1010, this.getBlockPos(), Item.getId(this.getTheItem().getItem()));
++        this.level.levelEvent((Player) null, 1010, this.getBlockPos(), this.getTheItem()); // Fiddle - client perspective - item replacements - level event data - play jukebox sound
          this.setChanged();
      }
  
-@@ -130,7 +130,7 @@ public class JukeboxBlockEntity extends BlockEntity implements Clearable, Contai
+@@ -129,7 +129,7 @@ public class JukeboxBlockEntity extends BlockEntity implements Clearable, Contai
          this.isPlaying = false;
          this.level.gameEvent(GameEvent.JUKEBOX_STOP_PLAY, this.getBlockPos(), GameEvent.Context.of(this.getBlockState()));
          this.level.updateNeighborsAt(this.getBlockPos(), this.getBlockState().getBlock());

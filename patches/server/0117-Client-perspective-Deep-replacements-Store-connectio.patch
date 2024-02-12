@@ -8,7 +8,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/network/protocol/common/ClientboundDisconnectPacket.java b/src/main/java/net/minecraft/network/protocol/common/ClientboundDisconnectPacket.java
-index 4df7ccd88a17d00baf51413614b920b95d008245..1de3668251bf11dd8606caf9e0d92de9566da2b5 100644
+index c75bebb43d8cfe787348b157ca980cbbe690c929..0b15cc94d5ab0b42ae873522ae340dcb1bc4c502 100644
 --- a/src/main/java/net/minecraft/network/protocol/common/ClientboundDisconnectPacket.java
 +++ b/src/main/java/net/minecraft/network/protocol/common/ClientboundDisconnectPacket.java
 @@ -4,14 +4,16 @@ import net.minecraft.network.FriendlyByteBuf;
@@ -26,7 +26,7 @@ index 4df7ccd88a17d00baf51413614b920b95d008245..1de3668251bf11dd8606caf9e0d92de9
  
      public ClientboundDisconnectPacket(FriendlyByteBuf buf) {
 +        super(); // Fiddle - client perspective - deep replacements - store connection explicitly in packets that may contain deep replaceables
-         this.reason = buf.readComponent();
+         this.reason = buf.readComponentTrusted();
      }
  
 diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundBlockEntityDataPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundBlockEntityDataPacket.java
@@ -58,7 +58,7 @@ index 3944852921335c78a04a9dc301882ab5b152b1ed..f0c68c01b06b9472e56484a7b028d22a
          this.type = buf.readById(BuiltInRegistries.BLOCK_ENTITY_TYPE);
          this.tag = buf.readNbt();
 diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundCommandSuggestionsPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundCommandSuggestionsPacket.java
-index 0e0692dd4244c02ee4f972df90d9d1471bf52e1d..450a06c4554c5e99b282e8b575c0f3b6664cb29d 100644
+index 8f62c67e28cad5cb240f8a9328e92fbea71c1725..8dfbede37b0c1bd67600194ea0ace92305031f04 100644
 --- a/src/main/java/net/minecraft/network/protocol/game/ClientboundCommandSuggestionsPacket.java
 +++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundCommandSuggestionsPacket.java
 @@ -9,16 +9,18 @@ import net.minecraft.network.chat.Component;
@@ -168,7 +168,7 @@ index f3b162fc2c859fa82029c35b9b81447a7327a19a..00e290b640b321f109de66ef526f89aa
          this.offers = MerchantOffers.createFromStream(buf);
          this.villagerLevel = buf.readVarInt();
 diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundOpenScreenPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundOpenScreenPacket.java
-index ffd6111f59c86d3606841d3feac5a3ce6f62e354..87a157b11df41773ba1ebf3917d8d4dea05ce72a 100644
+index d3823dbcf595a7bd755f4e1ef48269830307a7ea..423caa6b7fd235db5aa77e95f17ccac0ae8eb455 100644
 --- a/src/main/java/net/minecraft/network/protocol/game/ClientboundOpenScreenPacket.java
 +++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundOpenScreenPacket.java
 @@ -7,18 +7,20 @@ import net.minecraft.network.chat.Component;
@@ -192,7 +192,7 @@ index ffd6111f59c86d3606841d3feac5a3ce6f62e354..87a157b11df41773ba1ebf3917d8d4de
 +        super(); // Fiddle - client perspective - deep replacements - store connection explicitly in packets that may contain deep replaceables
          this.containerId = buf.readVarInt();
          this.type = buf.readById(BuiltInRegistries.MENU);
-         this.title = buf.readComponent();
+         this.title = buf.readComponentTrusted();
 diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundSetEntityDataPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundSetEntityDataPacket.java
 index 60c866d21aec7e6ddff2b1a55b2f64133529f366..debb34a8f99c5b1356a3f742ae34a002c375f1e8 100644
 --- a/src/main/java/net/minecraft/network/protocol/game/ClientboundSetEntityDataPacket.java
@@ -251,25 +251,21 @@ index 5a8f850b447fc3a4bd0eb0c505bbdfc8be7115e8..e77a13d52756882fb78458f753533f94
          EquipmentSlot[] equipmentSlots = EquipmentSlot.values();
          this.slots = Lists.newArrayList();
 diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundSystemChatPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundSystemChatPacket.java
-index 1387e3597c43fd652f2fc82ca6fc2e83039604e2..171cdabc9b70dcdebab3898f9411d9e844aadfbc 100644
+index 56349aa5f353bac6aaa7750bb92306c6b41f0b92..a5dbce44e45ec02d7729e3d3678181830d0855f7 100644
 --- a/src/main/java/net/minecraft/network/protocol/game/ClientboundSystemChatPacket.java
 +++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundSystemChatPacket.java
-@@ -6,7 +6,31 @@ import net.minecraft.network.chat.Component;
+@@ -5,7 +5,25 @@ import net.minecraft.network.FriendlyByteBuf;
+ import net.minecraft.network.chat.Component;
  import net.minecraft.network.protocol.Packet;
  
- // Spigot start
--public record ClientboundSystemChatPacket(@javax.annotation.Nullable net.kyori.adventure.text.Component adventure$content, @javax.annotation.Nullable String content, boolean overlay) implements Packet<ClientGamePacketListener> { // Paper - Adventure
+-public record ClientboundSystemChatPacket(Component content, boolean overlay) implements Packet<ClientGamePacketListener> {
++// Spigot start
 +// Fiddle start - client perspective - deep replacements - store connection explicitly in packets that may contain deep replaceables
 +public class ClientboundSystemChatPacket extends org.fiddlemc.fiddle.packet.PacketWithExplicitTargetClientConnection<ClientGamePacketListener> { // Paper - Adventure
-+    private final @javax.annotation.Nullable net.kyori.adventure.text.Component adventure$content;
-+    private final @javax.annotation.Nullable String content;
++    private final Component content;
 +    private final boolean overlay;
 +
-+    public @javax.annotation.Nullable net.kyori.adventure.text.Component adventure$content() {
-+        return this.adventure$content;
-+    }
-+
-+    public @javax.annotation.Nullable String content() {
++    public Component content() {
 +        return this.content;
 +    }
 +
@@ -277,34 +273,23 @@ index 1387e3597c43fd652f2fc82ca6fc2e83039604e2..171cdabc9b70dcdebab3898f9411d9e8
 +        return this.overlay;
 +    }
 +
-+    public ClientboundSystemChatPacket(@javax.annotation.Nullable net.kyori.adventure.text.Component adventure$content, @javax.annotation.Nullable String content, boolean overlay) {
-+        this.adventure$content = adventure$content;
++    public ClientboundSystemChatPacket(Component content, boolean overlay) {
 +        this.content = content;
 +        this.overlay = overlay;
-+        this.checkHasContent();
 +    }
 +    // Fiddle end - client perspective - deep replacements - store connection explicitly in packets that may contain deep replaceables
  
-     @io.papermc.paper.annotation.DoNotUse // Paper - No locale context
-     public ClientboundSystemChatPacket(Component content, boolean overlay) {
-@@ -18,7 +42,7 @@ public record ClientboundSystemChatPacket(@javax.annotation.Nullable net.kyori.a
-     }
-     // Spigot end
-     // Paper start
--    public ClientboundSystemChatPacket {
-+    private void checkHasContent() { // Fiddle - client perspective - deep replacements - store connection explicitly in packets that may contain deep replaceables
-         com.google.common.base.Preconditions.checkArgument(!(adventure$content == null && content == null), "Component adventure$content and String (json) content cannot both be null");
+     // Spigot start
+     public ClientboundSystemChatPacket(net.md_5.bungee.api.chat.BaseComponent[] content, boolean overlay) {
+@@ -24,7 +42,7 @@ public record ClientboundSystemChatPacket(Component content, boolean overlay) im
+ 
+     @Override
+     public void write(FriendlyByteBuf buf) {
+-        buf.writeComponent(this.content);
++        buf.writeComponent(this.content, org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope.EVERYTHING); // Fiddle - client perspective - deep replacements - store connection explicitly in packets that may contain deep replaceables
+         buf.writeBoolean(this.overlay);
      }
  
-@@ -45,7 +69,7 @@ public record ClientboundSystemChatPacket(@javax.annotation.Nullable net.kyori.a
-         if (this.adventure$content != null) {
-             buf.writeComponent(this.adventure$content);
-         } else if (this.content != null) {
--        buf.writeUtf(this.content, 262144); // Spigot
-+        buf.writeUtf(this.content, 262144, true, false, org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope.EVERYTHING); // Spigot // Fiddle - client perspective - deep replacements - store connection explicitly in packets that may contain deep replaceables
-         } else {
-             throw new IllegalArgumentException("Must supply either adventure component or string json content");
-         }
 diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundTagQueryPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundTagQueryPacket.java
 index e778322664bdd88bc34605f82c90ca7a5994e2f5..c7bccdd7a76de22b8f9f23d448e9a13925216b12 100644
 --- a/src/main/java/net/minecraft/network/protocol/game/ClientboundTagQueryPacket.java

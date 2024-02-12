@@ -11,7 +11,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/world/item/Item.java b/src/main/java/net/minecraft/world/item/Item.java
-index fdcc7c24e61d78964c18fede55ab8013bd6e985f..d9ff8199a58fa59ab8d149838deda48cc15da777 100644
+index 7c037da519a6e487128c0e49b43cea80ff38a281..b163e80205ef3c44d8921c172844fc85219a9f81 100644
 --- a/src/main/java/net/minecraft/world/item/Item.java
 +++ b/src/main/java/net/minecraft/world/item/Item.java
 @@ -59,6 +59,7 @@ public class Item implements FeatureElement, ItemLike {
@@ -23,11 +23,11 @@ index fdcc7c24e61d78964c18fede55ab8013bd6e985f..d9ff8199a58fa59ab8d149838deda48c
      private final int maxStackSize;
      private final int maxDamage;
 diff --git a/src/main/java/net/minecraft/world/level/block/Block.java b/src/main/java/net/minecraft/world/level/block/Block.java
-index e4f159bd937db5097b9cbf7aee6f216fe5b32d01..ea1365e0f95aba5f37b78f2ef925c8ca1becbb94 100644
+index 512906b5d977bddd0a218d70479279d7eeeb18e4..af60eff82fa914fd144b10bbeadbc00f59985732 100644
 --- a/src/main/java/net/minecraft/world/level/block/Block.java
 +++ b/src/main/java/net/minecraft/world/level/block/Block.java
-@@ -66,7 +66,9 @@ public class Block extends BlockBehaviour implements ItemLike {
- 
+@@ -68,7 +68,9 @@ public class Block extends BlockBehaviour implements ItemLike {
+     public static final MapCodec<Block> CODEC = simpleCodec(Block::new);
      private static final Logger LOGGER = LogUtils.getLogger();
      private final Holder.Reference<Block> builtInRegistryHolder;
 +    public static final IdMapper<Block> VANILLA_ONLY_BLOCK_REGISTRY = new org.fiddlemc.fiddle.registry.VanillaOnlyBlockRegistry(); // Fiddle - modded registries - vanilla-only registries - create - block
