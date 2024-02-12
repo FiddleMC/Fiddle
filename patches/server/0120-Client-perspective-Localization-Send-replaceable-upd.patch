@@ -8,11 +8,11 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index 114bcd7417e561a98bb1e7be186e2d20b7ce2d57..8e7e68a0eceddaf38b8f43ba656b036d33792c90 100644
+index b132a518b0429cb41b36ad9ccaf5dc023987b680..40061a2a1295116d4c7e792448354bfa73024dc2 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-@@ -2047,13 +2047,21 @@ public class ServerPlayer extends Player {
-             PlayerChangedMainHandEvent event = new PlayerChangedMainHandEvent(this.getBukkitEntity(), getMainArm() == HumanoidArm.LEFT ? MainHand.LEFT : MainHand.RIGHT);
+@@ -2048,7 +2048,10 @@ public class ServerPlayer extends Player {
+             PlayerChangedMainHandEvent event = new PlayerChangedMainHandEvent(this.getBukkitEntity(), this.getMainArm() == HumanoidArm.LEFT ? MainHand.LEFT : MainHand.RIGHT);
              this.server.server.getPluginManager().callEvent(event);
          }
 -        if (this.language == null || !this.language.equals(clientOptions.language())) { // Paper
@@ -23,8 +23,9 @@ index 114bcd7417e561a98bb1e7be186e2d20b7ce2d57..8e7e68a0eceddaf38b8f43ba656b036d
              PlayerLocaleChangeEvent event = new PlayerLocaleChangeEvent(this.getBukkitEntity(), clientOptions.language());
              this.server.server.getPluginManager().callEvent(event);
              this.server.server.getPluginManager().callEvent(new com.destroystokyo.paper.event.player.PlayerLocaleChangeEvent(this.getBukkitEntity(), this.language, clientOptions.language())); // Paper
-         }
-         // CraftBukkit end
+@@ -2060,6 +2063,11 @@ public class ServerPlayer extends Player {
+     public void updateOptionsNoEvents(ClientInformation clientOptions) {
+         // Paper end
          this.language = clientOptions.language();
 +        // Fiddle start - client perspective - localization - send update packets for replaceables after locale change
 +        if (localeChanged) {

@@ -36,7 +36,7 @@ index c3f1ab474cf564634e52ce4a76fdee1673c18559..a71e3e07d9b7eed16f1fef95c445a305
              /*
              IRegistryCustom.Dimension iregistrycustom_dimension = worldstem.registries().compositeAccess();
 diff --git a/src/main/java/org/bukkit/craftbukkit/Main.java b/src/main/java/org/bukkit/craftbukkit/Main.java
-index ba63e3f4b9c4b95d91114d4b85f8582107747cd2..1ee6e0defc7619bc49a0f83cf960d4090e2dacfd 100644
+index fd667ecf38e9b279154ab56227925fff345de583..fab6fab7cd2dc7bd0d45cab5a25ecf3fc297b2e5 100644
 --- a/src/main/java/org/bukkit/craftbukkit/Main.java
 +++ b/src/main/java/org/bukkit/craftbukkit/Main.java
 @@ -18,6 +18,13 @@ public class Main {
@@ -57,12 +57,12 @@ index ba63e3f4b9c4b95d91114d4b85f8582107747cd2..1ee6e0defc7619bc49a0f83cf960d409
                          .defaultsTo(new File("server.properties"))
                          .describedAs("Properties file");
  
--                acceptsAll(Main.asList("P", "plugins"), "Plugin directory to use")
-+                acceptsAll(Main.asList("P", pluginsFolderNameOptionKey), "Plugin directory to use")
+-                this.acceptsAll(Main.asList("P", "plugins"), "Plugin directory to use")
++                this.acceptsAll(Main.asList("P", pluginsFolderNameOptionKey), "Plugin directory to use") // Fiddle - read packs - scan for packs - command line arguments
                          .withRequiredArg()
                          .ofType(File.class)
 -                        .defaultsTo(new File("plugins"))
-+                        .defaultsTo(new File(defaultPluginsFolderName))
++                        .defaultsTo(new File(defaultPluginsFolderName)) // Fiddle - read packs - scan for packs - command line arguments
                          .describedAs("Plugin directory");
  
 +                // Fiddle start - read packs - scan for packs - command line arguments
@@ -73,7 +73,7 @@ index ba63e3f4b9c4b95d91114d4b85f8582107747cd2..1ee6e0defc7619bc49a0f83cf960d409
 +                    .describedAs("Fiddle pack directory");
 +                // Fiddle end - read packs - scan for packs - command line arguments
 +
-                 acceptsAll(Main.asList("h", "host", "server-ip"), "Host to listen on")
+                 this.acceptsAll(Main.asList("h", "host", "server-ip"), "Host to listen on")
                          .withRequiredArg()
                          .ofType(String.class)
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/PackScanner.java b/src/main/java/org/fiddlemc/fiddle/pack/read/PackScanner.java

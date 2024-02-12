@@ -522,7 +522,7 @@ index ec268189b19b6fa5c4521f96ce211a531db35ec5..dc8d3f1d2c4d37331802cc21903775cc
              Bootstrap.bootStrap();
              Bootstrap.validate();
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index fa457a6206e702dacf8bab7609efca60dd9bc02b..150f58be21ca15d8c6ad6cc7976205656877172d 100644
+index ab8689150820418854088594408a5f70488f3367..1a8d802dba1450642925d3bb21c585f614337358 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -299,7 +299,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
@@ -579,7 +579,7 @@ index a9b2c8cd4dcd3f884e4306bebee9334d3848fce5..9dbd17f5f587fca1cc33b14af36eb45b
 +
  }
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-index dbccbcb9b44e4efacdf53c2d161115cc20b36cff..bf522130c998c86c2bffac607ea5a57e732d525d 100644
+index 2b5d82fbf4e7ec32d0c53dd3e8207b1dba708bbd..8935ebc8cbf7d8a01b1713d69a9c5fa12350a282 100644
 --- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 @@ -208,6 +208,9 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
@@ -593,7 +593,7 @@ index dbccbcb9b44e4efacdf53c2d161115cc20b36cff..bf522130c998c86c2bffac607ea5a57e
          if (this.convertOldUsers()) {
              this.getProfileCache().save(false); // Paper
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index 868951dc21aff541765b1f58f08cdf3c47446d25..72965e0e120b1e4392aee38cca5acc6055e328d4 100644
+index 584a768f2ce1c98a1de7749060c47f21721f9055..f60ad1b920ac4a3a8ca4fedac778bb84e0cf8c35 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
 @@ -691,7 +691,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
@@ -606,7 +606,7 @@ index 868951dc21aff541765b1f58f08cdf3c47446d25..72965e0e120b1e4392aee38cca5acc60
          this.convertable = convertable_conversionsession;
          this.uuid = WorldUUID.getUUID(convertable_conversionsession.levelDirectory.path().toFile());
 diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
-index ea8a0961190e9aafda4fed6fecd85097c141040a..c9c1c6ab47c405a2c9a6a2e0a2aeb6bacebef1d0 100644
+index 2354a0e5d15e9be633d9fe3a1a9feefe7b9b7782..5f4e816235d096432f6acc15cbdd50c9a7fce428 100644
 --- a/src/main/java/net/minecraft/world/level/Level.java
 +++ b/src/main/java/net/minecraft/world/level/Level.java
 @@ -174,6 +174,12 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
@@ -635,12 +635,12 @@ index ea8a0961190e9aafda4fed6fecd85097c141040a..c9c1c6ab47c405a2c9a6a2e0a2aeb6ba
          this.world = new CraftWorld((ServerLevel) this, gen, biomeProvider, env);
  
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 55cd66a2ff5e1bc175bccf676c17b9a564f6d57f..6800d7fa8818f5f39de6ff041f3e628e28df19ec 100644
+index 93891f11a9abab43405ba86eb35a8fa3b93335c2..62024145ea669e46cfe0d64c78faac3ba07bb191 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 @@ -1039,6 +1039,7 @@ public final class CraftServer implements Server {
  
-         org.spigotmc.SpigotConfig.init((File) console.options.valueOf("spigot-settings")); // Spigot
+         org.spigotmc.SpigotConfig.init((File) this.console.options.valueOf("spigot-settings")); // Spigot
          this.console.paperConfigurations.reloadConfigs(this.console);
 +        org.fiddlemc.fiddle.configuration.FiddleConfigurations.get(null).reloadConfigs(this.console); // Fiddle - Fiddle configuration
          for (ServerLevel world : this.console.getAllLevels()) {

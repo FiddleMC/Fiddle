@@ -12,7 +12,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Bootstrap.java b/src/main/java/net/minecraft/server/Bootstrap.java
-index 4307af2e7d8d50c146802fa5278c3f053dad1608..fba0a71694b0e9f15e5424850970fcdd5d47b3eb 100644
+index b884cca03877b03c3eb10d573ea25935ee68532d..e594bcb5fbaf349a2475257477f4a3a5cd7a3f8b 100644
 --- a/src/main/java/net/minecraft/server/Bootstrap.java
 +++ b/src/main/java/net/minecraft/server/Bootstrap.java
 @@ -87,6 +87,7 @@ public class Bootstrap {
@@ -22,4 +22,4 @@ index 4307af2e7d8d50c146802fa5278c3f053dad1608..fba0a71694b0e9f15e5424850970fcdd
 +                    org.fiddlemc.fiddle.pack.load.fiddlecontent.block.BlockByDefinitionLoader.INSTANCE.register(readContentDefinitions.get(org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.block.BlockDefinition.TYPE)); // Fiddle - load packs - blocks - register - call after vanilla bootstrap
                      // Paper start
                      BuiltInRegistries.bootStrap(() -> {
-                         net.minecraft.core.Registry.register(net.minecraft.core.registries.BuiltInRegistries.MATERIAL_CONDITION, new net.minecraft.resources.ResourceLocation("paper", "bedrock_condition_source"), net.minecraft.data.worldgen.SurfaceRuleData.PaperBedrockConditionSource.CODEC.codec());
+                         io.papermc.paper.world.worldgen.OptionallyFlatBedrockConditionSource.bootstrap(); // Paper - optional flat bedrock

@@ -16,18 +16,18 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-index 7a9773cf0e4afe4d0f0441f6732f3abbfac77fdd..44444bf354b8041aaff1604e3c2657edeb776aa8 100644
+index e6869549dd3888fe92e906d8c98f59d1462269d9..82b6dc02c77da46bb30b0cfba1fe3bb66a80073f 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-@@ -63,6 +63,7 @@ import org.bukkit.inventory.ItemStack;
- import org.bukkit.material.MaterialData;
+@@ -68,6 +68,7 @@ import org.bukkit.material.MaterialData;
  import org.bukkit.plugin.InvalidPluginException;
  import org.bukkit.plugin.PluginDescriptionFile;
+ import org.bukkit.potion.PotionType;
 +import org.fiddlemc.fiddle.material.*;
  
  @SuppressWarnings("deprecation")
  public final class CraftMagicNumbers implements UnsafeValues {
-@@ -70,6 +71,125 @@ public final class CraftMagicNumbers implements UnsafeValues {
+@@ -75,6 +76,125 @@ public final class CraftMagicNumbers implements UnsafeValues {
  
      private CraftMagicNumbers() {}
  
@@ -153,7 +153,7 @@ index 7a9773cf0e4afe4d0f0441f6732f3abbfac77fdd..44444bf354b8041aaff1604e3c2657ed
      // Paper start
      @Override
      public net.kyori.adventure.text.flattener.ComponentFlattener componentFlattener() {
-@@ -656,4 +776,97 @@ public final class CraftMagicNumbers implements UnsafeValues {
+@@ -689,4 +809,97 @@ public final class CraftMagicNumbers implements UnsafeValues {
          public static final int TAG_INT_ARRAY = 11;
          public static final int TAG_ANY_NUMBER = 99;
      }

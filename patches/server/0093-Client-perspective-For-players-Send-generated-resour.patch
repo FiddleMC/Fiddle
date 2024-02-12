@@ -32,10 +32,10 @@ index c5598adb8cbcbcf7277c2fd4dd72c243d44d9700..1fd4f4e205480c7d8ea9a26108199696
          // Paper start - Configurable rcon ip
          final String rconIp = this.getStringRaw("rcon.ip");
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index d4aec99cac3f83d764e21946cc904c00e084704e..98b89412e896a4f91050d876f236b1e04e6bae75 100644
+index f71a4a8307fb092d33545e12d253e0b80c884168..c6bfc4ea2531a7732f2b1aefeeca9313d2c93b79 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-@@ -278,6 +278,8 @@ public class ServerPlayer extends Player {
+@@ -279,6 +279,8 @@ public class ServerPlayer extends Player {
      private final java.util.concurrent.atomic.AtomicReference<io.papermc.paper.chunk.system.RegionizedPlayerChunkLoader.ViewDistances> viewDistances = new java.util.concurrent.atomic.AtomicReference<>(new io.papermc.paper.chunk.system.RegionizedPlayerChunkLoader.ViewDistances(-1, -1, -1));
      public io.papermc.paper.chunk.system.RegionizedPlayerChunkLoader.PlayerChunkLoaderData chunkLoader;
  
@@ -92,7 +92,7 @@ index 655c065a30db9b0aab4a169702b8c8907d075514..f544959972b9b881231bcf9833b1ca18
  
      }
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index e188bb3ba5d2ec28421947c0b66b25eecb569bfe..7dbaebb6d44a85a1586df64898bafbcf3f3b958e 100644
+index 4f237880cf53ec2eb4e7c93dccc168bbb682f473..4aa60f7cbe2844391d0c0cb4a4ecf680ff749105 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 @@ -2297,34 +2297,48 @@ public class CraftPlayer extends CraftHumanEntity implements Player {

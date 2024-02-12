@@ -38,10 +38,10 @@ index 7b4947aa2cdd7f359184689bf348560bde1016dd..b1ad8bea989510bedfdf6674362336e1
          this.pos = pos;
          this.blockState = state;
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index 8e7e68a0eceddaf38b8f43ba656b036d33792c90..fb441c429875b5578a4cf78e8931ad59bd7b250f 100644
+index 40061a2a1295116d4c7e792448354bfa73024dc2..eb56b8e676ba4c798b5540363ff866d75f59aea7 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-@@ -2708,4 +2708,29 @@ public class ServerPlayer extends Player {
+@@ -2717,4 +2717,29 @@ public class ServerPlayer extends Player {
      }
      // Fiddle end - client perspective - deep replacements - send updates
  

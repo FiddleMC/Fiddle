@@ -81,7 +81,7 @@ index 9ca897d92c5bdd2764d114c74d64c776674d6beb..10b6947ccda5abc4c696e9ee6fdc0896
  
          @Override
 diff --git a/src/main/java/net/minecraft/network/syncher/SynchedEntityData.java b/src/main/java/net/minecraft/network/syncher/SynchedEntityData.java
-index 5dfb35117c285e0b202dc9c088ad5848beb8d054..b8603e5424449f34d443d8acdb4229e8d775a720 100644
+index a043c382c37058032548a5192e17f5f816abe5a6..8ab2c370ebe5f9dc432c5ea86610ea74cf27744f 100644
 --- a/src/main/java/net/minecraft/network/syncher/SynchedEntityData.java
 +++ b/src/main/java/net/minecraft/network/syncher/SynchedEntityData.java
 @@ -279,7 +279,7 @@ public class SynchedEntityData {
@@ -93,7 +93,7 @@ index 5dfb35117c285e0b202dc9c088ad5848beb8d054..b8603e5424449f34d443d8acdb4229e8
                  } // Paper
              }
          }
-@@ -326,7 +326,7 @@ public class SynchedEntityData {
+@@ -329,7 +329,7 @@ public class SynchedEntityData {
              values.add(synchedValue.value());
          }
  
@@ -102,7 +102,7 @@ index 5dfb35117c285e0b202dc9c088ad5848beb8d054..b8603e5424449f34d443d8acdb4229e8
      }
      // Paper end
  
-@@ -380,7 +380,7 @@ public class SynchedEntityData {
+@@ -383,7 +383,7 @@ public class SynchedEntityData {
              return new SynchedEntityData.DataValue<>(data.getId(), datawatcherserializer, datawatcherserializer.copy(value));
          }
  
@@ -111,7 +111,7 @@ index 5dfb35117c285e0b202dc9c088ad5848beb8d054..b8603e5424449f34d443d8acdb4229e8
              int i = EntityDataSerializers.getSerializedId(this.serializer);
  
              if (i < 0) {
-@@ -388,7 +388,13 @@ public class SynchedEntityData {
+@@ -391,7 +391,13 @@ public class SynchedEntityData {
              } else {
                  buf.writeByte(this.id);
                  buf.writeVarInt(i);
@@ -149,10 +149,10 @@ index 35674f92a67f93382103c2766df4b678ba5c862f..250d529ed8043b69e7eebbf9c73bcc92
  
          if (this.entity instanceof LivingEntity) {
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index f20ae9153b7098980ce6c0e75fcbbb4da652661b..f133f2c14aeeac7144ded8a3992d0de192b92641 100644
+index d435d04ab50b2f64e6438c6c26639b6048322013..f21205e33d9917708a00b51610927526c870e7aa 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
-@@ -4836,4 +4836,11 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
+@@ -4869,4 +4869,11 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
          return ((net.minecraft.server.level.ServerChunkCache) level.getChunkSource()).isPositionTicking(this);
      }
      // Paper end

@@ -5651,10 +5651,10 @@ index 8469cd2b8414fee9d06577bd5ee8379321d053f1..258e2301efeb2facae185cc980fe0862
  
      /**
 diff --git a/src/main/java/org/bukkit/UnsafeValues.java b/src/main/java/org/bukkit/UnsafeValues.java
-index a28463f13c995d501b6a0ba0040ba1689bab5b77..dd256344c1a2f25db0204e760d7b5663d343cb4e 100644
+index 39c2bf249ecd8e6702b472b8ddca9945c20d76ec..eacd1460facf86fc08acd050b84c110677508b30 100644
 --- a/src/main/java/org/bukkit/UnsafeValues.java
 +++ b/src/main/java/org/bukkit/UnsafeValues.java
-@@ -283,4 +283,48 @@ public interface UnsafeValues {
+@@ -292,4 +292,48 @@ public interface UnsafeValues {
      boolean isVanillaItem(Material material);
      // Fiddle end - flags for vanilla content - API - item
  

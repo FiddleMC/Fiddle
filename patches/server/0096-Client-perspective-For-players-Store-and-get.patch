@@ -33,10 +33,10 @@ index 3d650b96cc5e4b30d8bf82a8a7edda63ead28969..88f958349b466ac717ede5748ce5a4ff
 +
  }
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index 98b89412e896a4f91050d876f236b1e04e6bae75..498119eafda2ab1c61615fe7e6ecb5063f14bdec 100644
+index c6bfc4ea2531a7732f2b1aefeeca9313d2c93b79..badc2507bbd08905c84811ff0758ca2cad1b2edc 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-@@ -280,6 +280,8 @@ public class ServerPlayer extends Player {
+@@ -281,6 +281,8 @@ public class ServerPlayer extends Player {
  
      public boolean hasBeenPlacedIntoPlayerList = false; // Fiddle - client perspective - send resource pack
  
@@ -45,7 +45,7 @@ index 98b89412e896a4f91050d876f236b1e04e6bae75..498119eafda2ab1c61615fe7e6ecb506
      public io.papermc.paper.chunk.system.RegionizedPlayerChunkLoader.ViewDistances getViewDistances() {
          return this.viewDistances.get();
      }
-@@ -2649,4 +2651,25 @@ public class ServerPlayer extends Player {
+@@ -2658,4 +2660,25 @@ public class ServerPlayer extends Player {
          return (CraftPlayer) super.getBukkitEntity();
      }
      // CraftBukkit end

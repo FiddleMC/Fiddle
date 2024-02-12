@@ -10,10 +10,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
-index d56632563e638c9ad8eddc768fcb60910d81874d..057bd5517dab25db13196b2f38284b42d384a0df 100644
+index 5dfa7b67fbcb3ca1f80a54ef8706e2a73157bea5..e1159ca9660e63703f91fa94bcb02ddd2a397f5d 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
-@@ -514,14 +514,14 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -515,14 +515,14 @@ public class CraftWorld extends CraftRegionAccessor implements World {
                  if (playersInRange.isEmpty()) return true; // Paper - rewrite player chunk loader
  
                  // Paper start - Anti-Xray - Bypass

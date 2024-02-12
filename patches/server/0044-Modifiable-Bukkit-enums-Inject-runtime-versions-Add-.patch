@@ -11,10 +11,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 01c16b58c875c3d25a2853f731c8b6517e500aa6..5bc537a26d27687a1ccb04b68d0db8950b21cf2f 100644
+index 4e3f419057fd897c7853f2bd7043bed327aca675..2a0a7f60554d80c7fbd37d160f0aba34e202e2bb 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
-@@ -89,6 +89,7 @@ tasks.jar {
+@@ -87,6 +87,7 @@ tasks.jar {
          val gitBranch = git("rev-parse", "--abbrev-ref", "HEAD").getText().trim() // Paper
          attributes(
              "Main-Class" to "org.bukkit.craftbukkit.Main",
@@ -22,7 +22,7 @@ index 01c16b58c875c3d25a2853f731c8b6517e500aa6..5bc537a26d27687a1ccb04b68d0db895
              "Implementation-Title" to "CraftBukkit",
              "Implementation-Version" to "git-Fiddle-$implementationVersion", // Fiddle - branding changes - rename server brand
              "Implementation-Vendor" to date, // Paper
-@@ -198,6 +199,7 @@ fun TaskContainer.registerRunTask(
+@@ -196,6 +197,7 @@ fun TaskContainer.registerRunTask(
      val memoryGb = providers.gradleProperty("paper.runMemoryGb").getOrElse("2")
      minHeapSize = "${memoryGb}G"
      maxHeapSize = "${memoryGb}G"

@@ -10,10 +10,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/NamespacedKey.java b/src/main/java/org/bukkit/NamespacedKey.java
-index 1416918d1924b362a688635823484f16e6adf125..a27186d79b17fe59b5f6651803cae21b17148378 100644
+index 8ac72cb0b05e2c493d98310f2e87c3714d15c5e3..8ebc1bc3e6739bcf10ca6d149b69f68f312f3104 100644
 --- a/src/main/java/org/bukkit/NamespacedKey.java
 +++ b/src/main/java/org/bukkit/NamespacedKey.java
-@@ -29,6 +29,14 @@ public final class NamespacedKey implements net.kyori.adventure.key.Key, com.des
+@@ -30,6 +30,14 @@ public final class NamespacedKey implements net.kyori.adventure.key.Key, com.des
       * compatibility measures.
       */
      public static final String BUKKIT = "bukkit";
