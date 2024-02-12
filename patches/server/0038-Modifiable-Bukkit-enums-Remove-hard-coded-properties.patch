@@ -252,10 +252,10 @@ index a139e20ddfb460b81c2d652800a24efefd823913..b89febef77c4aadcd210d154d38d766a
 +
  }
 diff --git a/src/test/java/org/fiddlemc/fiddle/material/legacy/PerLegacyMaterialTest.java b/src/test/java/org/fiddlemc/fiddle/material/legacy/PerLegacyMaterialTest.java
-index 95e539a0c7ede3a4bed906a6e624ab328480d0e6..5584b3271cdbd62faab7d6b9949e5750326650b6 100644
+index 3087de012e42239a362b612bb9474c3d8dd2ab10..731582108911693263a7526cc60b0b2f8345b964 100644
 --- a/src/test/java/org/fiddlemc/fiddle/material/legacy/PerLegacyMaterialTest.java
 +++ b/src/test/java/org/fiddlemc/fiddle/material/legacy/PerLegacyMaterialTest.java
-@@ -35,4 +35,83 @@ public class PerLegacyMaterialTest extends AbstractTestingBase {
+@@ -36,4 +36,83 @@ public class PerLegacyMaterialTest extends AbstractTestingBase {
          }
      }
  
@@ -263,77 +263,77 @@ index 95e539a0c7ede3a4bed906a6e624ab328480d0e6..5584b3271cdbd62faab7d6b9949e5750
 +    @Test
 +    public void isBlock() {
 +        for (Material material : getMaterials()) {
-+            assertEquals("isBlock equals legacy isBlock for " + material, material.isBlockLegacy(), material.isBlock());
++            assertEquals(material.isBlockLegacy(), material.isBlock(), "isBlock does not equal legacy isBlock for " + material);
 +        }
 +    }
 +
 +    @Test
 +    public void isEdible() {
 +        for (Material material : getMaterials()) {
-+            assertEquals("isEdible equals legacy isEdible for " + material, material.isEdibleLegacy(), material.isEdible());
++            assertEquals(material.isEdibleLegacy(), material.isEdible(), "isEdible does not equal legacy isEdible for " + material);
 +        }
 +    }
 +
 +    @Test
 +    public void isRecord() {
 +        for (Material material : getMaterials()) {
-+            assertEquals("isRecord equals legacy iisRecord for " + material, material.isRecordLegacy(), material.isRecord());
++            assertEquals(material.isRecordLegacy(), material.isRecord(), "isRecord does not equal legacy iisRecord for " + material);
 +        }
 +    }
 +
 +    @Test
 +    public void isSolid() {
 +        for (Material material : getMaterials()) {
-+            assertEquals("isSolid equals legacy isSolid for " + material, material.isSolidLegacy(), material.isSolid());
++            assertEquals(material.isSolidLegacy(), material.isSolid(), "isSolid does not equal legacy isSolid for " + material);
 +        }
 +    }
 +
 +    @Test
 +    public void isAir() {
 +        for (Material material : getMaterials()) {
-+            assertEquals("isAir equals legacy isAir for " + material, material.isAirLegacy(), material.isAir());
++            assertEquals(material.isAirLegacy(), material.isAir(), "isAir does not equal legacy isAir for " + material);
 +        }
 +    }
 +
 +    @Test
 +    public void isFlammable() {
 +        for (Material material : getMaterials()) {
-+            assertEquals("isFlammable equals legacy isFlammable for " + material, material.isFlammableLegacy(), material.isFlammable());
++            assertEquals(material.isFlammableLegacy(), material.isFlammable(), "isFlammable does not equal legacy isFlammable for " + material);
 +        }
 +    }
 +
 +    @Test
 +    public void isBurnable() {
 +        for (Material material : getMaterials()) {
-+            assertEquals("isBurnable equals legacy isBurnable for " + material, material.isBurnableLegacy(), material.isBurnable());
++            assertEquals(material.isBurnableLegacy(), material.isBurnable(), "isBurnable does not equal legacy isBurnable for " + material);
 +        }
 +    }
 +
 +    @Test
 +    public void isFuel() {
 +        for (Material material : getMaterials()) {
-+            assertEquals("isFuel equals legacy isFuel for " + material, material.isFuelLegacy(), material.isFuel());
++            assertEquals(material.isFuelLegacy(), material.isFuel(), "isFuel does not equal legacy isFuel for " + material);
 +        }
 +    }
 +
 +    @Test
 +    public void isOccluding() {
 +        for (Material material : getMaterials()) {
-+            assertEquals("isOccluding equals legacy isOccluding for " + material, material.isOccludingLegacy(), material.isOccluding());
++            assertEquals(material.isOccludingLegacy(), material.isOccluding(), "isOccluding does not equal legacy isOccluding for " + material);
 +        }
 +    }
 +
 +    @Test
 +    public void hasGravity() {
 +        for (Material material : getMaterials()) {
-+            assertEquals("hasGravity equals legacy hasGravity for " + material, material.hasGravityLegacy(), material.hasGravity());
++            assertEquals(material.hasGravityLegacy(), material.hasGravity(), "hasGravity does not equal legacy hasGravity for " + material);
 +        }
 +    }
 +
 +    @Test
 +    public void isItem() {
 +        for (Material material : getMaterials()) {
-+            assertEquals("isItem equals legacy isItem for " + material, material.isItemLegacy(), material.isItem());
++            assertEquals(material.isItemLegacy(), material.isItem(), "isItem does not equal legacy isItem for " + material);
 +        }
 +    }
 +    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - most properties

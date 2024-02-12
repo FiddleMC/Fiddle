@@ -67,7 +67,7 @@ index 42a99ea7d67f74348f64ca33a0db5ddb639b0691..208a72638ee3e984c34d2ba2a473479a
      @Override
      public boolean isBlock(Material material) {
 diff --git a/src/test/java/org/fiddlemc/fiddle/material/legacy/PerLegacyMaterialTest.java b/src/test/java/org/fiddlemc/fiddle/material/legacy/PerLegacyMaterialTest.java
-index 468f1ef483294c7ec7b1712dc8f88865ea9e5874..ce1651edc34e52086fffe62f8a6f6785c6c3ac59 100644
+index 404343e96be4c5834fd159578530fb6e1a7a763a..b5162d77e33a806a74b24233ad38127029071702 100644
 --- a/src/test/java/org/fiddlemc/fiddle/material/legacy/PerLegacyMaterialTest.java
 +++ b/src/test/java/org/fiddlemc/fiddle/material/legacy/PerLegacyMaterialTest.java
 @@ -5,6 +5,7 @@ package org.fiddlemc.fiddle.material.legacy;
@@ -75,10 +75,10 @@ index 468f1ef483294c7ec7b1712dc8f88865ea9e5874..ce1651edc34e52086fffe62f8a6f6785
  import org.bukkit.craftbukkit.legacy.CraftLegacy;
  import org.bukkit.support.AbstractTestingBase;
 +import org.fiddlemc.fiddle.material.MaterialDefaultImplementations;
- import org.junit.Test;
+ import org.junit.jupiter.api.Test;
  
  import java.util.Arrays;
-@@ -60,6 +61,22 @@ public class PerLegacyMaterialTest extends AbstractTestingBase {
+@@ -61,6 +62,22 @@ public class PerLegacyMaterialTest extends AbstractTestingBase {
      }
      // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - durability
  
@@ -86,14 +86,14 @@ index 468f1ef483294c7ec7b1712dc8f88865ea9e5874..ce1651edc34e52086fffe62f8a6f6785
 +    @Test
 +    public void computeData_general() {
 +        for (Material material : getMaterials()) {
-+            assertEquals("computeData equals hard-coded data for " + material, material.data, material.computeData());
++            assertEquals(material.data, material.computeData(), "computeData does not equal hard-coded data for " + material);
 +        }
 +    }
 +
 +    @Test
 +    public void computeData_legacy() {
 +        for (Material material : getMaterials()) {
-+            assertEquals("computeData equals legacy computeData for " + material, MaterialDefaultImplementations.computeDataLegacy(material), material.computeData());
++            assertEquals(MaterialDefaultImplementations.computeDataLegacy(material), material.computeData(), "computeData does not equal legacy computeData for " + material);
 +        }
 +    }
 +    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - data
@@ -102,7 +102,7 @@ index 468f1ef483294c7ec7b1712dc8f88865ea9e5874..ce1651edc34e52086fffe62f8a6f6785
      @Test
      public void isBlock() {
 diff --git a/src/test/java/org/fiddlemc/fiddle/material/legacy/PerNonLegacyMaterialTest.java b/src/test/java/org/fiddlemc/fiddle/material/legacy/PerNonLegacyMaterialTest.java
-index b1a96deb7a50eb9fed7f2e25a083375be8e1e3eb..3234b4e74e22c25e534913697b578cefee6995e9 100644
+index 22dc1eb2e1849b90f952c244d5f2060c8c35839e..fd41b0c76fc42e689fe650ff393df91a9ec1cc9e 100644
 --- a/src/test/java/org/fiddlemc/fiddle/material/legacy/PerNonLegacyMaterialTest.java
 +++ b/src/test/java/org/fiddlemc/fiddle/material/legacy/PerNonLegacyMaterialTest.java
 @@ -64,4 +64,13 @@ public class PerNonLegacyMaterialTest extends AbstractTestingBase {
@@ -113,7 +113,7 @@ index b1a96deb7a50eb9fed7f2e25a083375be8e1e3eb..3234b4e74e22c25e534913697b578cef
 +    @Test
 +    public void computeData() {
 +        for (Material material : getMaterials()) {
-+            assertEquals("computeData equals hard-coded data for " + material, material.data, material.computeData());
++            assertEquals(material.data, material.computeData(), "computeData does not equal hard-coded data for " + material);
 +        }
 +    }
 +    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - data

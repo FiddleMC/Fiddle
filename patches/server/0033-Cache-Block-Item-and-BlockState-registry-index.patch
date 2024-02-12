@@ -253,7 +253,7 @@ index 94ff1dd6849f1e4f225254ff5c36421c7632b897..c5a0911cd33229c8a952293aacfc30b2
  
  }
 diff --git a/src/test/java/org/fiddlemc/fiddle/block/PerBlockTest.java b/src/test/java/org/fiddlemc/fiddle/block/PerBlockTest.java
-index bc9f7245a13a8a336cda803c8b23010098e7d83d..f6d757b6401b19ce66037442e0b40530fe5e7782 100644
+index cc59e81f1670e34f357d96c9be316af382322301..51c4f8d436fb54bca00abb6f14753641e8f1bae7 100644
 --- a/src/test/java/org/fiddlemc/fiddle/block/PerBlockTest.java
 +++ b/src/test/java/org/fiddlemc/fiddle/block/PerBlockTest.java
 @@ -24,4 +24,26 @@ public class PerBlockTest extends AbstractTestingBase {
@@ -264,8 +264,8 @@ index bc9f7245a13a8a336cda803c8b23010098e7d83d..f6d757b6401b19ce66037442e0b40530
 +    @Test
 +    public void indexInBlockRegistry() {
 +        for (Block block : getBlocks()) {
-+            assertEquals("Lookup value equals indexInBlockRegistry for " + block, BuiltInRegistries.BLOCK.getId(block), block.indexInBlockRegistry);
-+            assertEquals("Lookup value equals indexInVanillaOnlyBlockRegistry for " + block, Block.VANILLA_ONLY_BLOCK_REGISTRY.getId(block), block.indexInVanillaOnlyBlockRegistry);
++            assertEquals(BuiltInRegistries.BLOCK.getId(block), block.indexInBlockRegistry, "Lookup value does not equal indexInBlockRegistry for " + block);
++            assertEquals(Block.VANILLA_ONLY_BLOCK_REGISTRY.getId(block), block.indexInVanillaOnlyBlockRegistry, "Lookup value does not equal indexInVanillaOnlyBlockRegistry for " + block);
 +        }
 +    }
 +    // Fiddle end - cache registry indices as fields - block
@@ -275,8 +275,8 @@ index bc9f7245a13a8a336cda803c8b23010098e7d83d..f6d757b6401b19ce66037442e0b40530
 +    public void indexInBlockStateRegistry() {
 +        for (Block block : getBlocks()) {
 +            for (var state : block.getStateDefinition().getPossibleStates()) {
-+                assertEquals("Lookup value equals indexInBlockStateRegistry for " + state, Block.BLOCK_STATE_REGISTRY.getId(state), state.indexInBlockStateRegistry);
-+                assertEquals("Lookup value equals indexInVanillaOnlyBlockStateRegistry for " + state, Block.VANILLA_ONLY_BLOCK_STATE_REGISTRY.getId(state), state.indexInVanillaOnlyBlockStateRegistry);
++                assertEquals(Block.BLOCK_STATE_REGISTRY.getId(state), state.indexInBlockStateRegistry, "Lookup does not equal indexInBlockStateRegistry for " + state);
++                assertEquals(Block.VANILLA_ONLY_BLOCK_STATE_REGISTRY.getId(state), state.indexInVanillaOnlyBlockStateRegistry, "Lookup value does not equal indexInVanillaOnlyBlockStateRegistry for " + state);
 +            }
 +        }
 +    }
@@ -284,7 +284,7 @@ index bc9f7245a13a8a336cda803c8b23010098e7d83d..f6d757b6401b19ce66037442e0b40530
 +
  }
 diff --git a/src/test/java/org/fiddlemc/fiddle/item/PerItemTest.java b/src/test/java/org/fiddlemc/fiddle/item/PerItemTest.java
-index ee38ae7143ebb5c05e51ab31956a6023f558625b..0fa9b94adb8fa061cf294f94a84245509ffd7de9 100644
+index 799295777aaa2ed7d90b8a2a37c1dc30cfc3bf72..227e5d9c75791b6472feac1323cbab40fb76f655 100644
 --- a/src/test/java/org/fiddlemc/fiddle/item/PerItemTest.java
 +++ b/src/test/java/org/fiddlemc/fiddle/item/PerItemTest.java
 @@ -24,4 +24,14 @@ public class PerItemTest extends AbstractTestingBase {
@@ -295,8 +295,8 @@ index ee38ae7143ebb5c05e51ab31956a6023f558625b..0fa9b94adb8fa061cf294f94a8424550
 +    @Test
 +    public void indexInItemRegistry() {
 +        for (Item item : getItems()) {
-+            assertEquals("Lookup value equals indexInItemRegistry for " + item, BuiltInRegistries.ITEM.getId(item), item.indexInItemRegistry);
-+            assertEquals("Lookup value equals indexInVanillaOnlyItemRegistry for " + item, Item.VANILLA_ONLY_ITEM_REGISTRY.getId(item), item.indexInVanillaOnlyItemRegistry);
++            assertEquals(BuiltInRegistries.ITEM.getId(item), item.indexInItemRegistry, "Lookup value does not equal indexInItemRegistry for " + item);
++            assertEquals(Item.VANILLA_ONLY_ITEM_REGISTRY.getId(item), item.indexInVanillaOnlyItemRegistry, "Lookup value does not equal indexInVanillaOnlyItemRegistry for " + item);
 +        }
 +    }
 +    // Fiddle end - cache registry indices as fields - item

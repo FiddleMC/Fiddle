@@ -11,10 +11,10 @@ Fiddle - https://fiddlemc.org
 
 diff --git a/src/test/java/org/fiddlemc/fiddle/material/legacy/PerLegacyMaterialTest.java b/src/test/java/org/fiddlemc/fiddle/material/legacy/PerLegacyMaterialTest.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..95e539a0c7ede3a4bed906a6e624ab328480d0e6
+index 0000000000000000000000000000000000000000..3087de012e42239a362b612bb9474c3d8dd2ab10
 --- /dev/null
 +++ b/src/test/java/org/fiddlemc/fiddle/material/legacy/PerLegacyMaterialTest.java
-@@ -0,0 +1,38 @@
+@@ -0,0 +1,39 @@
 +// Fiddle - modifiable Bukkit enums - Material - make legacy conversion complete - tests
 +
 +package org.fiddlemc.fiddle.material.legacy;
@@ -22,11 +22,12 @@ index 0000000000000000000000000000000000000000..95e539a0c7ede3a4bed906a6e624ab32
 +import org.bukkit.Material;
 +import org.bukkit.craftbukkit.legacy.CraftLegacy;
 +import org.bukkit.support.AbstractTestingBase;
-+import org.junit.Test;
++import org.junit.jupiter.api.Test;
 +
 +import java.util.Arrays;
 +
-+import static org.junit.Assert.*;
++import static org.junit.jupiter.api.Assertions.assertEquals;
++import static org.junit.jupiter.api.Assertions.assertNotNull;
 +
 +/**
 + * Does a number of sanity checks on {@linkplain Material#isLegacy() legacy} {@link Material}s.
@@ -46,8 +47,8 @@ index 0000000000000000000000000000000000000000..95e539a0c7ede3a4bed906a6e624ab32
 +                var nonLegacy = CraftLegacy.fromLegacy(material, itemPriority);
 +
 +                // then
-+                assertNotNull("Non-legacy is non-null for " + material + " with item priority = " + itemPriority, nonLegacy);
-+                assertEquals("Non-legacy is non-air (unless original is legacy air) for " + material + " with item priority = " + itemPriority,material == Material.LEGACY_AIR, nonLegacy == Material.AIR);
++                assertNotNull(nonLegacy, "Non-legacy mapping is null for " + material + " with item priority = " + itemPriority);
++                assertEquals(material == Material.LEGACY_AIR, nonLegacy == Material.AIR, "Non-legacy mapping is air while original is non-air (or the other way around) for " + material + " with item priority = " + itemPriority);
 +            }
 +        }
 +    }
@@ -55,7 +56,7 @@ index 0000000000000000000000000000000000000000..95e539a0c7ede3a4bed906a6e624ab32
 +}
 diff --git a/src/test/java/org/fiddlemc/fiddle/material/legacy/PerNonLegacyMaterialTest.java b/src/test/java/org/fiddlemc/fiddle/material/legacy/PerNonLegacyMaterialTest.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..4a0b27c8472e8f694841a7dd76066e5023c17148
+index 0000000000000000000000000000000000000000..bee17680ef980db47e3ea84f273be73b549420ee
 --- /dev/null
 +++ b/src/test/java/org/fiddlemc/fiddle/material/legacy/PerNonLegacyMaterialTest.java
 @@ -0,0 +1,38 @@
@@ -66,12 +67,12 @@ index 0000000000000000000000000000000000000000..4a0b27c8472e8f694841a7dd76066e50
 +import org.bukkit.Material;
 +import org.bukkit.craftbukkit.legacy.CraftLegacy;
 +import org.bukkit.support.AbstractTestingBase;
-+import org.junit.Test;
++import org.junit.jupiter.api.Test;
 +
 +import java.util.Arrays;
 +import java.util.function.Predicate;
 +
-+import static org.junit.Assert.assertEquals;
++import static org.junit.jupiter.api.Assertions.assertEquals;
 +
 +/**
 + * Does a number of sanity checks on {@linkplain Material#isLegacy() non-legacy Materials}.
@@ -91,7 +92,7 @@ index 0000000000000000000000000000000000000000..4a0b27c8472e8f694841a7dd76066e50
 +                var nonLegacy = CraftLegacy.fromLegacy(material, itemPriority);
 +
 +                // then
-+                assertEquals("Non-legacy is self for " + material + " with item priority = " + itemPriority, material, nonLegacy);
++                assertEquals(material, nonLegacy, "Non-legacy mapping is not self for " + material + " with item priority = " + itemPriority);
 +            }
 +        }
 +    }

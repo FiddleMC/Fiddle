@@ -171,10 +171,10 @@ index 72c7ef7867f88e9add4a6d64a1fad1fe73262bb3..42a99ea7d67f74348f64ca33a0db5ddb
      public boolean isFlammable(Material material) {
          return this.isFlammableCache.get(material);
 diff --git a/src/test/java/org/fiddlemc/fiddle/material/legacy/PerLegacyMaterialTest.java b/src/test/java/org/fiddlemc/fiddle/material/legacy/PerLegacyMaterialTest.java
-index 6e983a44d7f014483722321714b9e049156b141c..468f1ef483294c7ec7b1712dc8f88865ea9e5874 100644
+index 5623ab42b73caba6be48c264c0f1bddfe1b63d19..404343e96be4c5834fd159578530fb6e1a7a763a 100644
 --- a/src/test/java/org/fiddlemc/fiddle/material/legacy/PerLegacyMaterialTest.java
 +++ b/src/test/java/org/fiddlemc/fiddle/material/legacy/PerLegacyMaterialTest.java
-@@ -96,6 +96,15 @@ public class PerLegacyMaterialTest extends AbstractTestingBase {
+@@ -97,6 +97,15 @@ public class PerLegacyMaterialTest extends AbstractTestingBase {
          }
      }
  
@@ -182,7 +182,7 @@ index 6e983a44d7f014483722321714b9e049156b141c..468f1ef483294c7ec7b1712dc8f88865
 +    @Test
 +    public void isTransparent() {
 +        for (Material material : getMaterials()) {
-+            assertEquals("isTransparent equals legacy isTransparent for " + material, material.isTransparentLegacy(), material.isTransparent());
++            assertEquals(material.isTransparentLegacy(), material.isTransparent(), "isTransparent does not equal legacy isTransparent for " + material);
 +        }
 +    }
 +    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - is transparent

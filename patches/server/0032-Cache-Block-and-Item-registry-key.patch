@@ -126,16 +126,16 @@ index e74f8c9b43894534fe624988ec9a3ca190ae5770..ac34e35521bb6772d25d1d5f43b9edd0
 +
  }
 diff --git a/src/test/java/org/fiddlemc/fiddle/block/PerBlockTest.java b/src/test/java/org/fiddlemc/fiddle/block/PerBlockTest.java
-index 4ad77f8ce7b43b5b54d7f7d1f9dfdebdd0ca9d8f..bc9f7245a13a8a336cda803c8b23010098e7d83d 100644
+index 4ad77f8ce7b43b5b54d7f7d1f9dfdebdd0ca9d8f..cc59e81f1670e34f357d96c9be316af382322301 100644
 --- a/src/test/java/org/fiddlemc/fiddle/block/PerBlockTest.java
 +++ b/src/test/java/org/fiddlemc/fiddle/block/PerBlockTest.java
 @@ -5,6 +5,9 @@ package org.fiddlemc.fiddle.block;
  import net.minecraft.core.registries.BuiltInRegistries;
  import net.minecraft.world.level.block.Block;
  import org.bukkit.support.AbstractTestingBase;
-+import org.junit.Test;
++import org.junit.jupiter.api.Test;
 +
-+import static org.junit.Assert.assertEquals;
++import static org.junit.jupiter.api.Assertions.assertEquals;
  
  public class PerBlockTest extends AbstractTestingBase {
  
@@ -147,23 +147,23 @@ index 4ad77f8ce7b43b5b54d7f7d1f9dfdebdd0ca9d8f..bc9f7245a13a8a336cda803c8b230100
 +    @Test
 +    public void keyInBlockRegistry() {
 +        for (Block block : getBlocks()) {
-+            assertEquals("Lookup value equals keyInBlockRegistry for " + block, BuiltInRegistries.BLOCK.getKey(block), block.keyInBlockRegistry);
++            assertEquals(BuiltInRegistries.BLOCK.getKey(block), block.keyInBlockRegistry, "Lookup value does not equal keyInBlockRegistry for " + block);
 +        }
 +    }
 +    // Fiddle end - cache registry keys as fields - block
 +
  }
 diff --git a/src/test/java/org/fiddlemc/fiddle/item/PerItemTest.java b/src/test/java/org/fiddlemc/fiddle/item/PerItemTest.java
-index d1d9ee8190fa648efacea96ddaf5b55801e2ade7..ee38ae7143ebb5c05e51ab31956a6023f558625b 100644
+index d1d9ee8190fa648efacea96ddaf5b55801e2ade7..799295777aaa2ed7d90b8a2a37c1dc30cfc3bf72 100644
 --- a/src/test/java/org/fiddlemc/fiddle/item/PerItemTest.java
 +++ b/src/test/java/org/fiddlemc/fiddle/item/PerItemTest.java
 @@ -5,6 +5,9 @@ package org.fiddlemc.fiddle.item;
  import net.minecraft.core.registries.BuiltInRegistries;
  import net.minecraft.world.item.Item;
  import org.bukkit.support.AbstractTestingBase;
-+import org.junit.Test;
++import org.junit.jupiter.api.Test;
 +
-+import static org.junit.Assert.assertEquals;
++import static org.junit.jupiter.api.Assertions.assertEquals;
  
  public class PerItemTest extends AbstractTestingBase {
  
@@ -175,7 +175,7 @@ index d1d9ee8190fa648efacea96ddaf5b55801e2ade7..ee38ae7143ebb5c05e51ab31956a6023
 +    @Test
 +    public void keyInItemRegistry() {
 +        for (Item item : getItems()) {
-+            assertEquals("Lookup value equals keyInItemRegistry for " + item, BuiltInRegistries.ITEM.getKey(item), item.keyInItemRegistry);
++            assertEquals(BuiltInRegistries.ITEM.getKey(item), item.keyInItemRegistry, "Lookup value does not equal keyInItemRegistry for " + item);
 +        }
 +    }
 +    // Fiddle end - cache registry keys as fields - item

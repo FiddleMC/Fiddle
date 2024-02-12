@@ -10,10 +10,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/test/java/org/fiddlemc/fiddle/material/legacy/PerLegacyMaterialTest.java b/src/test/java/org/fiddlemc/fiddle/material/legacy/PerLegacyMaterialTest.java
-index ce1651edc34e52086fffe62f8a6f6785c6c3ac59..72df25bd4166ce19963a66b9894cd20a89fb3769 100644
+index b5162d77e33a806a74b24233ad38127029071702..903a76b0ca91d43269282939d79a92851ce86961 100644
 --- a/src/test/java/org/fiddlemc/fiddle/material/legacy/PerLegacyMaterialTest.java
 +++ b/src/test/java/org/fiddlemc/fiddle/material/legacy/PerLegacyMaterialTest.java
-@@ -36,6 +36,16 @@ public class PerLegacyMaterialTest extends AbstractTestingBase {
+@@ -37,6 +37,16 @@ public class PerLegacyMaterialTest extends AbstractTestingBase {
          }
      }
  
@@ -22,7 +22,7 @@ index ce1651edc34e52086fffe62f8a6f6785c6c3ac59..72df25bd4166ce19963a66b9894cd20a
 +    @SuppressWarnings("deprecation")
 +    public void getId() {
 +        for (Material material : getMaterials()) {
-+            assertEquals("getId equals legacy getId for " + material, material.getIdLegacy(), material.getId());
++            assertEquals(material.getIdLegacy(), material.getId(), "getId does not equal legacy getId for " + material);
 +        }
 +    }
 +    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - id
