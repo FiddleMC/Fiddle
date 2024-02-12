@@ -27,10 +27,10 @@ As part of: Paper (https://github.com/PaperMC/Paper)
 Licensed under: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index e310c185e03faafbaa8c7e272363d12195aade79..ac149bb5dd530e24d069f4a73a12f536b53c2533 100644
+index 6800d7fa8818f5f39de6ff041f3e628e28df19ec..64282389c6bacac25130120a0c9c5a78a76c7794 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -2913,6 +2913,14 @@ public final class CraftServer implements Server {
+@@ -2915,6 +2915,14 @@ public final class CraftServer implements Server {
              return CraftServer.this.console.paperConfigurations.createLegacyObject(CraftServer.this.console);
          }
  

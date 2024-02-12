@@ -12,10 +12,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 0a8e4c247d802feedcdeee8b8dcbed5d58f807fd..ea8c593826811031046d8858cf770e467b8ccd1e 100644
+index f67bf29828e1d61abaf55ef9a310a2fadcf8fbfc..b3e1b2565e71cc40342541cf36348bd68530f44c 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -4393,7 +4393,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4396,7 +4396,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      private final short durabilityHardcoded;
      public final Class<?> data;
      private final boolean legacy;
@@ -23,7 +23,7 @@ index 0a8e4c247d802feedcdeee8b8dcbed5d58f807fd..ea8c593826811031046d8858cf770e46
  
      private Material(final int id) {
          this(id, 64);
-@@ -4421,7 +4420,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4424,7 +4423,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
          this.maxStackHardcoded = stack;
          this.data = data;
          this.legacy = this.name().startsWith(LEGACY_PREFIX);
@@ -31,7 +31,7 @@ index 0a8e4c247d802feedcdeee8b8dcbed5d58f807fd..ea8c593826811031046d8858cf770e46
          // try to cache the constructor for this material
          try {
              if (MaterialData.class.isAssignableFrom(data)) {
-@@ -4520,8 +4518,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4523,8 +4521,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      @NotNull
      @Override
      public NamespacedKey getKey() {
@@ -80,10 +80,10 @@ index db0b953c6aacd29817dcb0bd5069346ac7116b80..b600f06d62ea4b045590d72626d8029b
 +
  }
 diff --git a/src/test/java/org/bukkit/MaterialTest.java b/src/test/java/org/bukkit/MaterialTest.java
-index 6b0eaaadf9772a4850cb70cea2bfe72a81a47a04..ae3766e1804ca495ee1f5e1ee77cd1b4fee916b8 100644
+index 818aa21d3b6d59a65d91ab69d96e91d7eabaed08..3e771faab580e11625d264e70d6c5ca50dcada3d 100644
 --- a/src/test/java/org/bukkit/MaterialTest.java
 +++ b/src/test/java/org/bukkit/MaterialTest.java
-@@ -52,6 +52,18 @@ public class MaterialTest {
+@@ -53,6 +53,18 @@ public class MaterialTest {
          }
      }
  

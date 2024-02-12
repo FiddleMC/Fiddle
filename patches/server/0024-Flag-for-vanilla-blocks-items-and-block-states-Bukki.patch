@@ -1,0 +1,55 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Wed, 3 Jan 2024 18:21:17 +0100
+Subject: [PATCH] Flag for vanilla blocks, items and block states - Bukkit API
+
+Implements Bukkit API for the flags added in "Flag for vanilla blocks, items and block states - Create".
+This is done by implementing `UnsafeValues.isVanillaBlock()`, `UnsafeValues.isVanillaItem()` and `BlockData.isVanilla()`, which are defined in the "Flag for vanilla blocks, items and block states - Bukkit API" patch in the `fiddle-api` module.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/bukkit/craftbukkit/block/data/CraftBlockData.java b/src/main/java/org/bukkit/craftbukkit/block/data/CraftBlockData.java
+index 0bf863f597f3657a0f158756a2a91bda7eb453f6..429c36ed5fbda5e54739da5b25365de940a850f4 100644
+--- a/src/main/java/org/bukkit/craftbukkit/block/data/CraftBlockData.java
++++ b/src/main/java/org/bukkit/craftbukkit/block/data/CraftBlockData.java
+@@ -711,4 +711,12 @@ public class CraftBlockData implements BlockData {
+         return this.state.isRandomlyTicking();
+     }
+     // Paper end - Block tick API
++
++    // Fiddle start - flags for vanilla content - API - block state
++    @Override
++    public boolean isVanilla() {
++        return this.state.isVanilla();
++    }
++    // Fiddle end - flags for vanilla content - API - block state
++
+ }
+diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
+index 4cb9387855648aa6cc23c1d6f6becb364c507abb..cd2667fdd99457b39b6d042af5b8036b33db358b 100644
+--- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
++++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
+@@ -612,6 +612,22 @@ public final class CraftMagicNumbers implements UnsafeValues {
+     }
+     // Paper end
+ 
++    // Fiddle start - flags for vanilla content - API - block
++    @Override
++    public boolean isVanillaBlock(Material material) {
++        var block = CraftMagicNumbers.getBlock(material);
++        return block != null && block.isVanilla();
++    }
++    // Fiddle end - flags for vanilla content - API - block
++
++    // Fiddle start - flags for vanilla content - API - item
++    @Override
++    public boolean isVanillaItem(Material material) {
++        var item = CraftMagicNumbers.getItem(material);
++        return item != null && item.isVanilla();
++    }
++    // Fiddle end - flags for vanilla content - API - item
++
+     /**
+      * This helper class represents the different NBT Tags.
+      * <p>

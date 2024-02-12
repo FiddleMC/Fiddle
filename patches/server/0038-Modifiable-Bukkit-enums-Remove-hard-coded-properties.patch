@@ -2,171 +2,340 @@ From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
 Date: Mon, 10 Jul 2023 22:05:08 +0200
 Subject: [PATCH] Modifiable Bukkit enums - Remove hard-coded properties -
- Material - Max stack size, durability
+ Material - Most properties
 
 Implements the abstract methods defined in `UnsafeValues`
-in the "Modifiable Bukkit enums - Remove hard-coded properties - Material - Max stack size, durability" patch in the `fiddle-api` module,
+in the "Modifiable Bukkit enums - Remove hard-coded properties - Material - Most properties" patch in the `fiddle-api` module,
 in `CraftMagicNumbers`.
 
 The property values are also cached after being computed, for performant access.
 
-Also adds tests based on the original backing implementations,
-and a check in `CraftLegacy` that verifies equality of the existence of durability between legacy and modern `Material` instances.
+Also adds tests for those properties that have an original backing implementation that can be tested against.
 
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
-diff --git a/src/main/java/org/bukkit/craftbukkit/legacy/CraftLegacy.java b/src/main/java/org/bukkit/craftbukkit/legacy/CraftLegacy.java
-index bd3a4db2db5232a28f43c9ea3ce5446960b0c5ce..57133abd0052203e147f15542e88ef1cd8ecaf34 100644
---- a/src/main/java/org/bukkit/craftbukkit/legacy/CraftLegacy.java
-+++ b/src/main/java/org/bukkit/craftbukkit/legacy/CraftLegacy.java
-@@ -373,7 +373,7 @@ public final class CraftLegacy {
-             }
- 
-             // Handle items (and second fallback for blocks)
--            int maxData = material.getMaxDurability() == 0 ? 16 : 1;
-+            int maxData = material.hasNonZeroMaxDurability() ? 1 : 16; // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - durability
-             // Manually do oldold spawn eggs
-             if (material == Material.LEGACY_MONSTER_EGG) {
-                 maxData = 121; // Vilager + 1
-@@ -485,6 +485,18 @@ public final class CraftLegacy {
-         }
-         // Fiddle end - modifiable Bukkit enums - Material - make legacy conversion complete - ensure correct LEGACY_LONG_GRASS
- 
-+        // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - durability
-+        // Ensure that whether legacy Materials have durability is correct, because this is used to compute their corresponding non-legacy Materials
-+        for (Material material : Material.values()) {
-+            if (material.isLegacy()) {
-+                if ((material.hasNonZeroMaxDurability() != org.bukkit.craftbukkit.util.CraftLegacy.fromLegacy(material, true).hasNonZeroMaxDurability())) {
-+                    LOGGER.error("A Bukkit legacy item Material (" + material + " had" + (material.hasNonZeroMaxDurability() ? "" : " no") + " max durability, while its corresponding non-legacy item Material (" + org.bukkit.craftbukkit.util.CraftLegacy.fromLegacy(material, true) + ") did" + (material.hasNonZeroMaxDurability() ? " not" : ""));
-+                    System.exit(1);
-+                }
-+            }
-+        }
-+        // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - durability
-+
-     }
- 
-     public static void main(String[] args) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-index 7e22e1a806bf412e59559ba2cbbba9414dada291..88cda68dd2c74eb1199cc72132fa2072208b8195 100644
+index 7a9773cf0e4afe4d0f0441f6732f3abbfac77fdd..44444bf354b8041aaff1604e3c2657edeb776aa8 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-@@ -75,6 +75,33 @@ public final class CraftMagicNumbers implements UnsafeValues {
+@@ -63,6 +63,7 @@ import org.bukkit.inventory.ItemStack;
+ import org.bukkit.material.MaterialData;
+ import org.bukkit.plugin.InvalidPluginException;
+ import org.bukkit.plugin.PluginDescriptionFile;
++import org.fiddlemc.fiddle.material.*;
+ 
+ @SuppressWarnings("deprecation")
+ public final class CraftMagicNumbers implements UnsafeValues {
+@@ -70,6 +71,125 @@ public final class CraftMagicNumbers implements UnsafeValues {
  
      private CraftMagicNumbers() {}
  
-+    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - max stack size
-+    private final CachedMaterialIntProperty maxStackSizeCache = new CachedMaterialIntProperty(material -> {
-+        if (!material.isItem()) {
-+            return Item.MAX_STACK_SIZE;
++    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
++    private final CachedMaterialBooleanProperty isBlockCache = new CachedMaterialBooleanProperty(material -> {
++        if (material.isLegacy()) {
++            return MaterialDefaultImplementations.isBlockLegacy(material);
 +        }
-+        // Based on org.bukkit.PerMaterialTest#maxStackSize
-+        if (material == Material.AIR || material == Material.LEGACY_AIR) {
++        // Based on org.bukkit.PerMaterialTest#isBlock
++        return /*otherMaterial.isAir() || */getBlock(material) != null; // Removed isAir() check due to circular reference
++    });
++    private final CachedMaterialBooleanProperty isEdibleCache = new CachedMaterialBooleanProperty(material -> {
++        // Based on org.bukkit.PerMaterialTest#isEdible
++        return !material.isBlock() && getItem(material).isEdible();
++    });
++    private final CachedMaterialBooleanProperty isRecordCache = new CachedMaterialBooleanProperty(material -> {
++        // Based on org.bukkit.PerMaterialTest#isRecord
++        return getItem(material) instanceof net.minecraft.world.item.RecordItem;
++    });
++    private final CachedMaterialBooleanProperty isSolidCache = new CachedMaterialBooleanProperty(material -> {
++        // Based on org.bukkit.PerMaterialTest#isSolid
++        return material != Material.AIR && material.isBlock() && getBlock(material).defaultBlockState().blocksMotion();
++    });
++    private final CachedMaterialBooleanProperty isAirCache = new CachedMaterialBooleanProperty(material -> {
++        // Based on org.bukkit.PerMaterialTest#testAir
++       return material.isBlock() && getBlock(material).defaultBlockState().isAir();
++    });
++    private final CachedMaterialBooleanProperty isFlammableCache = new CachedMaterialBooleanProperty(material -> {
++        // Based on org.bukkit.PerMaterialTest#isFlammable
++        return material != Material.AIR && material.isBlock() && getBlock(material).defaultBlockState().ignitedByLava();
++    });
++    private final CachedMaterialBooleanProperty isBurnableCache = new CachedMaterialBooleanProperty(material -> {
++        // Based on org.bukkit.PerMaterialTest#isBurnable
++        return material.isBlock() && ((net.minecraft.world.level.block.FireBlock) net.minecraft.world.level.block.Blocks.FIRE).igniteOdds.getOrDefault(CraftMagicNumbers.getBlock(material), 0) > 0;
++    });
++    private final CachedMaterialBooleanProperty isFuelCache = new CachedMaterialBooleanProperty(material -> {
++        // Fix for LEGACY_LONG_GRASS, which translates to modern DEAD_BUSH, which is fuel (instead of GRASS, which is not fuel) for data byte 0
++        if (material == Material.LEGACY_LONG_GRASS) {
++            return false;
++        }
++        // Based on org.bukkit.PerMaterialTest#isFuel
++        return material.isItem() && net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity.isFuel(new net.minecraft.world.item.ItemStack(getItem(material)));
++    });
++    private final CachedMaterialBooleanProperty isOccludingCache = new CachedMaterialBooleanProperty(material -> {
++        // Fix for LEGACY_DOUBLE_STEP, LEGACY_WOOD_DOUBLE_STEP, LEGACY_DOUBLE_STONE_SLAB2 and LEGACY_PURPUR_DOUBLE_SLAB, which translate to various modern slabs, which are not necessarily occluding (only their double states would be)
++        if (material == Material.LEGACY_DOUBLE_STEP || material == Material.LEGACY_WOOD_DOUBLE_STEP || material == Material.LEGACY_DOUBLE_STONE_SLAB2 || material == Material.LEGACY_PURPUR_DOUBLE_SLAB) {
++            return true;
++        }
++        // Based on org.bukkit.PerMaterialTest#isOccluding
++        return material.isBlock() && getBlock(material).defaultBlockState().isRedstoneConductor(net.minecraft.world.level.EmptyBlockGetter.INSTANCE, net.minecraft.core.BlockPos.ZERO);
++    });
++    private final CachedMaterialBooleanProperty hasGravityCache = new CachedMaterialBooleanProperty(material -> {
++        // Based on org.bukkit.PerMaterialTest#hasGravity
++        if (!material.isBlock()) {
++            return false;
++        }
++        var block = getBlock(material);
++        return block instanceof net.minecraft.world.level.block.Fallable || block instanceof net.minecraft.world.level.block.ScaffoldingBlock;
++    });
++    private final CachedMaterialBooleanProperty isItemCache = new CachedMaterialBooleanProperty(material -> {
++        if (material.isLegacy()) {
++            return MaterialDefaultImplementations.isItemLegacy(material);
++        }
++        // Based on org.bukkit.PerMaterialTest#testItem
++        return material == Material.AIR || getItem(material) != null;
++    });
++    private final CachedMaterialBooleanProperty isInteractableCache = new CachedMaterialBooleanProperty(material -> {
++        // Based on org.bukkit.PerMaterialTest#testInteractable
++        if (!material.isBlock()) {
++            return false;
++        }
++        try {
++            return !getBlock(material).getClass()
++                .getMethod("use", BlockState.class, net.minecraft.world.level.Level.class, net.minecraft.core.BlockPos.class, net.minecraft.world.entity.player.Player.class, net.minecraft.world.InteractionHand.class, net.minecraft.world.phys.BlockHitResult.class)
++                .getDeclaringClass().equals(net.minecraft.world.level.block.state.BlockBehaviour.class);
++        } catch (NoSuchMethodException ignored) {}
++        return false;
++    });
++    private final CachedMaterialFloatProperty hardnessCache = new CachedMaterialFloatProperty(material -> {
++        if (!material.isBlock()) {
 +            return 0;
 +        }
-+        return getItem(material).getMaxStackSize();
++        // Based on org.bukkit.PerMaterialTest#testBlockHardness
++        return getBlock(material).defaultBlockState().destroySpeed;
 +    });
-+    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - max stack size
-+
-+    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - durability
-+    private final CachedMaterialShortProperty maxDurabilityCache = new CachedMaterialShortProperty(material -> {
-+        // Use hard-coded value instead of non-legacy value, to avoid circular reference
-+        if (material.isLegacy()) {
-+            return MaterialDefaultImplementations.getMaxDurabilityLegacy(material);
++    private final CachedMaterialFloatProperty blastResistanceCache = new CachedMaterialFloatProperty(material -> {
++        if (!material.isBlock()) {
++            return 0;
 +        }
-+        // Based on org.bukkit.PerMaterialTest#testDurability
-+        if (material.isBlock()) {
-+            return (short) 0;
-+        }
-+        return (short) getItem(material).getMaxDamage();
++        // Based on org.bukkit.PerMaterialTest#testBlastResistance
++        return getBlock(material).getExplosionResistance();
 +    });
-+    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - durability
++    private final CachedMaterialFloatProperty slipperinessCache = new CachedMaterialFloatProperty(material -> {
++        if (!material.isBlock()) {
++            return 0;
++        }
++        // Based on org.bukkit.PerMaterialTest#testSlipperiness
++        return getBlock(material).getFriction();
++    });
++    private final CachedMaterialProperty<Material> craftingRemainingItemCache = new CachedMaterialProperty<>(
++        Material[]::new,
++        material -> {
++            if (!material.isItem()) {
++                return null;
++            }
++            // Based on org.bukkit.PerMaterialTest#testCraftingRemainingItem
++            @org.jetbrains.annotations.Nullable Item expectedItem = getItem(material).getCraftingRemainingItem();
++            return expectedItem == null ? null : getMaterial(expectedItem);
++        }
++    );
++    private final CachedMaterialProperty<EquipmentSlot> equipmentSlotCache = new CachedMaterialProperty<>(
++        EquipmentSlot[]::new,
++        material -> {
++            if (!material.isItem()) {
++                return null;
++            }
++            // Based on org.bukkit.PerMaterialTest#testEquipmentSlot
++            return CraftEquipmentSlot.getSlot(net.minecraft.world.entity.Mob.getEquipmentSlotForItem(CraftItemStack.asNMSCopy(new ItemStack(material))));
++        }
++    );
++    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
 +
-     // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
-     private final CachedMaterialBooleanProperty isBlockCache = new CachedMaterialBooleanProperty(material -> {
-         if (material.isLegacy()) {
-@@ -795,6 +822,20 @@ public final class CraftMagicNumbers implements UnsafeValues {
+     // Paper start
+     @Override
+     public net.kyori.adventure.text.flattener.ComponentFlattener componentFlattener() {
+@@ -656,4 +776,97 @@ public final class CraftMagicNumbers implements UnsafeValues {
+         public static final int TAG_INT_ARRAY = 11;
          public static final int TAG_ANY_NUMBER = 99;
      }
- 
-+    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - max stack size
-+    @Override
-+    public int getMaxStackSize(Material material) {
-+        return this.maxStackSizeCache.get(material);
-+    }
-+    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - max stack size
 +
-+    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - durability
++    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
 +    @Override
-+    public short getMaxDurability(Material material) {
-+        return this.maxDurabilityCache.get(material);
++    public boolean isBlock(Material material) {
++        return this.isBlockCache.get(material);
 +    }
-+    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - durability
 +
-     // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
-     @Override
-     public boolean isBlock(Material material) {
++    @Override
++    public boolean isEdible(Material material) {
++        return this.isEdibleCache.get(material);
++    }
++
++    @Override
++    public boolean isRecord(Material material) {
++        return this.isRecordCache.get(material);
++    }
++
++    @Override
++    public boolean isSolid(Material material) {
++        return this.isSolidCache.get(material);
++    }
++
++    @Override
++    public boolean isAir(Material material) {
++        return this.isAirCache.get(material);
++    }
++
++    @Override
++    public boolean isFlammable(Material material) {
++        return this.isFlammableCache.get(material);
++    }
++
++    @Override
++    public boolean isBurnable(Material material) {
++        return this.isBurnableCache.get(material);
++    }
++
++    @Override
++    public boolean isFuel(Material material) {
++        return this.isFuelCache.get(material);
++    }
++
++    @Override
++    public boolean isOccluding(Material material) {
++        return this.isOccludingCache.get(material);
++    }
++
++    @Override
++    public boolean hasGravity(Material material) {
++        return this.hasGravityCache.get(material);
++    }
++
++    @Override
++    public boolean isItem(Material material) {
++        return this.isItemCache.get(material);
++    }
++
++    @Override
++    public boolean isInteractable(Material material) {
++        return this.isInteractableCache.get(material);
++    }
++
++    @Override
++    public float getHardness(Material material) {
++        Preconditions.checkArgument(material.isBlock(), "The Material is not a block!");
++        return this.hardnessCache.get(material);
++    }
++
++    @Override
++    public float getBlastResistance(Material material) {
++        Preconditions.checkArgument(material.isBlock(), "The Material is not a block!");
++        return this.blastResistanceCache.get(material);
++    }
++
++    @Override
++    public float getSlipperiness(Material material) {
++        Preconditions.checkArgument(material.isBlock(), "The Material is not a block!");
++        return this.slipperinessCache.get(material);
++    }
++
++    @Override
++    public @org.jetbrains.annotations.Nullable Material getCraftingRemainingItem(Material material) {
++        Preconditions.checkArgument(material.isItem(), "The Material is not an item!");
++        return this.craftingRemainingItemCache.get(material);
++    }
++
++    @Override
++    public @org.jetbrains.annotations.NotNull EquipmentSlot getEquipmentSlot(Material material) {
++        Preconditions.checkArgument(material.isItem(), "The Material is not an item!");
++        return this.equipmentSlotCache.get(material);
++    }
++    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
++
+ }
 diff --git a/src/test/java/org/fiddlemc/fiddle/material/legacy/PerLegacyMaterialTest.java b/src/test/java/org/fiddlemc/fiddle/material/legacy/PerLegacyMaterialTest.java
-index 5584b3271cdbd62faab7d6b9949e5750326650b6..6e983a44d7f014483722321714b9e049156b141c 100644
+index 95e539a0c7ede3a4bed906a6e624ab328480d0e6..5584b3271cdbd62faab7d6b9949e5750326650b6 100644
 --- a/src/test/java/org/fiddlemc/fiddle/material/legacy/PerLegacyMaterialTest.java
 +++ b/src/test/java/org/fiddlemc/fiddle/material/legacy/PerLegacyMaterialTest.java
-@@ -35,6 +35,31 @@ public class PerLegacyMaterialTest extends AbstractTestingBase {
+@@ -35,4 +35,83 @@ public class PerLegacyMaterialTest extends AbstractTestingBase {
          }
      }
  
-+    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - max stack size
++    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
 +    @Test
-+    public void getMaxStackSize() {
++    public void isBlock() {
 +        for (Material material : getMaterials()) {
-+            assertEquals("getMaxStackSize equals hard-coded getMaxStackSize for " + material, material.getMaxStackSizeHardcoded(), material.getMaxStackSize());
-+        }
-+    }
-+    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - max stack size
-+
-+    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - durability
-+    @Test
-+    public void getMaxDurability_hardcoded() {
-+        for (Material material : getMaterials()) {
-+            assertEquals("getMaxDurability equals hard-coded getMaxDurability for " + material, material.getMaxDurabilityHardcoded(), material.getMaxDurability());
++            assertEquals("isBlock equals legacy isBlock for " + material, material.isBlockLegacy(), material.isBlock());
 +        }
 +    }
 +
 +    @Test
-+    public void getMaxDurability_legacy() {
++    public void isEdible() {
 +        for (Material material : getMaterials()) {
-+            assertEquals("getMaxDurability equals legacy getMaxDurability for " + material, material.getMaxDurabilityLegacy(), material.getMaxDurability());
++            assertEquals("isEdible equals legacy isEdible for " + material, material.isEdibleLegacy(), material.isEdible());
 +        }
 +    }
-+    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - durability
 +
-     // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
-     @Test
-     public void isBlock() {
-diff --git a/src/test/java/org/fiddlemc/fiddle/material/legacy/PerNonLegacyMaterialTest.java b/src/test/java/org/fiddlemc/fiddle/material/legacy/PerNonLegacyMaterialTest.java
-index 4a0b27c8472e8f694841a7dd76066e5023c17148..5f2a50ccbcaff6213b6f0cd6afd0eba545cbe520 100644
---- a/src/test/java/org/fiddlemc/fiddle/material/legacy/PerNonLegacyMaterialTest.java
-+++ b/src/test/java/org/fiddlemc/fiddle/material/legacy/PerNonLegacyMaterialTest.java
-@@ -35,4 +35,22 @@ public class PerNonLegacyMaterialTest extends AbstractTestingBase {
-         }
-     }
- 
-+    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - max stack size
 +    @Test
-+    public void getMaxStackSize() {
++    public void isRecord() {
 +        for (Material material : getMaterials()) {
-+            assertEquals("getMaxStackSize equals hard-coded getMaxStackSize for " + material, material.getMaxStackSizeHardcoded(), material.getMaxStackSize());
++            assertEquals("isRecord equals legacy iisRecord for " + material, material.isRecordLegacy(), material.isRecord());
 +        }
 +    }
-+    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - max stack size
 +
-+    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - durability
 +    @Test
-+    public void getMaxDurability() {
++    public void isSolid() {
 +        for (Material material : getMaterials()) {
-+            assertEquals("getMaxDurability equals hard-coded getMaxDurability for " + material, material.getMaxDurabilityHardcoded(), material.getMaxDurability());
++            assertEquals("isSolid equals legacy isSolid for " + material, material.isSolidLegacy(), material.isSolid());
 +        }
 +    }
-+    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - durability
++
++    @Test
++    public void isAir() {
++        for (Material material : getMaterials()) {
++            assertEquals("isAir equals legacy isAir for " + material, material.isAirLegacy(), material.isAir());
++        }
++    }
++
++    @Test
++    public void isFlammable() {
++        for (Material material : getMaterials()) {
++            assertEquals("isFlammable equals legacy isFlammable for " + material, material.isFlammableLegacy(), material.isFlammable());
++        }
++    }
++
++    @Test
++    public void isBurnable() {
++        for (Material material : getMaterials()) {
++            assertEquals("isBurnable equals legacy isBurnable for " + material, material.isBurnableLegacy(), material.isBurnable());
++        }
++    }
++
++    @Test
++    public void isFuel() {
++        for (Material material : getMaterials()) {
++            assertEquals("isFuel equals legacy isFuel for " + material, material.isFuelLegacy(), material.isFuel());
++        }
++    }
++
++    @Test
++    public void isOccluding() {
++        for (Material material : getMaterials()) {
++            assertEquals("isOccluding equals legacy isOccluding for " + material, material.isOccludingLegacy(), material.isOccluding());
++        }
++    }
++
++    @Test
++    public void hasGravity() {
++        for (Material material : getMaterials()) {
++            assertEquals("hasGravity equals legacy hasGravity for " + material, material.hasGravityLegacy(), material.hasGravity());
++        }
++    }
++
++    @Test
++    public void isItem() {
++        for (Material material : getMaterials()) {
++            assertEquals("isItem equals legacy isItem for " + material, material.isItemLegacy(), material.isItem());
++        }
++    }
++    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
 +
  }

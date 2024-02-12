@@ -1,0 +1,30 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Mon, 8 Jan 2024 19:26:23 +0100
+Subject: [PATCH] Modifiable Bukkit enums - Complete legacy conversion -
+ Conversion is explicitly for item or block - Expose Bukkit API
+
+Has `CraftMagicNumbers` implement `UnsafeValues.fromLegacy(Material, boolean`),
+which is defined in the "Modifiable Bukkit enums - Complete legacy conversion - Conversion is explicitly for item or block - Expose Bukkit API" patch in the `fiddle-api` module.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
+index c59c97d0c8fbf806add03989252be4e7fc7e532b..7a9773cf0e4afe4d0f0441f6732f3abbfac77fdd 100644
+--- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
++++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
+@@ -227,6 +227,13 @@ public final class CraftMagicNumbers implements UnsafeValues {
+         return this.fromLegacy(material, false); // Fiddle - modifiable Bukkit enums - Material - make legacy conversion complete - conversion is explicitly for item or block
+     }
+ 
++    // Fiddle end - modifiable Bukkit enums - Material - make legacy conversion complete
++    @Override
++    public Material fromLegacy(Material material, boolean itemPriority) {
++        return CraftLegacy.fromLegacy(material, itemPriority);
++    }
++    // Fiddle end - modifiable Bukkit enums - Material - make legacy conversion complete
++
+     @Override
+     public Material fromLegacy(MaterialData material) {
+         return this.fromLegacy(material, false); // Fiddle - modifiable Bukkit enums - Material - make legacy conversion complete - conversion is explicitly for item or block

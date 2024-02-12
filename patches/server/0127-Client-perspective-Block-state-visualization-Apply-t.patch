@@ -1,41 +1,86 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
-Date: Sat, 30 Dec 2023 21:26:58 +0100
+Date: Wed, 3 Jan 2024 19:45:15 +0100
 Subject: [PATCH] Client perspective - Block state visualization - Apply to
- chunk packets - Store connection explicitly in chunk packets
+ block update packets - Store connection explicitly in block update packets
 
-Makes all instances of `ClientboundLevelChunkWithLightPacket` bound to a particular explicit target connection.
-This is done by making it a subclass of `PacketWithExplicitTargetClientConnection`.
+Makes all instances of `ClientboundBlockUpdatePacket` and `ClientboundSectionBlocksUpdatePacket` bound to a particular explicit target connection.
+This is done by making them a subclass of `PacketWithExplicitTargetClientConnection`.
 
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
-diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
-index 271b5a37332ed8ba72b8ddd1c6beb4ba5b507a42..1366eed8169ce9466c125e1547ba008e298707d8 100644
---- a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
-+++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
-@@ -8,7 +8,7 @@ import net.minecraft.world.level.ChunkPos;
- import net.minecraft.world.level.chunk.LevelChunk;
- import net.minecraft.world.level.lighting.LevelLightEngine;
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundBlockUpdatePacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundBlockUpdatePacket.java
+index b1ad8bea989510bedfdf6674362336e1fcdfc66a..d73bd60cad84bbfdf4ac2d6def2cb1d2c52bb7f7 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundBlockUpdatePacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundBlockUpdatePacket.java
+@@ -7,7 +7,7 @@ import net.minecraft.world.level.BlockGetter;
+ import net.minecraft.world.level.block.Block;
+ import net.minecraft.world.level.block.state.BlockState;
  
--public class ClientboundLevelChunkWithLightPacket implements Packet<ClientGamePacketListener> {
-+public class ClientboundLevelChunkWithLightPacket extends org.fiddlemc.fiddle.packet.PacketWithExplicitTargetClientConnection<ClientGamePacketListener> { // Fiddle - client perspective - block state visualization - apply to chunk packets - store connection explicitly
-     private final int x;
-     private final int z;
-     private final ClientboundLevelChunkPacketData chunkData;
-@@ -29,6 +29,7 @@ public class ClientboundLevelChunkWithLightPacket implements Packet<ClientGamePa
-     // Paper start - Anti-Xray - Add chunk packet info
-     @Deprecated @io.papermc.paper.annotation.DoNotUse public ClientboundLevelChunkWithLightPacket(LevelChunk chunk, LevelLightEngine lightProvider, @Nullable BitSet skyBits, @Nullable BitSet blockBits) { this(chunk, lightProvider, skyBits, blockBits, true); }
-     public ClientboundLevelChunkWithLightPacket(LevelChunk chunk, LevelLightEngine lightProvider, @Nullable BitSet skyBits, @Nullable BitSet blockBits, boolean modifyBlocks) {
-+        super(); // Fiddle - client perspective - block state visualization - apply to chunk packets - store connection explicitly
-         ChunkPos chunkPos = chunk.getPos();
-         this.x = chunkPos.x;
-         this.z = chunkPos.z;
-@@ -43,6 +44,7 @@ public class ClientboundLevelChunkWithLightPacket implements Packet<ClientGamePa
+-public class ClientboundBlockUpdatePacket implements Packet<ClientGamePacketListener> {
++public class ClientboundBlockUpdatePacket extends org.fiddlemc.fiddle.packet.PacketWithExplicitTargetClientConnection<ClientGamePacketListener> { // Fiddle - client perspective - block state visualization - apply to block update packets - store connection explicitly - single block update
+     private final BlockPos pos;
+     public final BlockState blockState;
+ 
+@@ -25,6 +25,7 @@ public class ClientboundBlockUpdatePacket implements Packet<ClientGamePacketList
+     // Fiddle end - client perspective - block state visualization - ability to send visualization changes
+ 
+     public ClientboundBlockUpdatePacket(BlockPos pos, BlockState state) {
++        super(); // Fiddle - client perspective - block state visualization - apply to block update packets - store connection explicitly - single block update
+         this.pos = pos;
+         this.blockState = state;
+     }
+@@ -34,6 +35,7 @@ public class ClientboundBlockUpdatePacket implements Packet<ClientGamePacketList
      }
  
-     public ClientboundLevelChunkWithLightPacket(FriendlyByteBuf buf) {
-+        super(); // Fiddle - client perspective - block state visualization - apply to chunk packets - store connection explicitly
-         this.x = buf.readInt();
-         this.z = buf.readInt();
-         this.chunkData = new ClientboundLevelChunkPacketData(buf, this.x, this.z);
+     public ClientboundBlockUpdatePacket(FriendlyByteBuf buf) {
++        super(); // Fiddle - client perspective - block state visualization - apply to block update packets - store connection explicitly - single block update
+         this.pos = buf.readBlockPos();
+         this.blockState = buf.readById(Block.BLOCK_STATE_REGISTRY);
+     }
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundSectionBlocksUpdatePacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundSectionBlocksUpdatePacket.java
+index e3f355c85eb7cc8c1683e3009502c10a5ed32daa..8724e49fe73993fcb3838e766e9c1b21c07d8ff0 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundSectionBlocksUpdatePacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundSectionBlocksUpdatePacket.java
+@@ -11,7 +11,7 @@ import net.minecraft.world.level.block.Block;
+ import net.minecraft.world.level.block.state.BlockState;
+ import net.minecraft.world.level.chunk.LevelChunkSection;
+ 
+-public class ClientboundSectionBlocksUpdatePacket implements Packet<ClientGamePacketListener> {
++public class ClientboundSectionBlocksUpdatePacket extends org.fiddlemc.fiddle.packet.PacketWithExplicitTargetClientConnection<ClientGamePacketListener> { // Fiddle - client perspective - block state visualization - apply to block update packets - store connection explicitly - section blocks update
+ 
+     private static final int POS_IN_SECTION_BITS = 12;
+     private final SectionPos sectionPos;
+@@ -19,6 +19,7 @@ public class ClientboundSectionBlocksUpdatePacket implements Packet<ClientGamePa
+     private final BlockState[] states;
+ 
+     public ClientboundSectionBlocksUpdatePacket(SectionPos sectionPos, ShortSet positions, LevelChunkSection section) {
++        super(); // Fiddle - client perspective - block state visualization - apply to block update packets - store connection explicitly - section blocks update
+         this.sectionPos = sectionPos;
+         int i = positions.size();
+ 
+@@ -37,6 +38,7 @@ public class ClientboundSectionBlocksUpdatePacket implements Packet<ClientGamePa
+ 
+     // CraftBukkit start - Add constructor
+     public ClientboundSectionBlocksUpdatePacket(SectionPos sectionposition, ShortSet shortset, BlockState[] states) {
++        super(); // Fiddle - client perspective - block state visualization - apply to block update packets - store connection explicitly - section blocks update
+         this.sectionPos = sectionposition;
+         this.positions = shortset.toShortArray();
+         this.states = states;
+@@ -44,6 +46,7 @@ public class ClientboundSectionBlocksUpdatePacket implements Packet<ClientGamePa
+     // CraftBukkit end
+ 
+     public ClientboundSectionBlocksUpdatePacket(FriendlyByteBuf buf) {
++        super(); // Fiddle - client perspective - block state visualization - apply to block update packets - store connection explicitly - section blocks update
+         this.sectionPos = SectionPos.of(buf.readLong());
+         int i = buf.readVarInt();
+ 
+@@ -61,6 +64,7 @@ public class ClientboundSectionBlocksUpdatePacket implements Packet<ClientGamePa
+ 
+     // Paper start
+     public ClientboundSectionBlocksUpdatePacket(SectionPos sectionPos, it.unimi.dsi.fastutil.shorts.Short2ObjectMap<BlockState> blockChanges) {
++        super(); // Fiddle - client perspective - block state visualization - apply to block update packets - store connection explicitly - section blocks update
+         this.sectionPos = sectionPos;
+         this.positions = blockChanges.keySet().toShortArray();
+         this.states = blockChanges.values().toArray(new BlockState[0]);

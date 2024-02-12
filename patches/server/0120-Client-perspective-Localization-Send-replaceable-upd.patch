@@ -1,0 +1,36 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sun, 23 Jul 2023 18:40:48 +0200
+Subject: [PATCH] Client perspective - Localization - Send replaceable updates
+ after locale change
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
+index 114bcd7417e561a98bb1e7be186e2d20b7ce2d57..8e7e68a0eceddaf38b8f43ba656b036d33792c90 100644
+--- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
++++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
+@@ -2047,13 +2047,21 @@ public class ServerPlayer extends Player {
+             PlayerChangedMainHandEvent event = new PlayerChangedMainHandEvent(this.getBukkitEntity(), getMainArm() == HumanoidArm.LEFT ? MainHand.LEFT : MainHand.RIGHT);
+             this.server.server.getPluginManager().callEvent(event);
+         }
+-        if (this.language == null || !this.language.equals(clientOptions.language())) { // Paper
++        // Fiddle start - client perspective - localization - send update packets for replaceables after locale change
++        boolean localeChanged = this.language == null || !this.language.equals(clientOptions.language()); // Paper
++        if (localeChanged) {
++            // Fiddle end - client perspective - localization - send update packets for replaceables after locale change
+             PlayerLocaleChangeEvent event = new PlayerLocaleChangeEvent(this.getBukkitEntity(), clientOptions.language());
+             this.server.server.getPluginManager().callEvent(event);
+             this.server.server.getPluginManager().callEvent(new com.destroystokyo.paper.event.player.PlayerLocaleChangeEvent(this.getBukkitEntity(), this.language, clientOptions.language())); // Paper
+         }
+         // CraftBukkit end
+         this.language = clientOptions.language();
++        // Fiddle start - client perspective - localization - send update packets for replaceables after locale change
++        if (localeChanged) {
++            this.sendUpdatesForDeepReplaceableContent(true, true);
++        }
++        // Fiddle end - client perspective - localization - send update packets for replaceables after locale change
+         this.adventure$locale = net.kyori.adventure.translation.Translator.parseLocale(this.language); // Paper
+         this.requestedViewDistance = clientOptions.viewDistance();
+         this.chatVisibility = clientOptions.chatVisibility();

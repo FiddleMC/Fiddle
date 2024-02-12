@@ -9,22 +9,26 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundUpdateRecipesPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundUpdateRecipesPacket.java
-index a7564a2dfce361a62b14a0bd2a77b122eaaebca3..48c3443788692cf95eca384b166c017ab6e09028 100644
+index ff6323bd5170359cf9c0d004aba68a792fa6a382..ddb04a1e7d50024ee2f3692bccf471509720f65e 100644
 --- a/src/main/java/net/minecraft/network/protocol/game/ClientboundUpdateRecipesPacket.java
 +++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundUpdateRecipesPacket.java
-@@ -45,6 +45,6 @@ public class ClientboundUpdateRecipesPacket implements Packet<ClientGamePacketLi
-     public static <T extends Recipe<?>> void toNetwork(FriendlyByteBuf buf, T recipe) {
-         buf.writeResourceLocation(BuiltInRegistries.RECIPE_SERIALIZER.getKey(recipe.getSerializer()));
-         buf.writeResourceLocation(recipe.getId());
--        recipe.getSerializer().toNetwork(buf, recipe);
-+        ((net.minecraft.world.item.crafting.RecipeSerializer<T>) recipe.getSerializer()).toNetwork(buf, recipe); // Fiddle - dev import deobfuscation fixes
+@@ -44,9 +44,9 @@ public class ClientboundUpdateRecipesPacket implements Packet<ClientGamePacketLi
+         return new RecipeHolder<>(resourceLocation2, recipe);
+     }
+ 
+-    public static <T extends Recipe<?>> void toNetwork(FriendlyByteBuf buf, RecipeHolder<?> recipe) {
++    public static <T extends Recipe<?>> void toNetwork(FriendlyByteBuf buf, RecipeHolder<T> recipe) { // Fiddle - dev import deobfuscation fixes
+         buf.writeResourceLocation(BuiltInRegistries.RECIPE_SERIALIZER.getKey(recipe.value().getSerializer()));
+         buf.writeResourceLocation(recipe.id());
+-        recipe.value().getSerializer().toNetwork(buf, recipe.value());
++        ((net.minecraft.world.item.crafting.RecipeSerializer<T>) recipe.value().getSerializer()).toNetwork(buf, recipe.value()); // Fiddle - dev import deobfuscation fixes
      }
  }
 diff --git a/src/main/java/net/minecraft/world/level/block/Blocks.java b/src/main/java/net/minecraft/world/level/block/Blocks.java
-index 877035b6c6593a28f475b9c5bcd7727e3fcdb802..f41e335be934d24080472be9d260f1be7c01614d 100644
+index d5654cfe37bd82f1290b280990a8502432491ae1..d8785f6adce58086f86ceee4bf628e3cedf85c02 100644
 --- a/src/main/java/net/minecraft/world/level/block/Blocks.java
 +++ b/src/main/java/net/minecraft/world/level/block/Blocks.java
-@@ -1159,7 +1159,7 @@ public class Blocks {
+@@ -1160,7 +1160,7 @@ public class Blocks {
      }
  
      private static Boolean ocelotOrParrot(BlockState state, BlockGetter world, BlockPos pos, EntityType<?> type) {

@@ -1,0 +1,449 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sat, 29 Jul 2023 12:54:28 +0200
+Subject: [PATCH] Client perspective - Deep replacements - Pass replacement
+ scope
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/nbt/CompoundTag.java b/src/main/java/net/minecraft/nbt/CompoundTag.java
+index 84fc2adf591f02a14862f7c1cd645c2efde55c3d..caa609116c5ae2175c99c3e1be4be4f080c21234 100644
+--- a/src/main/java/net/minecraft/nbt/CompoundTag.java
++++ b/src/main/java/net/minecraft/nbt/CompoundTag.java
+@@ -172,9 +172,16 @@ public class CompoundTag implements Tag {
+ 
+     @Override
+     public void write(DataOutput output) throws IOException {
++        // Fiddle start - client perspective - deep replacements - pass scope
++        throw new UnsupportedOperationException(this.getClass().getSimpleName() + ".write(DataOutput) without a replacement scope is not supported");
++    }
++
++    @Override
++    public void write(DataOutput output, @org.jetbrains.annotations.Nullable org.fiddlemc.fiddle.packet.deepreplacement.ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, @org.jetbrains.annotations.NotNull org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope replacementScope) throws IOException {
++        // Fiddle end - client perspective - deep replacements - pass scope
+         for(String string : this.tags.keySet()) {
+             Tag tag = this.tags.get(string);
+-            writeNamedTag(string, tag, output);
++            writeNamedTag(string, tag, output, clientPerspectiveAndSettings, replacementScope); // Fiddle - client perspective - deep replacements - pass scope
+         }
+ 
+         output.writeByte(0);
+@@ -528,11 +535,11 @@ public class CompoundTag implements Tag {
+         return this.tags.hashCode();
+     }
+ 
+-    private static void writeNamedTag(String key, Tag element, DataOutput output) throws IOException {
++    private static void writeNamedTag(String key, Tag element, DataOutput output, @org.jetbrains.annotations.Nullable org.fiddlemc.fiddle.packet.deepreplacement.ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, @org.jetbrains.annotations.NotNull org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope replacementScope) throws IOException { // Fiddle - client perspective - deep replacements - pass scope
+         output.writeByte(element.getId());
+         if (element.getId() != 0) {
+             output.writeUTF(key);
+-            element.write(output);
++            element.write(output, clientPerspectiveAndSettings, replacementScope); // Fiddle - client perspective - deep replacements - pass scope
+         }
+     }
+ 
+diff --git a/src/main/java/net/minecraft/nbt/ListTag.java b/src/main/java/net/minecraft/nbt/ListTag.java
+index 0ef36f5cfebf60c491d021b77b55c393f26feab5..2130091f021844e145c7ee152806a68db0b464e1 100644
+--- a/src/main/java/net/minecraft/nbt/ListTag.java
++++ b/src/main/java/net/minecraft/nbt/ListTag.java
+@@ -148,6 +148,13 @@ public class ListTag extends CollectionTag<Tag> {
+ 
+     @Override
+     public void write(DataOutput output) throws IOException {
++        // Fiddle start - client perspective - deep replacements - pass scope
++        throw new UnsupportedOperationException(this.getClass().getSimpleName() + ".write(DataOutput) without a replacement scope is not supported");
++    }
++
++    @Override
++    public void write(DataOutput output, @org.jetbrains.annotations.Nullable org.fiddlemc.fiddle.packet.deepreplacement.ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, @org.jetbrains.annotations.NotNull org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope replacementScope) throws IOException {
++        // Fiddle end - client perspective - deep replacements - pass scope
+         if (this.list.isEmpty()) {
+             this.type = 0;
+         } else {
+@@ -158,7 +165,7 @@ public class ListTag extends CollectionTag<Tag> {
+         output.writeInt(this.list.size());
+ 
+         for(Tag tag : this.list) {
+-            tag.write(output);
++            tag.write(output, clientPerspectiveAndSettings, replacementScope); // Fiddle end - client perspective - deep replacements - pass scope
+         }
+ 
+     }
+diff --git a/src/main/java/net/minecraft/nbt/NbtIo.java b/src/main/java/net/minecraft/nbt/NbtIo.java
+index 88abb546421d936988bae363fcdc3747e515ef3f..416592debc8e25ea6ee56b8617386eed5a7b1d46 100644
+--- a/src/main/java/net/minecraft/nbt/NbtIo.java
++++ b/src/main/java/net/minecraft/nbt/NbtIo.java
+@@ -245,7 +245,14 @@ public class NbtIo {
+     }
+ 
+     public static void write(CompoundTag nbt, DataOutput output) throws IOException {
+-        NbtIo.writeUnnamedTag(nbt, output);
++        // Fiddle start - client perspective - deep replacements - pass scope
++        // The only occurrence of NbtIo#write that is network-related is in FriendlyByteBuf#writeNbt, so by default we assume that calls are not network-related and therefore do not need replacements
++        write(nbt, output, null, org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope.NOTHING);
++    }
++
++    public static void write(CompoundTag nbt, DataOutput output, @org.jetbrains.annotations.Nullable org.fiddlemc.fiddle.packet.deepreplacement.ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, @org.jetbrains.annotations.NotNull org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope replacementScope) throws IOException {
++        // Fiddle end - client perspective - deep replacements - pass scope
++        NbtIo.writeUnnamedTag(nbt, output, clientPerspectiveAndSettings, replacementScope); // Fiddle - client perspective - deep replacements - pass scope
+     }
+ 
+     public static void parse(DataInput input, StreamTagVisitor scanner, NbtAccounter tracker) throws IOException {
+@@ -279,18 +286,18 @@ public class NbtIo {
+         return (Tag) (b0 == 0 ? EndTag.INSTANCE : NbtIo.readTagSafe(input, tracker, b0));
+     }
+ 
+-    public static void writeAnyTag(Tag nbt, DataOutput output) throws IOException {
++    public static void writeAnyTag(Tag nbt, DataOutput output, @org.jetbrains.annotations.Nullable org.fiddlemc.fiddle.packet.deepreplacement.ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, @org.jetbrains.annotations.NotNull org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope replacementScope) throws IOException {
+         output.writeByte(nbt.getId());
+         if (nbt.getId() != 0) {
+-            nbt.write(output);
++            nbt.write(output, clientPerspectiveAndSettings, replacementScope); // Fiddle - client perspective - deep replacements - pass scope
+         }
+     }
+ 
+-    public static void writeUnnamedTag(Tag nbt, DataOutput output) throws IOException {
++    public static void writeUnnamedTag(Tag nbt, DataOutput output, @org.jetbrains.annotations.Nullable org.fiddlemc.fiddle.packet.deepreplacement.ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, @org.jetbrains.annotations.NotNull org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope replacementScope) throws IOException { // Fiddle - client perspective - deep replacements - pass scope
+         output.writeByte(nbt.getId());
+         if (nbt.getId() != 0) {
+             output.writeUTF("");
+-            nbt.write(output);
++            nbt.write(output, clientPerspectiveAndSettings, replacementScope); // Fiddle - client perspective - deep replacements - pass scope
+         }
+     }
+ 
+diff --git a/src/main/java/net/minecraft/nbt/StringTag.java b/src/main/java/net/minecraft/nbt/StringTag.java
+index 8e5c030e38d07275561c69c24b1a735dcf25a90a..c42bad629faab9fcf1ea971a7b4d6d3e77636279 100644
+--- a/src/main/java/net/minecraft/nbt/StringTag.java
++++ b/src/main/java/net/minecraft/nbt/StringTag.java
+@@ -69,6 +69,13 @@ public class StringTag implements Tag {
+ 
+     @Override
+     public void write(DataOutput output) throws IOException {
++        // Fiddle start - client perspective - deep replacements - pass scope
++        throw new UnsupportedOperationException(this.getClass().getSimpleName() + ".write(DataOutput) without a replacement scope is not supported");
++    }
++
++    @Override
++    public void write(DataOutput output, @org.jetbrains.annotations.Nullable org.fiddlemc.fiddle.packet.deepreplacement.ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, @org.jetbrains.annotations.NotNull org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope replacementScope) throws IOException {
++        // Fiddle end - client perspective - deep replacements - pass scope
+         try {
+             output.writeUTF(this.data);
+         } catch (UTFDataFormatException var3) {
+diff --git a/src/main/java/net/minecraft/nbt/Tag.java b/src/main/java/net/minecraft/nbt/Tag.java
+index 0c3fb39dfff42cc322b82c6da885d39f866aee41..6d872e6e764a58ee398f524f781bedb0911422ee 100644
+--- a/src/main/java/net/minecraft/nbt/Tag.java
++++ b/src/main/java/net/minecraft/nbt/Tag.java
+@@ -26,6 +26,13 @@ public interface Tag {
+ 
+     void write(DataOutput output) throws IOException;
+ 
++    // Fiddle start - client perspective - deep replacements - pass scope
++    default void write(DataOutput output, @org.jetbrains.annotations.Nullable org.fiddlemc.fiddle.packet.deepreplacement.ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, @org.jetbrains.annotations.NotNull org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope replacementScope) throws IOException {
++        // By default, this simply calls write(DataOutput), which will be the implementation for most non-complex tags
++        this.write(output);
++    }
++    // Fiddle end - client perspective - deep replacements - pass scope
++
+     @Override
+     String toString();
+ 
+diff --git a/src/main/java/net/minecraft/network/FriendlyByteBuf.java b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
+index 06bf0c768dd74172e31a2c16ed0aa824d1b243d5..2c643b92d9f279a172cb49986a64a2db4f837f2c 100644
+--- a/src/main/java/net/minecraft/network/FriendlyByteBuf.java
++++ b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
+@@ -78,6 +78,8 @@ import net.minecraft.world.level.Level;
+ import net.minecraft.world.phys.BlockHitResult;
+ import net.minecraft.world.phys.Vec3;
+ import org.fiddlemc.fiddle.packet.deepreplacement.ClientPerspectiveAndSettingsSupplier;
++import org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope;
++import org.fiddlemc.fiddle.packet.item.ItemStackInPacketContext;
+ import org.jetbrains.annotations.NotNull;
+ import org.joml.Quaternionf;
+ import org.joml.Vector3f;
+@@ -563,18 +565,51 @@ public class FriendlyByteBuf extends ByteBuf {
+ 
+     // Paper start
+     public FriendlyByteBuf writeComponent(final net.kyori.adventure.text.Component component) {
+-        return this.writeUtf(io.papermc.paper.adventure.PaperAdventure.asJsonString(component, this.adventure$locale), 262144);
++        // Fiddle start - client perspective - deep replacements - pass scope
++        // By default, we assume all replacements should be made
++        return this.writeComponent(component, DeepReplacementScope.EVERYTHING);
++    }
++
++    public FriendlyByteBuf writeComponent(final net.kyori.adventure.text.Component component, @NotNull DeepReplacementScope replacementScope) {
++        return this.writeComponent(component, this.getClientPerspectiveAndSettingsSupplierUnlessScopeIsNothing(replacementScope), replacementScope);
++    }
++
++    public FriendlyByteBuf writeComponent(final net.kyori.adventure.text.Component component, @NotNull ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, @NotNull DeepReplacementScope replacementScope) {
++        return this.writeUtf(io.papermc.paper.adventure.PaperAdventure.asJsonString(component, this.adventure$locale), 262144, true, false, clientPerspectiveAndSettings, replacementScope);
++        // Fiddle end - client perspective - deep replacements - pass scope
+     }
+ 
+     @Deprecated
+     public FriendlyByteBuf writeComponent(final net.md_5.bungee.api.chat.BaseComponent[] component) {
+-        return this.writeUtf(net.md_5.bungee.chat.ComponentSerializer.toString(component), 262144);
++        // Fiddle start - client perspective - deep replacements - pass scope
++        // By default, we assume all replacements should be made
++        return this.writeComponent(component, DeepReplacementScope.EVERYTHING);
++    }
++
++    public FriendlyByteBuf writeComponent(final net.md_5.bungee.api.chat.BaseComponent[] component, @NotNull DeepReplacementScope replacementScope) {
++        return this.writeComponent(component, this.getClientPerspectiveAndSettingsSupplierUnlessScopeIsNothing(replacementScope), replacementScope);
++    }
++
++    public FriendlyByteBuf writeComponent(final net.md_5.bungee.api.chat.BaseComponent[] component, @NotNull ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, @NotNull DeepReplacementScope replacementScope) {
++        return this.writeUtf(net.md_5.bungee.chat.ComponentSerializer.toString(component), 262144, true, false, clientPerspectiveAndSettings, replacementScope);
++        // Fiddle end - client perspective - deep replacements - pass scope
+     }
+     // Paper end
+ 
+     public FriendlyByteBuf writeComponent(Component text) {
++        // Fiddle start - client perspective - deep replacements - pass scope
++        // By default, we assume all replacements should be made
++        return this.writeComponent(text, DeepReplacementScope.EVERYTHING);
++    }
++
++    public FriendlyByteBuf writeComponent(Component text, @NotNull DeepReplacementScope replacementScope) {
++        return this.writeComponent(text, this.getClientPerspectiveAndSettingsSupplierUnlessScopeIsNothing(replacementScope), replacementScope);
++    }
++
++    public FriendlyByteBuf writeComponent(Component text, @NotNull ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, @NotNull DeepReplacementScope replacementScope) {
++        // Fiddle end - client perspective - deep replacements - pass scope
+         //return this.a(IChatBaseComponent.ChatSerializer.a(ichatbasecomponent), 262144); // Paper - comment
+-        return this.writeUtf(io.papermc.paper.adventure.PaperAdventure.asJsonString(text, this.adventure$locale), 262144); // Paper
++        return this.writeUtf(io.papermc.paper.adventure.PaperAdventure.asJsonString(text, this.adventure$locale), 262144, true, false, clientPerspectiveAndSettings, replacementScope); // Paper // Fiddle - client perspective - deep replacements - pass scope
+     }
+ 
+     public <T extends Enum<T>> T readEnum(Class<T> enumClass) {
+@@ -626,12 +661,23 @@ public class FriendlyByteBuf extends ByteBuf {
+     }
+ 
+     public FriendlyByteBuf writeNbt(@Nullable Tag nbt) {
++        // Fiddle start - client perspective - deep replacements - pass scope
++        // By default, we assume all replacements should be made
++        return this.writeNbt(nbt, DeepReplacementScope.EVERYTHING);
++    }
++
++    public FriendlyByteBuf writeNbt(@Nullable Tag nbt, @NotNull DeepReplacementScope replacementScope) {
++        return this.writeNbt(nbt, this.getClientPerspectiveAndSettingsSupplierUnlessScopeIsNothing(replacementScope), replacementScope);
++    }
++
++    public FriendlyByteBuf writeNbt(@Nullable Tag nbt, @NotNull ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, @NotNull DeepReplacementScope replacementScope) {
++        // Fiddle end - client perspective - deep replacements - pass scope
+         if (nbt == null) {
+             nbt = EndTag.INSTANCE;
+         }
+ 
+         try {
+-            NbtIo.writeAnyTag((Tag) nbt, new ByteBufOutputStream(this));
++            NbtIo.writeAnyTag((Tag) nbt, new ByteBufOutputStream(this), clientPerspectiveAndSettings, replacementScope); // Fiddle - client perspective - deep replacements - pass scope
+             return this;
+         } catch (Exception ioexception) { // CraftBukkit - IOException -> Exception
+             throw new EncoderException(ioexception);
+@@ -661,6 +707,29 @@ public class FriendlyByteBuf extends ByteBuf {
+     }
+ 
+     public FriendlyByteBuf writeItem(ItemStack stack) {
++        // Fiddle start - client perspective - deep replacements - pass scope
++        return this.writeItem(stack, ItemStackInPacketContext.DEFAULT);
++    }
++
++    public FriendlyByteBuf writeItem(ItemStack stack, @NotNull ItemStackInPacketContext itemStackInPackContext) {
++        // By default, we assume all replacements should be made
++        return this.writeItem(stack, itemStackInPackContext, DeepReplacementScope.EVERYTHING);
++    }
++
++    public FriendlyByteBuf writeItem(ItemStack stack, @NotNull DeepReplacementScope replacementScope) {
++        return this.writeItem(stack, ItemStackInPacketContext.DEFAULT, replacementScope);
++    }
++
++    public FriendlyByteBuf writeItem(ItemStack stack, @NotNull ItemStackInPacketContext itemStackInPackContext, @NotNull DeepReplacementScope replacementScope) {
++        return this.writeItem(stack, itemStackInPackContext, this.getClientPerspectiveAndSettingsSupplierUnlessScopeIsNothing(replacementScope), replacementScope);
++    }
++
++    public FriendlyByteBuf writeItem(ItemStack stack, @NotNull ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, @NotNull DeepReplacementScope replacementScope) {
++        return this.writeItem(stack, ItemStackInPacketContext.DEFAULT, clientPerspectiveAndSettings, replacementScope);
++    }
++
++    public FriendlyByteBuf writeItem(ItemStack stack, @NotNull ItemStackInPacketContext itemStackInPackContext, @NotNull ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, @NotNull DeepReplacementScope replacementScope) {
++        // Fiddle end - client perspective - deep replacements - pass scope
+         if (stack.isEmpty() || stack.getItem() == null) { // CraftBukkit - NPE fix itemstack.getItem()
+             this.writeBoolean(false);
+         } else {
+@@ -679,7 +748,7 @@ public class FriendlyByteBuf extends ByteBuf {
+                 nbttagcompound = stack.getTag();
+             }
+ 
+-            this.writeNbt(nbttagcompound);
++            this.writeNbt(nbttagcompound, clientPerspectiveAndSettings, replacementScope); // Fiddle - client perspective - deep replacements - pass scope
+         }
+ 
+         return this;
+@@ -716,7 +785,26 @@ public class FriendlyByteBuf extends ByteBuf {
+     }
+ 
+     public FriendlyByteBuf writeUtf(String s, int maxLength) {
+-        Utf8String.write(this.source, s, maxLength);
++        // Fiddle start - client perspective - deep replacements - pass scope
++        // By default, we assume all replacements should be made
++        return this.writeUtf(s, maxLength, true, true, DeepReplacementScope.EVERYTHING);
++    }
++
++    public FriendlyByteBuf writeUtf(String s, boolean canBeRawJsonText, boolean canBeSNBT, @NotNull DeepReplacementScope replacementScope) {
++        return this.writeUtf(s, MAX_STRING_LENGTH, canBeRawJsonText, canBeSNBT, this.getClientPerspectiveAndSettingsSupplierUnlessScopeIsNothing(replacementScope), replacementScope);
++    }
++
++    public FriendlyByteBuf writeUtf(String s, boolean canBeRawJsonText, boolean canBeSNBT, @NotNull ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, @NotNull DeepReplacementScope replacementScope) {
++        return this.writeUtf(s, MAX_STRING_LENGTH, canBeRawJsonText, canBeSNBT, clientPerspectiveAndSettings, replacementScope);
++    }
++
++    public FriendlyByteBuf writeUtf(String s, int maxLength, boolean canBeRawJsonText, boolean canBeSNBT, @NotNull DeepReplacementScope replacementScope) {
++        return this.writeUtf(s, maxLength, canBeRawJsonText, canBeSNBT, this.getClientPerspectiveAndSettingsSupplierUnlessScopeIsNothing(replacementScope), replacementScope);
++    }
++
++    public FriendlyByteBuf writeUtf(String s, int maxLength, boolean canBeRawJsonText, boolean canBeSNBT, @NotNull ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, @NotNull DeepReplacementScope replacementScope) {
++        Utf8String.write(this.source, s, maxLength, canBeRawJsonText, canBeSNBT, clientPerspectiveAndSettings, replacementScope);
++        // Fiddle end - client perspective - deep replacements - pass scope
+         return this;
+     }
+ 
+@@ -725,7 +813,7 @@ public class FriendlyByteBuf extends ByteBuf {
+     }
+ 
+     public FriendlyByteBuf writeResourceLocation(ResourceLocation id) {
+-        this.writeUtf(id.toString());
++        this.writeUtf(id.toString(), false, false, DeepReplacementScope.NOTHING); // Fiddle - client perspective - deep replacements - pass scope - this never contains replaceables
+         return this;
+     }
+ 
+@@ -837,7 +925,7 @@ public class FriendlyByteBuf extends ByteBuf {
+ 
+     public void writeGameProfile(GameProfile gameProfile) {
+         this.writeUUID(gameProfile.getId());
+-        this.writeUtf(gameProfile.getName());
++        this.writeUtf(gameProfile.getName(), false, false, DeepReplacementScope.NOTHING); // Fiddle - client perspective - deep replacements - pass scope - this never contains replaceables
+         this.writeGameProfileProperties(gameProfile.getProperties());
+     }
+ 
+@@ -865,9 +953,11 @@ public class FriendlyByteBuf extends ByteBuf {
+     }
+ 
+     public void writeProperty(Property property) {
+-        this.writeUtf(property.name());
+-        this.writeUtf(property.value());
+-        this.writeNullable(property.signature(), FriendlyByteBuf::writeUtf);
++        // Fiddle start - client perspective - deep replacements - pass scope - this never contains replaceables
++        this.writeUtf(property.name(), false, false, DeepReplacementScope.NOTHING);
++        this.writeUtf(property.value(), false, false, DeepReplacementScope.NOTHING);
++        this.writeNullable(property.signature(), (buf, signature) -> buf.writeUtf(signature, false, false, DeepReplacementScope.NOTHING));
++        // Fiddle end - client perspective - deep replacements - pass scope - this never contains replaceables
+     }
+ 
+     public boolean isContiguous() {
+@@ -1763,4 +1853,15 @@ public class FriendlyByteBuf extends ByteBuf {
+     }
+     // Fiddle end - client perspective - deep replacements - perspective and settings supplier - cache in FriendlyByteBuf
+ 
++    // Fiddle start - client perspective - deep replacements - pass scope
++    /**
++     * The result of {@link #getClientPerspectiveAndSettingsSupplier()},
++     * unless the given {@code replacementScope} is {@link DeepReplacementScope#NOTHING}, in which case
++     * {@link ClientPerspectiveAndSettingsSupplier#ALWAYS_THROWS_EXCEPTION} is returned.
++     */
++    public @NotNull ClientPerspectiveAndSettingsSupplier getClientPerspectiveAndSettingsSupplierUnlessScopeIsNothing(@NotNull DeepReplacementScope replacementScope) {
++        return replacementScope == DeepReplacementScope.NOTHING ? ClientPerspectiveAndSettingsSupplier.ALWAYS_THROWS_EXCEPTION : this.getClientPerspectiveAndSettingsSupplier();
++    }
++    // Fiddle end - client perspective - deep replacements - pass scope
++
+ }
+diff --git a/src/main/java/net/minecraft/network/Utf8String.java b/src/main/java/net/minecraft/network/Utf8String.java
+index 7b39060cde0ec31c4adf36960b33cefcd5138527..3d5c67dc255684b60c2676f83fa4958a3ab5bf18 100644
+--- a/src/main/java/net/minecraft/network/Utf8String.java
++++ b/src/main/java/net/minecraft/network/Utf8String.java
+@@ -4,6 +4,10 @@ import io.netty.buffer.ByteBuf;
+ import io.netty.buffer.ByteBufUtil;
+ import io.netty.handler.codec.DecoderException;
+ import io.netty.handler.codec.EncoderException;
++import org.fiddlemc.fiddle.packet.deepreplacement.ClientPerspectiveAndSettingsSupplier;
++import org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope;
++import org.jetbrains.annotations.NotNull;
++
+ import java.nio.charset.StandardCharsets;
+ 
+ public class Utf8String {
+@@ -30,7 +34,7 @@ public class Utf8String {
+         }
+     }
+ 
+-    public static void write(ByteBuf buf, CharSequence string, int length) {
++    public static void write(ByteBuf buf, CharSequence string, int length, boolean canBeRawJsonText, boolean canBeSNBT, @NotNull ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, @NotNull DeepReplacementScope replacementScope) { // Fiddle - client perspective - deep replacements - pass scope
+         if (string.length() > length) {
+             throw new EncoderException("String too big (was " + string.length() + " characters, max " + length + ")");
+         } else {
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundCommandSuggestionsPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundCommandSuggestionsPacket.java
+index b8c008a311edebe90256bd8482a2402d12ffd0db..0e0692dd4244c02ee4f972df90d9d1471bf52e1d 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundCommandSuggestionsPacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundCommandSuggestionsPacket.java
+@@ -37,7 +37,7 @@ public class ClientboundCommandSuggestionsPacket implements Packet<ClientGamePac
+         buf.writeVarInt(this.suggestions.getRange().getStart());
+         buf.writeVarInt(this.suggestions.getRange().getLength());
+         buf.writeCollection(this.suggestions.getList(), (buf2, suggestion) -> {
+-            buf2.writeUtf(suggestion.getText());
++            buf2.writeUtf(suggestion.getText(), false, false, org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope.NOTHING); // Fiddle - client perspective - deep replacements - pass scope - this never contains replaceables
+             buf2.writeNullable(suggestion.getTooltip(), (buf3, tooltip) -> {
+                 buf3.writeComponent(ComponentUtils.fromMessage(tooltip));
+             });
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java
+index 51e24105facfe71ce9f2757c6c881a21b58dacfd..6fea470456059b21982ad1f35d5a2a2e2a098a31 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java
+@@ -89,7 +89,7 @@ public class ClientboundLevelChunkPacketData {
+     }
+ 
+     public void write(FriendlyByteBuf buf) {
+-        buf.writeNbt(this.heightmaps);
++        buf.writeNbt(this.heightmaps, org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope.NOTHING); // Fiddle - client perspective - deep replacements - pass scope - this never contains replaceables
+         buf.writeVarInt(this.buffer.length);
+         buf.writeBytes(this.buffer);
+         buf.writeCollection(this.blockEntitiesData, (buf2, entry) -> {
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundSetPlayerTeamPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundSetPlayerTeamPacket.java
+index 4ebe22ac20f1a98694cc3bec570ef5bbf06f00aa..d03c7100e48b015a3f6d9b619f43a2d7ddf2583e 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundSetPlayerTeamPacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundSetPlayerTeamPacket.java
+@@ -76,7 +76,7 @@ public class ClientboundSetPlayerTeamPacket implements Packet<ClientGamePacketLi
+         }
+ 
+         if (shouldHavePlayerList(this.method)) {
+-            buf.writeCollection(this.players, FriendlyByteBuf::writeUtf);
++            buf.writeCollection(this.players, (sameBuf, player) -> sameBuf.writeUtf(player, false, false, org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope.NOTHING)); // Fiddle - client perspective - deep replacements - pass scope - this never contains replaceables
+         }
+ 
+     }
+@@ -198,8 +198,10 @@ public class ClientboundSetPlayerTeamPacket implements Packet<ClientGamePacketLi
+         public void write(FriendlyByteBuf buf) {
+             buf.writeComponent(this.displayName);
+             buf.writeByte(this.options);
+-            buf.writeUtf(this.nametagVisibility);
+-            buf.writeUtf(!io.papermc.paper.configuration.GlobalConfiguration.get().collisions.enablePlayerCollisions ? "never" : this.collisionRule); // Paper
++            // Fiddle start - client perspective - deep replacements - pass scope - this never contains replaceables
++            buf.writeUtf(this.nametagVisibility, false, false, org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope.NOTHING);
++            buf.writeUtf(!io.papermc.paper.configuration.GlobalConfiguration.get().collisions.enablePlayerCollisions ? "never" : this.collisionRule, false, false, org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope.NOTHING); // Paper
++            // Fiddle end - client perspective - deep replacements - pass scope - this never contains replaceables
+             buf.writeEnum(this.color);
+             buf.writeComponent(this.playerPrefix);
+             buf.writeComponent(this.playerSuffix);
+diff --git a/src/main/java/net/minecraft/world/item/crafting/ShapedRecipe.java b/src/main/java/net/minecraft/world/item/crafting/ShapedRecipe.java
+index 17bef91546fa85d401b263c3a69fbf464f290eca..3c7c04b7f95ed8001a1ba4012233b1533b0d4336 100644
+--- a/src/main/java/net/minecraft/world/item/crafting/ShapedRecipe.java
++++ b/src/main/java/net/minecraft/world/item/crafting/ShapedRecipe.java
+@@ -377,7 +377,7 @@ public class ShapedRecipe extends io.papermc.paper.inventory.recipe.RecipeBookEx
+         public void toNetwork(FriendlyByteBuf buf, ShapedRecipe recipe) {
+             buf.writeVarInt(recipe.width);
+             buf.writeVarInt(recipe.height);
+-            buf.writeUtf(recipe.group);
++            buf.writeUtf(recipe.group, false, false, org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope.NOTHING); // Fiddle - client perspective - deep replacements - pass scope - this never contains replaceables
+             buf.writeEnum(recipe.category);
+             Iterator iterator = recipe.recipeItems.iterator();
+ 

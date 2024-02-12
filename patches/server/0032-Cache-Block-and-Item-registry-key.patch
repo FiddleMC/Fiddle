@@ -1,0 +1,183 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sat, 15 Jul 2023 13:23:05 +0200
+Subject: [PATCH] Cache Block and Item registry key
+
+Adds fields `Block.keyInBlockRegistry` and `Item.keyInItemRegistry` that cache the keys in their respective registries.
+
+Also includes corresponding unit tests.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/world/item/Item.java b/src/main/java/net/minecraft/world/item/Item.java
+index d9ff8199a58fa59ab8d149838deda48cc15da777..282d01b79854a6519332a7322cf11b755aa38c23 100644
+--- a/src/main/java/net/minecraft/world/item/Item.java
++++ b/src/main/java/net/minecraft/world/item/Item.java
+@@ -95,6 +95,15 @@ public class Item implements FeatureElement, ItemLike {
+     }
+     // Fiddle end - flags for vanilla content - item
+ 
++    // Fiddle start - cache registry keys as fields - item
++    /**
++     * The {@link net.minecraft.resources.ResourceLocation} with which this item is registered in the
++     * {@link BuiltInRegistries#ITEM item registry}.
++     * This will be null until initialized in {@link org.fiddlemc.fiddle.registry.ItemRegistry#register}.
++     */
++    public @Nullable net.minecraft.resources.ResourceLocation keyInItemRegistry = null;
++    // Fiddle end - cache registry keys as fields - item
++
+     public static int getId(Item item) {
+         return item == null ? 0 : BuiltInRegistries.ITEM.getId(item);
+     }
+diff --git a/src/main/java/net/minecraft/world/level/block/Block.java b/src/main/java/net/minecraft/world/level/block/Block.java
+index ea1365e0f95aba5f37b78f2ef925c8ca1becbb94..87fb852a06f17a88c35288105b58ce09cd4cc9cc 100644
+--- a/src/main/java/net/minecraft/world/level/block/Block.java
++++ b/src/main/java/net/minecraft/world/level/block/Block.java
+@@ -115,6 +115,16 @@ public class Block extends BlockBehaviour implements ItemLike {
+     private String descriptionId;
+     @Nullable
+     private Item item;
++
++    // Fiddle start - cache registry keys as fields - block
++    /**
++     * The {@link net.minecraft.resources.ResourceLocation} with which this block is registered in the
++     * {@link BuiltInRegistries#BLOCK block registry}.
++     * This will be null until initialized in {@link org.fiddlemc.fiddle.registry.BlockRegistry#register}.
++     */
++    public @Nullable net.minecraft.resources.ResourceLocation keyInBlockRegistry = null;
++    // Fiddle end - cache registry keys as fields - block
++
+     private static final int CACHE_SIZE = 2048;
+     private static final ThreadLocal<Object2ByteLinkedOpenHashMap<Block.BlockStatePairKey>> OCCLUSION_CACHE = ThreadLocal.withInitial(() -> {
+         Object2ByteLinkedOpenHashMap<Block.BlockStatePairKey> object2bytelinkedopenhashmap = new Object2ByteLinkedOpenHashMap<Block.BlockStatePairKey>(2048, 0.25F) {
+diff --git a/src/main/java/org/fiddlemc/fiddle/registry/BlockRegistry.java b/src/main/java/org/fiddlemc/fiddle/registry/BlockRegistry.java
+index edc623d3797a6e033447d3b6fb0c02aab125201f..71b6b4cc3e22ceb5a7322d81fbd640b7a1095e37 100644
+--- a/src/main/java/org/fiddlemc/fiddle/registry/BlockRegistry.java
++++ b/src/main/java/org/fiddlemc/fiddle/registry/BlockRegistry.java
+@@ -8,6 +8,7 @@ import net.minecraft.core.Holder;
+ import net.minecraft.core.Registry;
+ import net.minecraft.core.registries.BuiltInRegistries;
+ import net.minecraft.resources.ResourceKey;
++import net.minecraft.resources.ResourceLocation;
+ import net.minecraft.world.item.Item;
+ import net.minecraft.world.item.Items;
+ import net.minecraft.world.level.block.Block;
+@@ -42,6 +43,11 @@ public final class BlockRegistry extends DefaultedMappedRegistry<Block> {
+         // Register the entry
+         var reference = super.register(key, entry, lifecycle);
+ 
++        // Fiddle start - cache registry keys as fields - block
++        // Initialize the cached registry key field
++        entry.keyInBlockRegistry = super.getKey(entry);
++        // Fiddle end - cache registry keys as fields - block
++
+         // Fiddle start - modded registries - apply block post-register operations instantly
+         // Perform the post-register operations
+         for (BlockState blockState : entry.getStateDefinition().getPossibleStates()) {
+@@ -70,4 +76,12 @@ public final class BlockRegistry extends DefaultedMappedRegistry<Block> {
+ 
+     }
+ 
++    // Fiddle start - cache registry keys as fields - block
++    @Override
++    public ResourceLocation getKey(Block value) {
++        // Use the cached value
++        return value.keyInBlockRegistry;
++    }
++    // Fiddle end - cache registry keys as fields - block
++
+ }
+diff --git a/src/main/java/org/fiddlemc/fiddle/registry/ItemRegistry.java b/src/main/java/org/fiddlemc/fiddle/registry/ItemRegistry.java
+index e74f8c9b43894534fe624988ec9a3ca190ae5770..ac34e35521bb6772d25d1d5f43b9edd03229a62f 100644
+--- a/src/main/java/org/fiddlemc/fiddle/registry/ItemRegistry.java
++++ b/src/main/java/org/fiddlemc/fiddle/registry/ItemRegistry.java
+@@ -8,6 +8,7 @@ import net.minecraft.core.Holder;
+ import net.minecraft.core.Registry;
+ import net.minecraft.core.registries.BuiltInRegistries;
+ import net.minecraft.resources.ResourceKey;
++import net.minecraft.resources.ResourceLocation;
+ import net.minecraft.world.item.BlockItem;
+ import net.minecraft.world.item.Item;
+ 
+@@ -26,6 +27,11 @@ public final class ItemRegistry extends DefaultedMappedRegistry<Item> {
+         // Register the entry
+         var reference = super.register(key, entry, lifecycle);
+ 
++        // Fiddle start - cache registry keys as fields - item
++        // Initialize the cached registry key field
++        entry.keyInItemRegistry = super.getKey(entry);
++        // Fiddle end - cache registry keys as fields - item
++
+         // Fiddle start - modded registries - register item blocks from item registry
+         // Register the item by its blocks if applicable
+         if (entry instanceof BlockItem blockItem) {
+@@ -45,4 +51,12 @@ public final class ItemRegistry extends DefaultedMappedRegistry<Item> {
+ 
+     }
+ 
++    // Fiddle start - cache registry keys as fields - item
++    @Override
++    public ResourceLocation getKey(Item value) {
++        // Use the cached value
++        return value.keyInItemRegistry;
++    }
++    // Fiddle end - cache registry keys as fields - item
++
+ }
+diff --git a/src/test/java/org/fiddlemc/fiddle/block/PerBlockTest.java b/src/test/java/org/fiddlemc/fiddle/block/PerBlockTest.java
+index 4ad77f8ce7b43b5b54d7f7d1f9dfdebdd0ca9d8f..bc9f7245a13a8a336cda803c8b23010098e7d83d 100644
+--- a/src/test/java/org/fiddlemc/fiddle/block/PerBlockTest.java
++++ b/src/test/java/org/fiddlemc/fiddle/block/PerBlockTest.java
+@@ -5,6 +5,9 @@ package org.fiddlemc.fiddle.block;
+ import net.minecraft.core.registries.BuiltInRegistries;
+ import net.minecraft.world.level.block.Block;
+ import org.bukkit.support.AbstractTestingBase;
++import org.junit.Test;
++
++import static org.junit.Assert.assertEquals;
+ 
+ public class PerBlockTest extends AbstractTestingBase {
+ 
+@@ -12,4 +15,13 @@ public class PerBlockTest extends AbstractTestingBase {
+         return BuiltInRegistries.BLOCK;
+     }
+ 
++    // Fiddle start - cache registry keys as fields - block
++    @Test
++    public void keyInBlockRegistry() {
++        for (Block block : getBlocks()) {
++            assertEquals("Lookup value equals keyInBlockRegistry for " + block, BuiltInRegistries.BLOCK.getKey(block), block.keyInBlockRegistry);
++        }
++    }
++    // Fiddle end - cache registry keys as fields - block
++
+ }
+diff --git a/src/test/java/org/fiddlemc/fiddle/item/PerItemTest.java b/src/test/java/org/fiddlemc/fiddle/item/PerItemTest.java
+index d1d9ee8190fa648efacea96ddaf5b55801e2ade7..ee38ae7143ebb5c05e51ab31956a6023f558625b 100644
+--- a/src/test/java/org/fiddlemc/fiddle/item/PerItemTest.java
++++ b/src/test/java/org/fiddlemc/fiddle/item/PerItemTest.java
+@@ -5,6 +5,9 @@ package org.fiddlemc.fiddle.item;
+ import net.minecraft.core.registries.BuiltInRegistries;
+ import net.minecraft.world.item.Item;
+ import org.bukkit.support.AbstractTestingBase;
++import org.junit.Test;
++
++import static org.junit.Assert.assertEquals;
+ 
+ public class PerItemTest extends AbstractTestingBase {
+ 
+@@ -12,4 +15,13 @@ public class PerItemTest extends AbstractTestingBase {
+         return BuiltInRegistries.ITEM;
+     }
+ 
++    // Fiddle start - cache registry keys as fields - item
++    @Test
++    public void keyInItemRegistry() {
++        for (Item item : getItems()) {
++            assertEquals("Lookup value equals keyInItemRegistry for " + item, BuiltInRegistries.ITEM.getKey(item), item.keyInItemRegistry);
++        }
++    }
++    // Fiddle end - cache registry keys as fields - item
++
+ }

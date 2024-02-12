@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Thu, 11 May 2023 18:36:07 +0200
+Subject: [PATCH] Load packs - Data packs - Include Fiddle source in pack
+ repository
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/server/packs/repository/ServerPacksSource.java b/src/main/java/net/minecraft/server/packs/repository/ServerPacksSource.java
+index 4ed8f38ba9c7b075b99a0da0e213a1e9d03ac717..690f6fa2162cdb6da3139732ec61f38c592e7b08 100644
+--- a/src/main/java/net/minecraft/server/packs/repository/ServerPacksSource.java
++++ b/src/main/java/net/minecraft/server/packs/repository/ServerPacksSource.java
+@@ -53,7 +53,7 @@ public class ServerPacksSource extends BuiltInPackSource {
+     }
+ 
+     public static PackRepository createPackRepository(Path dataPacksPath, DirectoryValidator directoryValidator) {
+-        return new PackRepository(new ServerPacksSource(directoryValidator), new FolderRepositorySource(dataPacksPath, PackType.SERVER_DATA, PackSource.WORLD, directoryValidator));
++        return new PackRepository(new ServerPacksSource(directoryValidator), new org.fiddlemc.fiddle.pack.load.data.FiddleRepositorySource(), new FolderRepositorySource(dataPacksPath, PackType.SERVER_DATA, PackSource.WORLD, directoryValidator)); // Fiddle - load packs - data packs - repository source - include in pack repository
+     }
+ 
+     public static PackRepository createVanillaTrustedRepository() {

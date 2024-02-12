@@ -1,157 +1,60 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
-Date: Mon, 1 Jan 2024 20:30:52 +0100
+Date: Sat, 29 Jul 2023 18:53:58 +0200
 Subject: [PATCH] Client perspective - Block state visualization - Apply to
- chunk packets - Visualization step after anti-x-ray
+ chunk packets - Chunk packet data can use buffer partially
 
-Inserts a step into the process of preparing chunk packets to be sent, after anti-x-ray, where the visualization of block states is applied to that chunk packet, before it is marked ready.
+Instead of assuming we can precisely pre-calculate the size of the byte buffer needed
+to contain the data in ClientboundLevelChunkPacketData, we begin by assuming that the
+used buffer length is indeed the size that we pre-calculated, but we store it in a field (`bufferUsedLength`)
+that may be modified if it later becomes clear the the buffer is in fact not entirely filled.
+This gives us the opportunity to perform further changes to the chunk data after it has already been
+stored in the buffer, when those changes may have a higher final buffer length than we initially
+calculated. In that case, we can, instead of allocating a buffer with the precise length known in advance,
+allocate a buffer with a length that is sufficient instead, and later set `bufferUsedLength` to the length
+that was actually used, without having to re-allocate a new byte buffer with the correct trimmed size.
 
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
-diff --git a/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketBlockController.java b/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketBlockController.java
-index 061041006c88ba0a7583c60e0dffac93a711f01f..35eb6be651f3795ab899f39ec746a7721431a1ba 100644
---- a/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketBlockController.java
-+++ b/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketBlockController.java
-@@ -34,7 +34,7 @@ public class ChunkPacketBlockController {
-     }
- 
-     public void modifyBlocks(ClientboundLevelChunkWithLightPacket chunkPacket, @org.jetbrains.annotations.Nullable ChunkPacketInfoAntiXray chunkPacketInfo) { // Fiddle - client perspective - block state visualization - apply to chunk packets - every ChunkPacketInfo is ChunkPacketInfoAntiXray - the parameter type is always ChunkPacketInfoAntiXray, and is non-null if anti-x-ray is to be applied (but if it is non-null, still no anti-x-ray would be applied if this controller never applies anti-x-ray)
--        chunkPacket.setReady(true);
-+        chunkPacket.onAntiXrayFinish(); // Fiddle - client perspective - block state visualization - apply to chunk packets - no anti-x-ray needs to be applied because this controller never applies anti-x-ray
-     }
- 
-     public void onBlockChange(Level level, BlockPos blockPos, BlockState newBlockState, BlockState oldBlockState, int flags, int maxUpdateDepth) {
-diff --git a/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketBlockControllerAntiXray.java b/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketBlockControllerAntiXray.java
-index 2437d7ba59e1f730a38aac0d63667679353f91df..d8143c876deecfbf1e81ca922985211c13a5942d 100644
---- a/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketBlockControllerAntiXray.java
-+++ b/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketBlockControllerAntiXray.java
-@@ -179,7 +179,7 @@ public final class ChunkPacketBlockControllerAntiXray extends ChunkPacketBlockCo
-     public void modifyBlocks(ClientboundLevelChunkWithLightPacket chunkPacket, @org.jetbrains.annotations.Nullable ChunkPacketInfoAntiXray chunkPacketInfo) { // If and only if the given info instance is non-null, anti-x-ray will be applied (it may be null for packets sent to players that are exempt for anti-x-ray)
-         if (chunkPacketInfo == null || !chunkPacketInfo.applyAntiXray) {
-             // Fiddle end - client perspective - block state visualization - apply to chunk packets - every ChunkPacketInfo is ChunkPacketInfoAntiXray
--            chunkPacket.setReady(true);
-+            chunkPacket.onAntiXrayFinish(); // Fiddle - client perspective - block state visualization - apply to chunk packets - no anti-x-ray needs to be applied to this chunk packet
-             return;
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java
+index 29c499810af7f95f16331385fa6faab4eace9e81..3e345ff48cc57a11f50402b9c75b9546b7621563 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java
+@@ -29,6 +29,7 @@ public class ClientboundLevelChunkPacketData {
+     // Fiddle end - client perspective - block state visualization - apply to chunk packets - ClientboundLevelChunkPacketData has a reference to its ClientboundLevelChunkWithLightPacket
+     private final CompoundTag heightmaps;
+     private final byte[] buffer;
++    public int bufferUsedLength; // Fiddle - client perspective - block state visualization - apply to chunk packets - chunk packet data can use buffer partially
+     private final List<ClientboundLevelChunkPacketData.BlockEntityInfo> blockEntitiesData;
+     // Paper start
+     private final java.util.List<net.minecraft.network.protocol.Packet<?>> extraPackets = new java.util.ArrayList<>();
+@@ -54,6 +55,7 @@ public class ClientboundLevelChunkPacketData {
          }
  
-@@ -379,7 +379,7 @@ public final class ChunkPacketBlockControllerAntiXray extends ChunkPacketBlockCo
+         this.buffer = new byte[calculateChunkSize(chunk)];
++        this.bufferUsedLength = this.buffer.length; // Fiddle - client perspective - block state visualization - apply to chunk packets - chunk packet data can use buffer partially - initially we assume the entire buffer will be used
+ 
+         // Paper start - Anti-Xray - Add chunk packet info
+         if (chunkPacketInfo != null) {
+@@ -93,6 +95,7 @@ public class ClientboundLevelChunkPacketData {
+                 throw new RuntimeException("Chunk Packet trying to allocate too much memory on read.");
+             } else {
+                 this.buffer = new byte[i];
++                this.bufferUsedLength = this.buffer.length; // Fiddle - client perspective - block state visualization - apply to chunk packets - chunk packet data can use buffer partially - initially we assume the entire buffer will be used
+                 buf.readBytes(this.buffer);
+                 this.blockEntitiesData = buf.readList(ClientboundLevelChunkPacketData.BlockEntityInfo::new);
              }
-         }
+@@ -101,8 +104,10 @@ public class ClientboundLevelChunkPacketData {
  
--        chunkPacketInfoAntiXray.getChunkPacket().setReady(true);
-+        chunkPacketInfoAntiXray.getChunkPacket().onAntiXrayFinish(); // Fiddle - client perspective - block state visualization - apply to chunk packets - anti-x-ray finished
-     }
- 
-     private void obfuscateLayer(int y, BitStorageReader bitStorageReader, BitStorageWriter bitStorageWriter, boolean[] solid, boolean[] obfuscate, int[] presetBlockStateBits, boolean[][] current, boolean[][] next, boolean[][] nextNext, LevelChunkSection[] nearbyChunkSections, IntSupplier random) {
-diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
-index dd6642f1653979b3cafc93a646c07b00c13bb390..cd8ddc7885731a36997c0e9e3b9fc6c358592825 100644
---- a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
-+++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
-@@ -20,15 +20,58 @@ public class ClientboundLevelChunkWithLightPacket extends org.fiddlemc.fiddle.pa
-     public @Nullable net.minecraft.server.level.ServerLevel level;
-     // Fiddle end - block state visualization - apply to chunk packets - store ChunkPacketInfo and chunk details
-     // Paper start - Async-Anti-Xray - Ready flag for the connection
--    private volatile boolean ready;
-+    // Fiddle start - client perspective - block state visualization - apply to chunk packets
-+    /**
-+     * This is set to true with the single call to {@link #onApplyVisualizationFinish}.
-+     * <br>
-+     * This field used to be the {@code ready} field.
-+     */
-+    private volatile boolean hasApplyVisualizationFinished;
-+
-+    /**
-+     * This is incremented by both the single call to {@link #postSetConnectionAdaptForClient}.
-+     * and the single call to {@link #onAntiXrayFinish}.
-+     * <p>
-+     *     This exists because the applyinh visualization task may be attempted to be started from several threads
-+     *     at the same time: namely the thread that has finished the anti-x-ray
-+     *     (thereby invoking {@link #onAntiXrayFinish}) and the thread that is attempting to send the packet
-+     *     to the connection (thereby invoking {@link #postSetConnectionAdaptForClient}).
-+     * </p>
-+     */
-+    private @org.jetbrains.annotations.NotNull java.util.concurrent.atomic.AtomicInteger targetClientConnectionIsInitializedAndAntiXrayHasFinished = new java.util.concurrent.atomic.AtomicInteger();
-+    // Fiddle start - client perspective - block state visualization - apply to chunk packets
- 
-     @Override
-     public boolean isReady() {
--        return this.ready;
-+        return this.hasApplyVisualizationFinished; // Fiddle - client perspective - block state visualization - apply to chunk packets
-+    }
-+
-+    // Fiddle start - client perspective - block state visualization - apply to chunk packets
-+    /**
-+     * This is called when anti-x-ray has finished processing (or if it didn't need to be applied),
-+     * so we can now apply the visualizations.
-+     * <br>
-+     * Invocations of this method used to be invocations of {@code setReady(true)}.
-+     * <p>
-+     *     This immediately starts the task of applying block state visualization to this packet data,
-+     *     if {@linkplain #postSetConnectionAdaptForClient the target connection was already initialized}.
-+     * </p>
-+     */
-+    public void onAntiXrayFinish() {
-+        if (this.targetClientConnectionIsInitializedAndAntiXrayHasFinished.incrementAndGet() == 2) {
-+            this.startApplyVisualizationTask();
-+        }
-     }
- 
--    public void setReady(boolean ready) {
--        this.ready = ready;
-+    /**
-+     * Called when applying the visualization has finished (or if it didn't need to be applied),
-+     * so the packet is now ready to be sent.
-+     * <br>
-+     * The effect of this method is the same as the effect would have been of calling {@code setReady(true)}.
-+     */
-+    private void onApplyVisualizationFinish() {
-+        this.hasApplyVisualizationFinished = true;
-+        // Fiddle end - client perspective - block state visualization - apply to chunk packets
-     }
-     // Paper end
- 
-@@ -71,6 +114,43 @@ public class ClientboundLevelChunkWithLightPacket extends org.fiddlemc.fiddle.pa
-         this.lightData.write(buf);
-     }
- 
-+    // Fiddle start - client perspective - block state visualization - apply to chunk packets
-+    /**
-+     * Called by {@link ClientboundLevelChunkWithLightPacket} when the target client connection has been stored in it.
-+     * This is called exactly once.
-+     * <p>
-+     *     This immediately starts the task of applying block state visualization to this packet data,
-+     *     if {@linkplain #onAntiXrayFinish anti-x-ray has already finished}.
-+     * </p
-+     */
-+    @Override
-+    protected @org.jetbrains.annotations.NotNull Packet<ClientGamePacketListener> postSetConnectionAdaptForClient(@org.jetbrains.annotations.NotNull net.minecraft.network.Connection connection) {
-+        boolean startTask;
-+        if (this.targetClientConnectionIsInitializedAndAntiXrayHasFinished.incrementAndGet() == 2) {
-+            this.startApplyVisualizationTask();
-+        }
-+        return this;
-+    }
-+
-+    /**
-+     * Starts the task of applying visualizations to this chunk packet data.
-+     * <p>
-+     *     This is called exactly once.
-+     *     It is called either from {@link #onAntiXrayFinish} or from {@link #postSetConnectionAdaptForClient}.
-+     * </p>
-+     */
-+    private void startApplyVisualizationTask() {
-+        // Always apply the visualization on the main thread, analogous to what currently happens for anti-x-ray
-+        if (!org.bukkit.Bukkit.isPrimaryThread()) {
-+            // Plugins?
-+            net.minecraft.server.MinecraftServer.getServer().scheduleOnMain(this::startApplyVisualizationTask);
-+            return;
-+        }
-+        org.fiddlemc.fiddle.packet.block.SetUpVisualizationForChunkPackets.setUpAndModifyBuffer(this);
-+        this.onApplyVisualizationFinish();
-+    }
-+    // Fiddle end - client perspective - block state visualization - apply to chunk packets
-+
-     @Override
-     public void handle(ClientGamePacketListener listener) {
-         listener.handleLevelChunkWithLight(this);
+     public void write(FriendlyByteBuf buf) {
+         buf.writeNbt(this.heightmaps, org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope.NOTHING); // Fiddle - client perspective - deep replacements - pass scope - this never contains replaceables
+-        buf.writeVarInt(this.buffer.length);
+-        buf.writeBytes(this.buffer);
++        // Fiddle start - client perspective - block state visualization - apply to chunk packets - chunk packet data can use buffer partially
++        buf.writeVarInt(this.bufferUsedLength);
++        buf.writeBytes(this.buffer, 0, this.bufferUsedLength);
++        // Fiddle end - client perspective - block state visualization - apply to chunk packets - chunk packet data can use buffer partially
+         buf.writeCollection(this.blockEntitiesData, (buf2, entry) -> {
+             entry.write(buf2);
+         });

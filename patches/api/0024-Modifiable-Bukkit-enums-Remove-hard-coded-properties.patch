@@ -13,10 +13,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 82b19d461cc167101a113fd1f58de0f28f4f5f95..8794861d31a65f51597365d4a959cdb1a0416186 100644
+index 68d0c20439fd6d60cae0851103b481cc525f9808..e9df2a0fa787eb48b066d15af991b01df82f4266 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -4486,7 +4486,16 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4489,7 +4489,16 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       */
      @Deprecated
      public int getId() {

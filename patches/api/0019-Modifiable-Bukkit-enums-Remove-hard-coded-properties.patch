@@ -14,10 +14,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 753fdbd7d588d5913bc918eb61ba0e4fcc4bc2d1..0a8e4c247d802feedcdeee8b8dcbed5d58f807fd 100644
+index ca5e93c404abf0970ffb5dac611b9732a743bfaf..f67bf29828e1d61abaf55ef9a310a2fadcf8fbfc 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -4440,15 +4440,13 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4443,15 +4443,13 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
  
      /**
       * @return If the type is either AIR, CAVE_AIR or VOID_AIR
@@ -38,7 +38,7 @@ index 753fdbd7d588d5913bc918eb61ba0e4fcc4bc2d1..0a8e4c247d802feedcdeee8b8dcbed5d
      }
  
      @Override
-@@ -5086,142 +5084,22 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -5089,142 +5087,22 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material is a block and does not block any light
       * @deprecated currently does not have an implementation which is well
       * linked to the underlying server. Contributions welcome.
@@ -194,10 +194,10 @@ index 753fdbd7d588d5913bc918eb61ba0e4fcc4bc2d1..0a8e4c247d802feedcdeee8b8dcbed5d
              case LEGACY_SAPLING:
              case LEGACY_POWERED_RAIL:
 diff --git a/src/main/java/org/bukkit/UnsafeValues.java b/src/main/java/org/bukkit/UnsafeValues.java
-index 176123cdb4eb738069785c0fffa2241f6c3aa743..1a94e5b5af18604599348255096f4150f498e0a0 100644
+index ecd8e4d40d546ec4d5c9d22754afbffe44a249bc..1c3304646a53c3abd1657b2b92cb9d8086b24655 100644
 --- a/src/main/java/org/bukkit/UnsafeValues.java
 +++ b/src/main/java/org/bukkit/UnsafeValues.java
-@@ -299,6 +299,8 @@ public interface UnsafeValues {
+@@ -298,6 +298,8 @@ public interface UnsafeValues {
  
      boolean isAir(Material material);
  

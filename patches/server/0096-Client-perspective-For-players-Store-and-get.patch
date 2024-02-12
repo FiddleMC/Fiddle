@@ -1,0 +1,73 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sat, 29 Jul 2023 09:13:00 +0200
+Subject: [PATCH] Client perspective - For players - Store and get
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/network/Connection.java b/src/main/java/net/minecraft/network/Connection.java
+index 3d650b96cc5e4b30d8bf82a8a7edda63ead28969..88f958349b466ac717ede5748ce5a4fff487e771 100644
+--- a/src/main/java/net/minecraft/network/Connection.java
++++ b/src/main/java/net/minecraft/network/Connection.java
+@@ -959,4 +959,21 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+         }
+     }
+     // Paper end - Optimize network
++
++    // Fiddle start - client perspective - player - get from connection
++    /**
++     * @return The {@link org.fiddlemc.fiddle.packet.ClientPerspective} of this connection's {@linkplain #getPlayer() player}.
++     * This is null if the player is null.
++     *
++     * @see net.minecraft.server.level.ServerPlayer#getClientPerspective
++     */
++    public final @Nullable org.fiddlemc.fiddle.packet.ClientPerspective getPlayerClientPerspective() {
++        var player = this.getPlayer();
++        if (player == null) {
++            return null;
++        }
++        return player.getClientPerspective();
++    }
++    // Fiddle end - client perspective - player - get from connection
++
+ }
+diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
+index 98b89412e896a4f91050d876f236b1e04e6bae75..498119eafda2ab1c61615fe7e6ecb5063f14bdec 100644
+--- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
++++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
+@@ -280,6 +280,8 @@ public class ServerPlayer extends Player {
+ 
+     public boolean hasBeenPlacedIntoPlayerList = false; // Fiddle - client perspective - send resource pack
+ 
++    private @Nullable org.fiddlemc.fiddle.packet.ClientPerspective clientPerspective; // Fiddle - client perspective - player
++
+     public io.papermc.paper.chunk.system.RegionizedPlayerChunkLoader.ViewDistances getViewDistances() {
+         return this.viewDistances.get();
+     }
+@@ -2649,4 +2651,25 @@ public class ServerPlayer extends Player {
+         return (CraftPlayer) super.getBukkitEntity();
+     }
+     // CraftBukkit end
++
++    // Fiddle start - client perspective - player
++    /**
++     * @return The {@link org.fiddlemc.fiddle.packet.ClientPerspective} of this player.
++     * This is null if and only if it has not been {@linkplain #setClientPerspective initialized} yet.
++     */
++    public final @Nullable org.fiddlemc.fiddle.packet.ClientPerspective getClientPerspective() {
++        return this.clientPerspective;
++    }
++
++    /**
++     * @param clientPerspective The value to initialize this player's {@link ClientPerspective} to.
++     */
++    public final void setClientPerspective(@org.jetbrains.annotations.NotNull org.fiddlemc.fiddle.packet.ClientPerspective clientPerspective) {
++        if (this.clientPerspective != null) {
++            throw new IllegalStateException("Tried to set Player.clientPerspective when it was already set");
++        }
++        this.clientPerspective = clientPerspective;
++    }
++    // Fiddle end - client perspective - player
++
+ }

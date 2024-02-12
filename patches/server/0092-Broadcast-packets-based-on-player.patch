@@ -1,0 +1,38 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Wed, 3 Jan 2024 22:57:43 +0100
+Subject: [PATCH] Broadcast packets based on player
+
+Adds a method analogous to `PlayerList.broadcast` that allows sending a different packet to each target player.
+
+Adds no usages of this method; those are added in subsequent patches.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
+index 48d1444fbad1c57738807d0128b94160a5a17a4d..6301c90bb6d3049b933f5ba08a163ac6fcfce4b0 100644
+--- a/src/main/java/net/minecraft/server/players/PlayerList.java
++++ b/src/main/java/net/minecraft/server/players/PlayerList.java
+@@ -1182,6 +1182,12 @@ public abstract class PlayerList {
+     }
+ 
+     public void broadcast(@Nullable net.minecraft.world.entity.player.Player player, double x, double y, double z, double distance, ResourceKey<Level> worldKey, Packet<?> packet) {
++        // Fiddle start - broadcast packets based on player
++        this.broadcastDependentOnPlayer(player, x, y, z, distance, worldKey, targetPlayer -> packet);
++    }
++
++    public void broadcastDependentOnPlayer(@Nullable net.minecraft.world.entity.player.Player player, double x, double y, double z, double distance, ResourceKey<Level> worldKey, Function<ServerPlayer, Packet<?>> packet) {
++        // Fiddle end - broadcast packets based on player
+         for (int i = 0; i < this.players.size(); ++i) {
+             ServerPlayer entityplayer = (ServerPlayer) this.players.get(i);
+ 
+@@ -1197,7 +1203,7 @@ public abstract class PlayerList {
+                 double d6 = z - entityplayer.getZ();
+ 
+                 if (d4 * d4 + d5 * d5 + d6 * d6 < distance * distance) {
+-                    entityplayer.connection.send(packet);
++                    entityplayer.connection.send(packet.apply(entityplayer)); // Fiddle end - broadcast packets based on player
+                 }
+             }
+         }

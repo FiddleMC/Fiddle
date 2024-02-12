@@ -11,10 +11,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 039d8152639b22fbb6af9dfbcc7eb38466ef0f6a..4be53e8527558d180627fda7967f2a7be1247db0 100644
+index d95a42900399af3dd6775f4d9690eb08a96fa6bf..8469cd2b8414fee9d06577bd5ee8379321d053f1 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -11074,4 +11074,23 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -11077,4 +11077,23 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      public boolean isEnabledByFeature(@NotNull World world) {
          return Bukkit.getDataPackManager().isEnabledByFeature(this, world);
      }
@@ -39,10 +39,10 @@ index 039d8152639b22fbb6af9dfbcc7eb38466ef0f6a..4be53e8527558d180627fda7967f2a7b
 +
  }
 diff --git a/src/main/java/org/bukkit/UnsafeValues.java b/src/main/java/org/bukkit/UnsafeValues.java
-index de36dab37d3af249cf51573d163731c12346066a..b5a6bf8de49a7a42b253f6a27d84255021c8dd96 100644
+index 9237e2fca0557890b718de9029207a552396e45a..09d776f1cad7e95a68e82b1e76a0062c15652e89 100644
 --- a/src/main/java/org/bukkit/UnsafeValues.java
 +++ b/src/main/java/org/bukkit/UnsafeValues.java
-@@ -252,4 +252,21 @@ public interface UnsafeValues {
+@@ -251,4 +251,21 @@ public interface UnsafeValues {
  
      String getStatisticCriteriaKey(@NotNull org.bukkit.Statistic statistic);
      // Paper end

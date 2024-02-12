@@ -33,10 +33,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 4be53e8527558d180627fda7967f2a7be1247db0..856b17682568ed092fa135eb36d5969c10e7b75c 100644
+index 8469cd2b8414fee9d06577bd5ee8379321d053f1..258e2301efeb2facae185cc980fe0862ce246f81 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -4394,7 +4394,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4397,7 +4397,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      public final Class<?> data;
      private final boolean legacy;
      private final NamespacedKey key;
@@ -44,7 +44,7 @@ index 4be53e8527558d180627fda7967f2a7be1247db0..856b17682568ed092fa135eb36d5969c
  
      private Material(final int id) {
          this(id, 64);
-@@ -4629,1021 +4628,17 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4632,1021 +4631,17 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return true if this material is a block
       */
      public boolean isBlock() {
@@ -1076,7 +1076,7 @@ index 4be53e8527558d180627fda7967f2a7be1247db0..856b17682568ed092fa135eb36d5969c
      }
  
      /**
-@@ -5652,49 +4647,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -5655,49 +4650,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return true if this Material is edible.
       */
      public boolean isEdible() {
@@ -1137,7 +1137,7 @@ index 4be53e8527558d180627fda7967f2a7be1247db0..856b17682568ed092fa135eb36d5969c
              case LEGACY_BREAD:
              case LEGACY_CARROT_ITEM:
              case LEGACY_BAKED_POTATO:
-@@ -5820,7 +4784,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -5823,7 +4787,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      static {
          for (Material material : values()) {
              BY_NAME.put(material.name(), material);
@@ -1145,7 +1145,7 @@ index 4be53e8527558d180627fda7967f2a7be1247db0..856b17682568ed092fa135eb36d5969c
          }
      }
  
-@@ -5828,29 +4791,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -5831,29 +4794,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material represents a playable music disk.
       */
      public boolean isRecord() {
@@ -1187,7 +1187,7 @@ index 4be53e8527558d180627fda7967f2a7be1247db0..856b17682568ed092fa135eb36d5969c
      }
  
      /**
-@@ -5859,790 +4811,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -5862,790 +4814,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material is a block and solid
       */
      public boolean isSolid() {
@@ -1989,7 +1989,7 @@ index 4be53e8527558d180627fda7967f2a7be1247db0..856b17682568ed092fa135eb36d5969c
              case LEGACY_STONE:
              case LEGACY_GRASS:
              case LEGACY_DIRT:
-@@ -6855,18 +5035,17 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -6858,18 +5038,17 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material is an air block.
       */
      public boolean isAir() {
@@ -2019,7 +2019,7 @@ index 4be53e8527558d180627fda7967f2a7be1247db0..856b17682568ed092fa135eb36d5969c
      }
  
      /**
-@@ -7075,286 +5254,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -7078,286 +5257,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material is a block and can catch fire
       */
      public boolean isFlammable() {
@@ -2317,7 +2317,7 @@ index 4be53e8527558d180627fda7967f2a7be1247db0..856b17682568ed092fa135eb36d5969c
              case LEGACY_WOOD:
              case LEGACY_LOG:
              case LEGACY_LEAVES:
-@@ -7423,186 +5334,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -7426,186 +5337,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material is a block and can burn away
       */
      public boolean isBurnable() {
@@ -2515,7 +2515,7 @@ index 4be53e8527558d180627fda7967f2a7be1247db0..856b17682568ed092fa135eb36d5969c
              case LEGACY_WOOD:
              case LEGACY_LOG:
              case LEGACY_LEAVES:
-@@ -7653,257 +5396,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -7656,257 +5399,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return true if this Material can be used as fuel.
       */
      public boolean isFuel() {
@@ -2784,7 +2784,7 @@ index 4be53e8527558d180627fda7967f2a7be1247db0..856b17682568ed092fa135eb36d5969c
              case LEGACY_LAVA_BUCKET:
              case LEGACY_COAL_BLOCK:
              case LEGACY_BLAZE_ROD:
-@@ -7994,368 +5498,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -7997,368 +5501,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material is a block and occludes light
       */
      public boolean isOccluding() {
@@ -3164,7 +3164,7 @@ index 4be53e8527558d180627fda7967f2a7be1247db0..856b17682568ed092fa135eb36d5969c
              case LEGACY_STONE:
              case LEGACY_GRASS:
              case LEGACY_DIRT:
-@@ -8483,41 +5637,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -8486,41 +5640,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material is affected by gravity.
       */
      public boolean hasGravity() {
@@ -3217,7 +3217,7 @@ index 4be53e8527558d180627fda7967f2a7be1247db0..856b17682568ed092fa135eb36d5969c
              case LEGACY_SAND:
              case LEGACY_GRAVEL:
              case LEGACY_DRAGON_EGG: // Fiddle - add missing Material values with gravity
-@@ -8536,213 +5667,17 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -8539,213 +5670,17 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return true if this material is an item
       */
      public boolean isItem() {
@@ -3442,7 +3442,7 @@ index 4be53e8527558d180627fda7967f2a7be1247db0..856b17682568ed092fa135eb36d5969c
      }
  
      /**
-@@ -8762,331 +5697,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -8765,331 +5700,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return true if this material can be interacted with.
       */
      public boolean isInteractable() {
@@ -3775,7 +3775,7 @@ index 4be53e8527558d180627fda7967f2a7be1247db0..856b17682568ed092fa135eb36d5969c
      }
  
      /**
-@@ -9099,886 +5710,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -9102,886 +5713,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return the hardness of that material.
       */
      public float getHardness() {
@@ -4663,7 +4663,7 @@ index 4be53e8527558d180627fda7967f2a7be1247db0..856b17682568ed092fa135eb36d5969c
      }
  
      /**
-@@ -9992,885 +5724,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -9995,885 +5727,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return the blast resistance of that material.
       */
      public float getBlastResistance() {
@@ -5550,7 +5550,7 @@ index 4be53e8527558d180627fda7967f2a7be1247db0..856b17682568ed092fa135eb36d5969c
      }
  
      /**
-@@ -10886,21 +5740,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -10889,21 +5743,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return the slipperiness of this block
       */
      public float getSlipperiness() {
@@ -5573,7 +5573,7 @@ index 4be53e8527558d180627fda7967f2a7be1247db0..856b17682568ed092fa135eb36d5969c
      }
  
      /**
-@@ -10913,20 +5753,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -10916,20 +5756,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       */
      @Nullable
      public Material getCraftingRemainingItem() {
@@ -5595,7 +5595,7 @@ index 4be53e8527558d180627fda7967f2a7be1247db0..856b17682568ed092fa135eb36d5969c
      }
  
      /**
-@@ -10938,53 +5765,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -10941,53 +5768,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       */
      @NotNull
      public EquipmentSlot getEquipmentSlot() {
@@ -5651,10 +5651,10 @@ index 4be53e8527558d180627fda7967f2a7be1247db0..856b17682568ed092fa135eb36d5969c
  
      /**
 diff --git a/src/main/java/org/bukkit/UnsafeValues.java b/src/main/java/org/bukkit/UnsafeValues.java
-index 600b5699d2c4da75aab295fc021bc2866430083f..8dcf4b041a041d6d6d9b9facc28c2ec711d56429 100644
+index a28463f13c995d501b6a0ba0040ba1689bab5b77..dd256344c1a2f25db0204e760d7b5663d343cb4e 100644
 --- a/src/main/java/org/bukkit/UnsafeValues.java
 +++ b/src/main/java/org/bukkit/UnsafeValues.java
-@@ -284,4 +284,48 @@ public interface UnsafeValues {
+@@ -283,4 +283,48 @@ public interface UnsafeValues {
      boolean isVanillaItem(Material material);
      // Fiddle end - flags for vanilla content - API - item
  
@@ -5802,13 +5802,13 @@ index d1ca826aa4081ce7766c5ad705a3e772c2683860..068ff2f4d8511bc4744e569a499df261
 +
  }
 diff --git a/src/test/java/org/bukkit/scoreboard/CriteriaTest.java b/src/test/java/org/bukkit/scoreboard/CriteriaTest.java
-index 025ec8d6379c386bcef2295f2b358df1ccd00802..c52141ed037e3fe4348d72d8ca452f07dcc14ed3 100644
+index 034faf9a444455e2a047e46950e06f3af806b158..a45ad4e8cbe8cf6ca557fd17333ca8d91eaedbcf 100644
 --- a/src/test/java/org/bukkit/scoreboard/CriteriaTest.java
 +++ b/src/test/java/org/bukkit/scoreboard/CriteriaTest.java
-@@ -6,17 +6,36 @@ import org.bukkit.entity.EntityType;
+@@ -6,17 +6,38 @@ import org.bukkit.Statistic;
+ import org.bukkit.entity.EntityType;
  import org.bukkit.support.AbstractTestingBase;
- import org.junit.Assert;
- import org.junit.Test;
+ import org.junit.jupiter.api.Test;
 +import org.mockito.MockMakers;
 +
 +import static org.mockito.Mockito.*;
@@ -5817,7 +5817,7 @@ index 025ec8d6379c386bcef2295f2b358df1ccd00802..c52141ed037e3fe4348d72d8ca452f07
  
      @Test
      public void testStatistic() {
--        Assert.assertThrows(IllegalArgumentException.class, () -> Criteria.statistic(Statistic.AVIATE_ONE_CM, Material.STONE)); // Generic statistic with block
+-        assertThrows(IllegalArgumentException.class, () -> Criteria.statistic(Statistic.AVIATE_ONE_CM, Material.STONE)); // Generic statistic with block
 +        // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
 +        var nonBlockEnumValue = mock(Material.class, withSettings().mockMaker(MockMakers.INLINE)); // Used to be Material.DIAMOND_SWORD
 +        when(nonBlockEnumValue.isItem()).thenReturn(true);
@@ -5833,17 +5833,19 @@ index 025ec8d6379c386bcef2295f2b358df1ccd00802..c52141ed037e3fe4348d72d8ca452f07
 +        when(nonEntityButBlockEnumValue.isBlock()).thenReturn(true);
 +        var arbitraryMaterialValue = nonEntityButBlockEnumValue; // Used to be Material.STONE
 +
-+        Assert.assertThrows(IllegalArgumentException.class, () -> Criteria.statistic(Statistic.AVIATE_ONE_CM, arbitraryMaterialValue)); // Generic statistic with block
-         Assert.assertThrows(IllegalArgumentException.class, () -> Criteria.statistic(Statistic.AVIATE_ONE_CM, EntityType.CREEPER)); // Generic statistic with entity type
++        assertThrows(IllegalArgumentException.class, () -> Criteria.statistic(Statistic.AVIATE_ONE_CM, arbitraryMaterialValue)); // Generic statistic with block
++        // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
+         assertThrows(IllegalArgumentException.class, () -> Criteria.statistic(Statistic.AVIATE_ONE_CM, EntityType.CREEPER)); // Generic statistic with entity type
  
--        Assert.assertThrows(IllegalArgumentException.class, () -> Criteria.statistic(Statistic.ENTITY_KILLED_BY, Material.AMETHYST_SHARD)); // Entity statistic with material
--        Assert.assertThrows(IllegalArgumentException.class, () -> Criteria.statistic(Statistic.MINE_BLOCK, Material.DIAMOND_PICKAXE)); // Block statistic with item
--        Assert.assertThrows(IllegalArgumentException.class, () -> Criteria.statistic(Statistic.BREAK_ITEM, Material.WATER)); // Item statistic with block
--        Assert.assertThrows(IllegalArgumentException.class, () -> Criteria.statistic(Statistic.KILL_ENTITY, Material.STONE)); // Entity statistic with Material
-+        Assert.assertThrows(IllegalArgumentException.class, () -> Criteria.statistic(Statistic.ENTITY_KILLED_BY, nonEntityButItemEnumValue)); // Entity statistic with material
-+        Assert.assertThrows(IllegalArgumentException.class, () -> Criteria.statistic(Statistic.MINE_BLOCK, nonBlockEnumValue)); // Block statistic with item
-+        Assert.assertThrows(IllegalArgumentException.class, () -> Criteria.statistic(Statistic.BREAK_ITEM, nonItemEnumValue)); // Item statistic with block
-+        Assert.assertThrows(IllegalArgumentException.class, () -> Criteria.statistic(Statistic.KILL_ENTITY, nonEntityButBlockEnumValue)); // Entity statistic with Material
+-        assertThrows(IllegalArgumentException.class, () -> Criteria.statistic(Statistic.ENTITY_KILLED_BY, Material.AMETHYST_SHARD)); // Entity statistic with material
+-        assertThrows(IllegalArgumentException.class, () -> Criteria.statistic(Statistic.MINE_BLOCK, Material.DIAMOND_PICKAXE)); // Block statistic with item
+-        assertThrows(IllegalArgumentException.class, () -> Criteria.statistic(Statistic.BREAK_ITEM, Material.WATER)); // Item statistic with block
+-        assertThrows(IllegalArgumentException.class, () -> Criteria.statistic(Statistic.KILL_ENTITY, Material.STONE)); // Entity statistic with Material
++        // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
++        assertThrows(IllegalArgumentException.class, () -> Criteria.statistic(Statistic.ENTITY_KILLED_BY, nonEntityButItemEnumValue)); // Entity statistic with material
++        assertThrows(IllegalArgumentException.class, () -> Criteria.statistic(Statistic.MINE_BLOCK, nonBlockEnumValue)); // Block statistic with item
++        assertThrows(IllegalArgumentException.class, () -> Criteria.statistic(Statistic.BREAK_ITEM, nonItemEnumValue)); // Item statistic with block
++        assertThrows(IllegalArgumentException.class, () -> Criteria.statistic(Statistic.KILL_ENTITY, nonEntityButBlockEnumValue)); // Entity statistic with Material
 +        // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
      }
  }

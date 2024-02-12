@@ -3,11 +3,386 @@ From: Martijn Muijsers <martijnmuijsers@live.nl>
 Date: Wed, 24 Jan 2024 18:02:02 +0100
 Subject: [PATCH] Fiddle parameters, methods and fields are non-null by default
 
-Adds a `package-info.java` for the top-level Fiddle package, that declares all parameters, methods and fields to be non-null by default.
+Adds a `package-info.java` for every Fiddle package, that declares all parameters, methods and fields to be non-null by default.
 
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
+diff --git a/src/main/java/org/fiddlemc/fiddle/configuration/package-info.java b/src/main/java/org/fiddlemc/fiddle/configuration/package-info.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..4b5406690afdcaaf33bba4f8055a6b99693e01ff
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/configuration/package-info.java
+@@ -0,0 +1,9 @@
++@ParametersAreNonnullByDefault
++@MethodsReturnNonnullByDefault
++@FieldsAreNonnullByDefault
++package org.fiddlemc.fiddle.configuration;
++
++import net.minecraft.FieldsAreNonnullByDefault;
++import net.minecraft.MethodsReturnNonnullByDefault;
++
++import javax.annotation.ParametersAreNonnullByDefault;
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/exception/package-info.java b/src/main/java/org/fiddlemc/fiddle/pack/exception/package-info.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..eaae869f102fb3ec834672f7fd5e5f234947c7c5
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/exception/package-info.java
+@@ -0,0 +1,9 @@
++@ParametersAreNonnullByDefault
++@MethodsReturnNonnullByDefault
++@FieldsAreNonnullByDefault
++package org.fiddlemc.fiddle.pack.exception;
++
++import net.minecraft.FieldsAreNonnullByDefault;
++import net.minecraft.MethodsReturnNonnullByDefault;
++
++import javax.annotation.ParametersAreNonnullByDefault;
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/load/data/package-info.java b/src/main/java/org/fiddlemc/fiddle/pack/load/data/package-info.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..bb35644e5d6ac772610f4d6dc67330d2a72fadf3
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/load/data/package-info.java
+@@ -0,0 +1,9 @@
++@ParametersAreNonnullByDefault
++@MethodsReturnNonnullByDefault
++@FieldsAreNonnullByDefault
++package org.fiddlemc.fiddle.pack.load.data;
++
++import net.minecraft.FieldsAreNonnullByDefault;
++import net.minecraft.MethodsReturnNonnullByDefault;
++
++import javax.annotation.ParametersAreNonnullByDefault;
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/load/fiddlecontent/block/package-info.java b/src/main/java/org/fiddlemc/fiddle/pack/load/fiddlecontent/block/package-info.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..501f5ed13ab1b267a496522579d55bcc3fe6d510
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/load/fiddlecontent/block/package-info.java
+@@ -0,0 +1,9 @@
++@ParametersAreNonnullByDefault
++@MethodsReturnNonnullByDefault
++@FieldsAreNonnullByDefault
++package org.fiddlemc.fiddle.pack.load.fiddlecontent.block;
++
++import net.minecraft.FieldsAreNonnullByDefault;
++import net.minecraft.MethodsReturnNonnullByDefault;
++
++import javax.annotation.ParametersAreNonnullByDefault;
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/load/fiddlecontent/blockoritem/package-info.java b/src/main/java/org/fiddlemc/fiddle/pack/load/fiddlecontent/blockoritem/package-info.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..b093cd69c5763ca5f46377999101de3425bdb0fb
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/load/fiddlecontent/blockoritem/package-info.java
+@@ -0,0 +1,9 @@
++@ParametersAreNonnullByDefault
++@MethodsReturnNonnullByDefault
++@FieldsAreNonnullByDefault
++package org.fiddlemc.fiddle.pack.load.fiddlecontent.blockoritem;
++
++import net.minecraft.FieldsAreNonnullByDefault;
++import net.minecraft.MethodsReturnNonnullByDefault;
++
++import javax.annotation.ParametersAreNonnullByDefault;
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/load/fiddlecontent/item/package-info.java b/src/main/java/org/fiddlemc/fiddle/pack/load/fiddlecontent/item/package-info.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..3bf469158e6e54d9ab5e26c9d8a78db3ce5cc3a6
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/load/fiddlecontent/item/package-info.java
+@@ -0,0 +1,9 @@
++@ParametersAreNonnullByDefault
++@MethodsReturnNonnullByDefault
++@FieldsAreNonnullByDefault
++package org.fiddlemc.fiddle.pack.load.fiddlecontent.item;
++
++import net.minecraft.FieldsAreNonnullByDefault;
++import net.minecraft.MethodsReturnNonnullByDefault;
++
++import javax.annotation.ParametersAreNonnullByDefault;
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/load/fiddlecontent/package-info.java b/src/main/java/org/fiddlemc/fiddle/pack/load/fiddlecontent/package-info.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..a206d3ba1fbb6774a1feb9fdb51854dc9950058c
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/load/fiddlecontent/package-info.java
+@@ -0,0 +1,9 @@
++@ParametersAreNonnullByDefault
++@MethodsReturnNonnullByDefault
++@FieldsAreNonnullByDefault
++package org.fiddlemc.fiddle.pack.load.fiddlecontent;
++
++import net.minecraft.FieldsAreNonnullByDefault;
++import net.minecraft.MethodsReturnNonnullByDefault;
++
++import javax.annotation.ParametersAreNonnullByDefault;
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/load/fiddlecontent/withparent/package-info.java b/src/main/java/org/fiddlemc/fiddle/pack/load/fiddlecontent/withparent/package-info.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..4b6fe44f6cda97c7920b3434f34a7ffe65d25a7d
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/load/fiddlecontent/withparent/package-info.java
+@@ -0,0 +1,9 @@
++@ParametersAreNonnullByDefault
++@MethodsReturnNonnullByDefault
++@FieldsAreNonnullByDefault
++package org.fiddlemc.fiddle.pack.load.fiddlecontent.withparent;
++
++import net.minecraft.FieldsAreNonnullByDefault;
++import net.minecraft.MethodsReturnNonnullByDefault;
++
++import javax.annotation.ParametersAreNonnullByDefault;
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/load/package-info.java b/src/main/java/org/fiddlemc/fiddle/pack/load/package-info.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..49891693455eb2aa7521487649361c9974a9e7c8
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/load/package-info.java
+@@ -0,0 +1,9 @@
++@ParametersAreNonnullByDefault
++@MethodsReturnNonnullByDefault
++@FieldsAreNonnullByDefault
++package org.fiddlemc.fiddle.pack.load;
++
++import net.minecraft.FieldsAreNonnullByDefault;
++import net.minecraft.MethodsReturnNonnullByDefault;
++
++import javax.annotation.ParametersAreNonnullByDefault;
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/package-info.java b/src/main/java/org/fiddlemc/fiddle/pack/package-info.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..be2594f73b246a7d24fa15b9eff6c56c61cf75a8
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/package-info.java
+@@ -0,0 +1,9 @@
++@ParametersAreNonnullByDefault
++@MethodsReturnNonnullByDefault
++@FieldsAreNonnullByDefault
++package org.fiddlemc.fiddle.pack;
++
++import net.minecraft.FieldsAreNonnullByDefault;
++import net.minecraft.MethodsReturnNonnullByDefault;
++
++import javax.annotation.ParametersAreNonnullByDefault;
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/mapcolor/package-info.java b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/mapcolor/package-info.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..01ca682f0f860f369ff25ea31d631675a8b36504
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/mapcolor/package-info.java
+@@ -0,0 +1,9 @@
++@ParametersAreNonnullByDefault
++@MethodsReturnNonnullByDefault
++@FieldsAreNonnullByDefault
++package org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.block.mapcolor;
++
++import net.minecraft.FieldsAreNonnullByDefault;
++import net.minecraft.MethodsReturnNonnullByDefault;
++
++import javax.annotation.ParametersAreNonnullByDefault;
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/package-info.java b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/package-info.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..536e4759db1784b924b6f9bba28c32d3049eb861
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/package-info.java
+@@ -0,0 +1,9 @@
++@ParametersAreNonnullByDefault
++@MethodsReturnNonnullByDefault
++@FieldsAreNonnullByDefault
++package org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.block;
++
++import net.minecraft.FieldsAreNonnullByDefault;
++import net.minecraft.MethodsReturnNonnullByDefault;
++
++import javax.annotation.ParametersAreNonnullByDefault;
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/parent/package-info.java b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/parent/package-info.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..74bf6926b9360b1d8c10fa18b0979411dba13084
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/parent/package-info.java
+@@ -0,0 +1,9 @@
++@ParametersAreNonnullByDefault
++@MethodsReturnNonnullByDefault
++@FieldsAreNonnullByDefault
++package org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.block.parent;
++
++import net.minecraft.FieldsAreNonnullByDefault;
++import net.minecraft.MethodsReturnNonnullByDefault;
++
++import javax.annotation.ParametersAreNonnullByDefault;
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/blockoritem/package-info.java b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/blockoritem/package-info.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..68cbf7f4e150a22ba67b8a7cbce4bf5a06c72a38
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/blockoritem/package-info.java
+@@ -0,0 +1,9 @@
++@ParametersAreNonnullByDefault
++@MethodsReturnNonnullByDefault
++@FieldsAreNonnullByDefault
++package org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.blockoritem;
++
++import net.minecraft.FieldsAreNonnullByDefault;
++import net.minecraft.MethodsReturnNonnullByDefault;
++
++import javax.annotation.ParametersAreNonnullByDefault;
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/item/package-info.java b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/item/package-info.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..4d8d93acf520f8ea295d23bd719f3b98af474523
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/item/package-info.java
+@@ -0,0 +1,9 @@
++@ParametersAreNonnullByDefault
++@MethodsReturnNonnullByDefault
++@FieldsAreNonnullByDefault
++package org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.item;
++
++import net.minecraft.FieldsAreNonnullByDefault;
++import net.minecraft.MethodsReturnNonnullByDefault;
++
++import javax.annotation.ParametersAreNonnullByDefault;
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/item/parent/package-info.java b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/item/parent/package-info.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..8c4b2f1d3f3f71985d2f85a707aa73a9631dbdcc
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/item/parent/package-info.java
+@@ -0,0 +1,9 @@
++@ParametersAreNonnullByDefault
++@MethodsReturnNonnullByDefault
++@FieldsAreNonnullByDefault
++package org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.item.parent;
++
++import net.minecraft.FieldsAreNonnullByDefault;
++import net.minecraft.MethodsReturnNonnullByDefault;
++
++import javax.annotation.ParametersAreNonnullByDefault;
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/package-info.java b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/package-info.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..d6bfa44fefb81597f45aedd9afebe569b7ef8e66
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/package-info.java
+@@ -0,0 +1,9 @@
++@ParametersAreNonnullByDefault
++@MethodsReturnNonnullByDefault
++@FieldsAreNonnullByDefault
++package org.fiddlemc.fiddle.pack.read.fiddlecontent.definition;
++
++import net.minecraft.FieldsAreNonnullByDefault;
++import net.minecraft.MethodsReturnNonnullByDefault;
++
++import javax.annotation.ParametersAreNonnullByDefault;
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/withparent/package-info.java b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/withparent/package-info.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..d117ea2108d89648188b2f04a907e1265a9eb9f7
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/withparent/package-info.java
+@@ -0,0 +1,9 @@
++@ParametersAreNonnullByDefault
++@MethodsReturnNonnullByDefault
++@FieldsAreNonnullByDefault
++package org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.withparent;
++
++import net.minecraft.FieldsAreNonnullByDefault;
++import net.minecraft.MethodsReturnNonnullByDefault;
++
++import javax.annotation.ParametersAreNonnullByDefault;
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/package-info.java b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/package-info.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..ac8ecd117700aba5bcb1ef3fc0a3cc26530ca076
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/package-info.java
+@@ -0,0 +1,9 @@
++@ParametersAreNonnullByDefault
++@MethodsReturnNonnullByDefault
++@FieldsAreNonnullByDefault
++package org.fiddlemc.fiddle.pack.read.fiddlecontent;
++
++import net.minecraft.FieldsAreNonnullByDefault;
++import net.minecraft.MethodsReturnNonnullByDefault;
++
++import javax.annotation.ParametersAreNonnullByDefault;
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/filesprovider/archive/package-info.java b/src/main/java/org/fiddlemc/fiddle/pack/read/filesprovider/archive/package-info.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..d5de2c34af52de2629c566b9fb119cc9b5b0ba4a
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/filesprovider/archive/package-info.java
+@@ -0,0 +1,9 @@
++@ParametersAreNonnullByDefault
++@MethodsReturnNonnullByDefault
++@FieldsAreNonnullByDefault
++package org.fiddlemc.fiddle.pack.read.filesprovider.archive;
++
++import net.minecraft.FieldsAreNonnullByDefault;
++import net.minecraft.MethodsReturnNonnullByDefault;
++
++import javax.annotation.ParametersAreNonnullByDefault;
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/filesprovider/directory/package-info.java b/src/main/java/org/fiddlemc/fiddle/pack/read/filesprovider/directory/package-info.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..7d3c70aa1af7a3c2296ac5c27c44566c2a9daf4d
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/filesprovider/directory/package-info.java
+@@ -0,0 +1,9 @@
++@ParametersAreNonnullByDefault
++@MethodsReturnNonnullByDefault
++@FieldsAreNonnullByDefault
++package org.fiddlemc.fiddle.pack.read.filesprovider.directory;
++
++import net.minecraft.FieldsAreNonnullByDefault;
++import net.minecraft.MethodsReturnNonnullByDefault;
++
++import javax.annotation.ParametersAreNonnullByDefault;
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/filesprovider/package-info.java b/src/main/java/org/fiddlemc/fiddle/pack/read/filesprovider/package-info.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..a03048fcaafa5b0547dd5046e1e6258964fc5824
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/filesprovider/package-info.java
+@@ -0,0 +1,9 @@
++@ParametersAreNonnullByDefault
++@MethodsReturnNonnullByDefault
++@FieldsAreNonnullByDefault
++package org.fiddlemc.fiddle.pack.read.filesprovider;
++
++import net.minecraft.FieldsAreNonnullByDefault;
++import net.minecraft.MethodsReturnNonnullByDefault;
++
++import javax.annotation.ParametersAreNonnullByDefault;
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/meta/package-info.java b/src/main/java/org/fiddlemc/fiddle/pack/read/meta/package-info.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..67d2636a99a1adca5dbda5718cd1486f1940eee8
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/meta/package-info.java
+@@ -0,0 +1,9 @@
++@ParametersAreNonnullByDefault
++@MethodsReturnNonnullByDefault
++@FieldsAreNonnullByDefault
++package org.fiddlemc.fiddle.pack.read.meta;
++
++import net.minecraft.FieldsAreNonnullByDefault;
++import net.minecraft.MethodsReturnNonnullByDefault;
++
++import javax.annotation.ParametersAreNonnullByDefault;
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/namedjson/package-info.java b/src/main/java/org/fiddlemc/fiddle/pack/read/namedjson/package-info.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..33d6e783e5d90339827f571915896396c98acfea
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/namedjson/package-info.java
+@@ -0,0 +1,9 @@
++@ParametersAreNonnullByDefault
++@MethodsReturnNonnullByDefault
++@FieldsAreNonnullByDefault
++package org.fiddlemc.fiddle.pack.read.namedjson;
++
++import net.minecraft.FieldsAreNonnullByDefault;
++import net.minecraft.MethodsReturnNonnullByDefault;
++
++import javax.annotation.ParametersAreNonnullByDefault;
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/package-info.java b/src/main/java/org/fiddlemc/fiddle/pack/read/package-info.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..9304a2cf7750906d75a2ed321057859c95af212f
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/package-info.java
+@@ -0,0 +1,9 @@
++@ParametersAreNonnullByDefault
++@MethodsReturnNonnullByDefault
++@FieldsAreNonnullByDefault
++package org.fiddlemc.fiddle.pack.read;
++
++import net.minecraft.FieldsAreNonnullByDefault;
++import net.minecraft.MethodsReturnNonnullByDefault;
++
++import javax.annotation.ParametersAreNonnullByDefault;
 diff --git a/src/main/java/org/fiddlemc/fiddle/package-info.java b/src/main/java/org/fiddlemc/fiddle/package-info.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..336193b8d9409d91f6ce2445f2eb62327b7d899c
@@ -18,6 +393,141 @@ index 0000000000000000000000000000000000000000..336193b8d9409d91f6ce2445f2eb6232
 +@MethodsReturnNonnullByDefault
 +@FieldsAreNonnullByDefault
 +package org.fiddlemc.fiddle;
++
++import net.minecraft.FieldsAreNonnullByDefault;
++import net.minecraft.MethodsReturnNonnullByDefault;
++
++import javax.annotation.ParametersAreNonnullByDefault;
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/block/package-info.java b/src/main/java/org/fiddlemc/fiddle/packet/block/package-info.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..426e2e1aaa826b3daaeb9085e9e640dd0774c008
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/packet/block/package-info.java
+@@ -0,0 +1,9 @@
++@ParametersAreNonnullByDefault
++@MethodsReturnNonnullByDefault
++@FieldsAreNonnullByDefault
++package org.fiddlemc.fiddle.packet.block;
++
++import net.minecraft.FieldsAreNonnullByDefault;
++import net.minecraft.MethodsReturnNonnullByDefault;
++
++import javax.annotation.ParametersAreNonnullByDefault;
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/clientinformation/package-info.java b/src/main/java/org/fiddlemc/fiddle/packet/clientinformation/package-info.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..123cf0a2f3ef3803edbcf0237c25f1ccef229f51
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/packet/clientinformation/package-info.java
+@@ -0,0 +1,9 @@
++@ParametersAreNonnullByDefault
++@MethodsReturnNonnullByDefault
++@FieldsAreNonnullByDefault
++package org.fiddlemc.fiddle.packet.clientinformation;
++
++import net.minecraft.FieldsAreNonnullByDefault;
++import net.minecraft.MethodsReturnNonnullByDefault;
++
++import javax.annotation.ParametersAreNonnullByDefault;
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/package-info.java b/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/package-info.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..51eb0908db5cadfb8700956f84bd4a7911ee4ce1
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/package-info.java
+@@ -0,0 +1,9 @@
++@ParametersAreNonnullByDefault
++@MethodsReturnNonnullByDefault
++@FieldsAreNonnullByDefault
++package org.fiddlemc.fiddle.packet.deepreplacement;
++
++import net.minecraft.FieldsAreNonnullByDefault;
++import net.minecraft.MethodsReturnNonnullByDefault;
++
++import javax.annotation.ParametersAreNonnullByDefault;
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/item/package-info.java b/src/main/java/org/fiddlemc/fiddle/packet/item/package-info.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..b00adece3e74936c2f55a6c8d0207ddbd85d550e
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/packet/item/package-info.java
+@@ -0,0 +1,9 @@
++@ParametersAreNonnullByDefault
++@MethodsReturnNonnullByDefault
++@FieldsAreNonnullByDefault
++package org.fiddlemc.fiddle.packet.item;
++
++import net.minecraft.FieldsAreNonnullByDefault;
++import net.minecraft.MethodsReturnNonnullByDefault;
++
++import javax.annotation.ParametersAreNonnullByDefault;
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/locale/package-info.java b/src/main/java/org/fiddlemc/fiddle/packet/locale/package-info.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..ee24b0de21116beac28ddcc5fbc8908d1335d50d
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/packet/locale/package-info.java
+@@ -0,0 +1,9 @@
++@ParametersAreNonnullByDefault
++@MethodsReturnNonnullByDefault
++@FieldsAreNonnullByDefault
++package org.fiddlemc.fiddle.packet.locale;
++
++import net.minecraft.FieldsAreNonnullByDefault;
++import net.minecraft.MethodsReturnNonnullByDefault;
++
++import javax.annotation.ParametersAreNonnullByDefault;
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/package-info.java b/src/main/java/org/fiddlemc/fiddle/packet/package-info.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..672ca3f587e2556461348903edaa643b9477176f
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/packet/package-info.java
+@@ -0,0 +1,9 @@
++@ParametersAreNonnullByDefault
++@MethodsReturnNonnullByDefault
++@FieldsAreNonnullByDefault
++package org.fiddlemc.fiddle.packet;
++
++import net.minecraft.FieldsAreNonnullByDefault;
++import net.minecraft.MethodsReturnNonnullByDefault;
++
++import javax.annotation.ParametersAreNonnullByDefault;
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/resourcepack/package-info.java b/src/main/java/org/fiddlemc/fiddle/packet/resourcepack/package-info.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..a44f3d33db7727b80321b6349b7d04f3df4fc450
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/packet/resourcepack/package-info.java
+@@ -0,0 +1,9 @@
++@ParametersAreNonnullByDefault
++@MethodsReturnNonnullByDefault
++@FieldsAreNonnullByDefault
++package org.fiddlemc.fiddle.packet.resourcepack;
++
++import net.minecraft.FieldsAreNonnullByDefault;
++import net.minecraft.MethodsReturnNonnullByDefault;
++
++import javax.annotation.ParametersAreNonnullByDefault;
+diff --git a/src/main/java/org/fiddlemc/fiddle/registry/package-info.java b/src/main/java/org/fiddlemc/fiddle/registry/package-info.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..830d5434f03cb4f58ea45909ccff4957ac3f37b9
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/registry/package-info.java
+@@ -0,0 +1,9 @@
++@ParametersAreNonnullByDefault
++@MethodsReturnNonnullByDefault
++@FieldsAreNonnullByDefault
++package org.fiddlemc.fiddle.registry;
++
++import net.minecraft.FieldsAreNonnullByDefault;
++import net.minecraft.MethodsReturnNonnullByDefault;
++
++import javax.annotation.ParametersAreNonnullByDefault;
+diff --git a/src/main/java/org/fiddlemc/fiddle/version/package-info.java b/src/main/java/org/fiddlemc/fiddle/version/package-info.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..c6cdcdf1a9b78e74cbeb093d346c9b7e3aa92053
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/version/package-info.java
+@@ -0,0 +1,9 @@
++@ParametersAreNonnullByDefault
++@MethodsReturnNonnullByDefault
++@FieldsAreNonnullByDefault
++package org.fiddlemc.fiddle.version;
 +
 +import net.minecraft.FieldsAreNonnullByDefault;
 +import net.minecraft.MethodsReturnNonnullByDefault;

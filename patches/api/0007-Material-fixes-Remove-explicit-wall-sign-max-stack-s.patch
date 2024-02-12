@@ -10,10 +10,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 03b47012447430a350e152920f754d993d4023db..ff6da47034b7cd44f59b8b50a92bda78b387cf04 100644
+index da6e36a16e609272b60fc41ff69a6fa3c34926c0..5ab16a59c2f447565c4671f46324145fe22dd460 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -3032,39 +3032,39 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -3035,39 +3035,39 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      /**
       * BlockData: {@link WallSign}
       */
@@ -62,7 +62,7 @@ index 03b47012447430a350e152920f754d993d4023db..ff6da47034b7cd44f59b8b50a92bda78
      /**
       * BlockData: {@link WallHangingSign}
       */
-@@ -3357,11 +3357,11 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -3360,11 +3360,11 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      /**
       * BlockData: {@link WallSign}
       */

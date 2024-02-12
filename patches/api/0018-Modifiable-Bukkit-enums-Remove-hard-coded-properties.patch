@@ -14,10 +14,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 856b17682568ed092fa135eb36d5969c10e7b75c..753fdbd7d588d5913bc918eb61ba0e4fcc4bc2d1 100644
+index 258e2301efeb2facae185cc980fe0862ce246f81..ca5e93c404abf0970ffb5dac611b9732a743bfaf 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -4389,8 +4389,8 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4392,8 +4392,8 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      private final int id;
      private final Constructor<? extends MaterialData> ctor;
      private static final Map<String, Material> BY_NAME = Maps.newHashMap();
@@ -28,7 +28,7 @@ index 856b17682568ed092fa135eb36d5969c10e7b75c..753fdbd7d588d5913bc918eb61ba0e4f
      public final Class<?> data;
      private final boolean legacy;
      private final NamespacedKey key;
-@@ -4417,8 +4417,8 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4420,8 +4420,8 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
  
      private Material(final int id, final int stack, final int durability, /*@NotNull*/ final Class<?> data) {
          this.id = id;
@@ -39,7 +39,7 @@ index 856b17682568ed092fa135eb36d5969c10e7b75c..753fdbd7d588d5913bc918eb61ba0e4f
          this.data = data;
          this.legacy = this.name().startsWith(LEGACY_PREFIX);
          this.key = NamespacedKey.minecraft(this.name().toLowerCase(Locale.ROOT));
-@@ -4532,7 +4532,17 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4535,7 +4535,17 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return Maximum stack size for this material
       */
      public int getMaxStackSize() {
@@ -58,7 +58,7 @@ index 856b17682568ed092fa135eb36d5969c10e7b75c..753fdbd7d588d5913bc918eb61ba0e4f
      }
  
      /**
-@@ -4541,7 +4551,29 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4544,7 +4554,29 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return Maximum durability for this material
       */
      public short getMaxDurability() {
@@ -90,10 +90,10 @@ index 856b17682568ed092fa135eb36d5969c10e7b75c..753fdbd7d588d5913bc918eb61ba0e4f
  
      /**
 diff --git a/src/main/java/org/bukkit/UnsafeValues.java b/src/main/java/org/bukkit/UnsafeValues.java
-index 8dcf4b041a041d6d6d9b9facc28c2ec711d56429..176123cdb4eb738069785c0fffa2241f6c3aa743 100644
+index dd256344c1a2f25db0204e760d7b5663d343cb4e..ecd8e4d40d546ec4d5c9d22754afbffe44a249bc 100644
 --- a/src/main/java/org/bukkit/UnsafeValues.java
 +++ b/src/main/java/org/bukkit/UnsafeValues.java
-@@ -284,6 +284,10 @@ public interface UnsafeValues {
+@@ -283,6 +283,10 @@ public interface UnsafeValues {
      boolean isVanillaItem(Material material);
      // Fiddle end - flags for vanilla content - API - item
  

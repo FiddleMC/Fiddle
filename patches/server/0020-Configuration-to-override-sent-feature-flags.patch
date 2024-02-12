@@ -1,0 +1,99 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Wed, 31 Jan 2024 15:11:12 +0100
+Subject: [PATCH] Configuration to override sent feature flags
+
+Adds global configuration that allows declaring feature flags that are always, or never, sent to connecting cilents.
+In other words: the feature flags in the `always` list will be sent even if they are not enabled (or don't exist) on the server,
+and the feature flags in the `never` list will never be sent, even if they are enabled on the server.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/server/network/ServerConfigurationPacketListenerImpl.java b/src/main/java/net/minecraft/server/network/ServerConfigurationPacketListenerImpl.java
+index 8dbcc1b3a70b6bbea3bd2d15b6d66cc4f9cd53f8..655c065a30db9b0aab4a169702b8c8907d075514 100644
+--- a/src/main/java/net/minecraft/server/network/ServerConfigurationPacketListenerImpl.java
++++ b/src/main/java/net/minecraft/server/network/ServerConfigurationPacketListenerImpl.java
+@@ -70,7 +70,12 @@ public class ServerConfigurationPacketListenerImpl extends ServerCommonPacketLis
+         this.send(new ClientboundCustomPayloadPacket(new BrandPayload(this.server.getServerModName())));
+         LayeredRegistryAccess<RegistryLayer> layeredregistryaccess = this.server.registries();
+ 
+-        this.send(new ClientboundUpdateEnabledFeaturesPacket(FeatureFlags.REGISTRY.toNames(this.server.getWorldData().enabledFeatures())));
++        // Fiddle start - override sent feature flags
++        var featureFlagsToSend = FeatureFlags.REGISTRY.toNames(this.server.getWorldData().enabledFeatures());
++        featureFlagsToSend.addAll(org.fiddlemc.fiddle.configuration.FiddleGlobalConfiguration.get().sendFeatureFlagsToClients.alwaysResourceLocations);
++        featureFlagsToSend.removeAll(org.fiddlemc.fiddle.configuration.FiddleGlobalConfiguration.get().sendFeatureFlagsToClients.neverResourceLocations);
++        this.send(new ClientboundUpdateEnabledFeaturesPacket(featureFlagsToSend));
++        // Fiddle end - override sent feature flags
+         this.send(new ClientboundRegistryDataPacket((new RegistryAccess.ImmutableRegistryAccess(RegistrySynchronization.networkedRegistries(layeredregistryaccess))).freeze()));
+         this.send(new ClientboundUpdateTagsPacket(TagNetworkSerialization.serializeTagsToNetwork(layeredregistryaccess)));
+         this.addOptionalTasks();
+diff --git a/src/main/java/org/fiddlemc/fiddle/configuration/FiddleGlobalConfiguration.java b/src/main/java/org/fiddlemc/fiddle/configuration/FiddleGlobalConfiguration.java
+index 3ab7163a0389ef22ab683e41630c3499705ba9c0..ee3dd1e3383989ccb17318b4c412f4bfe8b6eb28 100644
+--- a/src/main/java/org/fiddlemc/fiddle/configuration/FiddleGlobalConfiguration.java
++++ b/src/main/java/org/fiddlemc/fiddle/configuration/FiddleGlobalConfiguration.java
+@@ -5,9 +5,14 @@ package org.fiddlemc.fiddle.configuration;
+ import com.mojang.logging.LogUtils;
+ import io.papermc.paper.configuration.Configuration;
+ import io.papermc.paper.configuration.ConfigurationPart;
++import net.minecraft.resources.ResourceLocation;
+ import org.slf4j.Logger;
+ import org.spongepowered.configurate.objectmapping.meta.Setting;
+ 
++import java.util.HashSet;
++import java.util.List;
++import java.util.Set;
++
+ @SuppressWarnings({"CanBeFinal", "FieldCanBeLocal", "FieldMayBeFinal", "NotNullFieldNotInitialized", "InnerClassMayBeStatic"})
+ public class FiddleGlobalConfiguration extends ConfigurationPart {
+ 
+@@ -25,4 +30,49 @@ public class FiddleGlobalConfiguration extends ConfigurationPart {
+     @Setting(Configuration.VERSION_FIELD)
+     public int version = CURRENT_VERSION;
+ 
++    // Fiddle start - override sent feature flags
++    public SendFeatureFlagsToClients sendFeatureFlagsToClients;
++    public class SendFeatureFlagsToClients extends ConfigurationPart.Post {
++
++        public List<String> always = List.of();
++        public List<String> never = List.of();
++
++        public transient Set<ResourceLocation> alwaysResourceLocations;
++        public transient Set<ResourceLocation> neverResourceLocations;
++
++        private Set<ResourceLocation> processElements(String name, List<String> elements) {
++            Set<ResourceLocation> processed = new HashSet<>(elements.size());
++            for (var element : elements) {
++                if (element.isBlank()) {
++                    LOGGER.warn("A value in send-feature-flags-to-clients." + name + " is blank");
++                    continue;
++                }
++                element = element.trim();
++                try {
++                    var resourceLocation = new ResourceLocation(element);
++                    if (!(resourceLocation.getNamespace().isBlank() || resourceLocation.getPath().isBlank())) {
++                        processed.add(resourceLocation);
++                        continue;
++                    }
++                } catch (Exception ignored) {
++                }
++                LOGGER.warn("The value '" + element + "' in send-feature-flags-to-clients." + name + " is not a valid namespaced key");
++            }
++            return processed;
++        }
++
++        @Override
++        public void postProcess() {
++            alwaysResourceLocations = processElements("always", always);
++            neverResourceLocations = processElements("never", never);
++            for (var element : alwaysResourceLocations) {
++                if (neverResourceLocations.contains(element)) {
++                    LOGGER.warn("'" + element + "' is in both send-feature-flags-to-clients.always and send-feature-flags-to-clients.never");
++                }
++            }
++        }
++
++    }
++    // Fiddle end - override sent feature flags
++
+ }

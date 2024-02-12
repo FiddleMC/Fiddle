@@ -1,0 +1,119 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Wed, 31 May 2023 23:50:34 +0200
+Subject: [PATCH] Read packs - Prevent duplicate packs
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
+index a71e3e07d9b7eed16f1fef95c445a305cc2d83d6..35da69141ef63ec422813d42f70773a3fdfd3823 100644
+--- a/src/main/java/net/minecraft/server/Main.java
++++ b/src/main/java/net/minecraft/server/Main.java
+@@ -197,6 +197,11 @@ public class Main {
+             // Fiddle end - confirm Fiddle permanence
+ 
+             org.fiddlemc.fiddle.pack.read.PackScanner.scanForAndOpenPacks(optionset); // Fiddle - read packs - scan for packs
++            // Fiddle start - read packs - prevent duplicate packs
++            if (org.fiddlemc.fiddle.pack.read.DuplicatePackDetection.logIfDuplicates() || org.fiddlemc.fiddle.pack.read.DuplicatePackDetection.logIfUsesExampleUUID()) {
++                return;
++            }
++            // Fiddle end - read packs - prevent duplicate packs
+ 
+             io.papermc.paper.plugin.PluginInitializerManager.load(optionset); // Paper
+             Bootstrap.bootStrap();
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/DuplicatePackDetection.java b/src/main/java/org/fiddlemc/fiddle/pack/read/DuplicatePackDetection.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..9355c897651789b95bbeae791fe6696bb9df9588
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/DuplicatePackDetection.java
+@@ -0,0 +1,89 @@
++// Fiddle - read packs - prevent duplicate packs
++
++package org.fiddlemc.fiddle.pack.read;
++
++import com.mojang.logging.LogUtils;
++import org.fiddlemc.fiddle.pack.FiddlePack;
++import org.fiddlemc.fiddle.pack.FiddlePackMeta;
++import org.fiddlemc.fiddle.pack.FiddlePacks;
++import org.jetbrains.annotations.Nullable;
++import org.jline.utils.Levenshtein;
++import org.slf4j.Logger;
++
++import java.util.HashMap;
++import java.util.Map;
++import java.util.UUID;
++
++/**
++ * A singleton that detects whether there are two packs with the same identification.
++ */
++public final class DuplicatePackDetection {
++
++    private static final Logger LOGGER = LogUtils.getClassLogger();
++
++    private DuplicatePackDetection() {
++        throw new RuntimeException();
++    }
++
++    /**
++     * If there are two {@linkplain FiddlePacks#getPacks() packs} that have the same
++     * {@link FiddlePackMeta#uuid} or {@link FiddlePackMeta#technicalName},
++     * an error message will be logged to the console.
++     *
++     * @return Whether two packs with the same identifying value were detected.
++     */
++    public static boolean logIfDuplicates() {
++        Map<UUID, FiddlePack> packByUUIDyTechnicalName = new HashMap<>();
++        Map<String, FiddlePack> packByTechnicalName = new HashMap<>();
++        for (FiddlePack pack : FiddlePacks.getPacks()) {
++            {
++                UUID uuid = pack.meta().uuid;
++                @Nullable FiddlePack packWithSameUUID = packByUUIDyTechnicalName.putIfAbsent(uuid, pack);
++                if (packWithSameUUID != null) {
++                    LOGGER.error("Two packs ('" + packWithSameUUID.filesProvider().getLocation() + "' and '" + pack.filesProvider().getLocation() + "') have the same UUID: " + uuid);
++                    return true;
++                }
++            }
++            {
++                String technicalName = pack.meta().technicalName;
++                @Nullable FiddlePack packWithSameTechnicalName = packByTechnicalName.putIfAbsent(technicalName, pack);
++                if (packWithSameTechnicalName != null) {
++                    LOGGER.error("Two packs ('" + packWithSameTechnicalName.filesProvider().getLocation() + "' and '" + pack.filesProvider().getLocation() + "') have the same technical name: " + technicalName);
++                    return true;
++                }
++            }
++        }
++        return false;
++    }
++
++    /**
++     * String representations (that are potentially invalid) used as examples of pack {@link UUID}s
++     * in some documentation.
++     */
++    private static final String[] exampleUUIDStrings = {
++        "b8f2e967-a4c2-40h6-8b7a-e3b470d23ffb" // Used in "Pack format" on the Fiddle wiki
++    };
++
++    /**
++     * If there is a {@linkplain FiddlePacks#getPacks() pack} that uses a {@link FiddlePackMeta#uuid}
++     * that is too close to an {@linkplain #exampleUUIDStrings example UUID}
++     * (indicating that the UUID was not produced by generating a random UUID, but instead by
++     * manually modifying an example, which could easily lead to conflicts if many people do this),
++     * an error message will be logged to the console.
++     *
++     * @return Whether a packs using a UUID derived from an example UUID was detected.
++     */
++    public static boolean logIfUsesExampleUUID() {
++        for (FiddlePack pack : FiddlePacks.getPacks()) {
++            String uuidString = pack.meta().uuid.toString();
++            for (String exampleUUIDString : exampleUUIDStrings) {
++                if (Levenshtein.distance(uuidString, exampleUUIDString) <= 3) {
++                    LOGGER.error("The UUID of the pack '" + pack.filesProvider().getLocation() + "' is (very close to) an example UUID, and was not randomly generated. Please generate a random UUID, for example by using: https://www.uuidgenerator.net/");
++                    return true;
++                }
++            }
++        }
++        return false;
++    }
++
++}

@@ -1,0 +1,32 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Wed, 24 Jan 2024 23:32:37 +0100
+Subject: [PATCH] Read packs - Content - Definitions - Read before bootstrap
+
+Invokes the reading of all content definitions of all types from all packs before the server bootstrap is called.
+This relies on the `FiddleContentDefinitionReader` defined in the "Read packs - Content - Definitions - Implementation to read all" patch.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
+index 35da69141ef63ec422813d42f70773a3fdfd3823..e82030dafcec0af7d7aca859f34150fb1a488540 100644
+--- a/src/main/java/net/minecraft/server/Main.java
++++ b/src/main/java/net/minecraft/server/Main.java
+@@ -203,6 +203,16 @@ public class Main {
+             }
+             // Fiddle end - read packs - prevent duplicate packs
+ 
++            // Fiddle start - read packs - content definitions - read before bootstrap
++            org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.FiddleContentDefinitionsByType readContentDefinitions;
++            try {
++                readContentDefinitions = org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.FiddleContentDefinitionReader.readAndSortDefinitions();
++            } catch (Exception e) {
++                LOGGER.error("Could not read block and item definitions", e);
++                return;
++            }
++            // Fiddle end - read packs - content definitions - read before bootstrap
++
+             io.papermc.paper.plugin.PluginInitializerManager.load(optionset); // Paper
+             Bootstrap.bootStrap();
+             Bootstrap.validate();

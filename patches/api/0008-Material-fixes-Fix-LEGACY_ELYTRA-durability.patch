@@ -9,10 +9,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index ff6da47034b7cd44f59b8b50a92bda78b387cf04..eb9cd9a8a0b5b0f249e62cddf4cc37e4ac5f38c6 100644
+index 5ab16a59c2f447565c4671f46324145fe22dd460..9f4d762e59273f6343678ef2e4d5294464821f30 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -4337,7 +4337,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4340,7 +4340,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      @Deprecated
      LEGACY_SHIELD(442, 1, 336),
      @Deprecated

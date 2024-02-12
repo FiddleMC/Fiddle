@@ -14,10 +14,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 7a79ad8b2d7a71768991091f013abb52cba10324..039d8152639b22fbb6af9dfbcc7eb38466ef0f6a 100644
+index 7e1780b815afd796bab675d560b2a9b985b727d4..d95a42900399af3dd6775f4d9690eb08a96fa6bf 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -8505,15 +8505,22 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -8508,15 +8508,22 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
              case MAGENTA_CONCRETE_POWDER:
              case ORANGE_CONCRETE_POWDER:
              case PINK_CONCRETE_POWDER:

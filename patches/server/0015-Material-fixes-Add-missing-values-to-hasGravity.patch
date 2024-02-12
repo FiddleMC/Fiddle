@@ -13,18 +13,18 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/test/java/org/bukkit/PerMaterialTest.java b/src/test/java/org/bukkit/PerMaterialTest.java
-index 7044d19e67e1514ff9685e12667c22a057b64df9..6715f63ea2fdc37ecf93a4f5a25357e7900e9afc 100644
+index 9dab4e713b9bc628872867c218fe0ebeca0b958f..d2f7d3d2a690a31c6dc926fc9e5f7b51bdbd9aab 100644
 --- a/src/test/java/org/bukkit/PerMaterialTest.java
 +++ b/src/test/java/org/bukkit/PerMaterialTest.java
-@@ -171,7 +171,10 @@ public class PerMaterialTest extends AbstractTestingBase {
-     @Test
-     public void hasGravity() {
-         if (this.material.isBlock()) {
--            assertThat(this.material.hasGravity(), is(CraftMagicNumbers.getBlock(material) instanceof FallingBlock));
+@@ -165,7 +165,10 @@ public class PerMaterialTest extends AbstractTestingBase {
+     @EnumSource(value = Material.class, names = "LEGACY_.*", mode = EnumSource.Mode.MATCH_NONE)
+     public void hasGravity(Material material) {
+         if (material.isBlock()) {
+-            assertThat(material.hasGravity(), is(CraftMagicNumbers.getBlock(material) instanceof FallingBlock));
 +            // Fiddle start - add missing Material values with gravity
 +            var block = CraftMagicNumbers.getBlock(material);
-+            assertThat(this.material.hasGravity(), is(block instanceof net.minecraft.world.level.block.Fallable || block instanceof net.minecraft.world.level.block.ScaffoldingBlock));
++            assertThat(material.hasGravity(), is(block instanceof net.minecraft.world.level.block.Fallable || block instanceof net.minecraft.world.level.block.ScaffoldingBlock));
 +            // Fiddle end - add missing Material values with gravity
          } else {
-             assertFalse(this.material.hasGravity());
+             assertFalse(material.hasGravity());
          }

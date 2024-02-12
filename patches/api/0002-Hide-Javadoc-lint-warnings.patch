@@ -21,7 +21,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Gale - https://galemc.org
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 9f8617a48988bc87ad47cb3a9a4913e1c174febc..59f5c420dd5d6b60338b4bb716882c3605703ad6 100644
+index a7de1e92e49af2ac15f3e6c9bca9822a04116ca6..61fa6eb1f28c78a26ca3394f9e940ec5809f5f6c 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -155,6 +155,8 @@ tasks.withType<Javadoc> {
@@ -32,4 +32,4 @@ index 9f8617a48988bc87ad47cb3a9a4913e1c174febc..59f5c420dd5d6b60338b4bb716882c36
 +    options.addStringOption("Xdoclint:none", "-quiet") // Fiddle - Gale - hide Javadoc lint warnings
  }
  
- // Paper start
+ tasks.test {

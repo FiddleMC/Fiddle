@@ -1,0 +1,201 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Tue, 18 Jul 2023 21:55:03 +0200
+Subject: [PATCH] Client perspective - For players - Send generated resource
+ pack
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/network/Connection.java b/src/main/java/net/minecraft/network/Connection.java
+index c0ea20dcee8bb293df96bc6ee019e50ad6b383fd..3d650b96cc5e4b30d8bf82a8a7edda63ead28969 100644
+--- a/src/main/java/net/minecraft/network/Connection.java
++++ b/src/main/java/net/minecraft/network/Connection.java
+@@ -120,6 +120,7 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+     public boolean isPending = true;
+     public boolean queueImmunity;
+     // Paper end - Optimize network
++    public boolean wasSentFiddleResourcePack; // Fiddle - client perspective - send resource pack
+ 
+     // Paper start - add utility methods
+     public final net.minecraft.server.level.ServerPlayer getPlayer() {
+diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServerProperties.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServerProperties.java
+index c5598adb8cbcbcf7277c2fd4dd72c243d44d9700..1fd4f4e205480c7d8ea9a26108199696d28d7abf 100644
+--- a/src/main/java/net/minecraft/server/dedicated/DedicatedServerProperties.java
++++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServerProperties.java
+@@ -168,6 +168,7 @@ public class DedicatedServerProperties extends Settings<DedicatedServerPropertie
+             return s1.toLowerCase(Locale.ROOT);
+         }, WorldPresets.NORMAL.location().toString()));
+         this.serverResourcePackInfo = DedicatedServerProperties.getServerPackInfo(this.get("resource-pack", ""), this.get("resource-pack-sha1", ""), this.getLegacyString("resource-pack-hash"), this.get("require-resource-pack", false), this.get("resource-pack-prompt", ""));
++        this.serverResourcePackInfo.ifPresent(info -> LOGGER.warn("A server resource pack URL is set in server.properties (URL: " + info.url() + "). Some Fiddle models/textures may potentially be overridden.")); // Fiddle - client perspective - send resource pack - skip existing server resource pack // TODO add option to not log this, and reference that option in the warning
+         this.initialDataPackConfiguration = DedicatedServerProperties.getDatapackConfig(this.get("initial-enabled-packs", String.join(",", WorldDataConfiguration.DEFAULT.dataPacks().getEnabled())), this.get("initial-disabled-packs", String.join(",", WorldDataConfiguration.DEFAULT.dataPacks().getDisabled())));
+         // Paper start - Configurable rcon ip
+         final String rconIp = this.getStringRaw("rcon.ip");
+diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
+index d4aec99cac3f83d764e21946cc904c00e084704e..98b89412e896a4f91050d876f236b1e04e6bae75 100644
+--- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
++++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
+@@ -278,6 +278,8 @@ public class ServerPlayer extends Player {
+     private final java.util.concurrent.atomic.AtomicReference<io.papermc.paper.chunk.system.RegionizedPlayerChunkLoader.ViewDistances> viewDistances = new java.util.concurrent.atomic.AtomicReference<>(new io.papermc.paper.chunk.system.RegionizedPlayerChunkLoader.ViewDistances(-1, -1, -1));
+     public io.papermc.paper.chunk.system.RegionizedPlayerChunkLoader.PlayerChunkLoaderData chunkLoader;
+ 
++    public boolean hasBeenPlacedIntoPlayerList = false; // Fiddle - client perspective - send resource pack
++
+     public io.papermc.paper.chunk.system.RegionizedPlayerChunkLoader.ViewDistances getViewDistances() {
+         return this.viewDistances.get();
+     }
+diff --git a/src/main/java/net/minecraft/server/network/ServerConfigurationPacketListenerImpl.java b/src/main/java/net/minecraft/server/network/ServerConfigurationPacketListenerImpl.java
+index 655c065a30db9b0aab4a169702b8c8907d075514..f544959972b9b881231bcf9833b1ca18fd04ff45 100644
+--- a/src/main/java/net/minecraft/server/network/ServerConfigurationPacketListenerImpl.java
++++ b/src/main/java/net/minecraft/server/network/ServerConfigurationPacketListenerImpl.java
+@@ -43,6 +43,7 @@ public class ServerConfigurationPacketListenerImpl extends ServerCommonPacketLis
+     @Nullable
+     private ConfigurationTask currentTask;
+     private ClientInformation clientInformation;
++    private @Nullable ServerResourcePackConfigurationTask fiddleResourcePackTask; // Fiddle - client perspective - send resource pack
+ 
+     public ServerConfigurationPacketListenerImpl(MinecraftServer minecraftserver, Connection networkmanager, CommonListenerCookie commonlistenercookie, ServerPlayer player) { // CraftBukkit
+         super(minecraftserver, networkmanager, commonlistenercookie, player); // CraftBukkit
+@@ -89,9 +90,20 @@ public class ServerConfigurationPacketListenerImpl extends ServerCommonPacketLis
+     }
+ 
+     private void addOptionalTasks() {
++        // Fiddle start - client perspective - send resource pack
++        var sendFiddleResourcePack = true; // TODO actually determine this based on whether there is a generated resource pack and other conditions as mentioned in the line below
++        // TODO ^ if there is no Fiddle resource pack that was generated (because it was unnecessary), or in some other condition like the player has an outdated client (via ViaVersion) or is on Bedrock, we don't want to send the resource pack
++        // TODO we must be sure to set a marker that the player was never offered a Fiddle resource pack, so that the client perspective is correctly set to "the player doesn't have the resource pack" even if the player has the "ACCEPTED" resource pack status because they clicked "Yes" on the resource pack screen for a non-Fiddle resource pack
++        // TODO edit @ all of this: to be updated in 1.20.3 for actual multiple resource packs
++        if (sendFiddleResourcePack) {
++            this.fiddleResourcePackTask = new org.fiddlemc.fiddle.packet.resourcepack.FiddleResourcePackConfigurationTask(this.connection);
++            this.configurationTasks.add(fiddleResourcePackTask);
++        } else {
++        // Fiddle end - client perspective - send resource pack
+         this.server.getServerResourcePack().ifPresent((minecraftserver_serverresourcepackinfo) -> {
+             this.configurationTasks.add(new ServerResourcePackConfigurationTask(minecraftserver_serverresourcepackinfo));
+         });
++        } // Fiddle - client perspective - send resource pack
+     }
+ 
+     @Override
+@@ -104,7 +116,13 @@ public class ServerConfigurationPacketListenerImpl extends ServerCommonPacketLis
+     public void handleResourcePackResponse(ServerboundResourcePackPacket packet) {
+         super.handleResourcePackResponse(packet);
+         if (packet.getAction() != ServerboundResourcePackPacket.Action.ACCEPTED) {
++            // Fiddle start - client perspective - send resource pack
++            if (this.currentTask != null && this.currentTask.type() == org.fiddlemc.fiddle.packet.resourcepack.FiddleResourcePackConfigurationTask.TYPE) {
++                this.finishCurrentTask(org.fiddlemc.fiddle.packet.resourcepack.FiddleResourcePackConfigurationTask.TYPE);
++            } else {
++            // Fiddle end - client perspective - send resource pack
+             this.finishCurrentTask(ServerResourcePackConfigurationTask.TYPE);
++            } // Fiddle - client perspective - send resource pack
+         }
+ 
+     }
+diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
+index e188bb3ba5d2ec28421947c0b66b25eecb569bfe..7dbaebb6d44a85a1586df64898bafbcf3f3b958e 100644
+--- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
++++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
+@@ -2297,34 +2297,48 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+         this.getHandle().connection.send(packet);
+     }
+ 
++    // Fiddle start - client perspective - send resource pack - do not send plugin resource packs
++    private static boolean warnedPluginSentResourcePack = false;
++
++    private static void logAttemptToSendResourcePackWarning(String url, CraftPlayer player) {
++        // TODO check if the Fiddle resource pack was even successfully loaded for this player, if not then ignore it (plugins sending resource packs to players that did not successfully load the Fiddle one is totally fine)
++        // TODO add configuration option to not log this at all, and include reference to that option in the warning
++        if (!warnedPluginSentResourcePack) {
++            Bukkit.getLogger().warning("A plugin is sending a resource pack (URL: " + url + ") to a player (" + player.getName() + ") after the Fiddle resource pack. Some Fiddle models/textures may potentially be overridden.");
++            warnedPluginSentResourcePack = true;
++        }
++    }
++    // Fiddle end - client perspective - send resource pack - do not send plugin resource packs
++
+     @Override
+     public void setTexturePack(String url) {
+-        this.setResourcePack(url);
++        logAttemptToSendResourcePackWarning(url, this); // Fiddle - client perspective - send resource pack - do not send plugin resource packs
+     }
+ 
+     @Override
+     public void setResourcePack(String url) {
+-        this.setResourcePack(url, (byte[]) null);
++        logAttemptToSendResourcePackWarning(url, this); // Fiddle - client perspective - send resource pack - do not send plugin resource packs
+     }
+ 
+     @Override
+     public void setResourcePack(String url, byte[] hash) {
+-        this.setResourcePack(url, hash, false);
++        logAttemptToSendResourcePackWarning(url, this); // Fiddle - client perspective - send resource pack - do not send plugin resource packs
+     }
+ 
+     @Override
+     public void setResourcePack(String url, byte[] hash, String prompt) {
+-        this.setResourcePack(url, hash, prompt, false);
++        logAttemptToSendResourcePackWarning(url, this); // Fiddle - client perspective - send resource pack - do not send plugin resource packs
+     }
+ 
+     @Override
+     public void setResourcePack(String url, byte[] hash, boolean force) {
+-        this.setResourcePack(url, hash, (String) null, force);
++        logAttemptToSendResourcePackWarning(url, this); // Fiddle - client perspective - send resource pack - do not send plugin resource packs
+     }
+ 
+     @Override
+     public void setResourcePack(String url, byte[] hash, String prompt, boolean force) {
+         Preconditions.checkArgument(url != null, "Resource pack URL cannot be null");
++        logAttemptToSendResourcePackWarning(url, this); // Fiddle - client perspective - send resource pack - do not send plugin resource packs
+ 
+         if (hash != null) {
+             Preconditions.checkArgument(hash.length == 20, "Resource pack hash should be 20 bytes long but was %s", hash.length);
+@@ -2339,6 +2353,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+     @Override
+     public void setResourcePack(String url, byte[] hashBytes, net.kyori.adventure.text.Component prompt, boolean force) {
+         Preconditions.checkArgument(url != null, "Resource pack URL cannot be null");
++        logAttemptToSendResourcePackWarning(url, this); // Fiddle - client perspective - send resource pack - do not send plugin resource packs
+         final String hash;
+         if (hashBytes != null) {
+             Preconditions.checkArgument(hashBytes.length == 20, "Resource pack hash should be 20 bytes long but was " + hashBytes.length);
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/resourcepack/FiddleResourcePackConfigurationTask.java b/src/main/java/org/fiddlemc/fiddle/packet/resourcepack/FiddleResourcePackConfigurationTask.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..5e102d6e89a552c9c8449cb8a4ca6035a1e3c99d
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/packet/resourcepack/FiddleResourcePackConfigurationTask.java
+@@ -0,0 +1,36 @@
++// Fiddle - client perspective - send resource pack
++
++package org.fiddlemc.fiddle.packet.resourcepack;
++
++import net.minecraft.network.Connection;
++import net.minecraft.network.protocol.Packet;
++import net.minecraft.server.MinecraftServer;
++import net.minecraft.server.network.ConfigurationTask;
++import net.minecraft.server.network.config.ServerResourcePackConfigurationTask;
++
++import java.lang.ref.WeakReference;
++import java.util.function.Consumer;
++
++public class FiddleResourcePackConfigurationTask extends ServerResourcePackConfigurationTask {
++
++    public static final ConfigurationTask.Type TYPE = new ConfigurationTask.Type("fiddle_server_resource_pack");
++
++    private final WeakReference<Connection> connection;
++
++    public FiddleResourcePackConfigurationTask(Connection connection) {
++        super(new MinecraftServer.ServerResourcePackInfo("https://www.fiddlemc.org/not-a-real-url.zip", com.google.common.io.BaseEncoding.base16().lowerCase().encode(new byte[20]), false, null)); // TODO fill this with something useful
++        this.connection = new WeakReference<>(connection);
++    }
++
++    @Override
++    public void start(Consumer<Packet<?>> sender) {
++        this.connection.get().wasSentFiddleResourcePack = true;
++        super.start(sender);
++    }
++
++    @Override
++    public ConfigurationTask.Type type() {
++        return TYPE;
++    }
++
++}

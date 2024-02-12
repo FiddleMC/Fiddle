@@ -15,10 +15,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index f24df3462e441a30fd329655b4ba734cdfcddcea..3c20677b408deb1bd1c0d5448c5c84d30458db3a 100644
+index db4b647f2a76519b753e168a3a540f7a380c7a81..921e02c2ffcd1c9fc1db69bc6dea171cacb05317 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
-@@ -144,6 +144,13 @@ public class Main {
+@@ -141,6 +141,13 @@ public class Main {
              fiddleConfigurations.initializeGlobalConfiguration();
              // Fiddle end - Fiddle configuration - load Fiddle global configuration before bootstrap
  
