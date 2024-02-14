@@ -12,10 +12,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 2949af41a806f42ae2c257dc2dee4303100b9f28..26438928078b25496003ede8231c8ca6624b5112 100644
+index 551605fbcf9b29671bf5a359de139d50396a825f..f5b71bb88fa0d277e280307577008a70aa6d102d 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -4636,7 +4636,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4693,7 +4693,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      public static final String LEGACY_PREFIX = org.fiddlemc.fiddle.material.MaterialLegacyNameChecker.LEGACY_MATERIAL_PREFIX; // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - is legacy
  
      private final int id;
@@ -23,7 +23,7 @@ index 2949af41a806f42ae2c257dc2dee4303100b9f28..26438928078b25496003ede8231c8ca6
      private final int maxStackHardcoded;
      private final short durabilityHardcoded;
      public final Class<?> data;
-@@ -4995,7 +4994,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -5052,7 +5051,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       */
      @Nullable
      public static Material getMaterial(@NotNull final String name) {
@@ -32,7 +32,7 @@ index 2949af41a806f42ae2c257dc2dee4303100b9f28..26438928078b25496003ede8231c8ca6
      }
  
      /**
-@@ -5014,17 +5013,10 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -5071,17 +5070,10 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return Material if found, or null
       */
      @Nullable
@@ -54,7 +54,7 @@ index 2949af41a806f42ae2c257dc2dee4303100b9f28..26438928078b25496003ede8231c8ca6
      }
  
      /**
-@@ -5039,7 +5031,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -5096,7 +5088,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       */
      @Nullable
      public static Material matchMaterial(@NotNull final String name) {
@@ -63,7 +63,7 @@ index 2949af41a806f42ae2c257dc2dee4303100b9f28..26438928078b25496003ede8231c8ca6
      }
  
      /**
-@@ -5056,23 +5048,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -5113,23 +5105,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       */
      @Nullable
      public static Material matchMaterial(@NotNull final String name, boolean legacyName) {

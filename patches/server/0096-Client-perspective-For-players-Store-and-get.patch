@@ -7,10 +7,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/network/Connection.java b/src/main/java/net/minecraft/network/Connection.java
-index 3d650b96cc5e4b30d8bf82a8a7edda63ead28969..88f958349b466ac717ede5748ce5a4fff487e771 100644
+index af63954c14eff664ced930da3ab03241cf9e9c43..a15e8420864b0cf9d8eb0d773a3818750128932b 100644
 --- a/src/main/java/net/minecraft/network/Connection.java
 +++ b/src/main/java/net/minecraft/network/Connection.java
-@@ -959,4 +959,21 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+@@ -963,4 +963,21 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
          }
      }
      // Paper end - Optimize network
@@ -33,7 +33,7 @@ index 3d650b96cc5e4b30d8bf82a8a7edda63ead28969..88f958349b466ac717ede5748ce5a4ff
 +
  }
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index 86dccdc9853c176d9cf7b3cf6f66b739601e5ab9..aa15968aec1d1e3defed043ba7005c19fa2bc1a9 100644
+index 23457de493ac3b2b4c1e77a10e27ca4818968412..6902ed7f83f2b2b02e47b67803c1ec7f4dd802a4 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
 @@ -288,6 +288,8 @@ public class ServerPlayer extends Player {
@@ -45,7 +45,7 @@ index 86dccdc9853c176d9cf7b3cf6f66b739601e5ab9..aa15968aec1d1e3defed043ba7005c19
      public io.papermc.paper.chunk.system.RegionizedPlayerChunkLoader.ViewDistances getViewDistances() {
          return this.viewDistances.get();
      }
-@@ -2757,4 +2759,26 @@ public class ServerPlayer extends Player {
+@@ -2758,4 +2760,26 @@ public class ServerPlayer extends Player {
          return (CraftPlayer) super.getBukkitEntity();
      }
      // CraftBukkit end

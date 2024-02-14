@@ -9,7 +9,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/network/Connection.java b/src/main/java/net/minecraft/network/Connection.java
-index 88f958349b466ac717ede5748ce5a4fff487e771..c2aa40d95bc16b587ad32ad754441ed3a2ce0eb8 100644
+index a15e8420864b0cf9d8eb0d773a3818750128932b..b6f0615ced64d371f09734ff978d0de154217dae 100644
 --- a/src/main/java/net/minecraft/network/Connection.java
 +++ b/src/main/java/net/minecraft/network/Connection.java
 @@ -380,6 +380,7 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
@@ -45,7 +45,7 @@ index 88f958349b466ac717ede5748ce5a4fff487e771..c2aa40d95bc16b587ad32ad754441ed3
          ++this.sentPackets;
          if (this.channel.eventLoop().inEventLoop()) {
              this.doSendPacket(packet, callbacks, flush);
-@@ -954,7 +962,7 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+@@ -958,7 +966,7 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
          private final Packet<?> packet;
  
          private PacketSendAction(final Packet<?> packet, @Nullable final PacketSendListener packetSendListener, final boolean flush) {

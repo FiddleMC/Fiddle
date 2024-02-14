@@ -12,7 +12,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/network/Connection.java b/src/main/java/net/minecraft/network/Connection.java
-index c2aa40d95bc16b587ad32ad754441ed3a2ce0eb8..57bee3e710ec6ec672c920e7ae19a7c4abf1f833 100644
+index b6f0615ced64d371f09734ff978d0de154217dae..07cc28cbef8f594b06d77c17c6707ad6a126d0f2 100644
 --- a/src/main/java/net/minecraft/network/Connection.java
 +++ b/src/main/java/net/minecraft/network/Connection.java
 @@ -150,6 +150,8 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
@@ -24,7 +24,7 @@ index c2aa40d95bc16b587ad32ad754441ed3a2ce0eb8..57bee3e710ec6ec672c920e7ae19a7c4
      public Connection(PacketFlow side) {
          this.receiving = side;
      }
-@@ -984,4 +986,16 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+@@ -988,4 +990,16 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
      }
      // Fiddle end - client perspective - player - get from connection
  

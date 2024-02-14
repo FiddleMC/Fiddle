@@ -12,10 +12,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 2188f12407bb299bcef22c84e33cb27149066cdd..d9d47a1d63101ab701960e109ca38f6b28dbe6fa 100644
+index 297a9c95040b0d4f300b324a010cd3dc5b0577ff..65fbcd0bedb9917a3ea40f195f61e46975bdd1ba 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -5055,7 +5055,7 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
+@@ -5112,7 +5112,7 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
       * <ol>
       *     <li>The {@linkplain #getKey() namespaced key}, for example: <code>"minecraft:stone_bricks"</code> or <code>"masonry:tuff_bricks"</code></li>
       *     <li>The namespaced key path (part behind the : in a namespaced key), for example: <code>"stone_bricks"</code> or <code>"tuff_bricks"</code></li>

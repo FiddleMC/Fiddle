@@ -8,10 +8,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/network/Connection.java b/src/main/java/net/minecraft/network/Connection.java
-index 500626970840ba23c88ca57a34a95ad596eb14b3..8669a34b2bd22d7ff792d144dfebc7785ade9daa 100644
+index cd86e23958d12551d487a5084f674c2f866e76da..47965e0af14f0449c2f7c53c88e371cdaf671e7f 100644
 --- a/src/main/java/net/minecraft/network/Connection.java
 +++ b/src/main/java/net/minecraft/network/Connection.java
-@@ -1014,4 +1014,25 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+@@ -1018,4 +1018,25 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
      }
      // Fiddle end - client perspective - localization - get player locale from connection
  

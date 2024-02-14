@@ -33,10 +33,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 241deb7f3b5e37d09c78048317428316be4406f0..931a261fd1d0b630e127dddb4b6c2a902a264591 100644
+index 67a67710736a023b1dfb01771f21576a76367f8e..708af8737010645c7837d6bd9cb650fd5fe3d35e 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -4643,7 +4643,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4700,7 +4700,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      public final Class<?> data;
      private final boolean legacy;
      private final NamespacedKey key;
@@ -44,7 +44,7 @@ index 241deb7f3b5e37d09c78048317428316be4406f0..931a261fd1d0b630e127dddb4b6c2a90
  
      private Material(final int id) {
          this(id, 64);
-@@ -4878,1076 +4877,20 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4935,1076 +4934,20 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return true if this material is a block
       */
      public boolean isBlock() {
@@ -1134,7 +1134,7 @@ index 241deb7f3b5e37d09c78048317428316be4406f0..931a261fd1d0b630e127dddb4b6c2a90
      }
  
      /**
-@@ -5956,49 +4899,21 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -6013,49 +4956,21 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return true if this Material is edible.
       */
      public boolean isEdible() {
@@ -1198,7 +1198,7 @@ index 241deb7f3b5e37d09c78048317428316be4406f0..931a261fd1d0b630e127dddb4b6c2a90
              case LEGACY_BREAD:
              case LEGACY_CARROT_ITEM:
              case LEGACY_BAKED_POTATO:
-@@ -6124,7 +5039,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -6181,7 +5096,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      static {
          for (Material material : values()) {
              BY_NAME.put(material.name(), material);
@@ -1206,7 +1206,7 @@ index 241deb7f3b5e37d09c78048317428316be4406f0..931a261fd1d0b630e127dddb4b6c2a90
          }
      }
  
-@@ -6132,29 +5046,21 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -6189,29 +5103,21 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material represents a playable music disk.
       */
      public boolean isRecord() {
@@ -1251,7 +1251,7 @@ index 241deb7f3b5e37d09c78048317428316be4406f0..931a261fd1d0b630e127dddb4b6c2a90
      }
  
      /**
-@@ -6163,845 +5069,21 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -6220,845 +5126,21 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material is a block and solid
       */
      public boolean isSolid() {
@@ -2111,7 +2111,7 @@ index 241deb7f3b5e37d09c78048317428316be4406f0..931a261fd1d0b630e127dddb4b6c2a90
              case LEGACY_STONE:
              case LEGACY_GRASS:
              case LEGACY_DIRT:
-@@ -7214,18 +5296,20 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -7271,18 +5353,20 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material is an air block.
       */
      public boolean isAir() {
@@ -2144,7 +2144,7 @@ index 241deb7f3b5e37d09c78048317428316be4406f0..931a261fd1d0b630e127dddb4b6c2a90
      }
  
      /**
-@@ -7434,286 +5518,21 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -7491,286 +5575,21 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material is a block and can catch fire
       */
      public boolean isFlammable() {
@@ -2445,7 +2445,7 @@ index 241deb7f3b5e37d09c78048317428316be4406f0..931a261fd1d0b630e127dddb4b6c2a90
              case LEGACY_WOOD:
              case LEGACY_LOG:
              case LEGACY_LEAVES:
-@@ -7782,186 +5601,21 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -7839,186 +5658,21 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material is a block and can burn away
       */
      public boolean isBurnable() {
@@ -2646,7 +2646,7 @@ index 241deb7f3b5e37d09c78048317428316be4406f0..931a261fd1d0b630e127dddb4b6c2a90
              case LEGACY_WOOD:
              case LEGACY_LOG:
              case LEGACY_LEAVES:
-@@ -8012,257 +5666,21 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -8069,257 +5723,21 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return true if this Material can be used as fuel.
       */
      public boolean isFuel() {
@@ -2918,7 +2918,7 @@ index 241deb7f3b5e37d09c78048317428316be4406f0..931a261fd1d0b630e127dddb4b6c2a90
              case LEGACY_LAVA_BUCKET:
              case LEGACY_COAL_BLOCK:
              case LEGACY_BLAZE_ROD:
-@@ -8353,382 +5771,21 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -8410,382 +5828,21 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material is a block and occludes light
       */
      public boolean isOccluding() {
@@ -3315,7 +3315,7 @@ index 241deb7f3b5e37d09c78048317428316be4406f0..931a261fd1d0b630e127dddb4b6c2a90
              case LEGACY_STONE:
              case LEGACY_GRASS:
              case LEGACY_DIRT:
-@@ -8856,41 +5913,21 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -8913,41 +5970,21 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material is affected by gravity.
       */
      public boolean hasGravity() {
@@ -3371,7 +3371,7 @@ index 241deb7f3b5e37d09c78048317428316be4406f0..931a261fd1d0b630e127dddb4b6c2a90
              case LEGACY_SAND:
              case LEGACY_GRAVEL:
              case LEGACY_DRAGON_EGG: // Fiddle - add missing Material values with gravity
-@@ -8909,213 +5946,20 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -8966,213 +6003,20 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return true if this material is an item
       */
      public boolean isItem() {
@@ -3599,7 +3599,7 @@ index 241deb7f3b5e37d09c78048317428316be4406f0..931a261fd1d0b630e127dddb4b6c2a90
      }
  
      /**
-@@ -9139,296 +5983,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -9196,296 +6040,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       */
      @Deprecated // Paper
      public boolean isInteractable() {
@@ -3897,7 +3897,7 @@ index 241deb7f3b5e37d09c78048317428316be4406f0..931a261fd1d0b630e127dddb4b6c2a90
      }
  
      /**
-@@ -9441,941 +5996,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -9498,941 +6053,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return the hardness of that material.
       */
      public float getHardness() {
@@ -4840,7 +4840,7 @@ index 241deb7f3b5e37d09c78048317428316be4406f0..931a261fd1d0b630e127dddb4b6c2a90
      }
  
      /**
-@@ -10389,941 +6010,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -10446,941 +6067,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return the blast resistance of that material.
       */
      public float getBlastResistance() {
@@ -5783,7 +5783,7 @@ index 241deb7f3b5e37d09c78048317428316be4406f0..931a261fd1d0b630e127dddb4b6c2a90
      }
  
      /**
-@@ -11339,21 +6026,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -11396,21 +6083,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return the slipperiness of this block
       */
      public float getSlipperiness() {
@@ -5806,7 +5806,7 @@ index 241deb7f3b5e37d09c78048317428316be4406f0..931a261fd1d0b630e127dddb4b6c2a90
      }
  
      /**
-@@ -11366,20 +6039,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -11423,20 +6096,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       */
      @Nullable
      public Material getCraftingRemainingItem() {
@@ -5828,7 +5828,7 @@ index 241deb7f3b5e37d09c78048317428316be4406f0..931a261fd1d0b630e127dddb4b6c2a90
      }
  
      /**
-@@ -11391,53 +6051,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -11448,53 +6108,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       */
      @NotNull
      public EquipmentSlot getEquipmentSlot() {

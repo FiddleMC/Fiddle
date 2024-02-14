@@ -14,10 +14,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index ca7b23a3608a8f65faeb559d125c25521d063146..cefb5d57a90958a42c80e3a33e238b8fa6f77aab 100644
+index 9381f7fac49050b8f4b87961211c44846dbf4813..4d8bc07045b6a432d9e0734eed10b06e220471ae 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -4689,15 +4689,13 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4746,15 +4746,13 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
  
      /**
       * @return If the type is either AIR, CAVE_AIR or VOID_AIR
@@ -38,7 +38,7 @@ index ca7b23a3608a8f65faeb559d125c25521d063146..cefb5d57a90958a42c80e3a33e238b8f
      }
  
      @Override
-@@ -5359,142 +5357,25 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -5416,142 +5414,25 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material is a block and does not block any light
       * @deprecated currently does not have an implementation which is well
       * linked to the underlying server. Contributions welcome.

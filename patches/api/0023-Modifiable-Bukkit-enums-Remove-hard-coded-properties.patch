@@ -12,10 +12,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 60abc3b0b7cde3c027f7c5a515e22a026d147343..cdfb5f207757698c3e029c85f61c1c18651673cb 100644
+index 44b4f736aa20f0e7524e2c1c8dc7599ddc5a2a91..2c8b7f7352f371f8f3f6bc39376fed711f0bfd80 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -4636,7 +4636,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4693,7 +4693,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      public static final String LEGACY_PREFIX = org.fiddlemc.fiddle.material.MaterialLegacyNameChecker.LEGACY_MATERIAL_PREFIX; // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - is legacy
  
      private final int id;
@@ -23,7 +23,7 @@ index 60abc3b0b7cde3c027f7c5a515e22a026d147343..cdfb5f207757698c3e029c85f61c1c18
      private static final Map<String, Material> BY_NAME = Maps.newHashMap();
      private final int maxStackHardcoded;
      private final short durabilityHardcoded;
-@@ -4667,18 +4666,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4724,18 +4723,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
          this.durabilityHardcoded = (short) durability;
          this.maxStackHardcoded = stack;
          this.data = data;
@@ -42,7 +42,7 @@ index 60abc3b0b7cde3c027f7c5a515e22a026d147343..cdfb5f207757698c3e029c85f61c1c18
      }
  
      // Paper start
-@@ -4873,8 +4860,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4930,8 +4917,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      @NotNull
      @Deprecated // Paper
      public Class<? extends MaterialData> getData() {
@@ -52,7 +52,7 @@ index 60abc3b0b7cde3c027f7c5a515e22a026d147343..cdfb5f207757698c3e029c85f61c1c18
      }
  
      /**
-@@ -4888,21 +4874,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4945,21 +4931,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      @Deprecated
      @NotNull
      public MaterialData getNewData(final byte raw) {

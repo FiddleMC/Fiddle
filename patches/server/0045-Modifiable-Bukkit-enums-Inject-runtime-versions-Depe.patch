@@ -8,10 +8,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 3cd4e3288ec746b2c3d197891423d1a7b7ceeda1..0d667ae4017bfbe029bff01c2829e08284c305d1 100644
+index 958ac76821c872f791186bf8defd477f714e37e9..a0341afce6624cb29ae28abb352af2c797366cee 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
-@@ -77,6 +77,8 @@ dependencies {
+@@ -63,6 +63,8 @@ dependencies {
      testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
      testImplementation("org.hamcrest:hamcrest:2.2")
      testImplementation("org.mockito:mockito-core:5.5.0")

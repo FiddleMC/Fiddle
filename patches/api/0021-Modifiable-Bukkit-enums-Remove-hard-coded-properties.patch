@@ -12,10 +12,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index cefb5d57a90958a42c80e3a33e238b8fa6f77aab..1c9f5c6e50faccb33cb896ee5b38ca67985d0e4a 100644
+index 4d8bc07045b6a432d9e0734eed10b06e220471ae..ddba9c4d6c5846eed3ccd19f5599b03b89ae585e 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -4642,7 +4642,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4699,7 +4699,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      private final short durabilityHardcoded;
      public final Class<?> data;
      private final boolean legacy;
@@ -23,7 +23,7 @@ index cefb5d57a90958a42c80e3a33e238b8fa6f77aab..1c9f5c6e50faccb33cb896ee5b38ca67
  
      private Material(final int id) {
          this(id, 64);
-@@ -4670,7 +4669,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4727,7 +4726,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
          this.maxStackHardcoded = stack;
          this.data = data;
          this.legacy = this.name().startsWith(LEGACY_PREFIX);
@@ -31,7 +31,7 @@ index cefb5d57a90958a42c80e3a33e238b8fa6f77aab..1c9f5c6e50faccb33cb896ee5b38ca67
          // try to cache the constructor for this material
          try {
              if (MaterialData.class.isAssignableFrom(data)) {
-@@ -4769,8 +4767,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4826,8 +4824,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      @NotNull
      @Override
      public NamespacedKey getKey() {

@@ -12,10 +12,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 1c9f5c6e50faccb33cb896ee5b38ca67985d0e4a..60abc3b0b7cde3c027f7c5a515e22a026d147343 100644
+index ddba9c4d6c5846eed3ccd19f5599b03b89ae585e..44b4f736aa20f0e7524e2c1c8dc7599ddc5a2a91 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -4633,7 +4633,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4690,7 +4690,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      //</editor-fold>
  
      @Deprecated
@@ -24,7 +24,7 @@ index 1c9f5c6e50faccb33cb896ee5b38ca67985d0e4a..60abc3b0b7cde3c027f7c5a515e22a02
  
      private final int id;
      private final Constructor<? extends MaterialData> ctor;
-@@ -4641,7 +4641,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4698,7 +4698,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      private final int maxStackHardcoded;
      private final short durabilityHardcoded;
      public final Class<?> data;
@@ -32,7 +32,7 @@ index 1c9f5c6e50faccb33cb896ee5b38ca67985d0e4a..60abc3b0b7cde3c027f7c5a515e22a02
  
      private Material(final int id) {
          this(id, 64);
-@@ -4668,7 +4667,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4725,7 +4724,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
          this.durabilityHardcoded = (short) durability;
          this.maxStackHardcoded = stack;
          this.data = data;
@@ -40,7 +40,7 @@ index 1c9f5c6e50faccb33cb896ee5b38ca67985d0e4a..60abc3b0b7cde3c027f7c5a515e22a02
          // try to cache the constructor for this material
          try {
              if (MaterialData.class.isAssignableFrom(data)) {
-@@ -4750,7 +4748,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4807,7 +4805,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       */
      @org.jetbrains.annotations.ApiStatus.Internal // Paper
      public int getId() {
@@ -49,7 +49,7 @@ index 1c9f5c6e50faccb33cb896ee5b38ca67985d0e4a..60abc3b0b7cde3c027f7c5a515e22a02
          return id;
      }
  
-@@ -4761,7 +4759,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4818,7 +4816,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       */
      // @Deprecated // Paper - this is useful, don't deprecate
      public boolean isLegacy() {
@@ -58,7 +58,7 @@ index 1c9f5c6e50faccb33cb896ee5b38ca67985d0e4a..60abc3b0b7cde3c027f7c5a515e22a02
      }
  
      @NotNull
-@@ -4875,7 +4873,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4932,7 +4930,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      @NotNull
      @Deprecated // Paper
      public Class<? extends MaterialData> getData() {
@@ -67,7 +67,7 @@ index 1c9f5c6e50faccb33cb896ee5b38ca67985d0e4a..60abc3b0b7cde3c027f7c5a515e22a02
          return ctor.getDeclaringClass();
      }
  
-@@ -4890,7 +4888,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4947,7 +4945,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      @Deprecated
      @NotNull
      public MaterialData getNewData(final byte raw) {
@@ -76,7 +76,7 @@ index 1c9f5c6e50faccb33cb896ee5b38ca67985d0e4a..60abc3b0b7cde3c027f7c5a515e22a02
          try {
              return ctor.newInstance(this, raw);
          } catch (InstantiationException ex) {
-@@ -5005,7 +5003,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -5062,7 +5060,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * Attempts to get the Material with the given name.
       * <p>
       * This is a normal lookup, names must be the precise name they are given in

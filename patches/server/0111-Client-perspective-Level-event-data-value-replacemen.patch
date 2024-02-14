@@ -28,10 +28,10 @@ index 4ce0e1e557a844fb3add866a257a8424885f7d43..875debd9d15a83c3d296bac1a47b25ac
          case PARTICLES_SCULK_CHARGE: // Paper - add missing effects
          case TRIAL_SPAWNER_DETECT_PLAYER: // Paper - add missing effects
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
-index e1fad381b861471a17529c246bb8a4a9c7646420..57bd15679316f5a8358ae3a162e3de1dbe060110 100644
+index 03eab4e7c2648c722c25387ec9353e8dafc09618..098a9c816ad13f6c3a20f1f62e1c1e0f4433f9c0 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
-@@ -1414,7 +1414,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -1462,7 +1462,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
              Preconditions.checkArgument(effect.getData() == null || effect == Effect.ELECTRIC_SPARK, "Wrong kind of data for the %s effect", effect);
          }
  
@@ -41,7 +41,7 @@ index e1fad381b861471a17529c246bb8a4a9c7646420..57bd15679316f5a8358ae3a162e3de1d
      }
  
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index c30f64e5445c3e878447b66f168887834f81fa28..07a9f5456f309de74bf4f127b24b77462e1dbe14 100644
+index 18d441bb968f35b48ccbb618647d34959384e337..5df25e413b473067f5941ce9323b1f940e0aa386 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 @@ -887,7 +887,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {

@@ -18,10 +18,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index dde86c696a90e2001acab78626a339bafd31d5b1..2188f12407bb299bcef22c84e33cb27149066cdd 100644
+index 80190abd184dddb08df8502adeb667d1809f8de0..297a9c95040b0d4f300b324a010cd3dc5b0577ff 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -4632,9 +4632,6 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
+@@ -4689,9 +4689,6 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
      ;
      //</editor-fold>
  
@@ -31,7 +31,7 @@ index dde86c696a90e2001acab78626a339bafd31d5b1..2188f12407bb299bcef22c84e33cb271
      private final int id;
      private final int maxStackHardcoded;
      private final short durabilityHardcoded;
-@@ -4676,17 +4673,14 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
+@@ -4733,17 +4730,14 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
       * it returns false for all materials added with Fiddle..
       * <!-- // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - is empty -->
       */
@@ -52,7 +52,7 @@ index dde86c696a90e2001acab78626a339bafd31d5b1..2188f12407bb299bcef22c84e33cb271
      }
  
      /**
-@@ -4695,9 +4689,10 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
+@@ -4752,9 +4746,10 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
       *
       * @return the item rarity
       */
@@ -64,7 +64,7 @@ index dde86c696a90e2001acab78626a339bafd31d5b1..2188f12407bb299bcef22c84e33cb271
      }
  
      /**
-@@ -4709,10 +4704,11 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
+@@ -4766,10 +4761,11 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
       * @return an immutable multimap of attributes
       * @deprecated use {@link #getDefaultAttributeModifiers(EquipmentSlot)}
       */
@@ -77,7 +77,7 @@ index dde86c696a90e2001acab78626a339bafd31d5b1..2188f12407bb299bcef22c84e33cb271
      }
  
      /**
-@@ -4721,8 +4717,9 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
+@@ -4778,8 +4774,9 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
       * @return true if collidable
       * @throws IllegalArgumentException if {@link #isBlock()} is false
       */
@@ -88,7 +88,7 @@ index dde86c696a90e2001acab78626a339bafd31d5b1..2188f12407bb299bcef22c84e33cb271
      }
      // Paper end
  
-@@ -4733,14 +4730,16 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
+@@ -4790,14 +4787,16 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
       * @apiNote Internal Use Only
       */
      @org.jetbrains.annotations.ApiStatus.Internal // Paper
@@ -106,7 +106,7 @@ index dde86c696a90e2001acab78626a339bafd31d5b1..2188f12407bb299bcef22c84e33cb271
       *
       * @apiNote Internal Use Only
       */
-@@ -4756,14 +4755,15 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
+@@ -4813,14 +4812,15 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
       * @return legacy status
       */
      // @Deprecated // Paper - this is useful, don't deprecate
@@ -124,7 +124,7 @@ index dde86c696a90e2001acab78626a339bafd31d5b1..2188f12407bb299bcef22c84e33cb271
      }
  
      /**
-@@ -4771,14 +4771,16 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
+@@ -4828,14 +4828,16 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
       *
       * @return Maximum stack size for this material
       */
@@ -142,7 +142,7 @@ index dde86c696a90e2001acab78626a339bafd31d5b1..2188f12407bb299bcef22c84e33cb271
       *
       * @apiNote Internal Use Only
       */
-@@ -4793,18 +4795,21 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
+@@ -4850,18 +4852,21 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
       *
       * @return Maximum durability for this material
       */
@@ -166,7 +166,7 @@ index dde86c696a90e2001acab78626a339bafd31d5b1..2188f12407bb299bcef22c84e33cb271
       *
       * @apiNote Internal Use Only
       */
-@@ -4820,8 +4825,9 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
+@@ -4877,8 +4882,9 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
       * @apiNote Internal Use Only
       */
      @org.jetbrains.annotations.ApiStatus.Internal
@@ -177,7 +177,7 @@ index dde86c696a90e2001acab78626a339bafd31d5b1..2188f12407bb299bcef22c84e33cb271
          // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - durability
      }
  
-@@ -4831,9 +4837,10 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
+@@ -4888,9 +4894,10 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
       *
       * @return new data instance
       */
@@ -189,7 +189,7 @@ index dde86c696a90e2001acab78626a339bafd31d5b1..2188f12407bb299bcef22c84e33cb271
      }
  
      /**
-@@ -4843,9 +4850,10 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
+@@ -4900,9 +4907,10 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
       * @param consumer consumer to run on new instance before returning
       * @return new data instance
       */
@@ -201,7 +201,7 @@ index dde86c696a90e2001acab78626a339bafd31d5b1..2188f12407bb299bcef22c84e33cb271
      }
  
      /**
-@@ -4857,9 +4865,10 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
+@@ -4914,9 +4922,10 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
       * @return new data instance
       * @throws IllegalArgumentException if the specified data is not valid
       */
@@ -213,7 +213,7 @@ index dde86c696a90e2001acab78626a339bafd31d5b1..2188f12407bb299bcef22c84e33cb271
      }
  
      /**
-@@ -4868,10 +4877,11 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
+@@ -4925,10 +4934,11 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
       * @return MaterialData associated with this Material
       * @deprecated use {@link #createBlockData()}
       */
@@ -226,7 +226,7 @@ index dde86c696a90e2001acab78626a339bafd31d5b1..2188f12407bb299bcef22c84e33cb271
      }
  
      /**
-@@ -4883,9 +4893,10 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
+@@ -4940,9 +4950,10 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
       * @deprecated Magic value
       */
      @Deprecated
@@ -238,7 +238,7 @@ index dde86c696a90e2001acab78626a339bafd31d5b1..2188f12407bb299bcef22c84e33cb271
      }
  
      // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - data
-@@ -4898,8 +4909,9 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
+@@ -4955,8 +4966,9 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
       * @apiNote Internal Use Only
       */
      @org.jetbrains.annotations.ApiStatus.Internal
@@ -249,7 +249,7 @@ index dde86c696a90e2001acab78626a339bafd31d5b1..2188f12407bb299bcef22c84e33cb271
      }
      // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - data
  
-@@ -4908,14 +4920,16 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
+@@ -4965,14 +4977,16 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
       *
       * @return true if this material is a block
       */
@@ -267,7 +267,7 @@ index dde86c696a90e2001acab78626a339bafd31d5b1..2188f12407bb299bcef22c84e33cb271
       *
       * @apiNote Internal Use Only
       */
-@@ -4930,14 +4944,16 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
+@@ -4987,14 +5001,16 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
       *
       * @return true if this Material is edible.
       */
@@ -285,7 +285,7 @@ index dde86c696a90e2001acab78626a339bafd31d5b1..2188f12407bb299bcef22c84e33cb271
       *
       * @apiNote Internal Use Only
       */
-@@ -4994,7 +5010,7 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
+@@ -5051,7 +5067,7 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
       */
      @Nullable
      public static Material getMaterial(@NotNull final String name) {
@@ -294,7 +294,7 @@ index dde86c696a90e2001acab78626a339bafd31d5b1..2188f12407bb299bcef22c84e33cb271
      }
  
      /**
-@@ -5015,7 +5031,7 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
+@@ -5072,7 +5088,7 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
      @Nullable
      // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - getMaterial
      public static Material getMaterial(@NotNull final String name, boolean legacyName) {
@@ -303,7 +303,7 @@ index dde86c696a90e2001acab78626a339bafd31d5b1..2188f12407bb299bcef22c84e33cb271
          // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - getMaterial
      }
  
-@@ -5050,7 +5066,7 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
+@@ -5107,7 +5123,7 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
       */
      @Nullable
      public static Material matchMaterial(@NotNull final String name) {
@@ -312,7 +312,7 @@ index dde86c696a90e2001acab78626a339bafd31d5b1..2188f12407bb299bcef22c84e33cb271
      }
  
      /**
-@@ -5075,20 +5091,22 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
+@@ -5132,20 +5148,22 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
       */
      @Nullable
      public static Material matchMaterial(@NotNull final String name, boolean legacyName) {
@@ -337,7 +337,7 @@ index dde86c696a90e2001acab78626a339bafd31d5b1..2188f12407bb299bcef22c84e33cb271
       *
       * @apiNote Internal Use Only
       */
-@@ -5104,14 +5122,16 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
+@@ -5161,14 +5179,16 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
       *
       * @return True if this material is a block and solid
       */
@@ -355,7 +355,7 @@ index dde86c696a90e2001acab78626a339bafd31d5b1..2188f12407bb299bcef22c84e33cb271
       *
       * @apiNote Internal Use Only
       */
-@@ -5331,14 +5351,16 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
+@@ -5388,14 +5408,16 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
       *
       * @return True if this material is an air block.
       */
@@ -373,7 +373,7 @@ index dde86c696a90e2001acab78626a339bafd31d5b1..2188f12407bb299bcef22c84e33cb271
       *
       * @apiNote Internal Use Only
       */
-@@ -5357,14 +5379,16 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
+@@ -5414,14 +5436,16 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
       * Because there is no linked implementation, this method returns false for all materials added with Fiddle.<!-- // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - is transparent -->
       */
      @Deprecated
@@ -391,7 +391,7 @@ index dde86c696a90e2001acab78626a339bafd31d5b1..2188f12407bb299bcef22c84e33cb271
       *
       * @apiNote Internal Use Only
       */
-@@ -5436,14 +5460,16 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
+@@ -5493,14 +5517,16 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
       *
       * @return True if this material is a block and can catch fire
       */
@@ -409,7 +409,7 @@ index dde86c696a90e2001acab78626a339bafd31d5b1..2188f12407bb299bcef22c84e33cb271
       *
       * @apiNote Internal Use Only
       */
-@@ -5519,14 +5545,16 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
+@@ -5576,14 +5602,16 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
       *
       * @return True if this material is a block and can burn away
       */
@@ -427,7 +427,7 @@ index dde86c696a90e2001acab78626a339bafd31d5b1..2188f12407bb299bcef22c84e33cb271
       *
       * @apiNote Internal Use Only
       */
-@@ -5584,14 +5612,16 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
+@@ -5641,14 +5669,16 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
       *
       * @return true if this Material can be used as fuel.
       */
@@ -445,7 +445,7 @@ index dde86c696a90e2001acab78626a339bafd31d5b1..2188f12407bb299bcef22c84e33cb271
       *
       * @apiNote Internal Use Only
       */
-@@ -5689,14 +5719,16 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
+@@ -5746,14 +5776,16 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
       *
       * @return True if this material is a block and occludes light
       */
@@ -463,7 +463,7 @@ index dde86c696a90e2001acab78626a339bafd31d5b1..2188f12407bb299bcef22c84e33cb271
       *
       * @apiNote Internal Use Only
       */
-@@ -5831,14 +5863,16 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
+@@ -5888,14 +5920,16 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
      /**
       * @return True if this material is affected by gravity.
       */
@@ -481,7 +481,7 @@ index dde86c696a90e2001acab78626a339bafd31d5b1..2188f12407bb299bcef22c84e33cb271
       *
       * @apiNote Internal Use Only
       */
-@@ -5864,14 +5898,16 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
+@@ -5921,14 +5955,16 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
       *
       * @return true if this material is an item
       */
@@ -499,7 +499,7 @@ index dde86c696a90e2001acab78626a339bafd31d5b1..2188f12407bb299bcef22c84e33cb271
       *
       * @apiNote Internal Use Only
       */
-@@ -5901,8 +5937,9 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
+@@ -5958,8 +5994,9 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
       * checks being true.
       */
      @Deprecated // Paper
@@ -510,7 +510,7 @@ index dde86c696a90e2001acab78626a339bafd31d5b1..2188f12407bb299bcef22c84e33cb271
      }
  
      /**
-@@ -5914,8 +5951,9 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
+@@ -5971,8 +6008,9 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
       *
       * @return the hardness of that material.
       */
@@ -521,7 +521,7 @@ index dde86c696a90e2001acab78626a339bafd31d5b1..2188f12407bb299bcef22c84e33cb271
      }
  
      /**
-@@ -5928,8 +5966,9 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
+@@ -5985,8 +6023,9 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
       *
       * @return the blast resistance of that material.
       */
@@ -532,7 +532,7 @@ index dde86c696a90e2001acab78626a339bafd31d5b1..2188f12407bb299bcef22c84e33cb271
      }
  
      /**
-@@ -5944,8 +5983,9 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
+@@ -6001,8 +6040,9 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
       *
       * @return the slipperiness of this block
       */
@@ -543,7 +543,7 @@ index dde86c696a90e2001acab78626a339bafd31d5b1..2188f12407bb299bcef22c84e33cb271
      }
  
      /**
-@@ -5958,7 +5998,7 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
+@@ -6015,7 +6055,7 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
       */
      @Nullable
      public Material getCraftingRemainingItem() {
@@ -552,7 +552,7 @@ index dde86c696a90e2001acab78626a339bafd31d5b1..2188f12407bb299bcef22c84e33cb271
      }
  
      /**
-@@ -5968,9 +6008,10 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
+@@ -6025,9 +6065,10 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
       *
       * @return the best EquipmentSlot for this Material
       */
@@ -564,7 +564,7 @@ index dde86c696a90e2001acab78626a339bafd31d5b1..2188f12407bb299bcef22c84e33cb271
      }
  
      /**
-@@ -5986,11 +6027,10 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
+@@ -6043,11 +6084,10 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
       * @return the immutable {@link Multimap} with the respective default
       * Attributes and modifiers, or an empty map if no attributes are set.
       */
@@ -578,7 +578,7 @@ index dde86c696a90e2001acab78626a339bafd31d5b1..2188f12407bb299bcef22c84e33cb271
      }
  
      /**
-@@ -5998,9 +6038,10 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
+@@ -6055,9 +6095,10 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
       *
       * @return the creative category. null if does not belong to a category
       */
@@ -590,7 +590,7 @@ index dde86c696a90e2001acab78626a339bafd31d5b1..2188f12407bb299bcef22c84e33cb271
      }
  
      /**
-@@ -6020,11 +6061,7 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
+@@ -6077,11 +6118,7 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
      @NotNull
      @Deprecated(forRemoval = true) // Paper
      public String getTranslationKey() {
@@ -603,7 +603,7 @@ index dde86c696a90e2001acab78626a339bafd31d5b1..2188f12407bb299bcef22c84e33cb271
      }
  
      /**
-@@ -6034,9 +6071,10 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
+@@ -6091,9 +6128,10 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
       * @return the translation key of the block associated with this material,
       * or null if this material does not have an associated block
       */
@@ -615,7 +615,7 @@ index dde86c696a90e2001acab78626a339bafd31d5b1..2188f12407bb299bcef22c84e33cb271
      }
  
      /**
-@@ -6046,9 +6084,10 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
+@@ -6103,9 +6141,10 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
       * @return the translation key of the item associated with this material, or
       * null if this material does not have an associated item.
       */
@@ -627,7 +627,7 @@ index dde86c696a90e2001acab78626a339bafd31d5b1..2188f12407bb299bcef22c84e33cb271
      }
  
      /**
-@@ -6057,8 +6096,9 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
+@@ -6114,8 +6153,9 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
       * @param world the world to check
       * @return true if this material can be used in this World.
       */
@@ -638,7 +638,7 @@ index dde86c696a90e2001acab78626a339bafd31d5b1..2188f12407bb299bcef22c84e33cb271
      }
  
      // Fiddle start - flags for vanilla content - API - block
-@@ -6066,7 +6106,7 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
+@@ -6123,7 +6163,7 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
       * @return Whether this {@link Material} is present in vanilla as a block.
       */
      public boolean isVanillaBlock() {
@@ -647,7 +647,7 @@ index dde86c696a90e2001acab78626a339bafd31d5b1..2188f12407bb299bcef22c84e33cb271
      }
      // Fiddle end - flags for vanilla content - API - block
  
-@@ -6075,7 +6115,7 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
+@@ -6132,7 +6172,7 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
       * @return Whether this {@link Material} is present in vanilla as an item.
       */
      public boolean isVanillaItem() {

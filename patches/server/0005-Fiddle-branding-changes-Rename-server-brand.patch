@@ -19,10 +19,10 @@ Licensed (except for image files) under: GPL-3.0 (https://www.gnu.org/licenses/g
 Gale - https://galemc.org
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 9d403429b33059d244c52027e9fad2902973dc51..b087e2eae59c88c2ac7aec4327bce8125ff18dea 100644
+index 20cdb0325ff47d661af5a86bed9992c33dde6a0e..fdcf7a5fca03085140323a8d46dfb20a2cbdee09 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
-@@ -102,7 +102,7 @@ tasks.jar {
+@@ -88,7 +88,7 @@ tasks.jar {
          attributes(
              "Main-Class" to "org.bukkit.craftbukkit.Main",
              "Implementation-Title" to "CraftBukkit",

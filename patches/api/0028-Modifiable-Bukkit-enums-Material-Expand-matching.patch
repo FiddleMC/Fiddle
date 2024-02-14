@@ -15,10 +15,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 26438928078b25496003ede8231c8ca6624b5112..9f86d681430f53feff3de85824929cf7d80f7325 100644
+index f5b71bb88fa0d277e280307577008a70aa6d102d..4c3591ac2badab50fee81afe4db2f5ca4e736ea2 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -5022,11 +5022,30 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -5079,11 +5079,30 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      /**
       * Attempts to match the Material with the given name.
       * <p>
@@ -53,7 +53,7 @@ index 26438928078b25496003ede8231c8ca6624b5112..9f86d681430f53feff3de85824929cf7
       * @return Material if found, or null
       */
      @Nullable
-@@ -5036,15 +5055,23 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -5093,15 +5112,23 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
  
      /**
       * Attempts to match the Material with the given name.
