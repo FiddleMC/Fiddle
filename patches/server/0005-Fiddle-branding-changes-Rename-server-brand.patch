@@ -19,7 +19,7 @@ Licensed (except for image files) under: GPL-3.0 (https://www.gnu.org/licenses/g
 Gale - https://galemc.org
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index ee9e727f4acca3c05982a41764cdaebd42bf4fe6..e150fd24d2502cb065bca9de5be1b6066ecadec2 100644
+index 9d403429b33059d244c52027e9fad2902973dc51..b087e2eae59c88c2ac7aec4327bce8125ff18dea 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -102,7 +102,7 @@ tasks.jar {
@@ -73,10 +73,10 @@ index 34f19ac897a30c0c4e3ab406013fcca1c8b7db93..4ba114a9301c3d35be6a97730421fee5
  
      public SystemReport fillSystemReport(SystemReport details) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 782bb8ca67517dde5dba8f0a133eb8699353dd01..805000249535dba4534daf1b0d7842d281e203d6 100644
+index e011cfcdda2e0a609d4158b0454bdf046b04c9d9..154a34bc7a85d391d413dce26606a0adc2acd698 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -270,7 +270,7 @@ import javax.annotation.Nullable; // Paper
+@@ -264,7 +264,7 @@ import javax.annotation.Nullable; // Paper
  import javax.annotation.Nonnull; // Paper
  
  public final class CraftServer implements Server {
