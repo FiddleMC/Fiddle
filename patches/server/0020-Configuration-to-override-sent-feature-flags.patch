@@ -11,7 +11,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/network/ServerConfigurationPacketListenerImpl.java b/src/main/java/net/minecraft/server/network/ServerConfigurationPacketListenerImpl.java
-index 8dbcc1b3a70b6bbea3bd2d15b6d66cc4f9cd53f8..655c065a30db9b0aab4a169702b8c8907d075514 100644
+index cae10b963d153fb1777b18054796a45b2809342b..ea8053c90601cb15d53a1e8fec2b4bcd12a9e1c4 100644
 --- a/src/main/java/net/minecraft/server/network/ServerConfigurationPacketListenerImpl.java
 +++ b/src/main/java/net/minecraft/server/network/ServerConfigurationPacketListenerImpl.java
 @@ -70,7 +70,12 @@ public class ServerConfigurationPacketListenerImpl extends ServerCommonPacketLis
@@ -29,26 +29,10 @@ index 8dbcc1b3a70b6bbea3bd2d15b6d66cc4f9cd53f8..655c065a30db9b0aab4a169702b8c890
          this.send(new ClientboundUpdateTagsPacket(TagNetworkSerialization.serializeTagsToNetwork(layeredregistryaccess)));
          this.addOptionalTasks();
 diff --git a/src/main/java/org/fiddlemc/fiddle/configuration/FiddleGlobalConfiguration.java b/src/main/java/org/fiddlemc/fiddle/configuration/FiddleGlobalConfiguration.java
-index 3ab7163a0389ef22ab683e41630c3499705ba9c0..c8060a0b175447c1a83dae5a109ffd550c5343b0 100644
+index 37236de96aaf38ffed201cbae052fbc5a7b94224..639f98a0ccb2db1cbd3597f5b33a78b93e4ab666 100644
 --- a/src/main/java/org/fiddlemc/fiddle/configuration/FiddleGlobalConfiguration.java
 +++ b/src/main/java/org/fiddlemc/fiddle/configuration/FiddleGlobalConfiguration.java
-@@ -5,9 +5,15 @@ package org.fiddlemc.fiddle.configuration;
- import com.mojang.logging.LogUtils;
- import io.papermc.paper.configuration.Configuration;
- import io.papermc.paper.configuration.ConfigurationPart;
-+import net.minecraft.resources.ResourceLocation;
- import org.slf4j.Logger;
-+import org.spongepowered.configurate.objectmapping.meta.PostProcess;
- import org.spongepowered.configurate.objectmapping.meta.Setting;
- 
-+import java.util.HashSet;
-+import java.util.List;
-+import java.util.Set;
-+
- @SuppressWarnings({"CanBeFinal", "FieldCanBeLocal", "FieldMayBeFinal", "NotNullFieldNotInitialized", "InnerClassMayBeStatic"})
- public class FiddleGlobalConfiguration extends ConfigurationPart {
- 
-@@ -25,4 +31,49 @@ public class FiddleGlobalConfiguration extends ConfigurationPart {
+@@ -30,4 +30,49 @@ public class FiddleGlobalConfiguration extends ConfigurationPart {
      @Setting(Configuration.VERSION_FIELD)
      public int version = CURRENT_VERSION;
  
@@ -59,11 +43,11 @@ index 3ab7163a0389ef22ab683e41630c3499705ba9c0..c8060a0b175447c1a83dae5a109ffd55
 +        public List<String> always = List.of();
 +        public List<String> never = List.of();
 +
-+        public transient Set<ResourceLocation> alwaysResourceLocations;
-+        public transient Set<ResourceLocation> neverResourceLocations;
++        public transient Set<net.minecraft.resources.ResourceLocation> alwaysResourceLocations;
++        public transient Set<net.minecraft.resources.ResourceLocation> neverResourceLocations;
 +
-+        private Set<ResourceLocation> processElements(String name, List<String> elements) {
-+            Set<ResourceLocation> processed = new HashSet<>(elements.size());
++        private Set<net.minecraft.resources.ResourceLocation> processElements(String name, List<String> elements) {
++            Set<net.minecraft.resources.ResourceLocation> processed = new HashSet<>(elements.size());
 +            for (var element : elements) {
 +                if (element.isBlank()) {
 +                    LOGGER.warn("A value in send-feature-flags-to-clients." + name + " is blank");
@@ -71,7 +55,7 @@ index 3ab7163a0389ef22ab683e41630c3499705ba9c0..c8060a0b175447c1a83dae5a109ffd55
 +                }
 +                element = element.trim();
 +                try {
-+                    var resourceLocation = new ResourceLocation(element);
++                    var resourceLocation = new net.minecraft.resources.ResourceLocation(element);
 +                    if (!(resourceLocation.getNamespace().isBlank() || resourceLocation.getPath().isBlank())) {
 +                        processed.add(resourceLocation);
 +                        continue;

@@ -68,7 +68,7 @@ index ba1763d6d399f282e34aa51a4d40a4e6a0eefcbb..0462cbff6eb3366077c1628c0c8a10e9
      protected BundlePacket(Iterable<Packet<T>> packets) {
          this.packets = packets;
 diff --git a/src/main/java/net/minecraft/network/protocol/Packet.java b/src/main/java/net/minecraft/network/protocol/Packet.java
-index da11266a0a23f446196e6facf2c358cfcc18070f..c7cc4689b566b46b958a4f5ff390f54a089c3d91 100644
+index da11266a0a23f446196e6facf2c358cfcc18070f..fbc6180cab00cc8733e7e9489be44c31fe618cfe 100644
 --- a/src/main/java/net/minecraft/network/protocol/Packet.java
 +++ b/src/main/java/net/minecraft/network/protocol/Packet.java
 @@ -48,4 +48,35 @@ public interface Packet<T extends PacketListener> {
@@ -101,14 +101,14 @@ index da11266a0a23f446196e6facf2c358cfcc18070f..c7cc4689b566b46b958a4f5ff390f54a
 +     * would normally not make in-place modifications to this original {@link Packet} instance,
 +     * but return a {@link Packet} instance specially constructed for each client.
 +     */
-+    default @org.jetbrains.annotations.NotNull Packet<T> adaptForClient(@org.jetbrains.annotations.NotNull net.minecraft.network.Connection connection) {
++    default Packet<T> adaptForClient(net.minecraft.network.Connection connection) {
 +        return this;
 +    }
 +    // Fiddle end - client perspective - packets are modifiable
 +
  }
 diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundBundlePacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundBundlePacket.java
-index 9ec905a409b6f0785bf8dcabffc43d67ebf6560e..ef465411b1a9e53eedb3c3b0ee3bb2975755a1e5 100644
+index 9ec905a409b6f0785bf8dcabffc43d67ebf6560e..801ef0521733fd4d4a89b71f68df9cb19bd267be 100644
 --- a/src/main/java/net/minecraft/network/protocol/game/ClientboundBundlePacket.java
 +++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundBundlePacket.java
 @@ -4,6 +4,16 @@ import net.minecraft.network.protocol.BundlePacket;
@@ -148,7 +148,7 @@ index 9ec905a409b6f0785bf8dcabffc43d67ebf6560e..ef465411b1a9e53eedb3c3b0ee3bb297
 +    }
 +
 +    @Override
-+    public @org.jetbrains.annotations.NotNull ClientboundBundlePacket adaptForClient(@org.jetbrains.annotations.NotNull net.minecraft.network.Connection connection) {
++    public ClientboundBundlePacket adaptForClient(net.minecraft.network.Connection connection) {
 +        if (!this.mayBeSentToMultipleTargetClients && this.packets instanceof java.util.ArrayList<Packet<ClientGamePacketListener>> packetsAsList) {
 +            // If this.mayBeSentToMultipleTargetClients os false and the packet iterable is an ArrayList, modify it in-place
 +            for (int i = 0; i < packetsAsList.size(); i++) {

@@ -30,3 +30,19 @@ index 786a4d38be67d28edf5fe446aec296631999e708..3290e0fe397d630cecb309eeef94a913
 +    // Fiddle end - client perspective - block state visualization - BlockState field for visualization setupper
 +
  }
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/block/OnePerCategoryBlockStateVisualizationSetupper.java b/src/main/java/org/fiddlemc/fiddle/packet/block/OnePerCategoryBlockStateVisualizationSetupper.java
+index 2b9fe6ea436d698bf5b8f420cb1302b5ec37b144..255f033ccb87e3e812e1ba7359d762ff05d5f181 100644
+--- a/src/main/java/org/fiddlemc/fiddle/packet/block/OnePerCategoryBlockStateVisualizationSetupper.java
++++ b/src/main/java/org/fiddlemc/fiddle/packet/block/OnePerCategoryBlockStateVisualizationSetupper.java
+@@ -40,7 +40,10 @@ public final class OnePerCategoryBlockStateVisualizationSetupper implements Bloc
+     /**
+      * Always return false;
+      * <br>
+-     * Could theoretically be true if all the possible replacements equal the given actual {@link BlockState}.
++     * <!-- // Fiddle start - client perspective - block state visualization - BlockState field for visualization setupper -->
++     * Could theoretically be true if all the possible replacements equal the given actual {@link BlockState},
++     * but in that case {@link BlockState#visualizationSetupper} should be set to null instead of to this setupper.
++     * <!-- // Fiddle end - client perspective - block state visualization - BlockState field for visualization setupper -->
+      */
+     @Override
+     public @NotNull Boolean preCheckWhetherDefinitelyHasNoVisualizationDifferentThanItself(

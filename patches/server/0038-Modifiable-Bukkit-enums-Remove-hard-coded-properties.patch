@@ -16,54 +16,46 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-index a139e20ddfb460b81c2d652800a24efefd823913..b89febef77c4aadcd210d154d38d766a6650cff2 100644
+index a139e20ddfb460b81c2d652800a24efefd823913..ceae9737059585c896396de9608b3903a7d85c92 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-@@ -66,6 +66,7 @@ import org.bukkit.material.MaterialData;
- import org.bukkit.plugin.InvalidPluginException;
- import org.bukkit.plugin.PluginDescriptionFile;
- import org.bukkit.potion.PotionType;
-+import org.fiddlemc.fiddle.material.*;
- 
- @SuppressWarnings("deprecation")
- public final class CraftMagicNumbers implements UnsafeValues {
-@@ -73,6 +74,125 @@ public final class CraftMagicNumbers implements UnsafeValues {
+@@ -73,6 +73,125 @@ public final class CraftMagicNumbers implements UnsafeValues {
  
      private CraftMagicNumbers() {}
  
 +    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
-+    private final CachedMaterialBooleanProperty isBlockCache = new CachedMaterialBooleanProperty(material -> {
++    private final org.fiddlemc.fiddle.material.CachedMaterialBooleanProperty isBlockCache = new org.fiddlemc.fiddle.material.CachedMaterialBooleanProperty(material -> {
 +        if (material.isLegacy()) {
-+            return MaterialDefaultImplementations.isBlockLegacy(material);
++            return org.fiddlemc.fiddle.material.MaterialDefaultImplementations.isBlockLegacy(material);
 +        }
 +        // Based on org.bukkit.PerMaterialTest#isBlock
 +        return /*otherMaterial.isAir() || */getBlock(material) != null; // Removed isAir() check due to circular reference
 +    });
-+    private final CachedMaterialBooleanProperty isEdibleCache = new CachedMaterialBooleanProperty(material -> {
++    private final org.fiddlemc.fiddle.material.CachedMaterialBooleanProperty isEdibleCache = new org.fiddlemc.fiddle.material.CachedMaterialBooleanProperty(material -> {
 +        // Based on org.bukkit.PerMaterialTest#isEdible
 +        return !material.isBlock() && getItem(material).isEdible();
 +    });
-+    private final CachedMaterialBooleanProperty isRecordCache = new CachedMaterialBooleanProperty(material -> {
++    private final org.fiddlemc.fiddle.material.CachedMaterialBooleanProperty isRecordCache = new org.fiddlemc.fiddle.material.CachedMaterialBooleanProperty(material -> {
 +        // Based on org.bukkit.PerMaterialTest#isRecord
 +        return getItem(material) instanceof net.minecraft.world.item.RecordItem;
 +    });
-+    private final CachedMaterialBooleanProperty isSolidCache = new CachedMaterialBooleanProperty(material -> {
++    private final org.fiddlemc.fiddle.material.CachedMaterialBooleanProperty isSolidCache = new org.fiddlemc.fiddle.material.CachedMaterialBooleanProperty(material -> {
 +        // Based on org.bukkit.PerMaterialTest#isSolid
 +        return material != Material.AIR && material.isBlock() && getBlock(material).defaultBlockState().blocksMotion();
 +    });
-+    private final CachedMaterialBooleanProperty isAirCache = new CachedMaterialBooleanProperty(material -> {
++    private final org.fiddlemc.fiddle.material.CachedMaterialBooleanProperty isAirCache = new org.fiddlemc.fiddle.material.CachedMaterialBooleanProperty(material -> {
 +        // Based on org.bukkit.PerMaterialTest#testAir
 +       return material.isBlock() && getBlock(material).defaultBlockState().isAir();
 +    });
-+    private final CachedMaterialBooleanProperty isFlammableCache = new CachedMaterialBooleanProperty(material -> {
++    private final org.fiddlemc.fiddle.material.CachedMaterialBooleanProperty isFlammableCache = new org.fiddlemc.fiddle.material.CachedMaterialBooleanProperty(material -> {
 +        // Based on org.bukkit.PerMaterialTest#isFlammable
 +        return material != Material.AIR && material.isBlock() && getBlock(material).defaultBlockState().ignitedByLava();
 +    });
-+    private final CachedMaterialBooleanProperty isBurnableCache = new CachedMaterialBooleanProperty(material -> {
++    private final org.fiddlemc.fiddle.material.CachedMaterialBooleanProperty isBurnableCache = new org.fiddlemc.fiddle.material.CachedMaterialBooleanProperty(material -> {
 +        // Based on org.bukkit.PerMaterialTest#isBurnable
 +        return material.isBlock() && ((net.minecraft.world.level.block.FireBlock) net.minecraft.world.level.block.Blocks.FIRE).igniteOdds.getOrDefault(CraftMagicNumbers.getBlock(material), 0) > 0;
 +    });
-+    private final CachedMaterialBooleanProperty isFuelCache = new CachedMaterialBooleanProperty(material -> {
++    private final org.fiddlemc.fiddle.material.CachedMaterialBooleanProperty isFuelCache = new org.fiddlemc.fiddle.material.CachedMaterialBooleanProperty(material -> {
 +        // Fix for LEGACY_LONG_GRASS, which translates to modern DEAD_BUSH, which is fuel (instead of GRASS, which is not fuel) for data byte 0
 +        if (material == Material.LEGACY_LONG_GRASS) {
 +            return false;
@@ -71,7 +63,7 @@ index a139e20ddfb460b81c2d652800a24efefd823913..b89febef77c4aadcd210d154d38d766a
 +        // Based on org.bukkit.PerMaterialTest#isFuel
 +        return material.isItem() && net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity.isFuel(new net.minecraft.world.item.ItemStack(getItem(material)));
 +    });
-+    private final CachedMaterialBooleanProperty isOccludingCache = new CachedMaterialBooleanProperty(material -> {
++    private final org.fiddlemc.fiddle.material.CachedMaterialBooleanProperty isOccludingCache = new org.fiddlemc.fiddle.material.CachedMaterialBooleanProperty(material -> {
 +        // Fix for LEGACY_DOUBLE_STEP, LEGACY_WOOD_DOUBLE_STEP, LEGACY_DOUBLE_STONE_SLAB2 and LEGACY_PURPUR_DOUBLE_SLAB, which translate to various modern slabs, which are not necessarily occluding (only their double states would be)
 +        if (material == Material.LEGACY_DOUBLE_STEP || material == Material.LEGACY_WOOD_DOUBLE_STEP || material == Material.LEGACY_DOUBLE_STONE_SLAB2 || material == Material.LEGACY_PURPUR_DOUBLE_SLAB) {
 +            return true;
@@ -79,7 +71,7 @@ index a139e20ddfb460b81c2d652800a24efefd823913..b89febef77c4aadcd210d154d38d766a
 +        // Based on org.bukkit.PerMaterialTest#isOccluding
 +        return material.isBlock() && getBlock(material).defaultBlockState().isRedstoneConductor(net.minecraft.world.level.EmptyBlockGetter.INSTANCE, net.minecraft.core.BlockPos.ZERO);
 +    });
-+    private final CachedMaterialBooleanProperty hasGravityCache = new CachedMaterialBooleanProperty(material -> {
++    private final org.fiddlemc.fiddle.material.CachedMaterialBooleanProperty hasGravityCache = new org.fiddlemc.fiddle.material.CachedMaterialBooleanProperty(material -> {
 +        // Based on org.bukkit.PerMaterialTest#hasGravity
 +        if (!material.isBlock()) {
 +            return false;
@@ -87,14 +79,14 @@ index a139e20ddfb460b81c2d652800a24efefd823913..b89febef77c4aadcd210d154d38d766a
 +        var block = getBlock(material);
 +        return block instanceof net.minecraft.world.level.block.Fallable || block instanceof net.minecraft.world.level.block.ScaffoldingBlock;
 +    });
-+    private final CachedMaterialBooleanProperty isItemCache = new CachedMaterialBooleanProperty(material -> {
++    private final org.fiddlemc.fiddle.material.CachedMaterialBooleanProperty isItemCache = new org.fiddlemc.fiddle.material.CachedMaterialBooleanProperty(material -> {
 +        if (material.isLegacy()) {
-+            return MaterialDefaultImplementations.isItemLegacy(material);
++            return org.fiddlemc.fiddle.material.MaterialDefaultImplementations.isItemLegacy(material);
 +        }
 +        // Based on org.bukkit.PerMaterialTest#testItem
 +        return material == Material.AIR || getItem(material) != null;
 +    });
-+    private final CachedMaterialBooleanProperty isInteractableCache = new CachedMaterialBooleanProperty(material -> {
++    private final org.fiddlemc.fiddle.material.CachedMaterialBooleanProperty isInteractableCache = new org.fiddlemc.fiddle.material.CachedMaterialBooleanProperty(material -> {
 +        // Based on org.bukkit.PerMaterialTest#testInteractable
 +        if (!material.isBlock()) {
 +            return false;
@@ -106,28 +98,28 @@ index a139e20ddfb460b81c2d652800a24efefd823913..b89febef77c4aadcd210d154d38d766a
 +        } catch (NoSuchMethodException ignored) {}
 +        return false;
 +    });
-+    private final CachedMaterialFloatProperty hardnessCache = new CachedMaterialFloatProperty(material -> {
++    private final org.fiddlemc.fiddle.material.CachedMaterialFloatProperty hardnessCache = new org.fiddlemc.fiddle.material.CachedMaterialFloatProperty(material -> {
 +        if (!material.isBlock()) {
 +            return 0;
 +        }
 +        // Based on org.bukkit.PerMaterialTest#testBlockHardness
 +        return getBlock(material).defaultBlockState().destroySpeed;
 +    });
-+    private final CachedMaterialFloatProperty blastResistanceCache = new CachedMaterialFloatProperty(material -> {
++    private final org.fiddlemc.fiddle.material.CachedMaterialFloatProperty blastResistanceCache = new org.fiddlemc.fiddle.material.CachedMaterialFloatProperty(material -> {
 +        if (!material.isBlock()) {
 +            return 0;
 +        }
 +        // Based on org.bukkit.PerMaterialTest#testBlastResistance
 +        return getBlock(material).getExplosionResistance();
 +    });
-+    private final CachedMaterialFloatProperty slipperinessCache = new CachedMaterialFloatProperty(material -> {
++    private final org.fiddlemc.fiddle.material.CachedMaterialFloatProperty slipperinessCache = new org.fiddlemc.fiddle.material.CachedMaterialFloatProperty(material -> {
 +        if (!material.isBlock()) {
 +            return 0;
 +        }
 +        // Based on org.bukkit.PerMaterialTest#testSlipperiness
 +        return getBlock(material).getFriction();
 +    });
-+    private final CachedMaterialProperty<Material> craftingRemainingItemCache = new CachedMaterialProperty<>(
++    private final org.fiddlemc.fiddle.material.CachedMaterialProperty<Material> craftingRemainingItemCache = new org.fiddlemc.fiddle.material.CachedMaterialProperty<>(
 +        Material[]::new,
 +        material -> {
 +            if (!material.isItem()) {
@@ -138,7 +130,7 @@ index a139e20ddfb460b81c2d652800a24efefd823913..b89febef77c4aadcd210d154d38d766a
 +            return expectedItem == null ? null : getMaterial(expectedItem);
 +        }
 +    );
-+    private final CachedMaterialProperty<EquipmentSlot> equipmentSlotCache = new CachedMaterialProperty<>(
++    private final org.fiddlemc.fiddle.material.CachedMaterialProperty<EquipmentSlot> equipmentSlotCache = new org.fiddlemc.fiddle.material.CachedMaterialProperty<>(
 +        EquipmentSlot[]::new,
 +        material -> {
 +            if (!material.isItem()) {
@@ -153,7 +145,7 @@ index a139e20ddfb460b81c2d652800a24efefd823913..b89febef77c4aadcd210d154d38d766a
      // Paper start
      @Override
      public net.kyori.adventure.text.flattener.ComponentFlattener componentFlattener() {
-@@ -686,4 +806,97 @@ public final class CraftMagicNumbers implements UnsafeValues {
+@@ -686,4 +805,97 @@ public final class CraftMagicNumbers implements UnsafeValues {
          public static final int TAG_INT_ARRAY = 11;
          public static final int TAG_ANY_NUMBER = 99;
      }

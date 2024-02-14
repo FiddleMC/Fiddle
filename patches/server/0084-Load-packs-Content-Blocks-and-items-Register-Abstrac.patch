@@ -167,31 +167,26 @@ index 0000000000000000000000000000000000000000..04fd085f18b3b30d3135c787b5885f30
 +
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/blockoritem/BlockOrItemDefinitionBase.java b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/blockoritem/BlockOrItemDefinitionBase.java
-index f844dce10a27c7b205d42b54fd0f4211ec70919c..2752f2c442788c881bf83dc14fd359e5d5a84bd2 100644
+index f844dce10a27c7b205d42b54fd0f4211ec70919c..f74e1d3bb28378d6bf27fd0f815833960f5ce83a 100644
 --- a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/blockoritem/BlockOrItemDefinitionBase.java
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/blockoritem/BlockOrItemDefinitionBase.java
-@@ -3,19 +3,34 @@
- package org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.blockoritem;
- 
- import net.minecraft.resources.ResourceLocation;
-+import org.fiddlemc.fiddle.pack.load.fiddlecontent.blockoritem.BlockOrItemByDefinitionLoader;
- import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.FiddleContentDefinitionType;
+@@ -7,15 +7,29 @@ import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.FiddleContentDefin
  import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.withparent.FiddleContentDefinitionBase;
  import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.withparent.FiddleContentDefinitionParent;
  
 -public abstract class BlockOrItemDefinitionBase
-+import java.util.function.Function;
-+
 +public abstract class BlockOrItemDefinitionBase<Properties> // Fiddle - load packs - blocks and items - register - implementation
      extends FiddleContentDefinitionBase
      implements FiddleContentDefinitionParent {
  
 +    // Fiddle start - load packs - blocks and items - register - implementation
 +    /**
-+     * The modifier of values for {@link BlockOrItemByDefinitionLoader#createPropertiesFromParent}.
-+     * It is always given the return value of {@link BlockOrItemByDefinitionLoader#createDefaultProperties}.
++     * The modifier of values for
++     * {@link org.fiddlemc.fiddle.pack.load.fiddlecontent.blockoritem.BlockOrItemByDefinitionLoader#createPropertiesFromParent}.
++     * It is always given the return value of
++     * {@link org.fiddlemc.fiddle.pack.load.fiddlecontent.blockoritem.BlockOrItemByDefinitionLoader#createDefaultProperties}.
 +     */
-+    public final Function<Properties, Properties> propertiesInitializer;
++    public final java.util.function.Function<Properties, Properties> propertiesInitializer;
 +    // Fiddle end - load packs - blocks and items - register - implementation
 +
      protected BlockOrItemDefinitionBase(
@@ -199,7 +194,7 @@ index f844dce10a27c7b205d42b54fd0f4211ec70919c..2752f2c442788c881bf83dc14fd359e5
 -        ResourceLocation untypedResourceLocation
 +        // Fiddle start - load packs - blocks and items - register - implementation
 +        ResourceLocation untypedResourceLocation,
-+        Function<Properties, Properties> propertiesInitializer
++        java.util.function.Function<Properties, Properties> propertiesInitializer
 +        // Fiddle end - load packs - blocks and items - register - implementation
      ) {
          super(type, untypedResourceLocation);

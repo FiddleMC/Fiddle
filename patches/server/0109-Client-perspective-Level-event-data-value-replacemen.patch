@@ -1,147 +1,25 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
-Date: Sat, 10 Feb 2024 13:47:32 +0100
+Date: Sat, 10 Feb 2024 13:35:46 +0100
 Subject: [PATCH] Client perspective - Level event data value replacements -
- Data can be generic
+ Adapt packet data when writing
 
-Allows the `data` field in `ClientboundLevelEventPacket` to have any type.
-
-Currently, `getData()` (and thereby also `write(FriendlyByteBuf)`) will fail if it is anything other than an `Integer`.
-Later patches can add cases where it is something else, and add support for it in the `getData()` method.
+A `ClientboundLevelEventPacket` will be written to a buffer with the return value of `getData()` method instead of the `data` field,
+so that the method can be expanded to include adaptations based on the target connection of the packet.
 
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelEventPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelEventPacket.java
-index 2c31c8d55d716b1660412218d5287da672ab45f6..11de2041b07914b2868a818acb756dc729eaf59c 100644
+index dc5d118ff78137339335dceef9fb1d123bd96411..2c31c8d55d716b1660412218d5287da672ab45f6 100644
 --- a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelEventPacket.java
 +++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelEventPacket.java
-@@ -7,10 +7,10 @@ import net.minecraft.network.protocol.Packet;
- public class ClientboundLevelEventPacket extends org.fiddlemc.fiddle.packet.CloningPacketWithExplicitTargetClientConnection<ClientGamePacketListener> { // Fiddle - client perspective - level event data value replacements - store connection explicitly
-     private final int type;
-     private final BlockPos pos;
--    private final int data;
-+    private final Object data; // Fiddle - client perspective - level event data value replacements - data can be generic
-     private final boolean globalEvent;
- 
--    public ClientboundLevelEventPacket(int eventId, BlockPos pos, int data, boolean global) {
-+    public ClientboundLevelEventPacket(int eventId, BlockPos pos, Object data, boolean global) { // Fiddle - client perspective - level event data value replacements - data can be generic
-         super(); // Fiddle - client perspective - level event data value replacements - store connection explicitly
-         this.type = eventId;
-         this.pos = pos.immutable();
-@@ -34,6 +34,12 @@ public class ClientboundLevelEventPacket extends org.fiddlemc.fiddle.packet.Clon
- 
-     @Override
-     protected boolean canSkipCloning() {
-+        // Fiddle start - client perspective - level event data value replacements - data can be generic
-+        if (!(this.data instanceof Integer)) {
-+            // Whether cloning can be skipped must already have been determined
-+            throw new IllegalStateException("Could not determine canSkipCloning() for non-integer data of type " + this.data.getClass().getName() + ": " + this.data);
-+        }
-+        // Fiddle end - client perspective - level event data value replacements - data can be generic
-         // The same data (an integer that doesn't represent anything replaceable) will be sent to everyone, so we can skip cloning
-         return true;
-     }
-@@ -61,7 +67,12 @@ public class ClientboundLevelEventPacket extends org.fiddlemc.fiddle.packet.Clon
-     }
- 
-     public int getData() {
--        return this.data;
-+        // Fiddle start - client perspective - level event data value replacements - data can be generic
-+        if (!(this.data instanceof Integer)) {
-+            throw new IllegalStateException("Could not determine getData() for non-integer data of type " + this.data.getClass().getName() + ": " + this.data);
-+        }
-+        // Fiddle end - client perspective - level event data value replacements - data can be generic
-+        return (int) this.data;
-     }
- 
-     public BlockPos getPos() {
-diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index 761fdaba9afa3bdcb2a70c8bf6d5c950681fa9d9..9c4a5f00e1d9b998831ed6cf2f59cc878b654fd7 100644
---- a/src/main/java/net/minecraft/server/level/ServerLevel.java
-+++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
-@@ -1830,7 +1830,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
-     }
- 
-     @Override
--    public void levelEvent(@Nullable Player player, int eventId, BlockPos pos, int data) {
-+    public void levelEvent(@Nullable Player player, int eventId, BlockPos pos, Object data) { // Fiddle - client perspective - level event data value replacements - data can be generic
-         this.server.getPlayerList().broadcast(player, (double) pos.getX(), (double) pos.getY(), (double) pos.getZ(), 64.0D, this.dimension(), new ClientboundLevelEventPacket(eventId, pos, data, false));
-     }
- 
-diff --git a/src/main/java/net/minecraft/server/level/WorldGenRegion.java b/src/main/java/net/minecraft/server/level/WorldGenRegion.java
-index 14a5492428eac823a295ef3746d0aca6fbdab4ec..7d0ec0741f4497aa27574802032abe6113bfd24a 100644
---- a/src/main/java/net/minecraft/server/level/WorldGenRegion.java
-+++ b/src/main/java/net/minecraft/server/level/WorldGenRegion.java
-@@ -486,7 +486,7 @@ public class WorldGenRegion implements WorldGenLevel {
-     public void addParticle(ParticleOptions parameters, double x, double y, double z, double velocityX, double velocityY, double velocityZ) {}
- 
-     @Override
--    public void levelEvent(@Nullable Player player, int eventId, BlockPos pos, int data) {}
-+    public void levelEvent(@Nullable Player player, int eventId, BlockPos pos, Object data) {} // Fiddle - client perspective - level event data value replacements - data can be generic
- 
-     @Override
-     public void gameEvent(GameEvent event, Vec3 emitterPos, GameEvent.Context emitter) {}
-diff --git a/src/main/java/net/minecraft/world/level/LevelAccessor.java b/src/main/java/net/minecraft/world/level/LevelAccessor.java
-index bd9ac874b2d4333bc5c3a79657d63f1bd41fd8c8..2393a6636aa32da862d81c45d6050b9046d0038d 100644
---- a/src/main/java/net/minecraft/world/level/LevelAccessor.java
-+++ b/src/main/java/net/minecraft/world/level/LevelAccessor.java
-@@ -95,12 +95,24 @@ public interface LevelAccessor extends CommonLevelAccessor, LevelTimeAccess {
- 
-     void addParticle(ParticleOptions parameters, double x, double y, double z, double velocityX, double velocityY, double velocityZ);
- 
--    void levelEvent(@Nullable Player player, int eventId, BlockPos pos, int data);
-+    // Fiddle start - client perspective - level event data value replacements - data can be generic
-+    void levelEvent(@Nullable Player player, int eventId, BlockPos pos, Object data);
- 
--    default void levelEvent(int eventId, BlockPos pos, int data) {
-+    default void levelEvent(@Nullable Player player, int eventId, BlockPos pos, int data) {
-+        this.levelEvent(player, eventId, pos, Integer.valueOf(data));
-+    }
-+
-+    default void levelEvent(int eventId, BlockPos pos, Object data) {
-+        // Fiddle end - client perspective - level event data value replacements - data can be generic
-         this.levelEvent((Player) null, eventId, pos, data);
-     }
- 
-+    // Fiddle start - client perspective - level event data value replacements - data can be generic
-+    default void levelEvent(int eventId, BlockPos pos, int data) {
-+        this.levelEvent(eventId, pos, Integer.valueOf(data));
-+    }
-+    // Fiddle end - client perspective - level event data value replacements - data can be generic
-+
-     void gameEvent(GameEvent event, Vec3 emitterPos, GameEvent.Context emitter);
- 
-     default void gameEvent(@Nullable Entity entity, GameEvent event, Vec3 pos) {
-diff --git a/src/main/java/org/bukkit/craftbukkit/util/DelegatedGeneratorAccess.java b/src/main/java/org/bukkit/craftbukkit/util/DelegatedGeneratorAccess.java
-index a650411e3fa7e2a045ac55502c77028be348acf1..65e2f2052ffac0029527854bc3275983e35a2a1c 100644
---- a/src/main/java/org/bukkit/craftbukkit/util/DelegatedGeneratorAccess.java
-+++ b/src/main/java/org/bukkit/craftbukkit/util/DelegatedGeneratorAccess.java
-@@ -214,12 +214,12 @@ public abstract class DelegatedGeneratorAccess implements WorldGenLevel {
-     }
- 
-     @Override
--    public void levelEvent(int eventId, BlockPos pos, int data) {
-+    public void levelEvent(int eventId, BlockPos pos, Object data) { // Fiddle - client perspective - level event data value replacements - data can be generic
-         this.handle.levelEvent(eventId, pos, data);
-     }
- 
-     @Override
--    public void levelEvent(Player player, int eventId, BlockPos pos, int data) {
-+    public void levelEvent(Player player, int eventId, BlockPos pos, Object data) { // Fiddle - client perspective - level event data value replacements - data can be generic
-         this.handle.levelEvent(player, eventId, pos, data);
-     }
- 
-diff --git a/src/main/java/org/bukkit/craftbukkit/util/DummyGeneratorAccess.java b/src/main/java/org/bukkit/craftbukkit/util/DummyGeneratorAccess.java
-index a5e34c25e00e7f770bcb6e15ed0bbfe8f369a68a..72e9e9b332b0c5965d03814c04ea7a7765c81d6c 100644
---- a/src/main/java/org/bukkit/craftbukkit/util/DummyGeneratorAccess.java
-+++ b/src/main/java/org/bukkit/craftbukkit/util/DummyGeneratorAccess.java
-@@ -114,7 +114,7 @@ public class DummyGeneratorAccess implements WorldGenLevel {
-     }
- 
-     @Override
--    public void levelEvent(Player player, int eventId, BlockPos pos, int data) {
-+    public void levelEvent(Player player, int eventId, BlockPos pos, Object data) { // Fiddle - client perspective - level event data value replacements - data can be generic
-         // Used by PowderSnowBlock.removeFluid
+@@ -43,7 +43,7 @@ public class ClientboundLevelEventPacket extends org.fiddlemc.fiddle.packet.Clon
+     public void write(FriendlyByteBuf buf) {
+         buf.writeInt(this.type);
+         buf.writeBlockPos(this.pos);
+-        buf.writeInt(this.data);
++        buf.writeInt(this.getData()); // Fiddle end - client perspective - store connection explicitly - allow written data to differ based on connection
+         buf.writeBoolean(this.globalEvent);
      }
  

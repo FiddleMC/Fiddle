@@ -14,7 +14,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 3893974cf5f472b7f9d26c7f19d330b7a836466c..baa3c57f76491ffeecb676514e30cbe24c88009d 100644
+index ca7b23a3608a8f65faeb559d125c25521d063146..cefb5d57a90958a42c80e3a33e238b8fa6f77aab 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
 @@ -4689,15 +4689,13 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
@@ -38,7 +38,7 @@ index 3893974cf5f472b7f9d26c7f19d330b7a836466c..baa3c57f76491ffeecb676514e30cbe2
      }
  
      @Override
-@@ -5335,142 +5333,22 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -5359,142 +5357,25 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material is a block and does not block any light
       * @deprecated currently does not have an implementation which is well
       * linked to the underlying server. Contributions welcome.
@@ -54,9 +54,12 @@ index 3893974cf5f472b7f9d26c7f19d330b7a836466c..baa3c57f76491ffeecb676514e30cbe2
 +    }
 +
 +    /**
-+     * @deprecated Do not use: this method is for internal testing purposes only.
++     * Do not use for any reason.
++     * This method is for internal testing purposes only.
++     *
++     * @apiNote Internal Use Only
 +     */
-+    @Deprecated(forRemoval = true)
++    @org.jetbrains.annotations.ApiStatus.Internal
 +    public boolean isTransparentLegacy() {
          switch (this) {
 -            //<editor-fold defaultstate="collapsed" desc="isTransparent">
@@ -207,10 +210,10 @@ index 43e601eb881faaabee5b88b731a7240db1ecfad2..0f4baeb39f0c228fff41ddb9633238a6
  
      boolean isBurnable(Material material);
 diff --git a/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java b/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
-index 948eda0324709a816803ff979901500250c9f540..6157337d6da3ce508b9a4a989c4a138a9bf9961b 100644
+index 906c7d9498969992f22cb669ad1c9cdf8bbd1011..c790413fb6039df77a3bdf63a2745a2589df5684 100644
 --- a/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
 +++ b/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
-@@ -18,6 +18,16 @@ public final class MaterialDefaultImplementations {
+@@ -21,6 +21,16 @@ public final class MaterialDefaultImplementations {
          throw new RuntimeException();
      }
  

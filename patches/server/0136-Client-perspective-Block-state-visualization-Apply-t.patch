@@ -1,157 +1,473 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
-Date: Mon, 1 Jan 2024 20:30:52 +0100
+Date: Mon, 1 Jan 2024 19:07:41 +0100
 Subject: [PATCH] Client perspective - Block state visualization - Apply to
- chunk packets - Visualization step after anti-x-ray
+ chunk packets - Call setup for all blocks in chunk packet
 
-Inserts a step into the process of preparing chunk packets to be sent, after anti-x-ray, where the visualization of block states is applied to that chunk packet, before it is marked ready.
+Provides the implementation to call the visualization setups for all blocks in a chunk packet being sent to a client.
+This does not add any invocations of this implementation yet: that is added in the "Client perspective - Block state visualization - Apply to chunk packets - Visualization step after anti-x-ray" patch.
 
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
-diff --git a/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketBlockController.java b/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketBlockController.java
-index 061041006c88ba0a7583c60e0dffac93a711f01f..35eb6be651f3795ab899f39ec746a7721431a1ba 100644
---- a/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketBlockController.java
-+++ b/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketBlockController.java
-@@ -34,7 +34,7 @@ public class ChunkPacketBlockController {
+diff --git a/src/main/java/com/destroystokyo/paper/antixray/BitStorageWriter.java b/src/main/java/com/destroystokyo/paper/antixray/BitStorageWriter.java
+index e4540ea278f2dc871cb6a3cb8897559bfd65e134..641d650c5638b660bb4f1eb7e7d5d6b7ccf0c80f 100644
+--- a/src/main/java/com/destroystokyo/paper/antixray/BitStorageWriter.java
++++ b/src/main/java/com/destroystokyo/paper/antixray/BitStorageWriter.java
+@@ -10,6 +10,12 @@ public final class BitStorageWriter {
+     private long current;
+     private boolean dirty;
+ 
++    // Fiddle start - client perspective - block state visualization - apply to chunk packets - call setup for all blocks in chunk packet
++    public int getIndex() {
++        return this.longInBufferIndex;
++    }
++    // Fiddle end - client perspective - block state visualization - apply to chunk packets - call setup for all blocks in chunk packet
++
+     public void setBuffer(byte[] buffer) {
+         this.buffer = buffer;
+     }
+diff --git a/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketInfo.java b/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketInfo.java
+index 31dfc95700dbfe0740b2ec13c16cbb867144efeb..631992ffc7a8409000c5401ae0db80b361a1c394 100644
+--- a/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketInfo.java
++++ b/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketInfo.java
+@@ -11,6 +11,11 @@ public sealed abstract class ChunkPacketInfo<T> permits ChunkPacketInfoAntiXray
+     private final int[] bits;
+     private final Object[] palettes;
+     private final int[] indexes;
++    // Fiddle start - client perspective - block state visualization - apply to chunk packets - call setup for all blocks in chunk packet - store more indices in ChunkPacketInfo
++    private final int[] nonEmptyBlockCountIndices;
++    private final int[] biomesInclusiveStartIndices;
++    private final int[] biomesExclusiveEndIndices;
++    // Fiddle end - client perspective - block state visualization - apply to chunk packets - call setup for all blocks in chunk packet - store more indices in ChunkPacketInfo
+     private final Object[][] presetValues;
+     private byte[] buffer;
+ 
+@@ -21,6 +26,11 @@ public sealed abstract class ChunkPacketInfo<T> permits ChunkPacketInfoAntiXray
+         bits = new int[sections];
+         palettes = new Object[sections];
+         indexes = new int[sections];
++        // Fiddle start - client perspective - block state visualization - apply to chunk packets - call setup for all blocks in chunk packet - store more indices in ChunkPacketInfo
++        this.nonEmptyBlockCountIndices = new int[sections];
++        this.biomesInclusiveStartIndices = new int[sections];
++        this.biomesExclusiveEndIndices = new int[sections];
++        // Fiddle end - client perspective - block state visualization - apply to chunk packets - call setup for all blocks in chunk packet - store more indices in ChunkPacketInfo
+         presetValues = new Object[sections][];
      }
  
-     public void modifyBlocks(ClientboundLevelChunkWithLightPacket chunkPacket, @org.jetbrains.annotations.Nullable ChunkPacketInfoAntiXray chunkPacketInfo) { // Fiddle - client perspective - block state visualization - apply to chunk packets - every ChunkPacketInfo is ChunkPacketInfoAntiXray - the parameter type is always ChunkPacketInfoAntiXray, and is non-null if anti-x-ray is to be applied (but if it is non-null, still no anti-x-ray would be applied if this controller never applies anti-x-ray)
--        chunkPacket.setReady(true);
-+        chunkPacket.onAntiXrayFinish(); // Fiddle - client perspective - block state visualization - apply to chunk packets - no anti-x-ray needs to be applied because this controller never applies anti-x-ray
+@@ -65,6 +75,32 @@ public sealed abstract class ChunkPacketInfo<T> permits ChunkPacketInfoAntiXray
+         indexes[chunkSectionIndex] = index;
      }
  
-     public void onBlockChange(Level level, BlockPos blockPos, BlockState newBlockState, BlockState oldBlockState, int flags, int maxUpdateDepth) {
-diff --git a/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketBlockControllerAntiXray.java b/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketBlockControllerAntiXray.java
-index 9367e1e6c5a7db16f4398d2d7475dd7d1b056e96..14e18e504cfd1a9ecc89f10f09cd9b3a2bb1acdb 100644
---- a/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketBlockControllerAntiXray.java
-+++ b/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketBlockControllerAntiXray.java
-@@ -183,7 +183,7 @@ public final class ChunkPacketBlockControllerAntiXray extends ChunkPacketBlockCo
-     public void modifyBlocks(ClientboundLevelChunkWithLightPacket chunkPacket, @org.jetbrains.annotations.Nullable ChunkPacketInfoAntiXray chunkPacketInfo) { // If and only if the given info instance is non-null, anti-x-ray will be applied (it may be null for packets sent to players that are exempt for anti-x-ray)
-         if (chunkPacketInfo == null || !chunkPacketInfo.applyAntiXray) {
-             // Fiddle end - client perspective - block state visualization - apply to chunk packets - every ChunkPacketInfo is ChunkPacketInfoAntiXray
--            chunkPacket.setReady(true);
-+            chunkPacket.onAntiXrayFinish(); // Fiddle - client perspective - block state visualization - apply to chunk packets - no anti-x-ray needs to be applied to this chunk packet
-             return;
-         }
- 
-@@ -383,7 +383,7 @@ public final class ChunkPacketBlockControllerAntiXray extends ChunkPacketBlockCo
-             }
-         }
- 
--        chunkPacketInfoAntiXray.getChunkPacket().setReady(true);
-+        chunkPacketInfoAntiXray.getChunkPacket().onAntiXrayFinish(); // Fiddle - client perspective - block state visualization - apply to chunk packets - anti-x-ray finished
-     }
- 
-     private void obfuscateLayer(int y, BitStorageReader bitStorageReader, BitStorageWriter bitStorageWriter, boolean[] solid, boolean[] obfuscate, int[] presetBlockStateBits, boolean[][] current, boolean[][] next, boolean[][] nextNext, LevelChunkSection[] nearbyChunkSections, IntSupplier random) {
++    // Fiddle start - client perspective - block state visualization - apply to chunk packets - call setup for all blocks in chunk packet - store more indices in ChunkPacketInfo
++    public int getNonEmptyBlockCountIndex(int chunkSectionIndex) {
++        return this.nonEmptyBlockCountIndices[chunkSectionIndex];
++    }
++
++    public void setNonEmptyBlockCountIndex(int chunkSectionIndex, int index) {
++        this.nonEmptyBlockCountIndices[chunkSectionIndex] = index;
++    }
++
++    public int getBiomesInclusiveStartIndex(int chunkSectionIndex) {
++        return this.biomesInclusiveStartIndices[chunkSectionIndex];
++    }
++
++    public void setBiomesInclusiveStartIndex(int chunkSectionIndex, int index) {
++        this.biomesInclusiveStartIndices[chunkSectionIndex] = index;
++    }
++
++    public int getBiomesExclusiveEndIndex(int chunkSectionIndex) {
++        return this.biomesExclusiveEndIndices[chunkSectionIndex];
++    }
++
++    public void setBiomesExclusiveEndIndex(int chunkSectionIndex, int index) {
++        this.biomesExclusiveEndIndices[chunkSectionIndex] = index;
++    }
++    // Fiddle end - client perspective - block state visualization - apply to chunk packets - call setup for all blocks in chunk packet - store more indices in ChunkPacketInfo
++
+     @SuppressWarnings("unchecked")
+     public T[] getPresetValues(int chunkSectionIndex) {
+         return (T[]) presetValues[chunkSectionIndex];
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java
+index 3e345ff48cc57a11f50402b9c75b9546b7621563..1e75184943a9874190495eef971aafceb70a8177 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java
+@@ -28,7 +28,7 @@ public class ClientboundLevelChunkPacketData {
+     private final ClientboundLevelChunkWithLightPacket containingPacket;
+     // Fiddle end - client perspective - block state visualization - apply to chunk packets - ClientboundLevelChunkPacketData has a reference to its ClientboundLevelChunkWithLightPacket
+     private final CompoundTag heightmaps;
+-    private final byte[] buffer;
++    public byte[] buffer; // Fiddle - client perspective - block state visualization - apply to chunk packets - call setup for all blocks in chunk packet - private -> public, final -> non-final
+     public int bufferUsedLength; // Fiddle - client perspective - block state visualization - apply to chunk packets - chunk packet data can use buffer partially
+     private final List<ClientboundLevelChunkPacketData.BlockEntityInfo> blockEntitiesData;
+     // Paper start
 diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
-index 0941332b538ee732d51d0442a4af7856a2103493..0be4062d0adedcbc0911088f3478451fffa84304 100644
+index 303fe6a1feb15e86e879d568becaee3d6b4cd9e6..0941332b538ee732d51d0442a4af7856a2103493 100644
 --- a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
 +++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
-@@ -20,15 +20,58 @@ public class ClientboundLevelChunkWithLightPacket extends org.fiddlemc.fiddle.pa
-     public @Nullable net.minecraft.server.level.ServerLevel level;
-     // Fiddle end - block state visualization - apply to chunk packets - store ChunkPacketInfo and chunk details
-     // Paper start - Async-Anti-Xray - Ready flag for the connection
--    private volatile boolean ready;
-+    // Fiddle start - client perspective - block state visualization - apply to chunk packets
-+    /**
-+     * This is set to true with the single call to {@link #onApplyVisualizationFinish}.
-+     * <br>
-+     * This field used to be the {@code ready} field.
-+     */
-+    private volatile boolean hasApplyVisualizationFinished;
-+
-+    /**
-+     * This is incremented by both the single call to {@link #postSetConnectionAdaptForClient}.
-+     * and the single call to {@link #onAntiXrayFinish}.
-+     * <p>
-+     *     This exists because the applyinh visualization task may be attempted to be started from several threads
-+     *     at the same time: namely the thread that has finished the anti-x-ray
-+     *     (thereby invoking {@link #onAntiXrayFinish}) and the thread that is attempting to send the packet
-+     *     to the connection (thereby invoking {@link #postSetConnectionAdaptForClient}).
-+     * </p>
-+     */
-+    private @org.jetbrains.annotations.NotNull java.util.concurrent.atomic.AtomicInteger targetClientConnectionIsInitializedAndAntiXrayHasFinished = new java.util.concurrent.atomic.AtomicInteger();
-+    // Fiddle start - client perspective - block state visualization - apply to chunk packets
+@@ -40,7 +40,7 @@ public class ClientboundLevelChunkWithLightPacket extends org.fiddlemc.fiddle.pa
+         this.x = chunkPos.x;
+         this.z = chunkPos.z;
+         // Fiddle start - client perspective - block state visualization - apply to chunk packets - every ChunkPacketInfo is ChunkPacketInfoAntiXray
+-        boolean isChunkPacketInfoNeeded = modifyBlocks;
++        boolean isChunkPacketInfoNeeded = true/*We would need the perspective here to say whether it needs visualization*/; // Fiddle - client perspective - block state visualization - apply to chunk packets - every ChunkPacketInfo is ChunkPacketInfoAntiXray - no effective changes to this field except the type is inferred // Fiddle - client perspective - block state visualization - apply to chunk packets - call setup for all blocks in chunk packet - also create ChunkPacketInfo if needed for visualization
+         var chunkPacketInfo = isChunkPacketInfoNeeded ? chunk.getLevel().chunkPacketBlockController.getChunkPacketInfo(this, chunk, modifyBlocks) : null; // No effective changes to this field except the type is inferred
+         // Fiddle start - block state visualization - apply to chunk packets - store ChunkPacketInfo and chunk details
+         this.chunkPacketInfo = chunkPacketInfo;
+diff --git a/src/main/java/net/minecraft/util/SimpleBitStorage.java b/src/main/java/net/minecraft/util/SimpleBitStorage.java
+index e4d0d7e8fc58b8f9f614d74a141e452166e0364c..dd8d05bd5de473d70dd074e1af4b5494b65dd8f2 100644
+--- a/src/main/java/net/minecraft/util/SimpleBitStorage.java
++++ b/src/main/java/net/minecraft/util/SimpleBitStorage.java
+@@ -72,6 +72,16 @@ public class SimpleBitStorage implements BitStorage {
  
-     @Override
-     public boolean isReady() {
--        return this.ready;
-+        return this.hasApplyVisualizationFinished; // Fiddle - client perspective - block state visualization - apply to chunk packets
+     }
+ 
++    // Fiddle start - client perspective - block state visualization - apply to chunk packets - call setup for all blocks in chunk packet - packet buffer length calculation
++    public static int getValuesPerLong(int elementBits) {
++        return 64 / elementBits;
 +    }
 +
-+    // Fiddle start - client perspective - block state visualization - apply to chunk packets
-+    /**
-+     * This is called when anti-x-ray has finished processing (or if it didn't need to be applied),
-+     * so we can now apply the visualizations.
-+     * <br>
-+     * Invocations of this method used to be invocations of {@code setReady(true)}.
-+     * <p>
-+     *     This immediately starts the task of applying block state visualization to this packet data,
-+     *     if {@linkplain #postSetConnectionAdaptForClient the target connection was already initialized}.
-+     * </p>
-+     */
-+    public void onAntiXrayFinish() {
-+        if (this.targetClientConnectionIsInitializedAndAntiXrayHasFinished.incrementAndGet() == 2) {
-+            this.startApplyVisualizationTask();
-+        }
++    public static int getLongArrayLength(int numberOfCompactedValuesInLongArray, int valuesPerLong) {
++        return (numberOfCompactedValuesInLongArray + valuesPerLong - 1) / valuesPerLong;
++    }
++    // Fiddle end - client perspective - block state visualization - apply to chunk packets - call setup for all blocks in chunk packet - packet buffer length calculation
++
+     private int cellIndex(int index) {
+         //long l = Integer.toUnsignedLong(this.divideMul); // Paper
+         //long m = Integer.toUnsignedLong(this.divideAdd); // Paper
+diff --git a/src/main/java/net/minecraft/world/level/chunk/LevelChunkSection.java b/src/main/java/net/minecraft/world/level/chunk/LevelChunkSection.java
+index 0847248507b5a9b374fea8270380511f1dc9f802..a78d1447eec2eb39be2bf2a860753568bc459138 100644
+--- a/src/main/java/net/minecraft/world/level/chunk/LevelChunkSection.java
++++ b/src/main/java/net/minecraft/world/level/chunk/LevelChunkSection.java
+@@ -200,9 +200,14 @@ public class LevelChunkSection {
+ 
+     // Paper start - Anti-Xray - Add chunk packet info
+     public void write(FriendlyByteBuf buf, @org.jetbrains.annotations.Nullable com.destroystokyo.paper.antixray.ChunkPacketInfoAntiXray chunkPacketInfo, int chunkSectionIndex) { // Fiddle - client perspective - block state visualization - apply to chunk packets - every ChunkPacketInfo is ChunkPacketInfoAntiXray - the parameter type is always ChunkPacketInfoAntiXray, and it is filled with data by this method if it is non-null
++        // Fiddle start - client perspective - block state visualization - apply to chunk packets - call setup for all blocks in chunk packet - store more indices in ChunkPacketInfo
++        chunkPacketInfo.setNonEmptyBlockCountIndex(chunkSectionIndex, buf.writerIndex());
++        // Fiddle end - client perspective - block state visualization - apply to chunk packets - call setup for all blocks in chunk packet - store more indices in ChunkPacketInfo
+         buf.writeShort(this.nonEmptyBlockCount);
+         this.states.write(buf, chunkPacketInfo, chunkSectionIndex);
++        chunkPacketInfo.setBiomesInclusiveStartIndex(chunkSectionIndex, buf.writerIndex()); // Fiddle - client perspective - block state visualization - apply to chunk packets - call setup for all blocks in chunk packet - store more indices in ChunkPacketInfo
+         this.biomes.write(buf, null, chunkSectionIndex);
++        chunkPacketInfo.setBiomesExclusiveEndIndex(chunkSectionIndex, buf.writerIndex()); // Fiddle - client perspective - block state visualization - apply to chunk packets - call setup for all blocks in chunk packet - store more indices in ChunkPacketInfo
+         // Paper end
      }
  
--    public void setReady(boolean ready) {
--        this.ready = ready;
-+    /**
-+     * Called when applying the visualization has finished (or if it didn't need to be applied),
-+     * so the packet is now ready to be sent.
-+     * <br>
-+     * The effect of this method is the same as the effect would have been of calling {@code setReady(true)}.
-+     */
-+    private void onApplyVisualizationFinish() {
-+        this.hasApplyVisualizationFinished = true;
-+        // Fiddle end - client perspective - block state visualization - apply to chunk packets
-     }
-     // Paper end
- 
-@@ -71,6 +114,43 @@ public class ClientboundLevelChunkWithLightPacket extends org.fiddlemc.fiddle.pa
-         this.lightData.write(buf);
-     }
- 
-+    // Fiddle start - client perspective - block state visualization - apply to chunk packets
-+    /**
-+     * Called by {@link ClientboundLevelChunkWithLightPacket} when the target client connection has been stored in it.
-+     * This is called exactly once.
-+     * <p>
-+     *     This immediately starts the task of applying block state visualization to this packet data,
-+     *     if {@linkplain #onAntiXrayFinish anti-x-ray has already finished}.
-+     * </p
-+     */
-+    @Override
-+    protected @org.jetbrains.annotations.NotNull Packet<ClientGamePacketListener> postSetConnectionAdaptForClient(@org.jetbrains.annotations.NotNull net.minecraft.network.Connection connection) {
-+        boolean startTask;
-+        if (this.targetClientConnectionIsInitializedAndAntiXrayHasFinished.incrementAndGet() == 2) {
-+            this.startApplyVisualizationTask();
-+        }
-+        return this;
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/block/SetUpVisualizationForChunkPackets.java b/src/main/java/org/fiddlemc/fiddle/packet/block/SetUpVisualizationForChunkPackets.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..7419f8233c8d1c2611d355f56aabf1702ee2061b
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/packet/block/SetUpVisualizationForChunkPackets.java
+@@ -0,0 +1,311 @@
++// Fiddle - client perspective - block state visualization - apply to chunk packets - call setup for all blocks in chunk packet
++
++package org.fiddlemc.fiddle.packet.block;
++
++import com.destroystokyo.paper.antixray.BitStorageReader;
++import com.destroystokyo.paper.antixray.BitStorageWriter;
++import io.netty.buffer.Unpooled;
++import it.unimi.dsi.fastutil.ints.Int2IntMap;
++import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
++import it.unimi.dsi.fastutil.ints.IntArrayList;
++import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
++import net.minecraft.core.SectionPos;
++import net.minecraft.network.FriendlyByteBuf;
++import net.minecraft.network.VarInt;
++import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
++import net.minecraft.util.Mth;
++import net.minecraft.util.SimpleBitStorage;
++import net.minecraft.world.level.block.state.BlockState;
++import net.minecraft.world.level.chunk.LevelChunkSection;
++import net.minecraft.world.level.chunk.PalettedContainer;
++
++import java.util.Arrays;
++
++/**
++ * A class that statically provides the {@link #setUpAndModifyBuffer} functionality.
++ */
++public final class SetUpVisualizationForChunkPackets {
++
++    private SetUpVisualizationForChunkPackets() {
++        throw new RuntimeException();
 +    }
 +
 +    /**
-+     * Starts the task of applying visualizations to this chunk packet data.
++     * Utility function to compute the maximum serialized size of a {@link PalettedContainer}
++     * for the given parameters.
 +     * <p>
-+     *     This is called exactly once.
-+     *     It is called either from {@link #onAntiXrayFinish} or from {@link #postSetConnectionAdaptForClient}.
++     *     This implementation is based on the implementation of {@link PalettedContainer#getSerializedSize()}.
 +     * </p>
 +     */
-+    private void startApplyVisualizationTask() {
-+        // Always apply the visualization on the main thread, analogous to what currently happens for anti-x-ray
-+        if (!org.bukkit.Bukkit.isPrimaryThread()) {
-+            // Plugins?
-+            net.minecraft.server.MinecraftServer.getServer().scheduleOnMain(this::startApplyVisualizationTask);
++    private static int computeMaxSerializedPalettedContainerSize(int storageEntries) {
++        /*
++        We assume (which is the worst case) that every storage entry has a different id in the palette,
++        in which case the maximum bits per entry would be used. In turn, the maximum bits per entry is 31
++        (since ids are nonnegative signed integers). In that case, 2 31-bit values fit into the 64-bit longs
++        in the storage array, meaning the storage array length is half the number of entries.
++         */
++        int paletteSerializedSize = 0; // Based on GlobalPalette#getSerializedSize
++        int storageArrayLength = storageEntries / 2;
++        return 1 + paletteSerializedSize + VarInt.getByteSize(storageArrayLength) + storageArrayLength * 8;
++    }
++
++    /**
++     * The maximum {@linkplain LevelChunkSection#getSerializedSize serialized size}
++     * (in bytes) of a {@link LevelChunkSection}.
++     * <p>
++     *     This value is based on the implementation of {@link LevelChunkSection#getSerializedSize()}
++     * </p>
++     */
++    private static final int maxSerializedSectionSize;
++    static {
++        int maxStatesSize = computeMaxSerializedPalettedContainerSize(4096);
++        int maxBiomesSize = computeMaxSerializedPalettedContainerSize(64);
++        maxSerializedSectionSize = 2 + maxStatesSize + maxBiomesSize;
++    }
++
++    /**
++     * The length of buffers in {@link #reusableBufferCache}, based on the number of sections in the chunk packet.
++     */
++    private static Int2IntMap reusableBufferLengthCache = new Int2IntOpenHashMap();
++
++    /**
++     * A {@link ThreadLocal} of reusable buffers, where each buffer is
++     * {@linkplain #reusableBufferLengthCache large enough} to hold any potential chunk data.
++     */
++    private static ThreadLocal<byte[]> reusableBufferCache = new ThreadLocal<>();
++
++    /**
++     * @return A buffer that is reusable, but unique to the current thread.
++     */
++    private static byte[] getReusableBuffer(int sectionsCount) {
++        // Get the desired buffer length
++        int minimumBufferLength = reusableBufferLengthCache.computeIfAbsent(sectionsCount, key -> key * maxSerializedSectionSize);
++        var buffer = reusableBufferCache.get();
++        if (buffer == null || buffer.length < minimumBufferLength) {
++            buffer = new byte[minimumBufferLength];
++            reusableBufferCache.set(buffer);
++        }
++        return buffer;
++    }
++
++    /**
++     * Sets up the visualization for the given chunk packet.
++     */
++    public static void setUpAndModifyBuffer(ClientboundLevelChunkWithLightPacket packet) {
++
++
++        // Get some context details that can be dereferenced after this, since they will be no longer needed
++        var chunkPacketInfo = packet.chunkPacketInfo;
++        var chunkPos = packet.chunkPos;
++        var level = packet.level;
++        packet.chunkPacketInfo = null;
++        packet.level = null;
++
++        // No replacement is necessary if the client understands all blocks//TODO make sure, in this case, that the buffer is already written using ids that are interpretable by the client rather than our own server-side ids//TODO this will require making getting the registry ids possible per player instead of per perspective
++        var clientPerspective = packet.getExplicitTargetClientPerspective();
++        /*
++        Note: if we wish to allow a pack to specify a visualization for a block that is shown even to clients
++        that understand the blocks, we should try to pre-send that visualization to the client so they can render
++        it appropriately themselves instead of performing the entire regular server-side visualization process.
++         */
++        if (clientPerspective.understandsServerSideItemsAndBlocks) {
 +            return;
 +        }
-+        org.fiddlemc.fiddle.packet.block.SetUpVisualizationForChunkPackets.setUpAndModifyBuffer(this);
-+        this.onApplyVisualizationFinish();
-+    }
-+    // Fiddle end - client perspective - block state visualization - apply to chunk packets
++        var clientInterpretableRegistry = clientPerspective.getPacketBlockStateIdMap();
 +
-     @Override
-     public void handle(ClientGamePacketListener listener) {
-         listener.handleLevelChunkWithLight(this);
++        // Get some more context details
++        var player = packet.getExplicitTargetClientConnection().getPlayer();
++        var chunkData = packet.getChunkData();
++        int sectionsCount = packet.sectionsCount;
++
++        // Get the old buffer and create appropriate readers
++        var oldBuffer = chunkPacketInfo.getBuffer();
++        var wrappedOldBuffer = Unpooled.wrappedBuffer(oldBuffer);
++        wrappedOldBuffer.writerIndex(oldBuffer.length);
++        wrappedOldBuffer.readerIndex(0);
++        var oldBufferByteBuf = new FriendlyByteBuf(wrappedOldBuffer);
++        var oldBitStorageReader = new BitStorageReader();
++        oldBitStorageReader.setBuffer(oldBuffer);
++
++        // Get a buffer to write to and create appropriate writers
++        var newBuffer = getReusableBuffer(sectionsCount);
++        var wrappedNewBuffer = Unpooled.wrappedBuffer(newBuffer);
++        wrappedNewBuffer.writerIndex(0);
++        var newBufferByteBuf = new FriendlyByteBuf(wrappedNewBuffer);
++        var newBitStorageWriter = new BitStorageWriter();
++        newBitStorageWriter.setBuffer(newBuffer);
++
++        // Reset the reader indices
++        oldBufferByteBuf.readerIndex(0);
++        oldBitStorageReader.setIndex(0);
++
++        // Translate every section
++        for (int sectionI = 0; sectionI < sectionsCount; sectionI++) {
++
++            // Get the coordinates within the level
++            int sectionY = level.getSectionYFromSectionIndex(sectionI);
++            var sectionPos = SectionPos.of(chunkPos, sectionY);
++
++            // Store the nonEmptyBlockCount index to be written to later when we know the right value, and skip it
++            int newNonEmptyBlockCountIndex = newBufferByteBuf.writerIndex();
++            newBufferByteBuf.writerIndex(newBufferByteBuf.writerIndex() + 2);
++
++            // Read the old nonEmptyBlockCount as the new nonEmptyBlockCount, to be updated on the go
++            oldBufferByteBuf.readerIndex(chunkPacketInfo.getNonEmptyBlockCountIndex(sectionI));
++            var newNonEmptyBlockCount = oldBufferByteBuf.readShort();
++
++            // Get the old palette
++            var palette = chunkPacketInfo.getPalette(sectionI);
++
++            // Prepare to read the old states
++            oldBitStorageReader.setIndex(chunkPacketInfo.getIndex(sectionI));
++            oldBitStorageReader.setBits(chunkPacketInfo.getBits(sectionI));
++
++            // Determine the new palette and states
++            var newPaletteStatesGlobalIdSet = new IntOpenHashSet(palette.getSize());
++            var newPaletteStatesGlobalIdList = new IntArrayList(palette.getSize());
++            var newStateGlobalIds = new int[4096];
++            for (int sectionBlockI = 0; sectionBlockI < 4096; sectionBlockI++) {
++
++                // Get the coordinates within the level
++                int x = sectionPos.getX() + sectionBlockI & 0x00F;
++                int z = sectionPos.getY() + (sectionBlockI & 0x0F0) >> 4;
++                int y = sectionPos.getZ() + (sectionBlockI * 0xF00) >> 8;
++
++                // Compute the new state
++                var oldState = palette.valueFor(oldBitStorageReader.read());
++                BlockState newState;
++                var visualizationSetupper = oldState.visualizationSetupper;
++                if (visualizationSetupper == null) {
++                    newState = oldState;
++                } else {
++                    newState = visualizationSetupper.setUp(level, x, y, z, oldState, player, clientPerspective, BlockStateVisualizationSetupper.BlockStateVisualizationPurpose.PHYSICAL);
++                }
++                int newStateGlobalId = clientInterpretableRegistry.getId(newState);
++
++                // Add the new state to the palette
++                if (newPaletteStatesGlobalIdSet.add(newStateGlobalId)) {
++                    newPaletteStatesGlobalIdList.add(newStateGlobalId);
++                }
++
++                // Update the nonEmptyBlockCount
++                if (oldState.isAir()) {
++                    newNonEmptyBlockCount++;
++                }
++                if (newState.isAir()) {
++                    newNonEmptyBlockCount--;
++                }
++
++                // Return the new state for this block
++                newStateGlobalIds[sectionBlockI] = newStateGlobalId;
++
++            }
++            var newPaletteStatesCount = newPaletteStatesGlobalIdList.size();
++
++            // Compute the number of necessary bits
++            int necessaryBits = newPaletteStatesCount == 0 ? 0 : Mth.ceillog2(newPaletteStatesCount);
++
++            /*
++            Compute the number of used bits per value,
++            based on PalettedContainer.Strategy#SECTION_STATES and each corresponding Palette#getSerializedSize.
++             */
++            int usedBits;
++            if (necessaryBits == 0) {
++                usedBits = 0;
++            } else if (necessaryBits <= 4) {
++                usedBits = 4;
++            } else if (necessaryBits <= 8) {
++                usedBits = necessaryBits;
++            } else {
++                usedBits = Mth.ceillog2(clientInterpretableRegistry.size());
++            }
++
++            // Set the number of used bits on the bit writer
++            newBitStorageWriter.setBits(usedBits);
++
++            // Write the number of used bits
++            newBufferByteBuf.writeByte(usedBits);
++
++            // Write the paletted container's palette (based on each Palette#write)
++            if (usedBits == 0) {
++                // Based on SingleValuePalette#write: write the palette's single value
++                newBufferByteBuf.writeVarInt(newPaletteStatesGlobalIdList.getInt(0));
++            } else if (usedBits <= 8) {
++                // Based on LinearPalette#write and HashMapPalette#write: write the palette's global ids
++                newBufferByteBuf.writeVarInt(newPaletteStatesCount);
++                for (int index = 0; index < newPaletteStatesGlobalIdList.size(); index++) {
++                    int globalId = newPaletteStatesGlobalIdList.getInt(index);
++                    newBufferByteBuf.writeVarInt(globalId);
++                }
++            } else {
++                // Based on GlobalPalette#write: nothing needs to happen
++            }
++
++            // Write the block states, based on PalettedContainer#write
++            if (usedBits == 0) {
++                // The states array is empty, so the array length is 0
++                newBufferByteBuf.writeVarInt(0);
++            } else {
++                // Compute the long array length and write it to the buffer
++                int statesLongArrayLength = SimpleBitStorage.getLongArrayLength(4096, SimpleBitStorage.getValuesPerLong(usedBits));
++                newBufferByteBuf.writeVarInt(statesLongArrayLength);
++                // Set the bit storage writer index correctly
++                newBitStorageWriter.setIndex(newBufferByteBuf.writerIndex());
++                // Compute the index where the long array will end
++                int endIndex = newBitStorageWriter.getIndex() + statesLongArrayLength * 8;
++                // Write the state ids
++                if (usedBits <= 8) {
++                    // Compute the palette index mapping
++                    var paletteIndexByGlobalId = new Int2IntOpenHashMap(newPaletteStatesCount);
++                    for (int index = 0; index < newPaletteStatesGlobalIdList.size(); index++) {
++                        int globalId = newPaletteStatesGlobalIdList.getInt(index);
++                        paletteIndexByGlobalId.put(globalId, index);
++                    }
++                    // Write the corresponding palette index for each state global id
++                    for (int newStateGlobalId : newStateGlobalIds) {
++                        newBitStorageWriter.write(paletteIndexByGlobalId.get(newStateGlobalId));
++                    }
++                } else {
++                    // Write the raw global ids
++                    for (int newStateGlobalId : newStateGlobalIds) {
++                        newBitStorageWriter.write(newStateGlobalId);
++                    }
++                }
++                newBitStorageWriter.flush();
++                // Set the index to behind the long array
++                newBufferByteBuf.writerIndex(endIndex);
++            }
++
++            // Write the nonEmptyBlockCount now
++            int indexBeforehand = newBufferByteBuf.writerIndex();
++            // Move to the index where the nonEmptyBlockCount should go
++            newBufferByteBuf.writerIndex(newNonEmptyBlockCountIndex);
++            newBufferByteBuf.writeShort(newNonEmptyBlockCount);
++            // Set the index back to where we were
++            newBufferByteBuf.writerIndex(indexBeforehand);
++
++            // Copy the biomes over
++            newBufferByteBuf.writeBytes(
++                oldBuffer,
++                chunkPacketInfo.getBiomesInclusiveStartIndex(sectionI),
++                chunkPacketInfo.getBiomesExclusiveEndIndex(sectionI) - chunkPacketInfo.getBiomesInclusiveStartIndex(sectionI)
++            );
++
++        }
++
++        // Create an actual new buffer: either re-use the old buffer if the new data fits, or construct a new one
++        var newBufferUsedLength = newBufferByteBuf.writerIndex();
++        if (newBufferUsedLength <= oldBuffer.length) {
++            // Copy the data to the old buffer
++            System.arraycopy(newBuffer, 0, chunkData.buffer, 0, newBufferUsedLength);
++        } else {
++            // Replace the buffer with a newly constructed one
++            chunkData.buffer = Arrays.copyOfRange(newBuffer, 0, newBufferUsedLength);
++        }
++        // Update the used length
++        chunkData.bufferUsedLength = newBufferUsedLength;
++        // We dereferenced the packet's ChunkPacketInfo earlier, so we can't update its buffer here, but it's not needed
++
++    }
++
++}

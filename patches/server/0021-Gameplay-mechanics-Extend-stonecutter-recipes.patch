@@ -694,21 +694,10 @@ index 76d1839b140e6e3ef385b54d68ed2b305d137f12..2e55d00756bfa52daeff7324d3056516
 +
  }
 diff --git a/src/main/java/org/fiddlemc/fiddle/configuration/FiddleGlobalConfiguration.java b/src/main/java/org/fiddlemc/fiddle/configuration/FiddleGlobalConfiguration.java
-index c8060a0b175447c1a83dae5a109ffd550c5343b0..a2151ec7c384342ff30ba38984a8ecc0a00e5fa6 100644
+index 639f98a0ccb2db1cbd3597f5b33a78b93e4ab666..e29648ac2431d229432502b8caf5a89770c0e838 100644
 --- a/src/main/java/org/fiddlemc/fiddle/configuration/FiddleGlobalConfiguration.java
 +++ b/src/main/java/org/fiddlemc/fiddle/configuration/FiddleGlobalConfiguration.java
-@@ -6,8 +6,10 @@ import com.mojang.logging.LogUtils;
- import io.papermc.paper.configuration.Configuration;
- import io.papermc.paper.configuration.ConfigurationPart;
- import net.minecraft.resources.ResourceLocation;
-+import org.jetbrains.annotations.Nullable;
- import org.slf4j.Logger;
- import org.spongepowered.configurate.objectmapping.meta.PostProcess;
-+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
- import org.spongepowered.configurate.objectmapping.meta.Setting;
- 
- import java.util.HashSet;
-@@ -76,4 +78,63 @@ public class FiddleGlobalConfiguration extends ConfigurationPart {
+@@ -75,4 +75,63 @@ public class FiddleGlobalConfiguration extends ConfigurationPart {
      }
      // Fiddle end - override sent feature flags
  
@@ -755,12 +744,12 @@ index c8060a0b175447c1a83dae5a109ffd550c5343b0..a2151ec7c384342ff30ba38984a8ecc0
 +                    this.output = output;
 +                }
 +
-+                public @Nullable ResourceLocation inputResourceLocation() {
-+                    return this.input == null ? null : new ResourceLocation(this.input);
++                public @Nullable net.minecraft.resources.ResourceLocation inputResourceLocation() {
++                    return this.input == null ? null : new net.minecraft.resources.ResourceLocation(this.input);
 +                }
 +
-+                public @Nullable ResourceLocation outputResourceLocation() {
-+                    return this.output == null ? null : new ResourceLocation(this.output);
++                public @Nullable net.minecraft.resources.ResourceLocation outputResourceLocation() {
++                    return this.output == null ? null : new net.minecraft.resources.ResourceLocation(this.output);
 +                }
 +
 +            }

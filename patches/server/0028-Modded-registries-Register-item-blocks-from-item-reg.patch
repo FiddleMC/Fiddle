@@ -26,24 +26,16 @@ index 1cc0c79ea3df283a1713eb5ed24d47090b8613df..6f2e493b6cf06fcb17e2f0ae3117043b
      }
  }
 diff --git a/src/main/java/org/fiddlemc/fiddle/registry/ItemRegistry.java b/src/main/java/org/fiddlemc/fiddle/registry/ItemRegistry.java
-index b8dfbb9de0ef985ded97354bc59f2f222c127714..8239fdf7c01eb71de5f1f4c25f476c8111826cd0 100644
+index b8dfbb9de0ef985ded97354bc59f2f222c127714..fecbb98b829bd0be3489b5a717fd3645f9df14f9 100644
 --- a/src/main/java/org/fiddlemc/fiddle/registry/ItemRegistry.java
 +++ b/src/main/java/org/fiddlemc/fiddle/registry/ItemRegistry.java
-@@ -8,6 +8,7 @@ import net.minecraft.core.Holder;
- import net.minecraft.core.Registry;
- import net.minecraft.core.registries.BuiltInRegistries;
- import net.minecraft.resources.ResourceKey;
-+import net.minecraft.world.item.BlockItem;
- import net.minecraft.world.item.Item;
- 
- /**
-@@ -25,6 +26,13 @@ public final class ItemRegistry extends DefaultedMappedRegistry<Item> {
+@@ -25,6 +25,13 @@ public final class ItemRegistry extends DefaultedMappedRegistry<Item> {
          // Register the entry
          var reference = super.register(key, entry, lifecycle);
  
 +        // Fiddle start - modded registries - register item blocks from item registry
 +        // Register the item by its blocks if applicable
-+        if (entry instanceof BlockItem blockItem) {
++        if (entry instanceof net.minecraft.world.item.BlockItem blockItem) {
 +            blockItem.registerBlocks(Item.BY_BLOCK, entry);
 +        }
 +        // Fiddle end - modded registries - register item blocks from item registry

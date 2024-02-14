@@ -8,7 +8,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayerGameMode.java b/src/main/java/net/minecraft/server/level/ServerPlayerGameMode.java
-index b2c2bd5ec0afd479973f7237a5c610f21231c505..faeda72dccdda41a256ef6015544af3f34b40233 100644
+index 58f972832c39a27a8ccd606f9144e1c54adbf6f3..d55a5154f2b4b8f9196ab2eb66c375bfa7e71440 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayerGameMode.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayerGameMode.java
 @@ -103,6 +103,13 @@ public class ServerPlayerGameMode {

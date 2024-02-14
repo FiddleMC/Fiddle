@@ -8,7 +8,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/network/Connection.java b/src/main/java/net/minecraft/network/Connection.java
-index 552add978fa28d05859f24828f72e6bdb5bfd185..8bfd8d5c283da3667abb41eca7b589a578527a9c 100644
+index 57bee3e710ec6ec672c920e7ae19a7c4abf1f833..500626970840ba23c88ca57a34a95ad596eb14b3 100644
 --- a/src/main/java/net/minecraft/network/Connection.java
 +++ b/src/main/java/net/minecraft/network/Connection.java
 @@ -998,4 +998,20 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
@@ -33,7 +33,7 @@ index 552add978fa28d05859f24828f72e6bdb5bfd185..8bfd8d5c283da3667abb41eca7b589a5
 +
  }
 diff --git a/src/main/java/net/minecraft/network/protocol/Packet.java b/src/main/java/net/minecraft/network/protocol/Packet.java
-index fb8e77cc6ceb2fec874087d30c3f167466b5a932..0164b7d2b5725c518a382b02614bbf9d952f042e 100644
+index d99a276e877e128014d27c41577ad7c4f94454fb..5ab0cc0dada53d176adb5f099fbc1cb97d68068f 100644
 --- a/src/main/java/net/minecraft/network/protocol/Packet.java
 +++ b/src/main/java/net/minecraft/network/protocol/Packet.java
 @@ -108,4 +108,24 @@ public interface Packet<T extends PacketListener> {
@@ -62,10 +62,10 @@ index fb8e77cc6ceb2fec874087d30c3f167466b5a932..0164b7d2b5725c518a382b02614bbf9d
 +
  }
 diff --git a/src/main/java/org/fiddlemc/fiddle/packet/PacketWithExplicitTargetClientConnection.java b/src/main/java/org/fiddlemc/fiddle/packet/PacketWithExplicitTargetClientConnection.java
-index b30d8725aee6fcd50ea804682f455cb0d50c32a0..a3a057a6781b86c4df55821796381d18f05d215a 100644
+index 5cc3e028fbf993da1681e06cb760b939015c9538..6298f4fef7b8cc07db8e69c4d14f3558ea24f57d 100644
 --- a/src/main/java/org/fiddlemc/fiddle/packet/PacketWithExplicitTargetClientConnection.java
 +++ b/src/main/java/org/fiddlemc/fiddle/packet/PacketWithExplicitTargetClientConnection.java
-@@ -61,4 +61,11 @@ public abstract class PacketWithExplicitTargetClientConnection<T extends PacketL
+@@ -59,4 +59,11 @@ public abstract class PacketWithExplicitTargetClientConnection<T extends PacketL
          return actualTargetClientConnection.getPlayerClientPerspective();
      }
  

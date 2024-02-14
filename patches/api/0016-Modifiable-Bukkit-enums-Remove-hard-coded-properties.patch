@@ -16,7 +16,7 @@ Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/fiddlemc/fiddle/material/CachedMaterialBooleanProperty.java b/src/main/java/org/fiddlemc/fiddle/material/CachedMaterialBooleanProperty.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..abac35f173c7fd8f798bee9f252ac0538d60f0cf
+index 0000000000000000000000000000000000000000..3a6823aa743f8f7ff5455b0cfa1e400d48702e2d
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/material/CachedMaterialBooleanProperty.java
 @@ -0,0 +1,64 @@
@@ -52,12 +52,12 @@ index 0000000000000000000000000000000000000000..abac35f173c7fd8f798bee9f252ac053
 +
 +    }
 +
-+    protected final @NotNull ToBooleanFunction<@NotNull Material> propertyFunction;
++    protected final ToBooleanFunction<@NotNull Material> propertyFunction;
 +
 +    protected boolean @Nullable [] cache;
 +    protected boolean areLegacyValuesCached = false;
 +
-+    public CachedMaterialBooleanProperty(@NotNull ToBooleanFunction<@NotNull Material> propertyFunction) {
++    public CachedMaterialBooleanProperty(ToBooleanFunction<@NotNull Material> propertyFunction) {
 +        this.propertyFunction = propertyFunction;
 +    }
 +
@@ -86,7 +86,7 @@ index 0000000000000000000000000000000000000000..abac35f173c7fd8f798bee9f252ac053
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/material/CachedMaterialFloatProperty.java b/src/main/java/org/fiddlemc/fiddle/material/CachedMaterialFloatProperty.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..5660997be3a9b6bdfa9da0566f4c6062f4cefc8f
+index 0000000000000000000000000000000000000000..9c161daa9c0ec9a4195ca4bdb263d072298b8101
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/material/CachedMaterialFloatProperty.java
 @@ -0,0 +1,64 @@
@@ -122,12 +122,12 @@ index 0000000000000000000000000000000000000000..5660997be3a9b6bdfa9da0566f4c6062
 +
 +    }
 +
-+    protected final @NotNull ToFloatFunction<@NotNull Material> propertyFunction;
++    protected final ToFloatFunction<@NotNull Material> propertyFunction;
 +
 +    protected float @Nullable [] cache;
 +    protected boolean areLegacyValuesCached = false;
 +
-+    public CachedMaterialFloatProperty(@NotNull ToFloatFunction<@NotNull Material> propertyFunction) {
++    public CachedMaterialFloatProperty(ToFloatFunction<@NotNull Material> propertyFunction) {
 +        this.propertyFunction = propertyFunction;
 +    }
 +
@@ -156,7 +156,7 @@ index 0000000000000000000000000000000000000000..5660997be3a9b6bdfa9da0566f4c6062
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/material/CachedMaterialIntProperty.java b/src/main/java/org/fiddlemc/fiddle/material/CachedMaterialIntProperty.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..e8dbccc44dfa82139c42d3816ae683f9fcb7b5e5
+index 0000000000000000000000000000000000000000..b7ccdcc745cce5b4884a8ab8f2985a5c252a26f5
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/material/CachedMaterialIntProperty.java
 @@ -0,0 +1,47 @@
@@ -175,12 +175,12 @@ index 0000000000000000000000000000000000000000..e8dbccc44dfa82139c42d3816ae683f9
 + */
 +public class CachedMaterialIntProperty {
 +
-+    protected final @NotNull ToIntFunction<@NotNull Material> propertyFunction;
++    protected final ToIntFunction<@NotNull Material> propertyFunction;
 +
 +    protected int @Nullable [] cache;
 +    protected boolean areLegacyValuesCached = false;
 +
-+    public CachedMaterialIntProperty(@NotNull ToIntFunction<@NotNull Material> propertyFunction) {
++    public CachedMaterialIntProperty(ToIntFunction<@NotNull Material> propertyFunction) {
 +        this.propertyFunction = propertyFunction;
 +    }
 +
@@ -209,7 +209,7 @@ index 0000000000000000000000000000000000000000..e8dbccc44dfa82139c42d3816ae683f9
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/material/CachedMaterialProperty.java b/src/main/java/org/fiddlemc/fiddle/material/CachedMaterialProperty.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..1380242bc51dd79dc37de3cbe029b3cb4fb706f4
+index 0000000000000000000000000000000000000000..5b837f1ce73f747b768bafe60ab914adbd90ca91
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/material/CachedMaterialProperty.java
 @@ -0,0 +1,70 @@
@@ -248,13 +248,13 @@ index 0000000000000000000000000000000000000000..1380242bc51dd79dc37de3cbe029b3cb
 +        return cachedMaterialValues;
 +    }
 +
-+    protected final @NotNull IntFunction<T @NotNull []> arrayConstructor;
-+    protected final @NotNull Function<@NotNull Material, T> propertyFunction;
++    protected final IntFunction<T @NotNull []> arrayConstructor;
++    protected final Function<@NotNull Material, T> propertyFunction;
 +
 +    protected T @Nullable [] cache;
 +    protected boolean areLegacyValuesCached = false;
 +
-+    public CachedMaterialProperty(@NotNull IntFunction<T @NotNull []> arrayConstructor, @NotNull Function<@NotNull Material, @UnknownNullability T> propertyFunction) {
++    public CachedMaterialProperty(IntFunction<T @NotNull []> arrayConstructor, Function<@NotNull Material, @UnknownNullability T> propertyFunction) {
 +        this.arrayConstructor = arrayConstructor;
 +        this.propertyFunction = propertyFunction;
 +    }
@@ -285,7 +285,7 @@ index 0000000000000000000000000000000000000000..1380242bc51dd79dc37de3cbe029b3cb
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/material/CachedMaterialShortProperty.java b/src/main/java/org/fiddlemc/fiddle/material/CachedMaterialShortProperty.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..5c989107230a115f7b596e8972e211f444988261
+index 0000000000000000000000000000000000000000..ff1bb95eb930ee4b4e2714ac41c29834d2d72dea
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/material/CachedMaterialShortProperty.java
 @@ -0,0 +1,64 @@
@@ -321,12 +321,12 @@ index 0000000000000000000000000000000000000000..5c989107230a115f7b596e8972e211f4
 +
 +    }
 +
-+    protected final @NotNull ToShortFunction<@NotNull Material> propertyFunction;
++    protected final ToShortFunction<@NotNull Material> propertyFunction;
 +
 +    protected short @Nullable [] cache;
 +    protected boolean areLegacyValuesCached = false;
 +
-+    public CachedMaterialShortProperty(@NotNull ToShortFunction<@NotNull Material> propertyFunction) {
++    public CachedMaterialShortProperty(ToShortFunction<@NotNull Material> propertyFunction) {
 +        this.propertyFunction = propertyFunction;
 +    }
 +
@@ -355,10 +355,10 @@ index 0000000000000000000000000000000000000000..5c989107230a115f7b596e8972e211f4
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java b/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..d1ca826aa4081ce7766c5ad705a3e772c2683860
+index 0000000000000000000000000000000000000000..179217e5e57ff2c9e0a7528a21b5e4e8efcd4ebe
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
-@@ -0,0 +1,20 @@
+@@ -0,0 +1,24 @@
 +// Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - utilities
 +
 +package org.fiddlemc.fiddle.material;
@@ -366,12 +366,16 @@ index 0000000000000000000000000000000000000000..d1ca826aa4081ce7766c5ad705a3e772
 +import org.bukkit.Material;
 +
 +/**
-+ * This class provides a number of default implementations for {@link Material} that
-+ * must be available in the API module for unit tests.
++ * Do not use for any reason.
++ * This class is for internal purposes only.
++ * <p>
++ *     This class provides a number of default implementations for {@link Material} that
++ *     must be available in the API module for unit tests.
++ * </p>
 + *
-+ * @deprecated Do not use: for internal use only.
++ * @apiNote Internal Use Only
 + */
-+@Deprecated(forRemoval = true)
++@org.jetbrains.annotations.ApiStatus.Internal
 +public final class MaterialDefaultImplementations {
 +
 +    private MaterialDefaultImplementations() {

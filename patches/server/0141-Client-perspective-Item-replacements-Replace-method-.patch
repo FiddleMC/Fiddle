@@ -54,33 +54,25 @@ index ed87722957a0bd5f6348b91ac2ea9bb5ceb6d853..ee891342d8964f45117d11f52a4e7f69
      @Specific(Specific.To.NBT)
      static final ItemMetaKey ENCHANTMENTS_ID = new ItemMetaKey("id");
 diff --git a/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacer.java b/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacer.java
-index 1e49ee61c1143ab5a358becd18629d163c1ce3a9..9d63ee3de41cd6e7d142ada85f490ad5aea24d82 100644
+index 1a32ad9eee713cc0b334b6f9be79c05aaadd2cbe..25c6f1ff6b5f7a692820eaebf10fbab685c9cea7 100644
 --- a/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacer.java
 +++ b/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacer.java
-@@ -11,6 +11,7 @@ import net.minecraft.network.chat.MutableComponent;
- import net.minecraft.network.chat.contents.TranslatableContents;
- import net.minecraft.world.item.ItemStack;
- import org.fiddlemc.fiddle.packet.item.ItemStackInPacketContext;
-+import org.fiddlemc.fiddle.packet.item.ItemStackInPacketReplacer;
- import org.fiddlemc.fiddle.packet.locale.ServerSideTranslations;
- import org.jetbrains.annotations.NotNull;
- import org.jetbrains.annotations.Nullable;
-@@ -415,8 +416,7 @@ public final class DeepReplacer {
+@@ -413,8 +413,7 @@ public final class DeepReplacer {
      }
  
-     public static @NotNull ItemStack replaceItemStack(@NotNull ItemStack value, @NotNull ItemStackInPacketContext itemStackInPacketContext, @NotNull ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, @NotNull DeepReplacementScope replacementScope) {
+     public static ItemStack replaceItemStack(ItemStack value, ItemStackInPacketContext itemStackInPacketContext, ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, DeepReplacementScope replacementScope) {
 -        // TODO call implementation
 -        return value;
-+        return ItemStackInPacketReplacer.replace(value, itemStackInPacketContext, clientPerspectiveAndSettings, replacementScope); // Fiddle - client perspective - item replacements
++        return org.fiddlemc.fiddle.packet.item.ItemStackInPacketReplacer.replace(value, itemStackInPacketContext, clientPerspectiveAndSettings, replacementScope); // Fiddle - client perspective - item replacements
      }
  
      /**
 diff --git a/src/main/java/org/fiddlemc/fiddle/packet/item/ItemInPacketReplacer.java b/src/main/java/org/fiddlemc/fiddle/packet/item/ItemInPacketReplacer.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..07da600ae35b5844a74ec6270d7b8eb01d5cddee
+index 0000000000000000000000000000000000000000..9c7162be75b5d07a203a5304c46eb435044c187a
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/packet/item/ItemInPacketReplacer.java
-@@ -0,0 +1,89 @@
+@@ -0,0 +1,88 @@
 +// Fiddle - client perspective - item replacements
 +
 +package org.fiddlemc.fiddle.packet.item;
@@ -88,7 +80,6 @@ index 0000000000000000000000000000000000000000..07da600ae35b5844a74ec6270d7b8eb0
 +import net.minecraft.world.item.Item;
 +import net.minecraft.world.item.ItemStack;
 +import org.fiddlemc.fiddle.packet.ClientPerspective;
-+import org.jetbrains.annotations.NotNull;
 +import org.jetbrains.annotations.Nullable;
 +
 +/**
@@ -106,7 +97,7 @@ index 0000000000000000000000000000000000000000..07da600ae35b5844a74ec6270d7b8eb0
 +     * that returns a value if it is always definitely the same for any {@link ClientPerspective},
 +     * but returns null if they may be different.
 +     */
-+    public static @Nullable Item replace(@NotNull Item original, @NotNull ItemInPacketContext context) {
++    public static @Nullable Item replace(Item original, ItemInPacketContext context) {
 +        return replaceInternal(original, null, null, context);
 +    }
 +
@@ -115,7 +106,7 @@ index 0000000000000000000000000000000000000000..07da600ae35b5844a74ec6270d7b8eb0
 +     * This is intended for scenarios in which an {@link Item} is sent, but not an {@link ItemStack}
 +     * (for example, the type of record that is playing in a jukebox).
 +     */
-+    public static @NotNull Item replace(@NotNull Item original, @NotNull ClientPerspective clientPerspective, @NotNull ItemInPacketContext context) {
++    public static Item replace(Item original, ClientPerspective clientPerspective, ItemInPacketContext context) {
 +        return replaceInternal(original, null, clientPerspective, context);
 +    }
 +
@@ -124,7 +115,7 @@ index 0000000000000000000000000000000000000000..07da600ae35b5844a74ec6270d7b8eb0
 +     * that returns the {@link Item} that is more specific, for a given {@link ItemStack},
 +     * for cases in which that makes a difference.
 +     */
-+    public static @Nullable Item replace(@NotNull ItemStack original, @NotNull ItemInPacketContext context) {
++    public static @Nullable Item replace(ItemStack original, ItemInPacketContext context) {
 +        return replaceInternal(null, original, null, context);
 +    }
 +
@@ -133,14 +124,14 @@ index 0000000000000000000000000000000000000000..07da600ae35b5844a74ec6270d7b8eb0
 +     * that returns the {@link Item} that is more specific, for a given {@link ItemStack},
 +     * for cases in which that makes a difference.
 +     */
-+    public static @NotNull Item replace(@NotNull ItemStack original, @NotNull ClientPerspective clientPerspective, @NotNull ItemInPacketContext context) {
++    public static Item replace(ItemStack original, ClientPerspective clientPerspective, ItemInPacketContext context) {
 +        return replaceInternal(null, original, clientPerspective, context);
 +    }
 +
 +    /**
 +     * The internal implementation of all other methods in this class.
 +     */
-+    private static @Nullable Item replaceInternal(@Nullable Item original, @Nullable ItemStack originalStack, @Nullable ClientPerspective clientPerspective, @NotNull ItemInPacketContext context) {
++    private static @Nullable Item replaceInternal(@Nullable Item original, @Nullable ItemStack originalStack, @Nullable ClientPerspective clientPerspective, ItemInPacketContext context) {
 +        var item = original != null ? original : originalStack.getItem();
 +        switch (context) {
 +            default -> {
@@ -172,10 +163,10 @@ index 0000000000000000000000000000000000000000..07da600ae35b5844a74ec6270d7b8eb0
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/packet/item/ItemStackInPacketReplacer.java b/src/main/java/org/fiddlemc/fiddle/packet/item/ItemStackInPacketReplacer.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..ee483678e2ca3a88e9bff6f2e80bfc7e87b03b6f
+index 0000000000000000000000000000000000000000..34159926feeff887cf6baddafbf2845111abaaf1
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/packet/item/ItemStackInPacketReplacer.java
-@@ -0,0 +1,160 @@
+@@ -0,0 +1,159 @@
 +// Fiddle - client perspective - item replacements
 +
 +package org.fiddlemc.fiddle.packet.item;
@@ -194,7 +185,6 @@ index 0000000000000000000000000000000000000000..ee483678e2ca3a88e9bff6f2e80bfc7e
 +import org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope;
 +import org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacer;
 +import org.fiddlemc.fiddle.packet.locale.ServerSideTranslations;
-+import org.jetbrains.annotations.NotNull;
 +import org.jetbrains.annotations.Nullable;
 +
 +/**
@@ -219,7 +209,7 @@ index 0000000000000000000000000000000000000000..ee483678e2ca3a88e9bff6f2e80bfc7e
 +     * </ul>
 +     * i.e. the given {@link ItemStack} is not modified in-place.
 +     */
-+    public static @NotNull ItemStack replace(@NotNull ItemStack original, @NotNull ItemStackInPacketContext context, @NotNull ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, @NotNull DeepReplacementScope replacementScope) {
++    public static ItemStack replace(ItemStack original, ItemStackInPacketContext context, ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, DeepReplacementScope replacementScope) {
 +
 +        // Skip if we have no replacements to make
 +        if (!replacementScope.canMakeAnyReplacements()) {

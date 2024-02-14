@@ -12,10 +12,10 @@ Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/fiddlemc/fiddle/packet/block/BlockStateVisualizationSetupper.java b/src/main/java/org/fiddlemc/fiddle/packet/block/BlockStateVisualizationSetupper.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..c6462ca14bc888a964ba6a3a684e8cc18de1e30e
+index 0000000000000000000000000000000000000000..2e15750d5798ef0b7cfc4cccf0590da4a184679a
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/packet/block/BlockStateVisualizationSetupper.java
-@@ -0,0 +1,308 @@
+@@ -0,0 +1,307 @@
 +// Fiddle - client perspective - block state visualization - setupper
 +
 +package org.fiddlemc.fiddle.packet.block;
@@ -26,7 +26,6 @@ index 0000000000000000000000000000000000000000..c6462ca14bc888a964ba6a3a684e8cc1
 +import net.minecraft.world.level.block.state.BlockState;
 +import org.bukkit.entity.Player;
 +import org.fiddlemc.fiddle.packet.ClientPerspective;
-+import org.jetbrains.annotations.NotNull;
 +import org.jetbrains.annotations.Nullable;
 +
 +/**
@@ -68,8 +67,8 @@ index 0000000000000000000000000000000000000000..c6462ca14bc888a964ba6a3a684e8cc1
 +     * @see #setUp(BlockState, BlockStateVisualizationPurpose)
 +     */
 +    @Nullable Boolean preCheckWhetherDefinitelyHasNoVisualizationDifferentThanItself(
-+        @NotNull BlockState actual,
-+        @NotNull BlockStateVisualizationPurpose purpose
++        BlockState actual,
++        BlockStateVisualizationPurpose purpose
 +    );
 +
 +    /**
@@ -89,10 +88,10 @@ index 0000000000000000000000000000000000000000..c6462ca14bc888a964ba6a3a684e8cc1
 +     * @see #setUp(BlockState, ServerPlayer, ClientPerspective, BlockStateVisualizationPurpose)
 +     */
 +    default @Nullable Boolean preCheckWhetherDefinitelyHasNoVisualizationDifferentThanItself(
-+        @NotNull BlockState actual,
-+        @NotNull ServerPlayer player,
-+        @NotNull ClientPerspective clientPerspective,
-+        @NotNull BlockStateVisualizationPurpose purpose
++        BlockState actual,
++        ServerPlayer player,
++        ClientPerspective clientPerspective,
++        BlockStateVisualizationPurpose purpose
 +    ) {
 +        return this.preCheckWhetherDefinitelyHasNoVisualizationDifferentThanItself(
 +            actual,
@@ -117,11 +116,11 @@ index 0000000000000000000000000000000000000000..c6462ca14bc888a964ba6a3a684e8cc1
 +     * @see #setUp(ServerLevel, BlockState, ServerPlayer, ClientPerspective, BlockStateVisualizationPurpose)
 +     */
 +    default @Nullable Boolean preCheckWhetherDefinitelyHasNoVisualizationDifferentThanItself(
-+        @NotNull ServerLevel level,
-+        @NotNull BlockState actual,
-+        @NotNull ServerPlayer player,
-+        @NotNull ClientPerspective clientPerspective,
-+        @NotNull BlockStateVisualizationPurpose purpose
++        ServerLevel level,
++        BlockState actual,
++        ServerPlayer player,
++        ClientPerspective clientPerspective,
++        BlockStateVisualizationPurpose purpose
 +    ) {
 +        return this.preCheckWhetherDefinitelyHasNoVisualizationDifferentThanItself(
 +            actual,
@@ -142,14 +141,14 @@ index 0000000000000000000000000000000000000000..c6462ca14bc888a964ba6a3a684e8cc1
 +     * (i.e. because there in fact will certainly be).
 +     */
 +    default boolean preCheckWhetherDefinitelyHasNoVisualizationDifferentThanItself(
-+        @NotNull ServerLevel level,
++        ServerLevel level,
 +        int x,
 +        int y,
 +        int z,
-+        @NotNull BlockState actual,
-+        @NotNull ServerPlayer player,
-+        @NotNull ClientPerspective clientPerspective,
-+        @NotNull BlockStateVisualizationPurpose purpose
++        BlockState actual,
++        ServerPlayer player,
++        ClientPerspective clientPerspective,
++        BlockStateVisualizationPurpose purpose
 +    ) {
 +        return this.preCheckWhetherDefinitelyHasNoVisualizationDifferentThanItself(
 +            level,
@@ -171,8 +170,8 @@ index 0000000000000000000000000000000000000000..c6462ca14bc888a964ba6a3a684e8cc1
 +     * </p>
 +     */
 +    @Nullable BlockState setUp(
-+        @NotNull BlockState actual,
-+        @NotNull BlockStateVisualizationPurpose purpose
++        BlockState actual,
++        BlockStateVisualizationPurpose purpose
 +    );
 +
 +    /**
@@ -186,10 +185,10 @@ index 0000000000000000000000000000000000000000..c6462ca14bc888a964ba6a3a684e8cc1
 +     * </p>
 +     */
 +    default @Nullable BlockState setUp(
-+        @NotNull BlockState actual,
-+        @NotNull ServerPlayer player,
-+        @NotNull ClientPerspective clientPerspective,
-+        @NotNull BlockStateVisualizationPurpose purpose
++        BlockState actual,
++        ServerPlayer player,
++        ClientPerspective clientPerspective,
++        BlockStateVisualizationPurpose purpose
 +    ) {
 +        return this.setUp(
 +            actual,
@@ -217,11 +216,11 @@ index 0000000000000000000000000000000000000000..c6462ca14bc888a964ba6a3a684e8cc1
 +     * </p>
 +     */
 +    default @Nullable BlockState setUp(
-+        @NotNull ServerLevel level,
-+        @NotNull BlockState actual,
-+        @NotNull ServerPlayer player,
-+        @NotNull ClientPerspective clientPerspective,
-+        @NotNull BlockStateVisualizationPurpose purpose
++        ServerLevel level,
++        BlockState actual,
++        ServerPlayer player,
++        ClientPerspective clientPerspective,
++        BlockStateVisualizationPurpose purpose
 +    ) {
 +        return this.setUp(
 +            actual,
@@ -288,15 +287,15 @@ index 0000000000000000000000000000000000000000..c6462ca14bc888a964ba6a3a684e8cc1
 +     *
 +     * @return The {@link BlockState} to send to the client as part of the packet that caused this visualization.
 +     */
-+    default @NotNull BlockState setUp(
-+        @NotNull ServerLevel level,
++    default BlockState setUp(
++        ServerLevel level,
 +        int x,
 +        int y,
 +        int z,
-+        @NotNull BlockState actual,
-+        @NotNull ServerPlayer player,
-+        @NotNull ClientPerspective clientPerspective,
-+        @NotNull BlockStateVisualizationPurpose purpose
++        BlockState actual,
++        ServerPlayer player,
++        ClientPerspective clientPerspective,
++        BlockStateVisualizationPurpose purpose
 +    ) {
 +        return this.setUp(
 +            level,
@@ -326,10 +325,10 @@ index 0000000000000000000000000000000000000000..c6462ca14bc888a964ba6a3a684e8cc1
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/packet/block/OnePerCategoryBlockStateVisualizationSetupper.java b/src/main/java/org/fiddlemc/fiddle/packet/block/OnePerCategoryBlockStateVisualizationSetupper.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..af54bdc2ee6194a736950c22c38b53a97c040900
+index 0000000000000000000000000000000000000000..2b9fe6ea436d698bf5b8f420cb1302b5ec37b144
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/packet/block/OnePerCategoryBlockStateVisualizationSetupper.java
-@@ -0,0 +1,150 @@
+@@ -0,0 +1,149 @@
 +// Fiddle - client perspective - block state visualization - setupper - basic implementations
 +
 +package org.fiddlemc.fiddle.packet.block;
@@ -356,64 +355,63 @@ index 0000000000000000000000000000000000000000..af54bdc2ee6194a736950c22c38b53a9
 +    /**
 +     * The replacement {@link BlockState}s, indexed by the corresponding {@link ClientPerspectiveCategory#ordinal()}.
 +     */
-+    private final @NotNull BlockState @NotNull[] replacements;
++    private final @NotNull BlockState @NotNull [] replacements;
 +
-+    public OnePerCategoryBlockStateVisualizationSetupper(@NotNull BlockState @NotNull[] replacements) {
++    public OnePerCategoryBlockStateVisualizationSetupper(@NotNull BlockState @NotNull [] replacements) {
 +        this.replacements = replacements;
 +    }
 +
 +    /**
 +     * Convenience constructor.
 +     */
-+    public OnePerCategoryBlockStateVisualizationSetupper(@NotNull Function<@NotNull ClientPerspectiveCategory, @NotNull BlockState> replacementFunction) {
++    public OnePerCategoryBlockStateVisualizationSetupper(Function<@NotNull ClientPerspectiveCategory, @NotNull BlockState> replacementFunction) {
 +        this(Arrays.stream(ClientPerspectiveCategory.values()).map(replacementFunction).toArray(BlockState[]::new));
 +    }
 +
 +    /**
 +     * Always return false;
 +     * <br>
-+     * Could theoretically be true if all the possible replacements equal the given actual {@link BlockState},
-+     * but in that case {@link BlockState#visualizationSetupper} should be set to null instead of to this setupper.
++     * Could theoretically be true if all the possible replacements equal the given actual {@link BlockState}.
 +     */
 +    @Override
 +    public @NotNull Boolean preCheckWhetherDefinitelyHasNoVisualizationDifferentThanItself(
-+        @NotNull BlockState actual,
-+        @NotNull BlockStateVisualizationPurpose purpose
++        BlockState actual,
++        BlockStateVisualizationPurpose purpose
 +    ) {
 +        return false;
 +    }
 +
 +    @Override
 +    public @NotNull Boolean preCheckWhetherDefinitelyHasNoVisualizationDifferentThanItself(
-+        @NotNull BlockState actual,
-+        @NotNull ServerPlayer player,
-+        @NotNull ClientPerspective clientPerspective,
-+        @NotNull BlockStateVisualizationPurpose purpose
++        BlockState actual,
++        ServerPlayer player,
++        ClientPerspective clientPerspective,
++        BlockStateVisualizationPurpose purpose
 +    ) {
 +        return this.replacements[clientPerspective.category.ordinal()] == actual;
 +    }
 +
 +    @Override
 +    public @NotNull Boolean preCheckWhetherDefinitelyHasNoVisualizationDifferentThanItself(
-+        @NotNull ServerLevel level,
-+        @NotNull BlockState actual,
-+        @NotNull ServerPlayer player,
-+        @NotNull ClientPerspective clientPerspective,
-+        @NotNull BlockStateVisualizationPurpose purpose
++        ServerLevel level,
++        BlockState actual,
++        ServerPlayer player,
++        ClientPerspective clientPerspective,
++        BlockStateVisualizationPurpose purpose
 +    ) {
 +        return this.replacements[clientPerspective.category.ordinal()] == actual;
 +    }
 +
 +    @Override
 +    public boolean preCheckWhetherDefinitelyHasNoVisualizationDifferentThanItself(
-+        @NotNull ServerLevel level,
++        ServerLevel level,
 +        int x,
 +        int y,
 +        int z,
-+        @NotNull BlockState actual,
-+        @NotNull ServerPlayer player,
-+        @NotNull ClientPerspective clientPerspective,
-+        @NotNull BlockStateVisualizationPurpose purpose
++        BlockState actual,
++        ServerPlayer player,
++        ClientPerspective clientPerspective,
++        BlockStateVisualizationPurpose purpose
 +    ) {
 +        return this.replacements[clientPerspective.category.ordinal()] == actual;
 +    }
@@ -423,43 +421,43 @@ index 0000000000000000000000000000000000000000..af54bdc2ee6194a736950c22c38b53a9
 +     */
 +    @Override
 +    public @Nullable BlockState setUp(
-+        @NotNull BlockState actual,
-+        @NotNull BlockStateVisualizationPurpose purpose
++        BlockState actual,
++        BlockStateVisualizationPurpose purpose
 +    ) {
 +        return null;
 +    }
 +
 +    @Override
 +    public @NotNull BlockState setUp(
-+        @NotNull BlockState actual,
-+        @NotNull ServerPlayer player,
-+        @NotNull ClientPerspective clientPerspective,
-+        @NotNull BlockStateVisualizationPurpose purpose
++        BlockState actual,
++        ServerPlayer player,
++        ClientPerspective clientPerspective,
++        BlockStateVisualizationPurpose purpose
 +    ) {
 +        return this.replacements[clientPerspective.category.ordinal()];
 +    }
 +
 +    @Override
 +    public @NotNull BlockState setUp(
-+        @NotNull ServerLevel level,
-+        @NotNull BlockState actual,
-+        @NotNull ServerPlayer player,
-+        @NotNull ClientPerspective clientPerspective,
-+        @NotNull BlockStateVisualizationPurpose purpose
++        ServerLevel level,
++        BlockState actual,
++        ServerPlayer player,
++        ClientPerspective clientPerspective,
++        BlockStateVisualizationPurpose purpose
 +    ) {
 +        return this.replacements[clientPerspective.category.ordinal()];
 +    }
 +
 +    @Override
 +    public @NotNull BlockState setUp(
-+        @NotNull ServerLevel level,
++        ServerLevel level,
 +        int x,
 +        int y,
 +        int z,
-+        @NotNull BlockState actual,
-+        @NotNull ServerPlayer player,
-+        @NotNull ClientPerspective clientPerspective,
-+        @NotNull BlockStateVisualizationPurpose purpose
++        BlockState actual,
++        ServerPlayer player,
++        ClientPerspective clientPerspective,
++        BlockStateVisualizationPurpose purpose
 +    ) {
 +        return this.replacements[clientPerspective.category.ordinal()];
 +    }

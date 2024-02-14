@@ -9,7 +9,7 @@ Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/ClientPerspectiveAndSettingsSupplier.java b/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/ClientPerspectiveAndSettingsSupplier.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..edd32378b38feb1934da03936000cea6ae9e8daf
+index 0000000000000000000000000000000000000000..36791d0783e812f57c1a81670f7058e2488bef5c
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/ClientPerspectiveAndSettingsSupplier.java
 @@ -0,0 +1,184 @@
@@ -44,7 +44,7 @@ index 0000000000000000000000000000000000000000..edd32378b38feb1934da03936000cea6
 +     * This may throw an exception when the client perspective can not be queried (for example because no
 +     * client has been associated with the current context, such as a {@link FriendlyByteBuf}).
 +     */
-+    @NotNull ClientPerspective getPerspective();
++    ClientPerspective getPerspective();
 +
 +    /**
 +     * @return The {@link ClientPerspective} of the client.
@@ -54,7 +54,7 @@ index 0000000000000000000000000000000000000000..edd32378b38feb1934da03936000cea6
 +    @Nullable ClientPerspective getPerspectiveOrNull();
 +
 +    /**
-+     * @return The {@link ServerPlayer#locale} set by the client.
++     * @return The {@link ServerPlayer#language} set by the client.
 +     * This may be null if the client has no known locale.
 +     * This may throw an exception when the locale can not be queried (for example because no
 +     * client has been associated with the current context, such as a {@link FriendlyByteBuf}).
@@ -68,20 +68,20 @@ index 0000000000000000000000000000000000000000..edd32378b38feb1934da03936000cea6
 +     * This may throw an exception when the game mode can not be queried (for example because no
 +     * client has been associated with the current context, such as a {@link FriendlyByteBuf}).
 +     */
-+    @NotNull GameType getGameMode();
++    GameType getGameMode();
 +
 +    /**
 +     * @return A {@link ClientPerspectiveAndSettingsSupplier} that lazily retrieves its values
 +     * from the given {@link FriendlyByteBuf}.
 +     */
-+    static ClientPerspectiveAndSettingsSupplier forFriendlyByteBuf(@NotNull FriendlyByteBuf friendlyByteBuf) {
++    static ClientPerspectiveAndSettingsSupplier forFriendlyByteBuf(FriendlyByteBuf friendlyByteBuf) {
 +        return new ClientPerspectiveAndSettingsSupplierForFriendlyByteBuf(friendlyByteBuf);
 +    }
 +
 +    /**
 +     * @return A {@link ClientPerspectiveAndSettingsSupplier} that always provides the given values.
 +     */
-+    static ClientPerspectiveAndSettingsSupplier forValues(@NotNull ClientPerspective targetClientPerspective, @Nullable String targetClientLocale, @NotNull GameType gameMode) {
++    static ClientPerspectiveAndSettingsSupplier forValues(ClientPerspective targetClientPerspective, @Nullable String targetClientLocale, GameType gameMode) {
 +        return new ClientPerspectiveAndSettingsSupplierForValues(targetClientPerspective, targetClientLocale, gameMode);
 +    }
 +
@@ -92,7 +92,7 @@ index 0000000000000000000000000000000000000000..edd32378b38feb1934da03936000cea6
 +    ClientPerspectiveAndSettingsSupplier ALWAYS_THROWS_EXCEPTION = new ClientPerspectiveAndSettingsSupplier() {
 +
 +        @Override
-+        public @NotNull ClientPerspective getPerspective() {
++        public ClientPerspective getPerspective() {
 +            throw new UnsupportedOperationException("Cannot call #getPerspective() on ClientPerspectiveAndSettingsSupplier.ALWAYS_THROWS_EXCEPTION");
 +        }
 +
@@ -107,7 +107,7 @@ index 0000000000000000000000000000000000000000..edd32378b38feb1934da03936000cea6
 +        }
 +
 +        @Override
-+        public @NotNull GameType getGameMode() {
++        public GameType getGameMode() {
 +            throw new UnsupportedOperationException("Cannot call #getGameMode() on ClientPerspectiveAndSettingsSupplier.ALWAYS_THROWS_EXCEPTION");
 +        }
 +
@@ -115,13 +115,13 @@ index 0000000000000000000000000000000000000000..edd32378b38feb1934da03936000cea6
 +
 +    class ClientPerspectiveAndSettingsSupplierForFriendlyByteBuf implements ClientPerspectiveAndSettingsSupplier {
 +
-+        private final @NotNull WeakReference<FriendlyByteBuf> friendlyByteBuf;
++        private final WeakReference<FriendlyByteBuf> friendlyByteBuf;
 +        private boolean isNotCached = true;
 +        private @Nullable ClientPerspective perspective;
 +        private @Nullable String locale;
 +        private @Nullable GameType gameMode;
 +
-+        private ClientPerspectiveAndSettingsSupplierForFriendlyByteBuf(@NotNull FriendlyByteBuf friendlyByteBuf) {
++        private ClientPerspectiveAndSettingsSupplierForFriendlyByteBuf(FriendlyByteBuf friendlyByteBuf) {
 +            this.friendlyByteBuf = new WeakReference<>(friendlyByteBuf);
 +        }
 +
@@ -135,7 +135,7 @@ index 0000000000000000000000000000000000000000..edd32378b38feb1934da03936000cea6
 +        }
 +
 +        @Override
-+        public @NotNull ClientPerspective getPerspective() {
++        public ClientPerspective getPerspective() {
 +            this.cacheIfNecessary();
 +            return this.perspective;
 +        }
@@ -155,7 +155,7 @@ index 0000000000000000000000000000000000000000..edd32378b38feb1934da03936000cea6
 +        }
 +
 +        @Override
-+        public @NotNull GameType getGameMode() {
++        public GameType getGameMode() {
 +            this.cacheIfNecessary();
 +            return this.gameMode;
 +        }
@@ -164,18 +164,18 @@ index 0000000000000000000000000000000000000000..edd32378b38feb1934da03936000cea6
 +
 +    class ClientPerspectiveAndSettingsSupplierForValues implements ClientPerspectiveAndSettingsSupplier {
 +
-+        private final @NotNull ClientPerspective perspective;
++        private final ClientPerspective perspective;
 +        private final @Nullable String locale;
-+        private final @NotNull GameType gameMode;
++        private final GameType gameMode;
 +
-+        private ClientPerspectiveAndSettingsSupplierForValues(@NotNull ClientPerspective perspective, @Nullable String locale, @NotNull GameType gameMode) {
++        private ClientPerspectiveAndSettingsSupplierForValues(ClientPerspective perspective, @Nullable String locale, GameType gameMode) {
 +            this.perspective = perspective;
 +            this.locale = locale;
 +            this.gameMode = gameMode;
 +        }
 +
 +        @Override
-+        public @NotNull ClientPerspective getPerspective() {
++        public ClientPerspective getPerspective() {
 +            return this.perspective;
 +        }
 +
@@ -190,7 +190,7 @@ index 0000000000000000000000000000000000000000..edd32378b38feb1934da03936000cea6
 +        }
 +
 +        @Override
-+        public @NotNull GameType getGameMode() {
++        public GameType getGameMode() {
 +            return this.gameMode;
 +        }
 +

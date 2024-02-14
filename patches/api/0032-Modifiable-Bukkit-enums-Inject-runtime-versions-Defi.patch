@@ -12,10 +12,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index f57161873323ba301e6090ec54dd7c05de19b95f..0a50b200c15d929966d407d734294f39adbf0107 100644
+index 2188f12407bb299bcef22c84e33cb27149066cdd..d9d47a1d63101ab701960e109ca38f6b28dbe6fa 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -5030,7 +5030,7 @@ public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiab
+@@ -5055,7 +5055,7 @@ public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial {
       * <ol>
       *     <li>The {@linkplain #getKey() namespaced key}, for example: <code>"minecraft:stone_bricks"</code> or <code>"masonry:tuff_bricks"</code></li>
       *     <li>The namespaced key path (part behind the : in a namespaced key), for example: <code>"stone_bricks"</code> or <code>"tuff_bricks"</code></li>
@@ -26,15 +26,13 @@ index f57161873323ba301e6090ec54dd7c05de19b95f..0a50b200c15d929966d407d734294f39
       * then case-sensitively against the namespaced key path, and so on.
 diff --git a/src/main/java/org/fiddlemc/fiddle/material/FiddleEnumNamePrefix.java b/src/main/java/org/fiddlemc/fiddle/material/FiddleEnumNamePrefix.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..1e63f41826c8e3020196c739c191b07f99b5e733
+index 0000000000000000000000000000000000000000..c2c19b7f657061878b5ecd66d3bc185c6d74fb23
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/material/FiddleEnumNamePrefix.java
-@@ -0,0 +1,18 @@
+@@ -0,0 +1,16 @@
 +// Fiddle - modifiable Bukkit enums - inject runtime versions - define Fiddle enum name prefix
 +
 +package org.fiddlemc.fiddle.material;
-+
-+import org.jetbrains.annotations.NotNull;
 +
 +/**
 + * A utility class solely for holding the {@link #PREFIX} value.
@@ -45,6 +43,6 @@ index 0000000000000000000000000000000000000000..1e63f41826c8e3020196c739c191b07f
 +        throw new RuntimeException();
 +    }
 +
-+    public static final @NotNull String PREFIX = "FIDDLE_";
++    public static final String PREFIX = "FIDDLE_";
 +
 +}

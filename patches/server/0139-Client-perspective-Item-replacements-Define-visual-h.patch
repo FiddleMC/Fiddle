@@ -14,7 +14,7 @@ Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/fiddlemc/fiddle/packet/item/ItemVisualHandle.java b/src/main/java/org/fiddlemc/fiddle/packet/item/ItemVisualHandle.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..66fe063d27288c94f9ed0f83223f7a3aa77023e9
+index 0000000000000000000000000000000000000000..b5ac338ffd4226176e6a225e8c1ba39313cd062c
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/packet/item/ItemVisualHandle.java
 @@ -0,0 +1,45 @@
@@ -60,22 +60,21 @@ index 0000000000000000000000000000000000000000..66fe063d27288c94f9ed0f83223f7a3a
 +     * {@linkplain ClientPerspective client perspective} of the target of the packet containing that {@link ItemStack}.
 +     * This can be null to indicate no item type or custom model data replacements need to be performed.
 +     */
-+    @Nullable Pair<@NotNull Item, @NotNull Integer> getReplacementItemAndCustomModelData(@NotNull ClientPerspective clientPerspective, @NotNull ItemAndCustomModelDataReplacementMapping mapping);
++    @Nullable Pair<@NotNull Item, @NotNull Integer> getReplacementItemAndCustomModelData(ClientPerspective clientPerspective, ItemAndCustomModelDataReplacementMapping mapping);
 +
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/packet/item/ItemVisualHandleProvider.java b/src/main/java/org/fiddlemc/fiddle/packet/item/ItemVisualHandleProvider.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..aaaf1ae9396a4ab7268a701398aaed2a607bf708
+index 0000000000000000000000000000000000000000..3e3e2869e4eee85fecd51f15bd29d365ea0c8e4d
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/packet/item/ItemVisualHandleProvider.java
-@@ -0,0 +1,27 @@
+@@ -0,0 +1,26 @@
 +// Fiddle - client perspective - item replacements - visual handle
 +
 +package org.fiddlemc.fiddle.packet.item;
 +
 +import net.minecraft.world.item.Item;
 +import net.minecraft.world.item.ItemStack;
-+import org.jetbrains.annotations.NotNull;
 +import org.jetbrains.annotations.Nullable;
 +
 +/**
@@ -93,12 +92,12 @@ index 0000000000000000000000000000000000000000..aaaf1ae9396a4ab7268a701398aaed2a
 +     * @return The desired {@link ItemVisualHandle} for the given {@link ItemStack}, or null if the
 +     * {@link ItemStack} can be sent unmodified to all possible clients.
 +     */
-+    @Nullable ItemVisualHandle getDesiredVisualHandle(@NotNull ItemStack itemStack);
++    @Nullable ItemVisualHandle getDesiredVisualHandle(ItemStack itemStack);
 +
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/packet/item/VanillaItemOverrideItemVisualHandle.java b/src/main/java/org/fiddlemc/fiddle/packet/item/VanillaItemOverrideItemVisualHandle.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..d905e97dde2c38736a66931cf85d6cd54bfd0777
+index 0000000000000000000000000000000000000000..8825f8c78c6fe7156a92d7bf9d4b981579d2612e
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/packet/item/VanillaItemOverrideItemVisualHandle.java
 @@ -0,0 +1,48 @@
@@ -129,16 +128,16 @@ index 0000000000000000000000000000000000000000..d905e97dde2c38736a66931cf85d6cd5
 + */
 +public class VanillaItemOverrideItemVisualHandle implements ItemVisualHandle {
 +
-+    public final @NotNull Pair<@NotNull Item, @NotNull Integer> replacementForJavaWithEnabledResourcePackPerspective;
-+    public final @NotNull Pair<@NotNull Item, @NotNull Integer> fallbackReplacement;
++    public final Pair<@NotNull Item, @NotNull Integer> replacementForJavaWithEnabledResourcePackPerspective;
++    public final Pair<@NotNull Item, @NotNull Integer> fallbackReplacement;
 +
-+    public VanillaItemOverrideItemVisualHandle(@NotNull Item vanillaItem, int resourcePackTextureCustomModelData) {
++    public VanillaItemOverrideItemVisualHandle(Item vanillaItem, int resourcePackTextureCustomModelData) {
 +        this.replacementForJavaWithEnabledResourcePackPerspective = Pair.of(vanillaItem, resourcePackTextureCustomModelData);
 +        this.fallbackReplacement = Pair.of(vanillaItem, 0);
 +    }
 +
 +    @Override
-+    public @Nullable Pair<@NotNull Item, @NotNull Integer> getReplacementItemAndCustomModelData(@NotNull ClientPerspective clientPerspective, @NotNull ItemAndCustomModelDataReplacementMapping mapping) {
++    public @Nullable Pair<@NotNull Item, @NotNull Integer> getReplacementItemAndCustomModelData(ClientPerspective clientPerspective, ItemAndCustomModelDataReplacementMapping mapping) {
 +        if (mapping != ItemAndCustomModelDataReplacementMapping.DEFAULT) {
 +            throw new IllegalArgumentException("Cannot call " + this.getClass().getName() + ".getReplacementItemAndCustomModelData(...) with replacement mapping " + mapping);
 +        }

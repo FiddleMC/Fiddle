@@ -33,7 +33,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 241deb7f3b5e37d09c78048317428316be4406f0..069d08b170a8da432c7776aac8dea4699b5a9507 100644
+index 241deb7f3b5e37d09c78048317428316be4406f0..931a261fd1d0b630e127dddb4b6c2a902a264591 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
 @@ -4643,7 +4643,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
@@ -44,7 +44,7 @@ index 241deb7f3b5e37d09c78048317428316be4406f0..069d08b170a8da432c7776aac8dea469
  
      private Material(final int id) {
          this(id, 64);
-@@ -4878,1076 +4877,17 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4878,1076 +4877,20 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return true if this material is a block
       */
      public boolean isBlock() {
@@ -1122,16 +1122,19 @@ index 241deb7f3b5e37d09c78048317428316be4406f0..069d08b170a8da432c7776aac8dea469
 -        }
 +
 +    /**
-+     * @deprecated Do not use: this method is for internal testing purposes only.
++     * Do not use for any reason.
++     * This method is for internal testing purposes only.
++     *
++     * @apiNote Internal Use Only
 +     */
-+    @Deprecated(forRemoval = true)
++    @org.jetbrains.annotations.ApiStatus.Internal
 +    public boolean isBlockLegacy() {
 +        return org.fiddlemc.fiddle.material.MaterialDefaultImplementations.isBlockLegacy(this);
 +        // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
      }
  
      /**
-@@ -5956,49 +4896,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -5956,49 +4899,21 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return true if this Material is edible.
       */
      public boolean isEdible() {
@@ -1140,9 +1143,12 @@ index 241deb7f3b5e37d09c78048317428316be4406f0..069d08b170a8da432c7776aac8dea469
 +    }
 +
 +    /**
-+     * @deprecated Do not use: this method is for internal testing purposes only.
++     * Do not use for any reason.
++     * This method is for internal testing purposes only.
++     *
++     * @apiNote Internal Use Only
 +     */
-+    @Deprecated(forRemoval = true)
++    @org.jetbrains.annotations.ApiStatus.Internal
 +    public boolean isEdibleLegacy() {
          switch (this) {
 -            //<editor-fold defaultstate="collapsed" desc="isEdible">
@@ -1192,7 +1198,7 @@ index 241deb7f3b5e37d09c78048317428316be4406f0..069d08b170a8da432c7776aac8dea469
              case LEGACY_BREAD:
              case LEGACY_CARROT_ITEM:
              case LEGACY_BAKED_POTATO:
-@@ -6124,7 +5033,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -6124,7 +5039,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      static {
          for (Material material : values()) {
              BY_NAME.put(material.name(), material);
@@ -1200,7 +1206,7 @@ index 241deb7f3b5e37d09c78048317428316be4406f0..069d08b170a8da432c7776aac8dea469
          }
      }
  
-@@ -6132,29 +5040,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -6132,29 +5046,21 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material represents a playable music disk.
       */
      public boolean isRecord() {
@@ -1232,9 +1238,12 @@ index 241deb7f3b5e37d09c78048317428316be4406f0..069d08b170a8da432c7776aac8dea469
 +    }
 +
 +    /**
-+     * @deprecated Do not use: this method is for internal testing purposes only.
++     * Do not use for any reason.
++     * This method is for internal testing purposes only.
++     *
++     * @apiNote Internal Use Only
 +     */
-+    @Deprecated(forRemoval = true)
++    @org.jetbrains.annotations.ApiStatus.Internal
 +    public boolean isRecordLegacy() {
 +        int id = this.getId();
 +        return id >= LEGACY_GOLD_RECORD.getId() && id <= LEGACY_RECORD_12.getId();
@@ -1242,7 +1251,7 @@ index 241deb7f3b5e37d09c78048317428316be4406f0..069d08b170a8da432c7776aac8dea469
      }
  
      /**
-@@ -6163,845 +5060,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -6163,845 +5069,21 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material is a block and solid
       */
      public boolean isSolid() {
@@ -1254,9 +1263,12 @@ index 241deb7f3b5e37d09c78048317428316be4406f0..069d08b170a8da432c7776aac8dea469
 +    }
 +
 +    /**
-+     * @deprecated Do not use: this method is for internal testing purposes only.
++     * Do not use for any reason.
++     * This method is for internal testing purposes only.
++     *
++     * @apiNote Internal Use Only
 +     */
-+    @Deprecated(forRemoval = true)
++    @org.jetbrains.annotations.ApiStatus.Internal
 +    public boolean isSolidLegacy() {
          switch (this) {
 -            //<editor-fold defaultstate="collapsed" desc="isSolid">
@@ -2099,7 +2111,7 @@ index 241deb7f3b5e37d09c78048317428316be4406f0..069d08b170a8da432c7776aac8dea469
              case LEGACY_STONE:
              case LEGACY_GRASS:
              case LEGACY_DIRT:
-@@ -7214,18 +5284,17 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -7214,18 +5296,20 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material is an air block.
       */
      public boolean isAir() {
@@ -2120,16 +2132,19 @@ index 241deb7f3b5e37d09c78048317428316be4406f0..069d08b170a8da432c7776aac8dea469
 +    }
 +
 +    /**
-+     * @deprecated Do not use: this method is for internal testing purposes only.
++     * Do not use for any reason.
++     * This method is for internal testing purposes only.
++     *
++     * @apiNote Internal Use Only
 +     */
-+    @Deprecated(forRemoval = true)
++    @org.jetbrains.annotations.ApiStatus.Internal
 +    public boolean isAirLegacy() {
 +        return this == LEGACY_AIR;
 +        // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
      }
  
      /**
-@@ -7434,286 +5503,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -7434,286 +5518,21 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material is a block and can catch fire
       */
      public boolean isFlammable() {
@@ -2141,9 +2156,12 @@ index 241deb7f3b5e37d09c78048317428316be4406f0..069d08b170a8da432c7776aac8dea469
 +    }
 +
 +    /**
-+     * @deprecated Do not use: this method is for internal testing purposes only.
++     * Do not use for any reason.
++     * This method is for internal testing purposes only.
++     *
++     * @apiNote Internal Use Only
 +     */
-+    @Deprecated(forRemoval = true)
++    @org.jetbrains.annotations.ApiStatus.Internal
 +    public boolean isFlammableLegacy() {
          switch (this) {
 -            //<editor-fold defaultstate="collapsed" desc="isFlammable">
@@ -2427,7 +2445,7 @@ index 241deb7f3b5e37d09c78048317428316be4406f0..069d08b170a8da432c7776aac8dea469
              case LEGACY_WOOD:
              case LEGACY_LOG:
              case LEGACY_LEAVES:
-@@ -7782,186 +5583,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -7782,186 +5601,21 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material is a block and can burn away
       */
      public boolean isBurnable() {
@@ -2439,9 +2457,12 @@ index 241deb7f3b5e37d09c78048317428316be4406f0..069d08b170a8da432c7776aac8dea469
 +    }
 +
 +    /**
-+     * @deprecated Do not use: this method is for internal testing purposes only.
++     * Do not use for any reason.
++     * This method is for internal testing purposes only.
++     *
++     * @apiNote Internal Use Only
 +     */
-+    @Deprecated(forRemoval = true)
++    @org.jetbrains.annotations.ApiStatus.Internal
 +    public boolean isBurnableLegacy() {
          switch (this) {
 -            //<editor-fold defaultstate="collapsed" desc="isBurnable">
@@ -2625,7 +2646,7 @@ index 241deb7f3b5e37d09c78048317428316be4406f0..069d08b170a8da432c7776aac8dea469
              case LEGACY_WOOD:
              case LEGACY_LOG:
              case LEGACY_LEAVES:
-@@ -8012,257 +5645,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -8012,257 +5666,21 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return true if this Material can be used as fuel.
       */
      public boolean isFuel() {
@@ -2634,9 +2655,12 @@ index 241deb7f3b5e37d09c78048317428316be4406f0..069d08b170a8da432c7776aac8dea469
 +    }
 +
 +    /**
-+     * @deprecated Do not use: this method is for internal testing purposes only.
++     * Do not use for any reason.
++     * This method is for internal testing purposes only.
++     *
++     * @apiNote Internal Use Only
 +     */
-+    @Deprecated(forRemoval = true)
++    @org.jetbrains.annotations.ApiStatus.Internal
 +    public boolean isFuelLegacy() {
          switch (this) {
 -            //<editor-fold defaultstate="collapsed" desc="isFuel">
@@ -2894,7 +2918,7 @@ index 241deb7f3b5e37d09c78048317428316be4406f0..069d08b170a8da432c7776aac8dea469
              case LEGACY_LAVA_BUCKET:
              case LEGACY_COAL_BLOCK:
              case LEGACY_BLAZE_ROD:
-@@ -8353,382 +5747,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -8353,382 +5771,21 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material is a block and occludes light
       */
      public boolean isOccluding() {
@@ -2906,9 +2930,12 @@ index 241deb7f3b5e37d09c78048317428316be4406f0..069d08b170a8da432c7776aac8dea469
 +    }
 +
 +    /**
-+     * @deprecated Do not use: this method is for internal testing purposes only.
++     * Do not use for any reason.
++     * This method is for internal testing purposes only.
++     *
++     * @apiNote Internal Use Only
 +     */
-+    @Deprecated(forRemoval = true)
++    @org.jetbrains.annotations.ApiStatus.Internal
 +    public boolean isOccludingLegacy() {
          switch (this) {
 -            //<editor-fold defaultstate="collapsed" desc="isOccluding">
@@ -3288,7 +3315,7 @@ index 241deb7f3b5e37d09c78048317428316be4406f0..069d08b170a8da432c7776aac8dea469
              case LEGACY_STONE:
              case LEGACY_GRASS:
              case LEGACY_DIRT:
-@@ -8856,41 +5886,18 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -8856,41 +5913,21 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return True if this material is affected by gravity.
       */
      public boolean hasGravity() {
@@ -3300,9 +3327,12 @@ index 241deb7f3b5e37d09c78048317428316be4406f0..069d08b170a8da432c7776aac8dea469
 +    }
 +
 +    /**
-+     * @deprecated Do not use: this method is for internal testing purposes only.
++     * Do not use for any reason.
++     * This method is for internal testing purposes only.
++     *
++     * @apiNote Internal Use Only
 +     */
-+    @Deprecated(forRemoval = true)
++    @org.jetbrains.annotations.ApiStatus.Internal
 +    public boolean hasGravityLegacy() {
          switch (this) {
 -            //<editor-fold defaultstate="collapsed" desc="hasGravity">
@@ -3341,7 +3371,7 @@ index 241deb7f3b5e37d09c78048317428316be4406f0..069d08b170a8da432c7776aac8dea469
              case LEGACY_SAND:
              case LEGACY_GRAVEL:
              case LEGACY_DRAGON_EGG: // Fiddle - add missing Material values with gravity
-@@ -8909,213 +5916,17 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -8909,213 +5946,20 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return true if this material is an item
       */
      public boolean isItem() {
@@ -3557,16 +3587,19 @@ index 241deb7f3b5e37d09c78048317428316be4406f0..069d08b170a8da432c7776aac8dea469
 +    }
 +
 +    /**
-+     * @deprecated Do not use: this method is for internal testing purposes only.
++     * Do not use for any reason.
++     * This method is for internal testing purposes only.
++     *
++     * @apiNote Internal Use Only
 +     */
-+    @Deprecated(forRemoval = true)
++    @org.jetbrains.annotations.ApiStatus.Internal
 +    public boolean isItemLegacy() {
 +        return org.fiddlemc.fiddle.material.MaterialDefaultImplementations.isItemLegacy(this);
 +        // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
      }
  
      /**
-@@ -9139,296 +5950,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -9139,296 +5983,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       */
      @Deprecated // Paper
      public boolean isInteractable() {
@@ -3864,7 +3897,7 @@ index 241deb7f3b5e37d09c78048317428316be4406f0..069d08b170a8da432c7776aac8dea469
      }
  
      /**
-@@ -9441,941 +5963,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -9441,941 +5996,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return the hardness of that material.
       */
      public float getHardness() {
@@ -4807,7 +4840,7 @@ index 241deb7f3b5e37d09c78048317428316be4406f0..069d08b170a8da432c7776aac8dea469
      }
  
      /**
-@@ -10389,941 +5977,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -10389,941 +6010,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return the blast resistance of that material.
       */
      public float getBlastResistance() {
@@ -5750,7 +5783,7 @@ index 241deb7f3b5e37d09c78048317428316be4406f0..069d08b170a8da432c7776aac8dea469
      }
  
      /**
-@@ -11339,21 +5993,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -11339,21 +6026,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return the slipperiness of this block
       */
      public float getSlipperiness() {
@@ -5773,7 +5806,7 @@ index 241deb7f3b5e37d09c78048317428316be4406f0..069d08b170a8da432c7776aac8dea469
      }
  
      /**
-@@ -11366,20 +6006,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -11366,20 +6039,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       */
      @Nullable
      public Material getCraftingRemainingItem() {
@@ -5795,7 +5828,7 @@ index 241deb7f3b5e37d09c78048317428316be4406f0..069d08b170a8da432c7776aac8dea469
      }
  
      /**
-@@ -11391,53 +6018,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -11391,53 +6051,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       */
      @NotNull
      public EquipmentSlot getEquipmentSlot() {
@@ -5904,18 +5937,10 @@ index 39c2bf249ecd8e6702b472b8ddca9945c20d76ec..eacd1460facf86fc08acd050b84c1106
 +
  }
 diff --git a/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java b/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
-index d1ca826aa4081ce7766c5ad705a3e772c2683860..068ff2f4d8511bc4744e569a499df2617fd98e61 100644
+index 179217e5e57ff2c9e0a7528a21b5e4e8efcd4ebe..dd46f15c51747a06dee1302ec7f23f80d2c23826 100644
 --- a/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
 +++ b/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
-@@ -2,6 +2,7 @@
- 
- package org.fiddlemc.fiddle.material;
- 
-+import com.google.common.base.Preconditions;
- import org.bukkit.Material;
- 
- /**
-@@ -17,4 +18,85 @@ public final class MaterialDefaultImplementations {
+@@ -21,4 +21,85 @@ public final class MaterialDefaultImplementations {
          throw new RuntimeException();
      }
  
@@ -5925,7 +5950,7 @@ index d1ca826aa4081ce7766c5ad705a3e772c2683860..068ff2f4d8511bc4744e569a499df261
 +     * is not {@linkplain Material#isLegacy legacy}.
 +     */
 +    public static boolean isBlockLegacy(Material material) {
-+        Preconditions.checkArgument(material.isLegacy(), "Cannot call isBlockLegacy(Material) for Modern Material");
++        com.google.common.base.Preconditions.checkArgument(material.isLegacy(), "Cannot call isBlockLegacy(Material) for Modern Material");
 +        // Based on the original org.bukkit.Material#isBlock
 +        int id = material.getId();
 +        return 0 <= id && id < 256;
@@ -5936,7 +5961,7 @@ index d1ca826aa4081ce7766c5ad705a3e772c2683860..068ff2f4d8511bc4744e569a499df261
 +     * is not {@linkplain Material#isLegacy legacy}.
 +     */
 +    public static boolean isItemLegacy(Material material) {
-+        Preconditions.checkArgument(material.isLegacy(), "Cannot call isItemLegacy(Material) for Modern Material");
++        com.google.common.base.Preconditions.checkArgument(material.isLegacy(), "Cannot call isItemLegacy(Material) for Modern Material");
 +        // Based on the original org.bukkit.Material#isItem
 +        switch (material) {
 +            //<editor-fold defaultstate="collapsed" desc="isItemLegacy">
@@ -6002,35 +6027,27 @@ index d1ca826aa4081ce7766c5ad705a3e772c2683860..068ff2f4d8511bc4744e569a499df261
 +
  }
 diff --git a/src/test/java/org/bukkit/scoreboard/CriteriaTest.java b/src/test/java/org/bukkit/scoreboard/CriteriaTest.java
-index 034faf9a444455e2a047e46950e06f3af806b158..a45ad4e8cbe8cf6ca557fd17333ca8d91eaedbcf 100644
+index 034faf9a444455e2a047e46950e06f3af806b158..1957b05ba3c6b1b04abe806f52f3785aa4b66924 100644
 --- a/src/test/java/org/bukkit/scoreboard/CriteriaTest.java
 +++ b/src/test/java/org/bukkit/scoreboard/CriteriaTest.java
-@@ -6,17 +6,38 @@ import org.bukkit.Statistic;
- import org.bukkit.entity.EntityType;
- import org.bukkit.support.AbstractTestingBase;
- import org.junit.jupiter.api.Test;
-+import org.mockito.MockMakers;
-+
-+import static org.mockito.Mockito.*;
- 
- public class CriteriaTest extends AbstractTestingBase {
+@@ -11,12 +11,30 @@ public class CriteriaTest extends AbstractTestingBase {
  
      @Test
      public void testStatistic() {
 -        assertThrows(IllegalArgumentException.class, () -> Criteria.statistic(Statistic.AVIATE_ONE_CM, Material.STONE)); // Generic statistic with block
 +        // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
-+        var nonBlockEnumValue = mock(Material.class, withSettings().mockMaker(MockMakers.INLINE)); // Used to be Material.DIAMOND_SWORD
-+        when(nonBlockEnumValue.isItem()).thenReturn(true);
-+        when(nonBlockEnumValue.isBlock()).thenReturn(false);
-+        var nonItemEnumValue = mock(Material.class, withSettings().mockMaker(MockMakers.INLINE)); // Used to be Material.WATER
-+        when(nonItemEnumValue.isItem()).thenReturn(false);
-+        when(nonItemEnumValue.isBlock()).thenReturn(true);
-+        var nonEntityButItemEnumValue = mock(Material.class, withSettings().mockMaker(MockMakers.INLINE)); // Used to be Material.AMETHYST_SHARD
-+        when(nonEntityButItemEnumValue.isItem()).thenReturn(true);
-+        when(nonEntityButItemEnumValue.isBlock()).thenReturn(false);
-+        var nonEntityButBlockEnumValue = mock(Material.class, withSettings().mockMaker(MockMakers.INLINE)); // Used to be Material.STONE
-+        when(nonEntityButBlockEnumValue.isItem()).thenReturn(true);
-+        when(nonEntityButBlockEnumValue.isBlock()).thenReturn(true);
++        var nonBlockEnumValue = org.mockito.Mockito.mock(Material.class, org.mockito.Mockito.withSettings().mockMaker(org.mockito.MockMakers.INLINE)); // Used to be Material.DIAMOND_SWORD
++        org.mockito.Mockito.when(nonBlockEnumValue.isItem()).thenReturn(true);
++        org.mockito.Mockito.when(nonBlockEnumValue.isBlock()).thenReturn(false);
++        var nonItemEnumValue = org.mockito.Mockito.mock(Material.class, org.mockito.Mockito.withSettings().mockMaker(org.mockito.MockMakers.INLINE)); // Used to be Material.WATER
++        org.mockito.Mockito.when(nonItemEnumValue.isItem()).thenReturn(false);
++        org.mockito.Mockito.when(nonItemEnumValue.isBlock()).thenReturn(true);
++        var nonEntityButItemEnumValue = org.mockito.Mockito.mock(Material.class, org.mockito.Mockito.withSettings().mockMaker(org.mockito.MockMakers.INLINE)); // Used to be Material.AMETHYST_SHARD
++        org.mockito.Mockito.when(nonEntityButItemEnumValue.isItem()).thenReturn(true);
++        org.mockito.Mockito.when(nonEntityButItemEnumValue.isBlock()).thenReturn(false);
++        var nonEntityButBlockEnumValue = org.mockito.Mockito.mock(Material.class, org.mockito.Mockito.withSettings().mockMaker(org.mockito.MockMakers.INLINE)); // Used to be Material.STONE
++        org.mockito.Mockito.when(nonEntityButBlockEnumValue.isItem()).thenReturn(true);
++        org.mockito.Mockito.when(nonEntityButBlockEnumValue.isBlock()).thenReturn(true);
 +        var arbitraryMaterialValue = nonEntityButBlockEnumValue; // Used to be Material.STONE
 +
 +        assertThrows(IllegalArgumentException.class, () -> Criteria.statistic(Statistic.AVIATE_ONE_CM, arbitraryMaterialValue)); // Generic statistic with block

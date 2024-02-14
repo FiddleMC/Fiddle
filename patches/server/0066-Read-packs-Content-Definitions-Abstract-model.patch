@@ -13,18 +13,16 @@ Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/FiddleContentDefinition.java b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/FiddleContentDefinition.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..a0cdf3251318ca7187a4f952305bc5c239702bd4
+index 0000000000000000000000000000000000000000..9373ec657bc5848867af308b84b4817ff5fbb82b
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/FiddleContentDefinition.java
-@@ -0,0 +1,120 @@
+@@ -0,0 +1,118 @@
 +// Fiddle - read packs - content definitions - model
 +
 +package org.fiddlemc.fiddle.pack.read.fiddlecontent.definition;
 +
 +import net.minecraft.resources.ResourceLocation;
 +import net.minecraft.world.level.block.StairBlock;
-+import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.block.BlockDefinition;
-+import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.item.ItemDefinition;
 +import org.jetbrains.annotations.NotNull;
 +
 +import java.util.*;
@@ -92,7 +90,7 @@ index 0000000000000000000000000000000000000000..a0cdf3251318ca7187a4f952305bc5c2
 +     *
 +     * @throws IllegalArgumentException If there is a cyclic dependency in the given definitions.
 +     */
-+    public static <T extends FiddleContentDefinition> @NotNull List<@NotNull T> getSortedTopologicallyByReferences(@NotNull List<@NotNull T> definitions) {
++    public static <T extends FiddleContentDefinition> List<@NotNull T> getSortedTopologicallyByReferences(List<@NotNull T> definitions) {
 +        if (definitions.isEmpty()) {
 +            return Collections.emptyList();
 +        }

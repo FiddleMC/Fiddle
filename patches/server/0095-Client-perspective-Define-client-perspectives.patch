@@ -8,15 +8,13 @@ Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/fiddlemc/fiddle/packet/ClientPerspective.java b/src/main/java/org/fiddlemc/fiddle/packet/ClientPerspective.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..cf87eea90d072d246184b24a4614573164aa1e5a
+index 0000000000000000000000000000000000000000..b97f5798056d3083cb0ba2e11c55544cff9dde81
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/packet/ClientPerspective.java
-@@ -0,0 +1,85 @@
+@@ -0,0 +1,83 @@
 +// Fiddle - client perspective - definition
 +
 +package org.fiddlemc.fiddle.packet;
-+
-+import org.jetbrains.annotations.NotNull;
 +
 +/**
 + * This class represents the static circumstances under which a client (typically a player) observes the data sent.
@@ -50,7 +48,7 @@ index 0000000000000000000000000000000000000000..cf87eea90d072d246184b24a46145731
 +    /**
 +     * The {@linkplain ClientPerspectiveCategory category} of this perspective.
 +     */
-+    public final @NotNull ClientPerspectiveCategory category;
++    public final ClientPerspectiveCategory category;
 +
 +    /**
 +     * Whether a client with this perspective is aware of the server-side item and block types.
@@ -69,7 +67,7 @@ index 0000000000000000000000000000000000000000..cf87eea90d072d246184b24a46145731
 +     */
 +    public final boolean understandsServerSideTranslations;
 +
-+    public ClientPerspective(@NotNull ClientPerspectiveCategory category, boolean understandsServerSideItemsAndBlocks, boolean understandsServerSideTranslations) {
++    public ClientPerspective(ClientPerspectiveCategory category, boolean understandsServerSideItemsAndBlocks, boolean understandsServerSideTranslations) {
 +        this.category = category;
 +        this.understandsServerSideItemsAndBlocks = understandsServerSideItemsAndBlocks;
 +        this.understandsServerSideTranslations = understandsServerSideTranslations;
@@ -99,17 +97,16 @@ index 0000000000000000000000000000000000000000..cf87eea90d072d246184b24a46145731
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/packet/ClientPerspectiveCategory.java b/src/main/java/org/fiddlemc/fiddle/packet/ClientPerspectiveCategory.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..8084a6f08e436f4c1180e76c23fd1fc4a3034bae
+index 0000000000000000000000000000000000000000..a6d4aa773fa8eb33318faa8247f2e3c35e48af95
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/packet/ClientPerspectiveCategory.java
-@@ -0,0 +1,76 @@
+@@ -0,0 +1,75 @@
 +// Fiddle - client perspective - definition
 +
 +package org.fiddlemc.fiddle.packet;
 +
 +import net.minecraft.world.entity.Display;
 +import org.bukkit.inventory.meta.ItemMeta;
-+import org.jetbrains.annotations.NotNull;
 +
 +/**
 + * This enum represents a category of {@link ClientPerspective}s.
@@ -169,7 +166,7 @@ index 0000000000000000000000000000000000000000..8084a6f08e436f4c1180e76c23fd1fc4
 +     * The {@link ClientPerspective} in this category most likely to occur in practice.
 +     * This must always and only be set in the static initialization of this class.
 +     */
-+    public @NotNull ClientPerspective mostLikelyPerspective;
++    public ClientPerspective mostLikelyPerspective;
 +
 +    static {
 +        // Initialize the values of mostLikelyPerspective

@@ -14,24 +14,18 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/FiddleContentDefinitionType.java b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/FiddleContentDefinitionType.java
-index 98dc3ff82ce6592a4edb33ad00200de169d680bd..29d84189b48091f06ef23125049a3ed092b1cc45 100644
+index 98dc3ff82ce6592a4edb33ad00200de169d680bd..c0e2018cff3e603fa2a73a2e152e0087682a3553 100644
 --- a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/FiddleContentDefinitionType.java
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/FiddleContentDefinitionType.java
-@@ -3,6 +3,7 @@
- package org.fiddlemc.fiddle.pack.read.fiddlecontent.definition;
- 
- import net.minecraft.resources.ResourceLocation;
-+import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.block.BlockDefinition;
- 
- /**
-  * The type of content of a {@link FiddleContentDefinition}.
-@@ -12,12 +13,27 @@ public class FiddleContentDefinitionType<T extends FiddleContentDefinition> {
+@@ -12,12 +12,31 @@ public class FiddleContentDefinitionType<T extends FiddleContentDefinition> {
      /**
       * The name of the folder corresponding to this type of resource,
       * when it is in a namespace folder inside the <code>content</code> folder in a Fiddle pack.
 +     * <!-- // Fiddle start - read packs - blocks - model -->
 +     * <p>
-+     *     For example, for {@link BlockDefinition#TYPE} this is <code>blocks</code>,
++     *     For example, for
++     *     {@link org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.block.BlockDefinition#TYPE}
++     *     this is <code>blocks</code>,
 +     *     as block definitions are read from the
 +     *     <code>&lt;pack root&gt;/content/&lt;namespace&gt;/blocks</code> folder.
 +     * </p>
@@ -44,7 +38,9 @@ index 98dc3ff82ce6592a4edb33ad00200de169d680bd..29d84189b48091f06ef23125049a3ed0
       * <code>/</code> character.
 +     * <!-- // Fiddle start - read packs - blocks - model -->
 +     * <p>
-+     *     For example, for {@link BlockDefinition#TYPE} this is <code>block</code>,
++     *     For example, for
++     *     {@link org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.block.BlockDefinition#TYPE}
++     *     this is <code>block</code>,
 +     *     as a block with the untyped {@link ResourceLocation}
 +     *     <code>masonry:tuff_bricks</code> would have the typed {@link ResourceLocation}
 +     *     <code>masonry:block/tuff_bricks</code>.

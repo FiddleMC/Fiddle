@@ -12,7 +12,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index baa3c57f76491ffeecb676514e30cbe24c88009d..aec7d1f3246a0ea4c93b438a3dcfab3293c59f80 100644
+index cefb5d57a90958a42c80e3a33e238b8fa6f77aab..1c9f5c6e50faccb33cb896ee5b38ca67985d0e4a 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
 @@ -4642,7 +4642,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
@@ -42,38 +42,25 @@ index baa3c57f76491ffeecb676514e30cbe24c88009d..aec7d1f3246a0ea4c93b438a3dcfab32
  
      /**
 diff --git a/src/main/java/org/fiddlemc/fiddle/material/MaterialNameAndKeyConversion.java b/src/main/java/org/fiddlemc/fiddle/material/MaterialNameAndKeyConversion.java
-index db0b953c6aacd29817dcb0bd5069346ac7116b80..b600f06d62ea4b045590d72626d8029be82e89f2 100644
+index 472e6f94da1726e4fde1eda4035dd91a50453f7d..6573b10a9210a1598804a3da60542b10be993d67 100644
 --- a/src/main/java/org/fiddlemc/fiddle/material/MaterialNameAndKeyConversion.java
 +++ b/src/main/java/org/fiddlemc/fiddle/material/MaterialNameAndKeyConversion.java
-@@ -2,7 +2,12 @@
- 
- package org.fiddlemc.fiddle.material;
- 
-+import com.google.common.base.Preconditions;
- import org.bukkit.Material;
-+import org.bukkit.NamespacedKey;
-+import org.jetbrains.annotations.NotNull;
-+
-+import java.util.Locale;
- 
- /**
-  * This class provides a number of implementations for the conversion of names and keys
-@@ -17,4 +22,20 @@ public final class MaterialNameAndKeyConversion {
+@@ -21,4 +21,20 @@ public final class MaterialNameAndKeyConversion {
          throw new RuntimeException();
      }
  
 +    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - key
-+    private static final CachedMaterialProperty<NamespacedKey> keyCache = new CachedMaterialProperty<>(
-+        NamespacedKey[]::new,
++    private static final CachedMaterialProperty<org.bukkit.NamespacedKey> keyCache = new CachedMaterialProperty<>(
++        org.bukkit.NamespacedKey[]::new,
 +        // Based on the original org.bukkit.Material constructor
-+        material -> NamespacedKey.minecraft(material.name().toLowerCase(Locale.ROOT))
++        material -> org.bukkit.NamespacedKey.minecraft(material.name().toLowerCase(java.util.Locale.ROOT))
 +    );
 +
 +    /**
 +     * @throws IllegalArgumentException If the given {@code material} is {@linkplain Material#isLegacy() legacy}.
 +     */
-+    public static @NotNull NamespacedKey getKey(Material material) {
-+        Preconditions.checkArgument(!material.isLegacy(), "Cannot get key of Legacy Material");
++    public static org.bukkit.NamespacedKey getKey(Material material) {
++        com.google.common.base.Preconditions.checkArgument(!material.isLegacy(), "Cannot get key of Legacy Material");
 +        return keyCache.get(material);
 +    }
 +    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - key

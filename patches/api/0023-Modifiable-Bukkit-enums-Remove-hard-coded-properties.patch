@@ -12,7 +12,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 1faa2020068583e5fc7367f10e42a244c8e9799e..a8926387fc178cffec1bea7d2c3b9c83a325d186 100644
+index 60abc3b0b7cde3c027f7c5a515e22a026d147343..cdfb5f207757698c3e029c85f61c1c18651673cb 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
 @@ -4636,7 +4636,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
@@ -42,7 +42,7 @@ index 1faa2020068583e5fc7367f10e42a244c8e9799e..a8926387fc178cffec1bea7d2c3b9c83
      }
  
      // Paper start
-@@ -4864,8 +4851,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4873,8 +4860,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      @NotNull
      @Deprecated // Paper
      public Class<? extends MaterialData> getData() {
@@ -52,7 +52,7 @@ index 1faa2020068583e5fc7367f10e42a244c8e9799e..a8926387fc178cffec1bea7d2c3b9c83
      }
  
      /**
-@@ -4879,21 +4865,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4888,21 +4874,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      @Deprecated
      @NotNull
      public MaterialData getNewData(final byte raw) {
@@ -76,34 +76,22 @@ index 1faa2020068583e5fc7367f10e42a244c8e9799e..a8926387fc178cffec1bea7d2c3b9c83
  
      /**
 diff --git a/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java b/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
-index 6a5bdd50f2bd036ea23522449858bb2a822181bd..a7d7e49ffc6768e85f98df1d44b7e437d9a01fff 100644
+index 3a6c4bdb49bef3ddf3984d60ecce624bc2bb41b2..3afa7b6e4eb85d8726d6edd8ffb85472fd69d07c 100644
 --- a/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
 +++ b/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
-@@ -4,8 +4,11 @@ package org.fiddlemc.fiddle.material;
- 
- import com.google.common.base.Preconditions;
- import org.bukkit.Material;
-+import org.bukkit.material.MaterialData;
- import org.jetbrains.annotations.NotNull;
- 
-+import java.lang.reflect.Constructor;
-+
- /**
-  * This class provides a number of default implementations for {@link Material} that
-  * must be available in the API module for unit tests.
-@@ -35,6 +38,35 @@ public final class MaterialDefaultImplementations {
+@@ -37,6 +37,35 @@ public final class MaterialDefaultImplementations {
      };
      // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - is legacy
  
 +    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - cached constructor
 +    @SuppressWarnings({"unchecked", "rawtypes"})
-+    private static final CachedMaterialProperty<Constructor<? extends MaterialData>> materialDataConstructorCache = new CachedMaterialProperty<>(
-+        Constructor[]::new,
++    private static final CachedMaterialProperty<java.lang.reflect.Constructor<? extends org.bukkit.material.MaterialData>> materialDataConstructorCache = new CachedMaterialProperty<>(
++        java.lang.reflect.Constructor[]::new,
 +        material -> {
 +            // Based on the original org.bukkit.Material constructor
 +            try {
-+                if (MaterialData.class.isAssignableFrom(material.data)) {
-+                    return (Constructor<? extends MaterialData>) material.data.getConstructor(Material.class, byte.class);
++                if (org.bukkit.material.MaterialData.class.isAssignableFrom(material.data)) {
++                    return (java.lang.reflect.Constructor<? extends org.bukkit.material.MaterialData>) material.data.getConstructor(Material.class, byte.class);
 +                }
 +            } catch (NoSuchMethodException | SecurityException ex) {
 +                throw new AssertionError(ex);
@@ -112,7 +100,7 @@ index 6a5bdd50f2bd036ea23522449858bb2a822181bd..a7d7e49ffc6768e85f98df1d44b7e437
 +        }
 +    );
 +
-+    private static final CachedMaterialProperty<Class<? extends MaterialData>> materialDataConstructorDeclaringClassCache = new CachedMaterialProperty<>(
++    private static final CachedMaterialProperty<Class<? extends org.bukkit.material.MaterialData>> materialDataConstructorDeclaringClassCache = new CachedMaterialProperty<>(
 +        Class[]::new,
 +        material -> {
 +            // Based on the original org.bukkit.Material#getData()
@@ -127,27 +115,27 @@ index 6a5bdd50f2bd036ea23522449858bb2a822181bd..a7d7e49ffc6768e85f98df1d44b7e437
      // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - is empty
      public static boolean isEmpty(Material material) {
          // Based on the original org.bukkit.Material#isEmpty()
-@@ -96,6 +128,40 @@ public final class MaterialDefaultImplementations {
+@@ -98,6 +127,40 @@ public final class MaterialDefaultImplementations {
      }
      // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - durability
  
 +    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - cached constructor
-+    private static @NotNull Constructor<? extends MaterialData> getMaterialDataConstructor(Material material) {
-+        Preconditions.checkArgument(material.isLegacy(), "Cannot get data class constructor of Modern Material"); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - is legacy
++    private static java.lang.reflect.Constructor<? extends org.bukkit.material.MaterialData> getMaterialDataConstructor(Material material) {
++        com.google.common.base.Preconditions.checkArgument(material.isLegacy(), "Cannot get data class constructor of Modern Material"); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - is legacy
 +        return materialDataConstructorCache.get(material);
 +    }
 +
-+    public static @NotNull Class<? extends MaterialData> getMaterialDataConstructorDeclaringClass(Material material) {
-+        Preconditions.checkArgument(material.isLegacy(), "Cannot get data class of Modern Material"); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - is legacy
++    public static Class<? extends org.bukkit.material.MaterialData> getMaterialDataConstructorDeclaringClass(Material material) {
++        com.google.common.base.Preconditions.checkArgument(material.isLegacy(), "Cannot get data class of Modern Material"); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - is legacy
 +        return materialDataConstructorDeclaringClassCache.get(material);
 +    }
 +
 +    /**
 +     * @throws IllegalArgumentException If the given {@code material} is not {@linkplain Material#isLegacy() legacy}.
 +     */
-+    public static @NotNull MaterialData getNewMaterialDataInstance(Material material, byte raw) {
++    public static org.bukkit.material.MaterialData getNewMaterialDataInstance(Material material, byte raw) {
 +        // Based on the original org.bukkit.Material#getNewData(byte)
-+        Preconditions.checkArgument(material.isLegacy(), "Cannot get new data of Modern Material"); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - is legacy
++        com.google.common.base.Preconditions.checkArgument(material.isLegacy(), "Cannot get new data of Modern Material"); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - is legacy
 +        try {
 +            return getMaterialDataConstructor(material).newInstance(material, raw);
 +        } catch (InstantiationException ex) {

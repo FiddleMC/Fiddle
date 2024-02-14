@@ -12,7 +12,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/network/Connection.java b/src/main/java/net/minecraft/network/Connection.java
-index c2aa40d95bc16b587ad32ad754441ed3a2ce0eb8..552add978fa28d05859f24828f72e6bdb5bfd185 100644
+index c2aa40d95bc16b587ad32ad754441ed3a2ce0eb8..57bee3e710ec6ec672c920e7ae19a7c4abf1f833 100644
 --- a/src/main/java/net/minecraft/network/Connection.java
 +++ b/src/main/java/net/minecraft/network/Connection.java
 @@ -150,6 +150,8 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
@@ -32,7 +32,7 @@ index c2aa40d95bc16b587ad32ad754441ed3a2ce0eb8..552add978fa28d05859f24828f72e6bd
 +    /**
 +     * @return A {@link java.lang.ref.WeakReference} to this {@link Connection} instance.
 +     */
-+    public final @org.jetbrains.annotations.NotNull java.lang.ref.WeakReference<Connection> getWeakReference() {
++    public final java.lang.ref.WeakReference<Connection> getWeakReference() {
 +        if (this.weakReference == null) {
 +            this.weakReference = new java.lang.ref.WeakReference<>(this);
 +        }
@@ -43,10 +43,10 @@ index c2aa40d95bc16b587ad32ad754441ed3a2ce0eb8..552add978fa28d05859f24828f72e6bd
  }
 diff --git a/src/main/java/org/fiddlemc/fiddle/packet/CloningPacketWithExplicitTargetClientConnection.java b/src/main/java/org/fiddlemc/fiddle/packet/CloningPacketWithExplicitTargetClientConnection.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..e69e4bf625e55bc7302a2ec099939fd47a2db43b
+index 0000000000000000000000000000000000000000..79d4998c99184810a06863c037cc77aaa10e9e9d
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/packet/CloningPacketWithExplicitTargetClientConnection.java
-@@ -0,0 +1,47 @@
+@@ -0,0 +1,41 @@
 +// Fiddle - client perspective - expose target client properties - packet can provide explicit connection - base implementations
 +
 +package org.fiddlemc.fiddle.packet;
@@ -54,12 +54,6 @@ index 0000000000000000000000000000000000000000..e69e4bf625e55bc7302a2ec099939fd4
 +import net.minecraft.network.Connection;
 +import net.minecraft.network.PacketListener;
 +import net.minecraft.network.protocol.Packet;
-+import net.minecraft.world.level.GameType;
-+import org.jetbrains.annotations.NotNull;
-+import org.jetbrains.annotations.Nullable;
-+
-+import java.lang.ref.WeakReference;
-+import java.util.Objects;
 +
 +/**
 + * A modified version of {@link PacketWithExplicitTargetClientConnection},
@@ -80,12 +74,12 @@ index 0000000000000000000000000000000000000000..e69e4bf625e55bc7302a2ec099939fd4
 +        return false;
 +    }
 +
-+    private @NotNull Packet<T>  superAdaptForClient(@NotNull Connection connection) {
++    private Packet<T>  superAdaptForClient(Connection connection) {
 +        return super.adaptForClient(connection);
 +    }
 +
 +    @Override
-+    public final @NotNull Packet<T> adaptForClient(@NotNull Connection connection) {
++    public final Packet<T> adaptForClient(Connection connection) {
 +        if (this.canSkipCloning()) {
 +            return this;
 +        }
@@ -96,10 +90,10 @@ index 0000000000000000000000000000000000000000..e69e4bf625e55bc7302a2ec099939fd4
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/packet/PacketWithExplicitTargetClientConnection.java b/src/main/java/org/fiddlemc/fiddle/packet/PacketWithExplicitTargetClientConnection.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..b30d8725aee6fcd50ea804682f455cb0d50c32a0
+index 0000000000000000000000000000000000000000..5cc3e028fbf993da1681e06cb760b939015c9538
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/packet/PacketWithExplicitTargetClientConnection.java
-@@ -0,0 +1,64 @@
+@@ -0,0 +1,62 @@
 +// Fiddle - client perspective - expose target client properties - packet can provide explicit connection - base implementations
 +
 +package org.fiddlemc.fiddle.packet;
@@ -107,8 +101,6 @@ index 0000000000000000000000000000000000000000..b30d8725aee6fcd50ea804682f455cb0
 +import net.minecraft.network.Connection;
 +import net.minecraft.network.PacketListener;
 +import net.minecraft.network.protocol.Packet;
-+import net.minecraft.world.level.GameType;
-+import org.jetbrains.annotations.NotNull;
 +import org.jetbrains.annotations.Nullable;
 +
 +import java.lang.ref.WeakReference;
@@ -132,22 +124,22 @@ index 0000000000000000000000000000000000000000..b30d8725aee6fcd50ea804682f455cb0
 +     * This method is called after setting {@link #targetClientConnection} in {@link #adaptForClient},
 +     * and must be overridden instead of {@link #adaptForClient}.
 +     */
-+    protected @NotNull Packet<T> postSetConnectionAdaptForClient(@NotNull Connection connection) {
++    protected Packet<T> postSetConnectionAdaptForClient(Connection connection) {
 +        return this;
 +    }
 +
 +    @Override
-+    public @NotNull Packet<T> adaptForClient(@NotNull Connection connection) {
++    public Packet<T> adaptForClient(Connection connection) {
 +        this.targetClientConnection = connection.getWeakReference();
 +        return this.postSetConnectionAdaptForClient(connection);
 +    }
 +
-+    public @NotNull Connection getExplicitTargetClientConnection() throws NullPointerException {
++    public Connection getExplicitTargetClientConnection() throws NullPointerException {
 +        return Objects.requireNonNull(this.targetClientConnection.get());
 +    }
 +
 +    @Override
-+    public @NotNull ClientPerspective getExplicitTargetClientPerspective() throws NullPointerException {
++    public ClientPerspective getExplicitTargetClientPerspective() throws NullPointerException {
 +        return Objects.requireNonNull(this.targetClientConnection.get().getPlayerClientPerspective());
 +    }
 +

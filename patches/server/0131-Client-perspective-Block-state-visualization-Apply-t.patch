@@ -1,35 +1,41 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
-Date: Sat, 30 Dec 2023 21:37:02 +0100
+Date: Sat, 30 Dec 2023 21:26:58 +0100
 Subject: [PATCH] Client perspective - Block state visualization - Apply to
- chunk packets - Do not multicast chunk packets for anti-x-ray
+ chunk packets - Store connection explicitly in chunk packets
 
-Removes the mechanism by which constructed `ClientboundLevelChunkWithLightPacket` instances may be sent to multiple targets, if they all must or all must not have anti-x-ray applied.
+Makes all instances of `ClientboundLevelChunkWithLightPacket` bound to a particular explicit target connection.
+This is done by making it a subclass of `PacketWithExplicitTargetClientConnection`.
 
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
-diff --git a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
-index 57bd15679316f5a8358ae3a162e3de1dbe060110..09709d87370213b5d7bb011d842eb8e286c535ed 100644
---- a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
-+++ b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
-@@ -524,14 +524,14 @@ public class CraftWorld extends CraftRegionAccessor implements World {
-                 if (playersInRange.isEmpty()) return true; // Paper - rewrite player chunk loader
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
+index 3c7cf38cc9f26fda6c71eb140a506432e5b3da1d..fea39d2ef11f8ca0c8b3b00e09442809d74129d9 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
+@@ -8,7 +8,7 @@ import net.minecraft.world.level.ChunkPos;
+ import net.minecraft.world.level.chunk.LevelChunk;
+ import net.minecraft.world.level.lighting.LevelLightEngine;
  
-                 // Paper start - Anti-Xray - Bypass
--                Map<Object, ClientboundLevelChunkWithLightPacket> refreshPackets = new HashMap<>();
-                 for (ServerPlayer player : playersInRange) {
-                     if (player.connection == null) continue;
+-public class ClientboundLevelChunkWithLightPacket implements Packet<ClientGamePacketListener> {
++public class ClientboundLevelChunkWithLightPacket extends org.fiddlemc.fiddle.packet.PacketWithExplicitTargetClientConnection<ClientGamePacketListener> { // Fiddle - client perspective - block state visualization - apply to chunk packets - store connection explicitly
+     private final int x;
+     private final int z;
+     private final ClientboundLevelChunkPacketData chunkData;
+@@ -29,6 +29,7 @@ public class ClientboundLevelChunkWithLightPacket implements Packet<ClientGamePa
+     // Paper start - Anti-Xray - Add chunk packet info
+     @Deprecated @io.papermc.paper.annotation.DoNotUse public ClientboundLevelChunkWithLightPacket(LevelChunk chunk, LevelLightEngine lightProvider, @Nullable BitSet skyBits, @Nullable BitSet blockBits) { this(chunk, lightProvider, skyBits, blockBits, true); }
+     public ClientboundLevelChunkWithLightPacket(LevelChunk chunk, LevelLightEngine lightProvider, @Nullable BitSet skyBits, @Nullable BitSet blockBits, boolean modifyBlocks) {
++        super(); // Fiddle - client perspective - block state visualization - apply to chunk packets - store connection explicitly
+         ChunkPos chunkPos = chunk.getPos();
+         this.x = chunkPos.x;
+         this.z = chunkPos.z;
+@@ -43,6 +44,7 @@ public class ClientboundLevelChunkWithLightPacket implements Packet<ClientGamePa
+     }
  
--                    Boolean shouldModify = chunk.getLevel().chunkPacketBlockController.shouldModify(player, chunk);
--                    player.connection.send(refreshPackets.computeIfAbsent(shouldModify, s -> { // Use connection to prevent creating firing event
--                        return new ClientboundLevelChunkWithLightPacket(chunk, this.world.getLightEngine(), null, null, (Boolean) s);
--                    }));
-+                    // Fiddle start - client perspective - block state visualization - apply to chunk packets - do not cache for anti-x-ray
-+                    boolean shouldModify = chunk.getLevel().chunkPacketBlockController.shouldModify(player, chunk);
-+                    var packet = new ClientboundLevelChunkWithLightPacket(chunk, this.world.getLightEngine(), null, null, shouldModify);
-+                    player.connection.send(packet); // Use connection to prevent creating firing event
-+                    // Fiddle end - client perspective - block state visualization - apply to chunk packets - do not cache for anti-x-ray
-                     // Paper end
-                 }
-         // Paper - rewrite player chunk loader
+     public ClientboundLevelChunkWithLightPacket(FriendlyByteBuf buf) {
++        super(); // Fiddle - client perspective - block state visualization - apply to chunk packets - store connection explicitly
+         this.x = buf.readInt();
+         this.z = buf.readInt();
+         this.chunkData = new ClientboundLevelChunkPacketData(buf, this.x, this.z);

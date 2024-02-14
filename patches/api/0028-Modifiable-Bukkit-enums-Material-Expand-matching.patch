@@ -15,10 +15,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 5c002b4a28e57c752dc6e8e10e0e03f3359df2b3..cc89e445cd6fadb718a6cf4a14f4948cc41f7a28 100644
+index 26438928078b25496003ede8231c8ca6624b5112..9f86d681430f53feff3de85824929cf7d80f7325 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -5001,11 +5001,30 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -5022,11 +5022,30 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
      /**
       * Attempts to match the Material with the given name.
       * <p>
@@ -53,7 +53,7 @@ index 5c002b4a28e57c752dc6e8e10e0e03f3359df2b3..cc89e445cd6fadb718a6cf4a14f4948c
       * @return Material if found, or null
       */
      @Nullable
-@@ -5015,15 +5034,23 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -5036,15 +5055,23 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
  
      /**
       * Attempts to match the Material with the given name.
@@ -84,19 +84,19 @@ index 5c002b4a28e57c752dc6e8e10e0e03f3359df2b3..cc89e445cd6fadb718a6cf4a14f4948c
      @Nullable
      public static Material matchMaterial(@NotNull final String name, boolean legacyName) {
 diff --git a/src/main/java/org/fiddlemc/fiddle/material/MaterialNameAndKeyConversion.java b/src/main/java/org/fiddlemc/fiddle/material/MaterialNameAndKeyConversion.java
-index 6a43a90bd4fc533cfc5a738c3b196d72711b171e..582b539d165454611c5bb74a7bae78d5eaf6fae3 100644
+index 3c992c62764cb54e36a0409dd922dc48aaef1928..5a72421d3e60d493f0f2b6a0a3f75c078476d215 100644
 --- a/src/main/java/org/fiddlemc/fiddle/material/MaterialNameAndKeyConversion.java
 +++ b/src/main/java/org/fiddlemc/fiddle/material/MaterialNameAndKeyConversion.java
-@@ -48,6 +48,121 @@ public final class MaterialNameAndKeyConversion {
+@@ -43,6 +43,121 @@ public final class MaterialNameAndKeyConversion {
      }
      // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - getMaterial
  
 +    // Fiddle start - modifiable Bukkit enums - expand Material matching
-+    private static @Nullable Map<String, Material> cachedMaterialsByMatchableString = null;
++    private static @org.jetbrains.annotations.Nullable java.util.Map<String, Material> cachedMaterialsByMatchableString = null;
 +
-+    private static @NotNull Map<String, Material> getCachedMaterialsByMatchableString() {
++    private static java.util.Map<String, Material> getCachedMaterialsByMatchableString() {
 +        if (cachedMaterialsByMatchableString == null) {
-+            cachedMaterialsByMatchableString = Maps.newHashMap();
++            cachedMaterialsByMatchableString = com.google.common.collect.Maps.newHashMap();
 +            for (int valueIndex = 0; valueIndex < numberOfMatchMaterialValues; valueIndex++) {
 +                for (int normalizationIndex = 0; normalizationIndex < NormalizedMatchMaterialStrings.numberOfNormalizations; normalizationIndex++) {
 +                    for (var material : CachedMaterialProperty.getCachedMaterialValues()) {
@@ -114,7 +114,7 @@ index 6a43a90bd4fc533cfc5a738c3b196d72711b171e..582b539d165454611c5bb74a7bae78d5
 +
 +    private static final int numberOfMatchMaterialValues = 3;
 +
-+    private static @Nullable String getMatchMaterialValue(@NotNull Material material, int valueIndex) {
++    private static @org.jetbrains.annotations.Nullable String getMatchMaterialValue(Material material, int valueIndex) {
 +        return switch (valueIndex) {
 +            case 0 -> material.isLegacy() ? null : material.getKey().toString();
 +            case 1 -> material.isLegacy() ? null : material.getKey().getKey();
@@ -127,24 +127,24 @@ index 6a43a90bd4fc533cfc5a738c3b196d72711b171e..582b539d165454611c5bb74a7bae78d5
 +
 +        public static final int numberOfNormalizations = 5;
 +
-+        public final @NotNull String original;
-+        private @Nullable String lowerCase;
-+        private @Nullable String lowerCaseLettersDigitsUnderscoresAndColons;
-+        private @Nullable String lowerCaseLettersDigitsAndUnderscores;
-+        private @Nullable String lowerCaseLettersAndDigits;
++        public final String original;
++        private @org.jetbrains.annotations.Nullable String lowerCase;
++        private @org.jetbrains.annotations.Nullable String lowerCaseLettersDigitsUnderscoresAndColons;
++        private @org.jetbrains.annotations.Nullable String lowerCaseLettersDigitsAndUnderscores;
++        private @org.jetbrains.annotations.Nullable String lowerCaseLettersAndDigits;
 +
-+        public NormalizedMatchMaterialStrings(@NotNull String original) {
++        public NormalizedMatchMaterialStrings(@org.jetbrains.annotations.NotNull String original) {
 +            this.original = original;
 +        }
 +
-+        public @NotNull String getLowerCase() {
++        public @org.jetbrains.annotations.NotNull String getLowerCase() {
 +            if (this.lowerCase == null) {
-+                this.lowerCase = this.original.toLowerCase(Locale.ROOT);
++                this.lowerCase = this.original.toLowerCase(java.util.Locale.ROOT);
 +            }
 +            return this.lowerCase;
 +        }
 +
-+        public @NotNull String getLowerCaseLettersDigitsUnderscoresAndColons() {
++        public @org.jetbrains.annotations.NotNull String getLowerCaseLettersDigitsUnderscoresAndColons() {
 +            if (this.lowerCaseLettersDigitsUnderscoresAndColons == null) {
 +                char[] characters = this.getLowerCase().toCharArray();
 +                int writeIndex = 0;
@@ -160,7 +160,7 @@ index 6a43a90bd4fc533cfc5a738c3b196d72711b171e..582b539d165454611c5bb74a7bae78d5
 +            return this.lowerCaseLettersDigitsUnderscoresAndColons;
 +        }
 +
-+        public @NotNull String getLowerCaseLettersDigitsAndUnderscores() {
++        public @org.jetbrains.annotations.NotNull String getLowerCaseLettersDigitsAndUnderscores() {
 +            if (this.lowerCaseLettersDigitsAndUnderscores == null) {
 +                char[] characters = this.getLowerCaseLettersDigitsUnderscoresAndColons().toCharArray();
 +                int writeIndex = 0;
@@ -176,7 +176,7 @@ index 6a43a90bd4fc533cfc5a738c3b196d72711b171e..582b539d165454611c5bb74a7bae78d5
 +            return this.lowerCaseLettersDigitsAndUnderscores;
 +        }
 +
-+        public @NotNull String getLowerCaseLettersAndDigits() {
++        public @org.jetbrains.annotations.NotNull String getLowerCaseLettersAndDigits() {
 +            if (this.lowerCaseLettersAndDigits == null) {
 +                char[] characters = this.getLowerCaseLettersDigitsAndUnderscores().toCharArray();
 +                int writeIndex = 0;
@@ -192,7 +192,7 @@ index 6a43a90bd4fc533cfc5a738c3b196d72711b171e..582b539d165454611c5bb74a7bae78d5
 +            return this.lowerCaseLettersAndDigits;
 +        }
 +
-+        public @NotNull String getNormalized(int normalizationIndex) {
++        public @org.jetbrains.annotations.NotNull String getNormalized(int normalizationIndex) {
 +            return switch (normalizationIndex) {
 +                case 0 -> this.original;
 +                case 1 -> this.getLowerCase();
@@ -209,13 +209,12 @@ index 6a43a90bd4fc533cfc5a738c3b196d72711b171e..582b539d165454611c5bb74a7bae78d5
      // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - key
      /**
       * @throws IllegalArgumentException If the given {@code material} is {@linkplain Material#isLegacy() legacy}.
-@@ -91,7 +206,20 @@ public final class MaterialNameAndKeyConversion {
+@@ -86,7 +201,20 @@ public final class MaterialNameAndKeyConversion {
       */
-     public static @Nullable Material matchMaterial(@NotNull final String name, boolean legacyName) {
+     public static @org.jetbrains.annotations.Nullable Material matchMaterial(final String name, boolean legacyName) {
          // Based on the original org.bukkit.Material#matchMaterial(String, boolean)
--        Preconditions.checkArgument(name != null, "Name cannot be null");
 +        // Fiddle start - modifiable Bukkit enums - expand Material matching
-+        Preconditions.checkArgument(name != null, "Name string given to matchMaterial(...) cannot be null");
+         com.google.common.base.Preconditions.checkArgument(name != null, "Name cannot be null");
 +        if (!legacyName) {
 +            var cachedMaterialsByMatchableString = getCachedMaterialsByMatchableString();
 +            var normalizedStrings = new NormalizedMatchMaterialStrings(name);
@@ -230,4 +229,4 @@ index 6a43a90bd4fc533cfc5a738c3b196d72711b171e..582b539d165454611c5bb74a7bae78d5
 +        // Fiddle end - modifiable Bukkit enums - expand Material matching
  
          String filtered = name;
-         if (filtered.startsWith(NamespacedKey.MINECRAFT + ":")) {
+         if (filtered.startsWith(org.bukkit.NamespacedKey.MINECRAFT + ":")) {

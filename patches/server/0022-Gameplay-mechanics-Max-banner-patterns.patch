@@ -105,10 +105,10 @@ index 046e9ea3434a1ed80a863a4dd295be0121f83993..e6f18675d473ce847533748057713143
                  }
              }
 diff --git a/src/main/java/org/fiddlemc/fiddle/configuration/FiddleWorldConfiguration.java b/src/main/java/org/fiddlemc/fiddle/configuration/FiddleWorldConfiguration.java
-index ad2b35278ee7ef1460e2a76d2953d3fce72d52d8..d8cfbe0c2f052433b9d11cabef8fcdc0c31b3286 100644
+index fbcccc1d76dd3ad0c0dc6c0ee35cfdf4c8442e64..0171910f024ca0191b71bcf58639f5fa03a5a6f0 100644
 --- a/src/main/java/org/fiddlemc/fiddle/configuration/FiddleWorldConfiguration.java
 +++ b/src/main/java/org/fiddlemc/fiddle/configuration/FiddleWorldConfiguration.java
-@@ -30,4 +30,40 @@ public class FiddleWorldConfiguration extends ConfigurationPart {
+@@ -32,4 +32,40 @@ public class FiddleWorldConfiguration extends ConfigurationPart {
      @Setting(Configuration.VERSION_FIELD)
      public int version = CURRENT_VERSION;
  

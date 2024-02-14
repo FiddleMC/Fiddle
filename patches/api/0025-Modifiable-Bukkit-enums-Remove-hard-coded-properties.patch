@@ -13,10 +13,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index f9c086a5c366ff79cc93156bc842903375267b77..ab83cdfb8bac264a32ca09b753ec55715b6810be 100644
+index 699000792889f64e6c72073f9d820a55b94ab571..872f8b53d112dc65ef6b1f8d01fff6bd513798c3 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -4735,7 +4735,16 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4735,7 +4735,19 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       */
      @org.jetbrains.annotations.ApiStatus.Internal // Paper
      public int getId() {
@@ -26,19 +26,22 @@ index f9c086a5c366ff79cc93156bc842903375267b77..ab83cdfb8bac264a32ca09b753ec5571
 +    }
 +
 +    /**
-+     * @deprecated Do not use: this method is for internal testing purposes only.
++     * Do not use for any reason.
++     * This method is for internal testing purposes only.
++     *
++     * @apiNote Internal Use Only
 +     */
-+    @Deprecated(forRemoval = true)
++    @org.jetbrains.annotations.ApiStatus.Internal
 +    public int getIdLegacy() {
 +        // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - id
          return id;
      }
  
 diff --git a/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java b/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
-index 3ba8ba2a102bf2bdc24469aeb46a8b50394164e0..778f6f89415293f89aa6cbc08af7b6a5c53023f2 100644
+index cd0a3c2d4a700fbf6d418f8b0a4f7be3ff9a89c6..3b35bfb2d4610069f00617a25fc00f12fa92fd40 100644
 --- a/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
 +++ b/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
-@@ -22,6 +22,483 @@ public final class MaterialDefaultImplementations {
+@@ -21,6 +21,483 @@ public final class MaterialDefaultImplementations {
          throw new RuntimeException();
      }
  
@@ -522,7 +525,7 @@ index 3ba8ba2a102bf2bdc24469aeb46a8b50394164e0..778f6f89415293f89aa6cbc08af7b6a5
      // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - is legacy
      private static final CachedMaterialBooleanProperty isLegacyCache = new CachedMaterialBooleanProperty(material -> {
          // Based on the original org.bukkit.Material constructor
-@@ -77,6 +554,16 @@ public final class MaterialDefaultImplementations {
+@@ -76,6 +553,16 @@ public final class MaterialDefaultImplementations {
      }
      // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - is empty
  
@@ -531,7 +534,7 @@ index 3ba8ba2a102bf2bdc24469aeb46a8b50394164e0..778f6f89415293f89aa6cbc08af7b6a5
 +     * @throws IllegalArgumentException If the given {@code material} is not {@linkplain Material#isLegacy() legacy}.
 +     */
 +    public static int getLegacyId(Material material) {
-+        Preconditions.checkArgument(material.isLegacy(), "Cannot get ID of Modern Material"); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - is legacy
++        com.google.common.base.Preconditions.checkArgument(material.isLegacy(), "Cannot get ID of Modern Material"); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - is legacy
 +        return legacyIdCache.get(material);
 +    }
 +    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - id

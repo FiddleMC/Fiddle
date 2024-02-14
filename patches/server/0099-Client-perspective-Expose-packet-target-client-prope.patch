@@ -11,7 +11,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/network/protocol/Packet.java b/src/main/java/net/minecraft/network/protocol/Packet.java
-index c7cc4689b566b46b958a4f5ff390f54a089c3d91..fb8e77cc6ceb2fec874087d30c3f167466b5a932 100644
+index fbc6180cab00cc8733e7e9489be44c31fe618cfe..d99a276e877e128014d27c41577ad7c4f94454fb 100644
 --- a/src/main/java/net/minecraft/network/protocol/Packet.java
 +++ b/src/main/java/net/minecraft/network/protocol/Packet.java
 @@ -79,4 +79,33 @@ public interface Packet<T extends PacketListener> {
@@ -34,7 +34,7 @@ index c7cc4689b566b46b958a4f5ff390f54a089c3d91..fb8e77cc6ceb2fec874087d30c3f1674
 +     * it indicates that there is code that needs this value,
 +     * but it is not available early enough for the value to be available.
 +     */
-+    default @org.jetbrains.annotations.NotNull org.fiddlemc.fiddle.packet.ClientPerspective getExplicitTargetClientPerspective() throws UnsupportedOperationException {
++    default org.fiddlemc.fiddle.packet.ClientPerspective getExplicitTargetClientPerspective() throws UnsupportedOperationException {
 +        throw new UnsupportedOperationException("Tried to call getExplicitTargetClientPerspective() on a " + Packet.class.getSimpleName() + " instance of type " + this.getClass().getName() + ", but no overriding implementation is available");
 +    }
 +

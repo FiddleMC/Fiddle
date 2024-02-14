@@ -10,25 +10,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/test/java/org/fiddlemc/fiddle/material/legacy/PerNonLegacyMaterialTest.java b/src/test/java/org/fiddlemc/fiddle/material/legacy/PerNonLegacyMaterialTest.java
-index f11b7d202160a598ab2d431960d02791f3abcb28..22dc1eb2e1849b90f952c244d5f2060c8c35839e 100644
+index f11b7d202160a598ab2d431960d02791f3abcb28..a7e3252b9e4c1d8a218500adc58744335cc636e3 100644
 --- a/src/test/java/org/fiddlemc/fiddle/material/legacy/PerNonLegacyMaterialTest.java
 +++ b/src/test/java/org/fiddlemc/fiddle/material/legacy/PerNonLegacyMaterialTest.java
-@@ -3,12 +3,14 @@
- package org.fiddlemc.fiddle.material.legacy;
- 
- import org.bukkit.Material;
-+import org.bukkit.NamespacedKey;
- import org.bukkit.craftbukkit.legacy.CraftLegacy;
- import org.bukkit.support.AbstractTestingBase;
- import org.junit.jupiter.api.Test;
- 
- import java.util.Arrays;
- import java.util.function.Predicate;
-+import java.util.Locale;
- 
- import static org.junit.jupiter.api.Assertions.assertEquals;
- 
-@@ -35,6 +37,15 @@ public class PerNonLegacyMaterialTest extends AbstractTestingBase {
+@@ -35,6 +35,15 @@ public class PerNonLegacyMaterialTest extends AbstractTestingBase {
          }
      }
  
@@ -36,7 +21,7 @@ index f11b7d202160a598ab2d431960d02791f3abcb28..22dc1eb2e1849b90f952c244d5f2060c
 +    @Test
 +    public void getKey() {
 +        for (Material material : getMaterials()) {
-+            assertEquals(NamespacedKey.minecraft(material.name().toLowerCase(Locale.ROOT)), material.getKey(), "getKey is incorrect for " + material);
++            assertEquals(org.bukkit.NamespacedKey.minecraft(material.name().toLowerCase(java.util.Locale.ROOT)), material.getKey(), "getKey is incorrect for " + material);
 +        }
 +    }
 +    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - key

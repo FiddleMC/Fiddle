@@ -12,7 +12,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index ab83cdfb8bac264a32ca09b753ec55715b6810be..5c002b4a28e57c752dc6e8e10e0e03f3359df2b3 100644
+index 2949af41a806f42ae2c257dc2dee4303100b9f28..26438928078b25496003ede8231c8ca6624b5112 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
 @@ -4636,7 +4636,6 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
@@ -23,7 +23,7 @@ index ab83cdfb8bac264a32ca09b753ec55715b6810be..5c002b4a28e57c752dc6e8e10e0e03f3
      private final int maxStackHardcoded;
      private final short durabilityHardcoded;
      public final Class<?> data;
-@@ -4974,7 +4973,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4995,7 +4994,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       */
      @Nullable
      public static Material getMaterial(@NotNull final String name) {
@@ -32,7 +32,7 @@ index ab83cdfb8bac264a32ca09b753ec55715b6810be..5c002b4a28e57c752dc6e8e10e0e03f3
      }
  
      /**
-@@ -4993,17 +4992,10 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -5014,17 +5013,10 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return Material if found, or null
       */
      @Nullable
@@ -54,7 +54,7 @@ index ab83cdfb8bac264a32ca09b753ec55715b6810be..5c002b4a28e57c752dc6e8e10e0e03f3
      }
  
      /**
-@@ -5018,7 +5010,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -5039,7 +5031,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       */
      @Nullable
      public static Material matchMaterial(@NotNull final String name) {
@@ -63,7 +63,7 @@ index ab83cdfb8bac264a32ca09b753ec55715b6810be..5c002b4a28e57c752dc6e8e10e0e03f3
      }
  
      /**
-@@ -5035,23 +5027,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -5056,23 +5048,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       */
      @Nullable
      public static Material matchMaterial(@NotNull final String name, boolean legacyName) {
@@ -89,49 +89,33 @@ index ab83cdfb8bac264a32ca09b753ec55715b6810be..5c002b4a28e57c752dc6e8e10e0e03f3
  
      /**
 diff --git a/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java b/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
-index 778f6f89415293f89aa6cbc08af7b6a5c53023f2..09851a9182508fac6b5f6803ae36968e5b40983d 100644
+index 3b35bfb2d4610069f00617a25fc00f12fa92fd40..362baf8edfbf4a4e721c3884a382ef828ee7829b 100644
 --- a/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
 +++ b/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
-@@ -532,6 +532,7 @@ public final class MaterialDefaultImplementations {
+@@ -531,6 +531,7 @@ public final class MaterialDefaultImplementations {
          }
      );
  
 +    @SuppressWarnings({"unchecked", "rawtypes"})
-     private static final CachedMaterialProperty<Class<? extends MaterialData>> materialDataConstructorDeclaringClassCache = new CachedMaterialProperty<>(
+     private static final CachedMaterialProperty<Class<? extends org.bukkit.material.MaterialData>> materialDataConstructorDeclaringClassCache = new CachedMaterialProperty<>(
          Class[]::new,
          material -> {
 diff --git a/src/main/java/org/fiddlemc/fiddle/material/MaterialNameAndKeyConversion.java b/src/main/java/org/fiddlemc/fiddle/material/MaterialNameAndKeyConversion.java
-index b600f06d62ea4b045590d72626d8029be82e89f2..6a43a90bd4fc533cfc5a738c3b196d72711b171e 100644
+index 6573b10a9210a1598804a3da60542b10be993d67..3c992c62764cb54e36a0409dd922dc48aaef1928 100644
 --- a/src/main/java/org/fiddlemc/fiddle/material/MaterialNameAndKeyConversion.java
 +++ b/src/main/java/org/fiddlemc/fiddle/material/MaterialNameAndKeyConversion.java
-@@ -3,11 +3,15 @@
- package org.fiddlemc.fiddle.material;
- 
- import com.google.common.base.Preconditions;
-+import com.google.common.collect.Maps;
-+import org.bukkit.Bukkit;
- import org.bukkit.Material;
- import org.bukkit.NamespacedKey;
- import org.jetbrains.annotations.NotNull;
-+import org.jetbrains.annotations.Nullable;
- 
- import java.util.Locale;
-+import java.util.Map;
- 
- /**
-  * This class provides a number of implementations for the conversion of names and keys
-@@ -28,7 +32,23 @@ public final class MaterialNameAndKeyConversion {
+@@ -27,7 +27,23 @@ public final class MaterialNameAndKeyConversion {
          // Based on the original org.bukkit.Material constructor
-         material -> NamespacedKey.minecraft(material.name().toLowerCase(Locale.ROOT))
+         material -> org.bukkit.NamespacedKey.minecraft(material.name().toLowerCase(java.util.Locale.ROOT))
      );
 +    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - key
 +
 +    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - getMaterial
-+    private static @Nullable Map<String, Material> cachedMaterialsByName = null;
++    private static @org.jetbrains.annotations.Nullable java.util.Map<String, Material> cachedMaterialsByName = null;
 +
-+    private static @NotNull Map<String, Material> getCachedMaterialsByName() {
++    private static java.util.Map<String, Material> getCachedMaterialsByName() {
 +        if (cachedMaterialsByName == null) {
-+            cachedMaterialsByName = Maps.newHashMap();
++            cachedMaterialsByName = com.google.common.collect.Maps.newHashMap();
 +            for (Material material : CachedMaterialProperty.getCachedMaterialValues()) {
 +                cachedMaterialsByName.put(material.name(), material);
 +            }
@@ -144,16 +128,16 @@ index b600f06d62ea4b045590d72626d8029be82e89f2..6a43a90bd4fc533cfc5a738c3b196d72
      /**
       * @throws IllegalArgumentException If the given {@code material} is {@linkplain Material#isLegacy() legacy}.
       */
-@@ -38,4 +58,51 @@ public final class MaterialNameAndKeyConversion {
+@@ -37,4 +53,51 @@ public final class MaterialNameAndKeyConversion {
      }
      // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - key
  
 +    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - getMaterial
-+    public static @Nullable Material getMaterial(@NotNull final String name) {
++    public static @org.jetbrains.annotations.Nullable Material getMaterial(final String name) {
 +        return getMaterial(name, false);
 +    }
 +
-+    public static @Nullable Material getMaterial(@NotNull String name, boolean legacyName) {
++    public static @org.jetbrains.annotations.Nullable Material getMaterial(String name, boolean legacyName) {
 +        // Based on the original org.bukkit.Material#getMaterial(String, boolean)
 +        if (legacyName) {
 +            if (!name.startsWith(MaterialLegacyNameChecker.LEGACY_MATERIAL_PREFIX)) {
@@ -161,7 +145,7 @@ index b600f06d62ea4b045590d72626d8029be82e89f2..6a43a90bd4fc533cfc5a738c3b196d72
 +            }
 +
 +            Material match = getCachedMaterialsByName().get(name);
-+            return Bukkit.getUnsafe().fromLegacy(match, false); // Fiddle - modifiable Bukkit enums - Material - make legacy conversion complete
++            return org.bukkit.Bukkit.getUnsafe().fromLegacy(match, false); // Fiddle - modifiable Bukkit enums - Material - make legacy conversion complete
 +        }
 +
 +        return getCachedMaterialsByName().get(name);
@@ -172,20 +156,20 @@ index b600f06d62ea4b045590d72626d8029be82e89f2..6a43a90bd4fc533cfc5a738c3b196d72
 +    /**
 +     * @throws IllegalArgumentException If the given {@code name} is null.
 +     */
-+    public static @Nullable Material matchMaterial(@NotNull final String name) {
++    public static @org.jetbrains.annotations.Nullable Material matchMaterial(final String name) {
 +        return matchMaterial(name, false);
 +    }
 +
 +    /**
 +     * @throws IllegalArgumentException If the given {@code name} is null.
 +     */
-+    public static @Nullable Material matchMaterial(@NotNull final String name, boolean legacyName) {
++    public static @org.jetbrains.annotations.Nullable Material matchMaterial(final String name, boolean legacyName) {
 +        // Based on the original org.bukkit.Material#matchMaterial(String, boolean)
-+        Preconditions.checkArgument(name != null, "Name cannot be null");
++        com.google.common.base.Preconditions.checkArgument(name != null, "Name cannot be null");
 +
 +        String filtered = name;
-+        if (filtered.startsWith(NamespacedKey.MINECRAFT + ":")) {
-+            filtered = filtered.substring((NamespacedKey.MINECRAFT + ":").length());
++        if (filtered.startsWith(org.bukkit.NamespacedKey.MINECRAFT + ":")) {
++            filtered = filtered.substring((org.bukkit.NamespacedKey.MINECRAFT + ":").length());
 +        }
 +
 +        filtered = filtered.toUpperCase(java.util.Locale.ENGLISH);

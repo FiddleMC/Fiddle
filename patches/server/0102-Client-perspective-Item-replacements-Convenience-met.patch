@@ -8,7 +8,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/network/Connection.java b/src/main/java/net/minecraft/network/Connection.java
-index 8bfd8d5c283da3667abb41eca7b589a578527a9c..9d3985015fd34145bb26af302a29143707bb4fda 100644
+index 500626970840ba23c88ca57a34a95ad596eb14b3..8669a34b2bd22d7ff792d144dfebc7785ade9daa 100644
 --- a/src/main/java/net/minecraft/network/Connection.java
 +++ b/src/main/java/net/minecraft/network/Connection.java
 @@ -1014,4 +1014,25 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
@@ -38,7 +38,7 @@ index 8bfd8d5c283da3667abb41eca7b589a578527a9c..9d3985015fd34145bb26af302a291437
 +
  }
 diff --git a/src/main/java/net/minecraft/network/protocol/Packet.java b/src/main/java/net/minecraft/network/protocol/Packet.java
-index 0164b7d2b5725c518a382b02614bbf9d952f042e..16b931e5afdcca3646b7fc508c37320ea9bda4e8 100644
+index 5ab0cc0dada53d176adb5f099fbc1cb97d68068f..881b517d6b012ebb22f39cdf5eb82cf0da6bf823 100644
 --- a/src/main/java/net/minecraft/network/protocol/Packet.java
 +++ b/src/main/java/net/minecraft/network/protocol/Packet.java
 @@ -128,4 +128,25 @@ public interface Packet<T extends PacketListener> {
@@ -61,23 +61,23 @@ index 0164b7d2b5725c518a382b02614bbf9d952f042e..16b931e5afdcca3646b7fc508c37320e
 +     * it indicates that there is code that needs this value,
 +     * but it is not available early enough for the value to be available.
 +     */
-+    default @org.jetbrains.annotations.NotNull net.minecraft.world.level.GameType getExplicitTargetGameMode() throws UnsupportedOperationException {
++    default net.minecraft.world.level.GameType getExplicitTargetGameMode() throws UnsupportedOperationException {
 +        throw new UnsupportedOperationException("Tried to call getExplicitTargetGameMode() on a " + Packet.class.getSimpleName() + " instance of type " + this.getClass().getName() + ", but no overriding implementation is available");
 +    }
 +    // Fiddle end - client perspective - item replacements - get player game mode from connection
 +
  }
 diff --git a/src/main/java/org/fiddlemc/fiddle/packet/PacketWithExplicitTargetClientConnection.java b/src/main/java/org/fiddlemc/fiddle/packet/PacketWithExplicitTargetClientConnection.java
-index a3a057a6781b86c4df55821796381d18f05d215a..d555849c71b3c724cf85e46d681bf71e99925851 100644
+index 6298f4fef7b8cc07db8e69c4d14f3558ea24f57d..0df644b758a72357a33b036d1eac4a9f1a7a406c 100644
 --- a/src/main/java/org/fiddlemc/fiddle/packet/PacketWithExplicitTargetClientConnection.java
 +++ b/src/main/java/org/fiddlemc/fiddle/packet/PacketWithExplicitTargetClientConnection.java
-@@ -68,4 +68,11 @@ public abstract class PacketWithExplicitTargetClientConnection<T extends PacketL
+@@ -66,4 +66,11 @@ public abstract class PacketWithExplicitTargetClientConnection<T extends PacketL
      }
      // Fiddle end - client perspective - localization - get player locale from connection
  
 +    // Fiddle start - client perspective - item replacements - get player game mode from connection
 +    @Override
-+    public @NotNull GameType getExplicitTargetGameMode() throws NullPointerException {
++    public net.minecraft.world.level.GameType getExplicitTargetGameMode() throws NullPointerException {
 +        return this.targetClientConnection.get().getPlayerGameMode();
 +    }
 +    // Fiddle end - client perspective - item replacements - get player game mode from connection

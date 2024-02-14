@@ -33,7 +33,7 @@ index 3d650b96cc5e4b30d8bf82a8a7edda63ead28969..88f958349b466ac717ede5748ce5a4ff
 +
  }
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index 86dccdc9853c176d9cf7b3cf6f66b739601e5ab9..02fce6e7148cd8552356b1e83fb8bd5bfcb196d0 100644
+index 86dccdc9853c176d9cf7b3cf6f66b739601e5ab9..aa15968aec1d1e3defed043ba7005c19fa2bc1a9 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
 @@ -288,6 +288,8 @@ public class ServerPlayer extends Player {
@@ -45,7 +45,7 @@ index 86dccdc9853c176d9cf7b3cf6f66b739601e5ab9..02fce6e7148cd8552356b1e83fb8bd5b
      public io.papermc.paper.chunk.system.RegionizedPlayerChunkLoader.ViewDistances getViewDistances() {
          return this.viewDistances.get();
      }
-@@ -2757,4 +2759,25 @@ public class ServerPlayer extends Player {
+@@ -2757,4 +2759,26 @@ public class ServerPlayer extends Player {
          return (CraftPlayer) super.getBukkitEntity();
      }
      // CraftBukkit end
@@ -60,9 +60,10 @@ index 86dccdc9853c176d9cf7b3cf6f66b739601e5ab9..02fce6e7148cd8552356b1e83fb8bd5b
 +    }
 +
 +    /**
-+     * @param clientPerspective The value to initialize this player's {@link ClientPerspective} to.
++     * @param clientPerspective The value to initialize this player's
++     * {@link org.fiddlemc.fiddle.packet.ClientPerspective} to.
 +     */
-+    public final void setClientPerspective(@org.jetbrains.annotations.NotNull org.fiddlemc.fiddle.packet.ClientPerspective clientPerspective) {
++    public final void setClientPerspective(org.fiddlemc.fiddle.packet.ClientPerspective clientPerspective) {
 +        if (this.clientPerspective != null) {
 +            throw new IllegalStateException("Tried to set Player.clientPerspective when it was already set");
 +        }

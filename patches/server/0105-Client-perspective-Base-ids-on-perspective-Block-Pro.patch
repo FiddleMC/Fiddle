@@ -13,53 +13,45 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/fiddlemc/fiddle/packet/ClientPerspective.java b/src/main/java/org/fiddlemc/fiddle/packet/ClientPerspective.java
-index cf87eea90d072d246184b24a4614573164aa1e5a..0393fce9dbe9cb66ba776a4dd85d8310e8750fa2 100644
+index b97f5798056d3083cb0ba2e11c55544cff9dde81..eb26df34a458d48319fe7500322525661e06a0fb 100644
 --- a/src/main/java/org/fiddlemc/fiddle/packet/ClientPerspective.java
 +++ b/src/main/java/org/fiddlemc/fiddle/packet/ClientPerspective.java
-@@ -2,7 +2,12 @@
- 
- package org.fiddlemc.fiddle.packet;
- 
-+import net.minecraft.core.IdMap;
-+import net.minecraft.core.registries.BuiltInRegistries;
-+import net.minecraft.world.level.block.Block;
-+import net.minecraft.world.level.block.Blocks;
- import org.jetbrains.annotations.NotNull;
-+import org.jetbrains.annotations.Nullable;
- 
- /**
-  * This class represents the static circumstances under which a client (typically a player) observes the data sent.
-@@ -61,6 +66,38 @@ public class ClientPerspective {
+@@ -59,6 +59,43 @@ public class ClientPerspective {
          this.understandsServerSideTranslations = understandsServerSideTranslations;
      }
  
 +    // Fiddle start - client perspective - base ids on perspective - provide - block
 +    /**
-+     * @return The {@link IdMap} that {@linkplain IdMap#getId provides} the ids for {@linkplain Block blocks}
++     * @return The {@link net.minecraft.core.IdMap} that
++     * {@linkplain net.minecraft.core.IdMap#getId provides} the ids for
++     * {@linkplain net.minecraft.world.level.block.Block blocks}
 +     * that a client with this perspective interprets correctly.
 +     */
-+    public IdMap<Block> getPacketBlockIdMap() {
-+        return understandsServerSideItemsAndBlocks ? BuiltInRegistries.BLOCK : Block.VANILLA_ONLY_BLOCK_REGISTRY;
++    public net.minecraft.core.IdMap<net.minecraft.world.level.block.Block> getPacketBlockIdMap() {
++        return understandsServerSideItemsAndBlocks ? net.minecraft.core.registries.BuiltInRegistries.BLOCK : net.minecraft.world.level.block.Block.VANILLA_ONLY_BLOCK_REGISTRY;
 +    }
 +
 +    /**
-+     * @return The id provided by this perspective's {@link #getPacketBlockIdMap()}, for the given {@link Block}.
-+     * A null value will be interpreted as {@link Blocks#AIR}.
++     * @return The id provided by this perspective's {@link #getPacketBlockIdMap()},
++     * for the given {@link net.minecraft.world.level.block.Block}.
++     * A null value will be interpreted as
++     * {@link net.minecraft.world.level.block.Blocks#AIR}.
 +     * <p>
 +     *     This is based on {@link #getPacketBlockIdMap()}, but uses the cached id for optimization instead.
 +     * </p>
 +     */
-+    public int getPacketBlockId(@Nullable Block block) {
-+        var blockToQuery = block == null ? Blocks.AIR : block;
++    public int getPacketBlockId(@org.jetbrains.annotations.Nullable net.minecraft.world.level.block.Block block) {
++        var blockToQuery = block == null ? net.minecraft.world.level.block.Blocks.AIR : block;
 +        return understandsServerSideItemsAndBlocks ? blockToQuery.indexInBlockRegistry : blockToQuery.indexInVanillaOnlyBlockRegistry;
 +    }
 +
 +    /**
-+     * @return The single {@link #getPacketBlockId} value for the given {@link Block}, if it is the same
++     * @return The single {@link #getPacketBlockId} value for the given
++     * {@link net.minecraft.world.level.block.Block}, if it is the same
 +     * for all possible perspectives, or -1 otherwise.
 +     */
-+    public static int getSinglePacketBlockId(@Nullable Block block) {
-+        var blockToQuery = block == null ? Blocks.AIR : block;
++    public static int getSinglePacketBlockId(@org.jetbrains.annotations.Nullable net.minecraft.world.level.block.Block block) {
++        var blockToQuery = block == null ? net.minecraft.world.level.block.Blocks.AIR : block;
 +        int potentialSingleIndex = blockToQuery.indexInBlockRegistry;
 +        return potentialSingleIndex == blockToQuery.indexInVanillaOnlyBlockRegistry ? potentialSingleIndex : -1;
 +    }

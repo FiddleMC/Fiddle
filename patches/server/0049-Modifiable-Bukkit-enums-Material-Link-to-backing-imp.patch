@@ -17,10 +17,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-index 208a72638ee3e984c34d2ba2a473479ad1e7629e..3bc9e10b929b39d46a6d72a94c6c0242a6f1d1cd 100644
+index f4c164cca6604ce310d392fc90a95689eaed8881..1bdb975180b31bcad8b306ff5a05d9aa2585d103 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-@@ -298,11 +298,11 @@ public final class CraftMagicNumbers implements UnsafeValues {
+@@ -297,11 +297,11 @@ public final class CraftMagicNumbers implements UnsafeValues {
          }
          // Paper end
          for (Block block : BuiltInRegistries.BLOCK) {

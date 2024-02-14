@@ -14,40 +14,40 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/fiddlemc/fiddle/material/MaterialNameAndKeyConversion.java b/src/main/java/org/fiddlemc/fiddle/material/MaterialNameAndKeyConversion.java
-index fe14459638ae832f98594a95057a3b69246c661a..8cca22d4f380878c3d0fdebd57f39494a86528f7 100644
+index 95b8664aafb176bb549d376b7e248cf3e792de76..bbae3c95ffaf5697fd9509690d0953ce4b78badd 100644
 --- a/src/main/java/org/fiddlemc/fiddle/material/MaterialNameAndKeyConversion.java
 +++ b/src/main/java/org/fiddlemc/fiddle/material/MaterialNameAndKeyConversion.java
-@@ -26,12 +26,42 @@ public final class MaterialNameAndKeyConversion {
+@@ -21,12 +21,42 @@ public final class MaterialNameAndKeyConversion {
          throw new RuntimeException();
      }
  
 +    // Fiddle start - modifiable Bukkit enums - inject runtime versions - Material - keys for Fiddle values
-+    private static @Nullable Map<String, NamespacedKey> fiddleEnumNamesToNamespacedKey = new java.util.HashMap<>(0);
++    private static @org.jetbrains.annotations.Nullable java.util.Map<String, org.bukkit.NamespacedKey> fiddleEnumNamesToNamespacedKey = new java.util.HashMap<>(0);
 +
-+    public static void registerFiddleEnumNameToNamespacedKey(@NotNull String enumName, @NotNull String namespace, @NotNull String path) {
++    public static void registerFiddleEnumNameToNamespacedKey(String enumName, String namespace, String path) {
 +        if (fiddleEnumNamesToNamespacedKey == null) {
 +            throw new IllegalStateException("Cannot register Fiddle enum name to namespaced key after the key cache has been filled");
 +        }
-+        fiddleEnumNamesToNamespacedKey.put(enumName, new NamespacedKey(namespace, path));
++        fiddleEnumNamesToNamespacedKey.put(enumName, new org.bukkit.NamespacedKey(namespace, path));
 +    }
 +    // Fiddle end - modifiable Bukkit enums - inject runtime versions - Material - keys for Fiddle values
 +
      // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - key
-     private static final CachedMaterialProperty<NamespacedKey> keyCache = new CachedMaterialProperty<>(
-         NamespacedKey[]::new,
+     private static final CachedMaterialProperty<org.bukkit.NamespacedKey> keyCache = new CachedMaterialProperty<>(
+         org.bukkit.NamespacedKey[]::new,
 -        // Based on the original org.bukkit.Material constructor
--        material -> NamespacedKey.minecraft(material.name().toLowerCase(Locale.ROOT))
+-        material -> org.bukkit.NamespacedKey.minecraft(material.name().toLowerCase(java.util.Locale.ROOT))
 -    );
 +        // Fiddle start - modifiable Bukkit enums - inject runtime versions - Material - keys for Fiddle values
 +        material -> {
 +            if (fiddleEnumNamesToNamespacedKey != null) {
-+                @Nullable NamespacedKey fromFiddleEnumName = fiddleEnumNamesToNamespacedKey.get(material.name());
++                @org.jetbrains.annotations.Nullable org.bukkit.NamespacedKey fromFiddleEnumName = fiddleEnumNamesToNamespacedKey.get(material.name());
 +                if (fromFiddleEnumName != null) {
 +                    return fromFiddleEnumName;
 +                }
 +            }
 +            // Based on the original org.bukkit.Material constructor
-+            return NamespacedKey.minecraft(material.name().toLowerCase(Locale.ROOT));
++            return org.bukkit.NamespacedKey.minecraft(material.name().toLowerCase(java.util.Locale.ROOT));
 +        }
 +    ) {
 +

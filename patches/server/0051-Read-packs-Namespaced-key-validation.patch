@@ -10,17 +10,16 @@ Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/ContentNamespacedKeyValidation.java b/src/main/java/org/fiddlemc/fiddle/pack/read/ContentNamespacedKeyValidation.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..606f95f74b169f6c1065cfdae317b1284437ea01
+index 0000000000000000000000000000000000000000..f1863aa9043e4da5926589b92a4cd56f406399c5
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/read/ContentNamespacedKeyValidation.java
-@@ -0,0 +1,85 @@
+@@ -0,0 +1,84 @@
 +// Fiddle - read packs - namespaced key validation
 +
 +package org.fiddlemc.fiddle.pack.read;
 +
 +import net.minecraft.resources.ResourceLocation;
 +import org.bukkit.NamespacedKey;
-+import org.jetbrains.annotations.NotNull;
 +import org.jetbrains.annotations.Nullable;
 +
 +/**
@@ -54,7 +53,7 @@ index 0000000000000000000000000000000000000000..606f95f74b169f6c1065cfdae317b128
 +     */
 +    private static final int MAX_PATH_LENGTH = 140;
 +
-+    public static boolean hasOnlyLowerCaseLettersDigitsAndUnderscores(@NotNull String string) {
++    public static boolean hasOnlyLowerCaseLettersDigitsAndUnderscores(String string) {
 +        for (char c : string.toCharArray()) {
 +            if (!((c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '_')) {
 +                return false;

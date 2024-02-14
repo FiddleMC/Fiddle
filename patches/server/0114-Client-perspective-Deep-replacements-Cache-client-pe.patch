@@ -8,34 +8,26 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/network/FriendlyByteBuf.java b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
-index 9df85af48978e8b3a690b5415502be5a3efb2029..15100226d5eab17f5be39651eeb2cbbf565807d1 100644
+index af73b6f3fc9f9467bee4703652103c02b20f8dca..545878d17c4d421b4bb97b85e62d42ddc75c4d75 100644
 --- a/src/main/java/net/minecraft/network/FriendlyByteBuf.java
 +++ b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
-@@ -78,6 +78,7 @@ import net.minecraft.world.level.ChunkPos;
- import net.minecraft.world.level.Level;
- import net.minecraft.world.phys.BlockHitResult;
- import net.minecraft.world.phys.Vec3;
-+import org.fiddlemc.fiddle.packet.deepreplacement.ClientPerspectiveAndSettingsSupplier;
- import org.jetbrains.annotations.NotNull;
- import org.joml.Quaternionf;
- import org.joml.Vector3f;
-@@ -103,6 +104,8 @@ public class FriendlyByteBuf extends ByteBuf {
-     public @Nullable java.lang.ref.WeakReference<net.minecraft.network.protocol.@NotNull Packet<?>> writingPacket;
+@@ -102,6 +102,8 @@ public class FriendlyByteBuf extends ByteBuf {
+     public @Nullable java.lang.ref.WeakReference<net.minecraft.network.protocol.@org.jetbrains.annotations.NotNull Packet<?>> writingPacket;
      // Fiddle end - client perspective - packets are modifiable - store explicit perspective and locale - FriendlyByteBuf
  
-+    private @Nullable ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettingsSupplier; // Fiddle - client perspective - deep replacements - perspective and settings supplier - cache in FriendlyByteBuf
++    private @Nullable org.fiddlemc.fiddle.packet.deepreplacement.ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettingsSupplier; // Fiddle - client perspective - deep replacements - perspective and settings supplier - cache in FriendlyByteBuf
 +
      public FriendlyByteBuf(ByteBuf parent) {
          this.source = parent;
      }
-@@ -1754,4 +1757,13 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -1753,4 +1755,13 @@ public class FriendlyByteBuf extends ByteBuf {
      }
      // Fiddle end - client perspective - packets are modifiable - expose target client properties - can be used by FriendlyByteBuf
  
 +    // Fiddle start - client perspective - deep replacements - perspective and settings supplier - cache in FriendlyByteBuf
-+    public @NotNull ClientPerspectiveAndSettingsSupplier getClientPerspectiveAndSettingsSupplier() {
++    public org.fiddlemc.fiddle.packet.deepreplacement.ClientPerspectiveAndSettingsSupplier getClientPerspectiveAndSettingsSupplier() {
 +        if (this.clientPerspectiveAndSettingsSupplier == null) {
-+            this.clientPerspectiveAndSettingsSupplier = ClientPerspectiveAndSettingsSupplier.forFriendlyByteBuf(this);
++            this.clientPerspectiveAndSettingsSupplier = org.fiddlemc.fiddle.packet.deepreplacement.ClientPerspectiveAndSettingsSupplier.forFriendlyByteBuf(this);
 +        }
 +        return this.clientPerspectiveAndSettingsSupplier;
 +    }

@@ -9,7 +9,7 @@ Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacementScope.java b/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacementScope.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..caa54c23bf71da0d86c6ff8c08811c61cea0b78d
+index 0000000000000000000000000000000000000000..303f2ff8b790166371cab71e30045ab37ff4aa5a
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacementScope.java
 @@ -0,0 +1,145 @@
@@ -72,31 +72,31 @@ index 0000000000000000000000000000000000000000..caa54c23bf71da0d86c6ff8c08811c61
 +        return this.attemptToReplaceItemsAndBlocks || this.attemptToReplaceTranslatables;
 +    }
 +
-+    public @NotNull DeepReplacementScope withAttemptToReplaceItemsAndBlocks() {
++    public DeepReplacementScope withAttemptToReplaceItemsAndBlocks() {
 +        return values[this.indexInValues | 1];
 +    }
 +
-+    public @NotNull DeepReplacementScope withAttemptToReplaceTranslatables() {
++    public DeepReplacementScope withAttemptToReplaceTranslatables() {
 +        return values[this.indexInValues | 2];
 +    }
 +
-+    public @NotNull DeepReplacementScope withAttemptToReplaceInHoverEvents() {
++    public DeepReplacementScope withAttemptToReplaceInHoverEvents() {
 +        return values[this.indexInValues | 4];
 +    }
 +
-+    public @NotNull DeepReplacementScope withoutAttemptToReplaceItemsAndBlocks() {
++    public DeepReplacementScope withoutAttemptToReplaceItemsAndBlocks() {
 +        return values[this.indexInValues & (~1)];
 +    }
 +
-+    public @NotNull DeepReplacementScope withoutAttemptToReplaceTranslatables() {
++    public DeepReplacementScope withoutAttemptToReplaceTranslatables() {
 +        return values[this.indexInValues & (~2)];
 +    }
 +
-+    public @NotNull DeepReplacementScope withoutAttemptToReplaceInHoverEvents() {
++    public DeepReplacementScope withoutAttemptToReplaceInHoverEvents() {
 +        return values[this.indexInValues & (~4)];
 +    }
 +
-+    public @NotNull DeepReplacementScope withoutUnnecessaryReplacements(@Nullable ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings) {
++    public DeepReplacementScope withoutUnnecessaryReplacements(@Nullable ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings) {
 +        // If there are already no replacements, we do not have to remove any
 +        if (this == DeepReplacementScope.NOTHING) {
 +            return this;
@@ -142,7 +142,7 @@ index 0000000000000000000000000000000000000000..caa54c23bf71da0d86c6ff8c08811c61
 +        }
 +    }
 +
-+    public static @NotNull DeepReplacementScope of(boolean attemptToReplaceItemsAndBlocks, boolean attemptToReplaceTranslatables, boolean attemptToReplaceInHoverEvents) {
++    public static DeepReplacementScope of(boolean attemptToReplaceItemsAndBlocks, boolean attemptToReplaceTranslatables, boolean attemptToReplaceInHoverEvents) {
 +        int index = (attemptToReplaceItemsAndBlocks ? 1 : 0) + (attemptToReplaceTranslatables ? 2 : 0) + (attemptToReplaceInHoverEvents ? 4 : 0);
 +        return values[index];
 +    }
@@ -150,11 +150,11 @@ index 0000000000000000000000000000000000000000..caa54c23bf71da0d86c6ff8c08811c61
 +    /**
 +     * A {@link DeepReplacementScope} that performs all replacement checks.
 +     */
-+    public static final @NotNull DeepReplacementScope EVERYTHING = of(true, true, true);
++    public static final DeepReplacementScope EVERYTHING = of(true, true, true);
 +
 +    /**
 +     * A {@link DeepReplacementScope} that makes no replacements.
 +     */
-+    public static final @NotNull DeepReplacementScope NOTHING = of(false, false, false);
++    public static final DeepReplacementScope NOTHING = of(false, false, false);
 +
 +}

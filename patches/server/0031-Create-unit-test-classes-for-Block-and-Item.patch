@@ -11,10 +11,10 @@ Fiddle - https://fiddlemc.org
 
 diff --git a/src/test/java/org/fiddlemc/fiddle/block/PerBlockTest.java b/src/test/java/org/fiddlemc/fiddle/block/PerBlockTest.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..4ad77f8ce7b43b5b54d7f7d1f9dfdebdd0ca9d8f
+index 0000000000000000000000000000000000000000..d7d99910630a7e8267352b734bc2eee6c91982f6
 --- /dev/null
 +++ b/src/test/java/org/fiddlemc/fiddle/block/PerBlockTest.java
-@@ -0,0 +1,15 @@
+@@ -0,0 +1,18 @@
 +// Fiddle - tests related to net.minecraft.world.level.block.Block
 +
 +package org.fiddlemc.fiddle.block;
@@ -22,6 +22,9 @@ index 0000000000000000000000000000000000000000..4ad77f8ce7b43b5b54d7f7d1f9dfdebd
 +import net.minecraft.core.registries.BuiltInRegistries;
 +import net.minecraft.world.level.block.Block;
 +import org.bukkit.support.AbstractTestingBase;
++import org.junit.jupiter.api.Test;
++
++import static org.junit.jupiter.api.Assertions.*;
 +
 +public class PerBlockTest extends AbstractTestingBase {
 +
@@ -32,10 +35,10 @@ index 0000000000000000000000000000000000000000..4ad77f8ce7b43b5b54d7f7d1f9dfdebd
 +}
 diff --git a/src/test/java/org/fiddlemc/fiddle/item/PerItemTest.java b/src/test/java/org/fiddlemc/fiddle/item/PerItemTest.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..d1d9ee8190fa648efacea96ddaf5b55801e2ade7
+index 0000000000000000000000000000000000000000..911160beec65ff1d865e068f8ad817d6b533ebda
 --- /dev/null
 +++ b/src/test/java/org/fiddlemc/fiddle/item/PerItemTest.java
-@@ -0,0 +1,15 @@
+@@ -0,0 +1,18 @@
 +// Fiddle - tests related to net.minecraft.world.item.Item
 +
 +package org.fiddlemc.fiddle.item;
@@ -43,6 +46,9 @@ index 0000000000000000000000000000000000000000..d1d9ee8190fa648efacea96ddaf5b558
 +import net.minecraft.core.registries.BuiltInRegistries;
 +import net.minecraft.world.item.Item;
 +import org.bukkit.support.AbstractTestingBase;
++import org.junit.jupiter.api.Test;
++
++import static org.junit.jupiter.api.Assertions.*;
 +
 +public class PerItemTest extends AbstractTestingBase {
 +

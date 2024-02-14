@@ -17,10 +17,10 @@ Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/fiddlemc/fiddle/material/MaterialNameAndKeyConversion.java b/src/main/java/org/fiddlemc/fiddle/material/MaterialNameAndKeyConversion.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..db0b953c6aacd29817dcb0bd5069346ac7116b80
+index 0000000000000000000000000000000000000000..472e6f94da1726e4fde1eda4035dd91a50453f7d
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/material/MaterialNameAndKeyConversion.java
-@@ -0,0 +1,20 @@
+@@ -0,0 +1,24 @@
 +// Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - name and key conversion
 +
 +package org.fiddlemc.fiddle.material;
@@ -28,12 +28,16 @@ index 0000000000000000000000000000000000000000..db0b953c6aacd29817dcb0bd5069346a
 +import org.bukkit.Material;
 +
 +/**
-+ * This class provides a number of implementations for the conversion of names and keys
-+ * from and to {@link Material} instances.
++ * Do not use for any reason.
++ * This class is for internal purposes only.
++ * <p>
++ *     This class provides a number of implementations for the conversion of names and keys
++ *     from and to {@link Material} instances.
++ * </p>
 + *
-+ * @deprecated Do not use: for internal use only.
++ * @apiNote Internal Use Only
 + */
-+@Deprecated(forRemoval = true)
++@org.jetbrains.annotations.ApiStatus.Internal
 +public final class MaterialNameAndKeyConversion {
 +
 +    private MaterialNameAndKeyConversion() {

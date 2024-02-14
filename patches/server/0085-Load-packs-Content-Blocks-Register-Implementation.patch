@@ -234,27 +234,15 @@ index 0000000000000000000000000000000000000000..5e98efefe943fac910f9af086d629ccf
 +
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/parent/BlockDefinitionBase.java b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/parent/BlockDefinitionBase.java
-index c66e667ebe1cdc9ceb0d81add588246ccad0302e..2bf1934b8f7386200474b0323ca26b23e1feb47f 100644
+index c66e667ebe1cdc9ceb0d81add588246ccad0302e..9c0a9bec2484ed628bec3527eb8b77024d2b5a88 100644
 --- a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/parent/BlockDefinitionBase.java
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/parent/BlockDefinitionBase.java
-@@ -4,23 +4,35 @@ package org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.block.parent;
- 
- import net.minecraft.resources.ResourceLocation;
- import net.minecraft.world.level.block.Block;
-+import net.minecraft.world.level.block.state.BlockBehaviour;
- import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.block.BlockDefinition;
- import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.blockoritem.BlockOrItemDefinitionBase;
- import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.withparent.FiddleContentDefinitionParent;
- 
-+import java.util.function.Function;
-+
- /**
-  * A parent for blocks that can be used in a {@link BlockDefinition}
+@@ -13,14 +13,23 @@ import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.withparent.FiddleC
   * instead of a particular block. Most bases correspond to some particular subclass of {@link Block}.
   */
  public final class BlockDefinitionBase
 -    extends BlockOrItemDefinitionBase
-+    extends BlockOrItemDefinitionBase<BlockBehaviour.Properties> // Fiddle - load packs - blocks - register - implementation
++    extends BlockOrItemDefinitionBase<net.minecraft.world.level.block.state.BlockBehaviour.Properties> // Fiddle - load packs - blocks - register - implementation
      implements FiddleContentDefinitionParent {
  
      public static final BlockDefinitionBase BLOCK = new BlockDefinitionBase(new ResourceLocation(ResourceLocation.DEFAULT_NAMESPACE, ""));
@@ -263,7 +251,7 @@ index c66e667ebe1cdc9ceb0d81add588246ccad0302e..2bf1934b8f7386200474b0323ca26b23
 +    // Fiddle start - load packs - blocks - register - implementation
 +    private BlockDefinitionBase(
 +        ResourceLocation untypedResourceLocation,
-+        Function<BlockBehaviour.Properties, BlockBehaviour.Properties> propertiesCreator
++        java.util.function.Function<net.minecraft.world.level.block.state.BlockBehaviour.Properties, net.minecraft.world.level.block.state.BlockBehaviour.Properties> propertiesCreator
 +    ) {
 +        super(BlockDefinition.TYPE, untypedResourceLocation, propertiesCreator);
 +    }
@@ -271,7 +259,7 @@ index c66e667ebe1cdc9ceb0d81add588246ccad0302e..2bf1934b8f7386200474b0323ca26b23
 +
      private BlockDefinitionBase(ResourceLocation untypedResourceLocation) {
 -        this(untypedResourceLocation);
-+        this(untypedResourceLocation, Function.identity()); // Fiddle - load packs - blocks - register - implementation
++        this(untypedResourceLocation, java.util.function.Function.identity()); // Fiddle - load packs - blocks - register - implementation
      }
  
  }

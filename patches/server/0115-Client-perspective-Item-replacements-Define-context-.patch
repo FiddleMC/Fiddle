@@ -65,10 +65,10 @@ index 0000000000000000000000000000000000000000..1f516f518a6ab7f05a3dffce75a2dbff
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/packet/item/ItemStackInPacketContext.java b/src/main/java/org/fiddlemc/fiddle/packet/item/ItemStackInPacketContext.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..a8d014fd551627e992035906524c5d992dcff3b8
+index 0000000000000000000000000000000000000000..0c7df915214609aeaca4c5b72044c536dc53b710
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/packet/item/ItemStackInPacketContext.java
-@@ -0,0 +1,69 @@
+@@ -0,0 +1,68 @@
 +// Fiddle - client perspective - item replacements - context of ItemStack in packets
 +
 +package org.fiddlemc.fiddle.packet.item;
@@ -79,7 +79,6 @@ index 0000000000000000000000000000000000000000..a8d014fd551627e992035906524c5d99
 +import net.minecraft.world.item.Item;
 +import net.minecraft.world.item.ItemStack;
 +import net.minecraft.world.item.crafting.StonecutterRecipe;
-+import org.jetbrains.annotations.NotNull;
 +
 +/**
 + * The context of why an {@link ItemStack} is included in a packet,
@@ -125,14 +124,14 @@ index 0000000000000000000000000000000000000000..a8d014fd551627e992035906524c5d99
 +     */
 +    IN_ITEM_FRAME(ItemAndCustomModelDataReplacementMapping.DEFAULT, false);
 +
-+    public final @NotNull ItemAndCustomModelDataReplacementMapping typeAndCustomModelDataMapping;
++    public final ItemAndCustomModelDataReplacementMapping typeAndCustomModelDataMapping;
 +
 +    /**
 +     * If false, no attempt is made to modify the display name of the item.
 +     */
 +    public final boolean attemptToChangeDisplayName;
 +
-+    ItemStackInPacketContext(@NotNull ItemAndCustomModelDataReplacementMapping typeAndCustomModelDataMapping, boolean attemptToChangeDisplayName) {
++    ItemStackInPacketContext(ItemAndCustomModelDataReplacementMapping typeAndCustomModelDataMapping, boolean attemptToChangeDisplayName) {
 +        this.typeAndCustomModelDataMapping = typeAndCustomModelDataMapping;
 +        this.attemptToChangeDisplayName = attemptToChangeDisplayName;
 +    }

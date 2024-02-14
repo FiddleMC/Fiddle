@@ -52,18 +52,10 @@ index af60eff82fa914fd144b10bbeadbc00f59985732..a608ec6ac4eb34c0894095516aa63a1c
      private static final ThreadLocal<Object2ByteLinkedOpenHashMap<Block.BlockStatePairKey>> OCCLUSION_CACHE = ThreadLocal.withInitial(() -> {
          Object2ByteLinkedOpenHashMap<Block.BlockStatePairKey> object2bytelinkedopenhashmap = new Object2ByteLinkedOpenHashMap<Block.BlockStatePairKey>(2048, 0.25F) {
 diff --git a/src/main/java/org/fiddlemc/fiddle/registry/BlockRegistry.java b/src/main/java/org/fiddlemc/fiddle/registry/BlockRegistry.java
-index edc623d3797a6e033447d3b6fb0c02aab125201f..71b6b4cc3e22ceb5a7322d81fbd640b7a1095e37 100644
+index 3fa7faeeaa2fe076ace33d8219f3c44fe3039aa6..b5fd2a1094f6ea8278f3d76228b9919d51e3b849 100644
 --- a/src/main/java/org/fiddlemc/fiddle/registry/BlockRegistry.java
 +++ b/src/main/java/org/fiddlemc/fiddle/registry/BlockRegistry.java
-@@ -8,6 +8,7 @@ import net.minecraft.core.Holder;
- import net.minecraft.core.Registry;
- import net.minecraft.core.registries.BuiltInRegistries;
- import net.minecraft.resources.ResourceKey;
-+import net.minecraft.resources.ResourceLocation;
- import net.minecraft.world.item.Item;
- import net.minecraft.world.item.Items;
- import net.minecraft.world.level.block.Block;
-@@ -42,6 +43,11 @@ public final class BlockRegistry extends DefaultedMappedRegistry<Block> {
+@@ -41,6 +41,11 @@ public final class BlockRegistry extends DefaultedMappedRegistry<Block> {
          // Register the entry
          var reference = super.register(key, entry, lifecycle);
  
@@ -74,14 +66,14 @@ index edc623d3797a6e033447d3b6fb0c02aab125201f..71b6b4cc3e22ceb5a7322d81fbd640b7
 +
          // Fiddle start - modded registries - apply block post-register operations instantly
          // Perform the post-register operations
-         for (BlockState blockState : entry.getStateDefinition().getPossibleStates()) {
-@@ -70,4 +76,12 @@ public final class BlockRegistry extends DefaultedMappedRegistry<Block> {
+         for (net.minecraft.world.level.block.state.BlockState blockState : entry.getStateDefinition().getPossibleStates()) {
+@@ -69,4 +74,12 @@ public final class BlockRegistry extends DefaultedMappedRegistry<Block> {
  
      }
  
 +    // Fiddle start - cache registry keys as fields - block
 +    @Override
-+    public ResourceLocation getKey(Block value) {
++    public net.minecraft.resources.ResourceLocation getKey(Block value) {
 +        // Use the cached value
 +        return value.keyInBlockRegistry;
 +    }
@@ -89,18 +81,10 @@ index edc623d3797a6e033447d3b6fb0c02aab125201f..71b6b4cc3e22ceb5a7322d81fbd640b7
 +
  }
 diff --git a/src/main/java/org/fiddlemc/fiddle/registry/ItemRegistry.java b/src/main/java/org/fiddlemc/fiddle/registry/ItemRegistry.java
-index e74f8c9b43894534fe624988ec9a3ca190ae5770..ac34e35521bb6772d25d1d5f43b9edd03229a62f 100644
+index 07c51206756ff60cdf45092f0ffc55d1f8bd1c13..2e867d0ce7d6521daabae3fde1f9d0909547b963 100644
 --- a/src/main/java/org/fiddlemc/fiddle/registry/ItemRegistry.java
 +++ b/src/main/java/org/fiddlemc/fiddle/registry/ItemRegistry.java
-@@ -8,6 +8,7 @@ import net.minecraft.core.Holder;
- import net.minecraft.core.Registry;
- import net.minecraft.core.registries.BuiltInRegistries;
- import net.minecraft.resources.ResourceKey;
-+import net.minecraft.resources.ResourceLocation;
- import net.minecraft.world.item.BlockItem;
- import net.minecraft.world.item.Item;
- 
-@@ -26,6 +27,11 @@ public final class ItemRegistry extends DefaultedMappedRegistry<Item> {
+@@ -25,6 +25,11 @@ public final class ItemRegistry extends DefaultedMappedRegistry<Item> {
          // Register the entry
          var reference = super.register(key, entry, lifecycle);
  
@@ -111,14 +95,14 @@ index e74f8c9b43894534fe624988ec9a3ca190ae5770..ac34e35521bb6772d25d1d5f43b9edd0
 +
          // Fiddle start - modded registries - register item blocks from item registry
          // Register the item by its blocks if applicable
-         if (entry instanceof BlockItem blockItem) {
-@@ -45,4 +51,12 @@ public final class ItemRegistry extends DefaultedMappedRegistry<Item> {
+         if (entry instanceof net.minecraft.world.item.BlockItem blockItem) {
+@@ -44,4 +49,12 @@ public final class ItemRegistry extends DefaultedMappedRegistry<Item> {
  
      }
  
 +    // Fiddle start - cache registry keys as fields - item
 +    @Override
-+    public ResourceLocation getKey(Item value) {
++    public net.minecraft.resources.ResourceLocation getKey(Item value) {
 +        // Use the cached value
 +        return value.keyInItemRegistry;
 +    }
@@ -126,20 +110,10 @@ index e74f8c9b43894534fe624988ec9a3ca190ae5770..ac34e35521bb6772d25d1d5f43b9edd0
 +
  }
 diff --git a/src/test/java/org/fiddlemc/fiddle/block/PerBlockTest.java b/src/test/java/org/fiddlemc/fiddle/block/PerBlockTest.java
-index 4ad77f8ce7b43b5b54d7f7d1f9dfdebdd0ca9d8f..cc59e81f1670e34f357d96c9be316af382322301 100644
+index d7d99910630a7e8267352b734bc2eee6c91982f6..f0c325cfc3bdda179482f8b6289e5fde33949e29 100644
 --- a/src/test/java/org/fiddlemc/fiddle/block/PerBlockTest.java
 +++ b/src/test/java/org/fiddlemc/fiddle/block/PerBlockTest.java
-@@ -5,6 +5,9 @@ package org.fiddlemc.fiddle.block;
- import net.minecraft.core.registries.BuiltInRegistries;
- import net.minecraft.world.level.block.Block;
- import org.bukkit.support.AbstractTestingBase;
-+import org.junit.jupiter.api.Test;
-+
-+import static org.junit.jupiter.api.Assertions.assertEquals;
- 
- public class PerBlockTest extends AbstractTestingBase {
- 
-@@ -12,4 +15,13 @@ public class PerBlockTest extends AbstractTestingBase {
+@@ -15,4 +15,13 @@ public class PerBlockTest extends AbstractTestingBase {
          return BuiltInRegistries.BLOCK;
      }
  
@@ -154,20 +128,10 @@ index 4ad77f8ce7b43b5b54d7f7d1f9dfdebdd0ca9d8f..cc59e81f1670e34f357d96c9be316af3
 +
  }
 diff --git a/src/test/java/org/fiddlemc/fiddle/item/PerItemTest.java b/src/test/java/org/fiddlemc/fiddle/item/PerItemTest.java
-index d1d9ee8190fa648efacea96ddaf5b55801e2ade7..799295777aaa2ed7d90b8a2a37c1dc30cfc3bf72 100644
+index 911160beec65ff1d865e068f8ad817d6b533ebda..dbde3a6be3b45aea946eb18d7758a8230791c0e9 100644
 --- a/src/test/java/org/fiddlemc/fiddle/item/PerItemTest.java
 +++ b/src/test/java/org/fiddlemc/fiddle/item/PerItemTest.java
-@@ -5,6 +5,9 @@ package org.fiddlemc.fiddle.item;
- import net.minecraft.core.registries.BuiltInRegistries;
- import net.minecraft.world.item.Item;
- import org.bukkit.support.AbstractTestingBase;
-+import org.junit.jupiter.api.Test;
-+
-+import static org.junit.jupiter.api.Assertions.assertEquals;
- 
- public class PerItemTest extends AbstractTestingBase {
- 
-@@ -12,4 +15,13 @@ public class PerItemTest extends AbstractTestingBase {
+@@ -15,4 +15,13 @@ public class PerItemTest extends AbstractTestingBase {
          return BuiltInRegistries.ITEM;
      }
  

@@ -213,17 +213,10 @@ index 0000000000000000000000000000000000000000..cba53dbd37c307a9e978b26d9bf07a42
 +
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/item/parent/ItemDefinitionBase.java b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/item/parent/ItemDefinitionBase.java
-index f350d6858642891f2fd9016ba826d78bd7b7d074..f352b8a259eafa79da4575f678dc8504ef556755 100644
+index f350d6858642891f2fd9016ba826d78bd7b7d074..eb69ac9f03a7ffce9cb6c2ff320794b29e3d6c68 100644
 --- a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/item/parent/ItemDefinitionBase.java
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/item/parent/ItemDefinitionBase.java
-@@ -8,19 +8,30 @@ import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.blockoritem.BlockO
- import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.item.ItemDefinition;
- import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.withparent.FiddleContentDefinitionParent;
- 
-+import java.util.function.Function;
-+
- /**
-  * A parent for items that can be used in an {@link ItemDefinition}
+@@ -13,14 +13,23 @@ import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.withparent.FiddleC
   * instead of a particular block. Most bases correspond to some particular subclass of {@link Item}.
   */
  public final class ItemDefinitionBase
@@ -237,7 +230,7 @@ index f350d6858642891f2fd9016ba826d78bd7b7d074..f352b8a259eafa79da4575f678dc8504
 +    // Fiddle start - load packs - items - register - implementation
 +    private ItemDefinitionBase(
 +        ResourceLocation untypedResourceLocation,
-+        Function<Item.Properties, Item.Properties> propertiesCreator
++        java.util.function.Function<Item.Properties, Item.Properties> propertiesCreator
 +    ) {
 +        super(ItemDefinition.TYPE, untypedResourceLocation, propertiesCreator);
 +    }
@@ -245,7 +238,7 @@ index f350d6858642891f2fd9016ba826d78bd7b7d074..f352b8a259eafa79da4575f678dc8504
 +
      private ItemDefinitionBase(ResourceLocation untypedResourceLocation) {
 -        this(untypedResourceLocation);
-+        this(untypedResourceLocation, Function.identity()); // Fiddle - load packs - items - register - implementation
++        this(untypedResourceLocation, java.util.function.Function.identity()); // Fiddle - load packs - items - register - implementation
      }
  
  }

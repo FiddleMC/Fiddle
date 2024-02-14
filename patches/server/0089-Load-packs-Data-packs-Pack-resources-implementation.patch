@@ -20,26 +20,18 @@ index 5fc30259ea094ba4115cf0053e9bf79ae01a0487..ebba022e0f629eb05f448862677f2deb
      }
  
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java b/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java
-index c6e897377a80133df3039394a66e3fcc30886675..befba01ebb79f651ecb3419950dd1a6d57f22289 100644
+index c6e897377a80133df3039394a66e3fcc30886675..29e03b22f44306c5d8b91283c69941848ea79b7e 100644
 --- a/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/FiddlePackMeta.java
-@@ -3,6 +3,7 @@
- package org.fiddlemc.fiddle.pack;
- 
- import com.google.gson.JsonElement;
-+import com.google.gson.JsonObject;
- import org.jetbrains.annotations.Nullable;
- 
- import java.util.Objects;
-@@ -94,10 +95,14 @@ public class FiddlePackMeta {
+@@ -94,10 +94,14 @@ public class FiddlePackMeta {
          @SuppressWarnings({"FieldCanBeLocal", "unused"})
          private final int givenFormat;
          public final @Nullable JsonElement description;
 +        // Fiddle start - load packs - data packs - pack resources - meta
-+        public final JsonObject originalJson;
++        public final com.google.gson.JsonObject originalJson;
  
 -        public DataPackMeta(int givenFormat, @Nullable JsonElement description) {
-+        public DataPackMeta(int givenFormat, @Nullable JsonElement description, JsonObject originalJson) {
++        public DataPackMeta(int givenFormat, @Nullable JsonElement description, com.google.gson.JsonObject originalJson) {
 +            // Fiddle end - load packs - data packs - pack resources - meta
              this.givenFormat = givenFormat;
              this.description = description;

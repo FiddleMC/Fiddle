@@ -94,10 +94,10 @@ index acb458e03bfffdae406eae99eb81ce0c3078c9ea..786a4d38be67d28edf5fe446aec29663
          super(block, propertyMap, codec);
      }
 diff --git a/src/main/java/org/fiddlemc/fiddle/registry/BlockRegistry.java b/src/main/java/org/fiddlemc/fiddle/registry/BlockRegistry.java
-index 71b6b4cc3e22ceb5a7322d81fbd640b7a1095e37..d8de79dd7468f3c272a207db9939cb9ec2e4d765 100644
+index b5fd2a1094f6ea8278f3d76228b9919d51e3b849..9de1599bd929ed93531d1c4924b507b7d2432ed8 100644
 --- a/src/main/java/org/fiddlemc/fiddle/registry/BlockRegistry.java
 +++ b/src/main/java/org/fiddlemc/fiddle/registry/BlockRegistry.java
-@@ -48,6 +48,11 @@ public final class BlockRegistry extends DefaultedMappedRegistry<Block> {
+@@ -46,6 +46,11 @@ public final class BlockRegistry extends DefaultedMappedRegistry<Block> {
          entry.keyInBlockRegistry = super.getKey(entry);
          // Fiddle end - cache registry keys as fields - block
  
@@ -108,8 +108,8 @@ index 71b6b4cc3e22ceb5a7322d81fbd640b7a1095e37..d8de79dd7468f3c272a207db9939cb9e
 +
          // Fiddle start - modded registries - apply block post-register operations instantly
          // Perform the post-register operations
-         for (BlockState blockState : entry.getStateDefinition().getPossibleStates()) {
-@@ -84,4 +89,12 @@ public final class BlockRegistry extends DefaultedMappedRegistry<Block> {
+         for (net.minecraft.world.level.block.state.BlockState blockState : entry.getStateDefinition().getPossibleStates()) {
+@@ -82,4 +87,12 @@ public final class BlockRegistry extends DefaultedMappedRegistry<Block> {
      }
      // Fiddle end - cache registry keys as fields - block
  
@@ -152,10 +152,10 @@ index d1f2e7f8c60e4762a3e72b00ad30e04682914a15..ed2ed67a71e0bc71ccb0eecd4e4f109f
 +
  }
 diff --git a/src/main/java/org/fiddlemc/fiddle/registry/ItemRegistry.java b/src/main/java/org/fiddlemc/fiddle/registry/ItemRegistry.java
-index ac34e35521bb6772d25d1d5f43b9edd03229a62f..46dab70cdde17c1beeb3f374198a9270b6a6e89c 100644
+index 2e867d0ce7d6521daabae3fde1f9d0909547b963..0a448e99216adcbf82501bc3486ccf851956993b 100644
 --- a/src/main/java/org/fiddlemc/fiddle/registry/ItemRegistry.java
 +++ b/src/main/java/org/fiddlemc/fiddle/registry/ItemRegistry.java
-@@ -32,6 +32,11 @@ public final class ItemRegistry extends DefaultedMappedRegistry<Item> {
+@@ -30,6 +30,11 @@ public final class ItemRegistry extends DefaultedMappedRegistry<Item> {
          entry.keyInItemRegistry = super.getKey(entry);
          // Fiddle end - cache registry keys as fields - item
  
@@ -166,8 +166,8 @@ index ac34e35521bb6772d25d1d5f43b9edd03229a62f..46dab70cdde17c1beeb3f374198a9270
 +
          // Fiddle start - modded registries - register item blocks from item registry
          // Register the item by its blocks if applicable
-         if (entry instanceof BlockItem blockItem) {
-@@ -59,4 +64,12 @@ public final class ItemRegistry extends DefaultedMappedRegistry<Item> {
+         if (entry instanceof net.minecraft.world.item.BlockItem blockItem) {
+@@ -57,4 +62,12 @@ public final class ItemRegistry extends DefaultedMappedRegistry<Item> {
      }
      // Fiddle end - cache registry keys as fields - item
  
@@ -253,7 +253,7 @@ index 94ff1dd6849f1e4f225254ff5c36421c7632b897..c5a0911cd33229c8a952293aacfc30b2
  
  }
 diff --git a/src/test/java/org/fiddlemc/fiddle/block/PerBlockTest.java b/src/test/java/org/fiddlemc/fiddle/block/PerBlockTest.java
-index cc59e81f1670e34f357d96c9be316af382322301..51c4f8d436fb54bca00abb6f14753641e8f1bae7 100644
+index f0c325cfc3bdda179482f8b6289e5fde33949e29..2992ecd670453569ab8daf0f5b45a397cd726555 100644
 --- a/src/test/java/org/fiddlemc/fiddle/block/PerBlockTest.java
 +++ b/src/test/java/org/fiddlemc/fiddle/block/PerBlockTest.java
 @@ -24,4 +24,26 @@ public class PerBlockTest extends AbstractTestingBase {
@@ -284,7 +284,7 @@ index cc59e81f1670e34f357d96c9be316af382322301..51c4f8d436fb54bca00abb6f14753641
 +
  }
 diff --git a/src/test/java/org/fiddlemc/fiddle/item/PerItemTest.java b/src/test/java/org/fiddlemc/fiddle/item/PerItemTest.java
-index 799295777aaa2ed7d90b8a2a37c1dc30cfc3bf72..227e5d9c75791b6472feac1323cbab40fb76f655 100644
+index dbde3a6be3b45aea946eb18d7758a8230791c0e9..43304cc134fc687fd5f4811cd60e1f9b94a85c0f 100644
 --- a/src/test/java/org/fiddlemc/fiddle/item/PerItemTest.java
 +++ b/src/test/java/org/fiddlemc/fiddle/item/PerItemTest.java
 @@ -24,4 +24,14 @@ public class PerItemTest extends AbstractTestingBase {

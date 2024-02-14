@@ -1,0 +1,27 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sat, 10 Feb 2024 11:01:28 +0100
+Subject: [PATCH] Client perspective - Block state visualization - Level event
+ data - Block brush completion
+
+Registers `LevelEvent.PARTICLES_AND_SOUND_BRUSH_BLOCK_COMPLETE` as a level event type where the data represents a block state.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelEventPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelEventPacket.java
+index 9a18265f7ab69077d4199f5013846511587a83a0..e447801333cf4ad744e2b4e22fa9404f7296aee2 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelEventPacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelEventPacket.java
+@@ -8,9 +8,11 @@ public class ClientboundLevelEventPacket extends org.fiddlemc.fiddle.packet.Clon
+     // Fiddle start - client perspective - block state visualization - level event data - data can be BlockState
+     private final static int[] typesWhereDataIsBlockState = {
+         net.minecraft.world.level.block.LevelEvent.PARTICLES_DESTROY_BLOCK, // Fiddle - client perspective - block state visualization - level event data - block break particles
++        net.minecraft.world.level.block.LevelEvent.PARTICLES_AND_SOUND_BRUSH_BLOCK_COMPLETE, // Fiddle - client perspective - block state visualization - level event data - block brush complete
+     };
+     private final static org.fiddlemc.fiddle.packet.block.BlockStateVisualizationSetupper.BlockStateVisualizationPurpose[] blockStateVisualizationPurposeForTypes = {
+         org.fiddlemc.fiddle.packet.block.BlockStateVisualizationSetupper.BlockStateVisualizationPurpose.PARTICLE, // Fiddle - client perspective - block state visualization - level event data - block break particles
++        org.fiddlemc.fiddle.packet.block.BlockStateVisualizationSetupper.BlockStateVisualizationPurpose.PARTICLE, // Fiddle - client perspective - block state visualization - level event data - block brush complete
+     };
+     // Fiddle end - client perspective - block state visualization - level event data - data can be BlockState
+     private final int type;

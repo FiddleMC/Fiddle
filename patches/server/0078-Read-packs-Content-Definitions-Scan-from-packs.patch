@@ -10,7 +10,7 @@ Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/PackFiddleContentDefinitionScanner.java b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/PackFiddleContentDefinitionScanner.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..863be508edd7ad6ef086dc3d675fe974611d56b4
+index 0000000000000000000000000000000000000000..ca9ab567d1e7e9e4faaa0af0685d8eb254d7f9b4
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/PackFiddleContentDefinitionScanner.java
 @@ -0,0 +1,107 @@
@@ -44,9 +44,9 @@ index 0000000000000000000000000000000000000000..863be508edd7ad6ef086dc3d675fe974
 +        throw new RuntimeException();
 +    }
 +
-+    private static final @NotNull String contentFolderName = "content";
++    private static final String contentFolderName = "content";
 +
-+    private static final @NotNull Logger LOGGER = LogUtils.getClassLogger();
++    private static final Logger LOGGER = LogUtils.getClassLogger();
 +
 +    /**
 +     * @return A (possibly empty) list of all regular files in the {@linkplain #contentFolderName Fiddle folder in packs},
@@ -54,7 +54,7 @@ index 0000000000000000000000000000000000000000..863be508edd7ad6ef086dc3d675fe974
 +     * <code>&lt;pack root&gt;/&lt;{@link #contentFolderName}&gt;/&lt;a {@link ContentNamespacedKeyValidation#isValidNamespace valid namespace}&gt;/&lt;{@code subNamespaceFolderName}&gt;/&lt;a {@linkplain ContentNamespacedKeyValidation#isValidPathJSONFilename(String) valid namespaced key path}&gt;</the></the></the></code>,
 +     * paired with their namespace.
 +     */
-+    private static @NotNull List<@NotNull Pair<@NotNull RegularFileInPack, @NotNull String>> getSubNamespacedFolderFilesInContentFolder(@NotNull FiddlePack pack, @NotNull String subNamespaceFolderName) throws PackException {
++    private static List<@NotNull Pair<@NotNull RegularFileInPack, @NotNull String>> getSubNamespacedFolderFilesInContentFolder(FiddlePack pack, String subNamespaceFolderName) throws PackException {
 +        var contentFolder = pack.filesProvider().getTopLevelDirectory(contentFolderName);
 +        if (contentFolder == null) {
 +            return Collections.emptyList();
@@ -90,7 +90,7 @@ index 0000000000000000000000000000000000000000..863be508edd7ad6ef086dc3d675fe974
 +     * namespace has been turned into the file opened and parsed as JSON, and the {@link ResourceLocation} made
 +     * of the namespace and path.
 +     */
-+    static @NotNull List<@NotNull Pair<@NotNull JsonElement, @NotNull ResourceLocation>> getSubNamespacedFolderFilesInContentFolderAsJSON(@NotNull FiddlePack pack, @NotNull String subNamespaceFolderName) throws PackException {
++    static List<@NotNull Pair<@NotNull JsonElement, @NotNull ResourceLocation>> getSubNamespacedFolderFilesInContentFolderAsJSON(FiddlePack pack, String subNamespaceFolderName) throws PackException {
 +        var namespacedFolderFiles = getSubNamespacedFolderFilesInContentFolder(pack, subNamespaceFolderName);
 +        if (namespacedFolderFiles.isEmpty()) {
 +            return Collections.emptyList();

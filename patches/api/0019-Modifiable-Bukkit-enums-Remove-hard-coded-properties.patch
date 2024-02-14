@@ -14,7 +14,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index 069d08b170a8da432c7776aac8dea4699b5a9507..3893974cf5f472b7f9d26c7f19d330b7a836466c 100644
+index 931a261fd1d0b630e127dddb4b6c2a902a264591..ca7b23a3608a8f65faeb559d125c25521d063146 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
 @@ -4638,8 +4638,8 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
@@ -39,7 +39,7 @@ index 069d08b170a8da432c7776aac8dea4699b5a9507..3893974cf5f472b7f9d26c7f19d330b7
          this.data = data;
          this.legacy = this.name().startsWith(LEGACY_PREFIX);
          this.key = NamespacedKey.minecraft(this.name().toLowerCase(Locale.ROOT));
-@@ -4781,7 +4781,17 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4781,7 +4781,20 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return Maximum stack size for this material
       */
      public int getMaxStackSize() {
@@ -49,16 +49,19 @@ index 069d08b170a8da432c7776aac8dea4699b5a9507..3893974cf5f472b7f9d26c7f19d330b7
 +    }
 +
 +    /**
-+     * @deprecated Do not use: this method is for internal testing purposes only.
++     * Do not use for any reason.
++     * This method is for internal testing purposes only.
++     *
++     * @apiNote Internal Use Only
 +     */
-+    @Deprecated(forRemoval = true)
++    @org.jetbrains.annotations.ApiStatus.Internal
 +    public int getMaxStackSizeHardcoded() {
 +        return this.maxStackHardcoded;
 +        // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - max stack size
      }
  
      /**
-@@ -4790,7 +4800,29 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+@@ -4790,7 +4803,35 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
       * @return Maximum durability for this material
       */
      public short getMaxDurability() {
@@ -72,17 +75,23 @@ index 069d08b170a8da432c7776aac8dea4699b5a9507..3893974cf5f472b7f9d26c7f19d330b7
 +    }
 +
 +    /**
-+     * @deprecated Do not use: this method is for internal testing purposes only.
++     * Do not use for any reason.
++     * This method is for internal testing purposes only.
++     *
++     * @apiNote Internal Use Only
 +     */
-+    @Deprecated(forRemoval = true)
++    @org.jetbrains.annotations.ApiStatus.Internal
 +    public short getMaxDurabilityHardcoded() {
 +        return durabilityHardcoded;
 +    }
 +
 +    /**
-+     * @deprecated Do not use: for internal use only.
++     * Do not use for any reason.
++     * This method is for internal testing purposes only.
++     *
++     * @apiNote Internal Use Only
 +     */
-+    @Deprecated(forRemoval = true)
++    @org.jetbrains.annotations.ApiStatus.Internal
 +    public short getMaxDurabilityLegacy() {
 +        return org.fiddlemc.fiddle.material.MaterialDefaultImplementations.getMaxDurabilityLegacy(this);
 +        // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - durability
@@ -105,10 +114,10 @@ index eacd1460facf86fc08acd050b84c110677508b30..43e601eb881faaabee5b88b731a7240d
      boolean isBlock(Material material);
  
 diff --git a/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java b/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
-index 068ff2f4d8511bc4744e569a499df2617fd98e61..948eda0324709a816803ff979901500250c9f540 100644
+index dd46f15c51747a06dee1302ec7f23f80d2c23826..906c7d9498969992f22cb669ad1c9cdf8bbd1011 100644
 --- a/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
 +++ b/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
-@@ -18,6 +18,51 @@ public final class MaterialDefaultImplementations {
+@@ -21,6 +21,51 @@ public final class MaterialDefaultImplementations {
          throw new RuntimeException();
      }
  
@@ -121,7 +130,7 @@ index 068ff2f4d8511bc4744e569a499df2617fd98e61..948eda0324709a816803ff9799015002
 +     * @throws IllegalArgumentException If the given {@code material} is not {@linkplain Material#isLegacy() legacy}.
 +     */
 +    public static short getMaxDurabilityLegacy(Material material) {
-+        Preconditions.checkArgument(material.isLegacy(), "Cannot call getMaxDurabilityLegacy(Material) for Modern Material");
++        com.google.common.base.Preconditions.checkArgument(material.isLegacy(), "Cannot call getMaxDurabilityLegacy(Material) for Modern Material");
 +        return switch (material) {
 +            //<editor-fold defaultstate="collapsed" desc="getMaxDurabilityLegacy">
 +            case LEGACY_IRON_SPADE, LEGACY_IRON_PICKAXE, LEGACY_IRON_AXE, LEGACY_IRON_SWORD, LEGACY_IRON_HOE -> 250;

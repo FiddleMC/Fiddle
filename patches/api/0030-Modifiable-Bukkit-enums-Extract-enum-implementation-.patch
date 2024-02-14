@@ -18,23 +18,15 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
-index cc89e445cd6fadb718a6cf4a14f4948cc41f7a28..2d3a1709c5c0b1dc5b43113971e19ac7e601edfc 100644
+index 9040e27277889ca6075380d5dbf2201db508ac39..3efa6eda0dda5928d74376a68083f34839c1fb20 100644
 --- a/src/main/java/org/bukkit/Material.java
 +++ b/src/main/java/org/bukkit/Material.java
-@@ -115,6 +115,7 @@ import org.bukkit.block.data.type.WallSign;
- import org.bukkit.inventory.CreativeCategory;
- import org.bukkit.inventory.EquipmentSlot;
- import org.bukkit.material.MaterialData;
-+import org.fiddlemc.fiddle.material.AbstractMaterial;
- import org.jetbrains.annotations.NotNull;
- import org.jetbrains.annotations.Nullable;
- 
-@@ -122,7 +123,7 @@ import org.jetbrains.annotations.Nullable;
+@@ -122,7 +122,7 @@ import org.jetbrains.annotations.Nullable;
   * An enum of all material IDs accepted by the official server and client
   */
  @SuppressWarnings({"DeprecatedIsStillUsed", "deprecation"}) // Paper
 -public enum Material implements Keyed, Translatable, net.kyori.adventure.translation.Translatable { // Paper
-+public enum Material implements AbstractMaterial { // Paper // Fiddle - modifiable Bukkit enums - create corresponding interfaces - Material
++public enum Material implements org.fiddlemc.fiddle.material.AbstractMaterial { // Paper // Fiddle - modifiable Bukkit enums - create corresponding interfaces - Material
      //<editor-fold desc="Materials" defaultstate="collapsed">
      AIR(9648, 0),
      STONE(22948),

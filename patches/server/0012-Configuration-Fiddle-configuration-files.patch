@@ -633,7 +633,7 @@ index 58536aabf607015939a1326f80207c0a06eed8ff..04d5891abf7eef4d973d74c59d8826e8
          if (this.convertOldUsers()) {
              this.getProfileCache().save(false); // Paper
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index f4d53d9bfe5b060158f69b5d9e4533a5b9869eed..761fdaba9afa3bdcb2a70c8bf6d5c950681fa9d9 100644
+index b78a9628a88f2a495ef6de74446a02a14d41a1f6..cc7f2d52fbaac1b9ce792c1a3ff45f697030405b 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
 @@ -693,7 +693,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
@@ -836,10 +836,10 @@ index 0000000000000000000000000000000000000000..1579e257e6a9b81f924aad97cae85895
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/configuration/FiddleGlobalConfiguration.java b/src/main/java/org/fiddlemc/fiddle/configuration/FiddleGlobalConfiguration.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..3ab7163a0389ef22ab683e41630c3499705ba9c0
+index 0000000000000000000000000000000000000000..37236de96aaf38ffed201cbae052fbc5a7b94224
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/configuration/FiddleGlobalConfiguration.java
-@@ -0,0 +1,28 @@
+@@ -0,0 +1,33 @@
 +// Fiddle - Fiddle configuration - global configuration
 +
 +package org.fiddlemc.fiddle.configuration;
@@ -847,8 +847,13 @@ index 0000000000000000000000000000000000000000..3ab7163a0389ef22ab683e41630c3499
 +import com.mojang.logging.LogUtils;
 +import io.papermc.paper.configuration.Configuration;
 +import io.papermc.paper.configuration.ConfigurationPart;
++import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
 +import org.slf4j.Logger;
-+import org.spongepowered.configurate.objectmapping.meta.Setting;
++import org.spongepowered.configurate.objectmapping.meta.*;
++import org.spongepowered.configurate.objectmapping.*;
++
++import java.util.*;
 +
 +@SuppressWarnings({"CanBeFinal", "FieldCanBeLocal", "FieldMayBeFinal", "NotNullFieldNotInitialized", "InnerClassMayBeStatic"})
 +public class FiddleGlobalConfiguration extends ConfigurationPart {
@@ -889,10 +894,10 @@ index 0000000000000000000000000000000000000000..76adbd0b8bfe9cd5f6dd389263fc6ca7
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/configuration/FiddleWorldConfiguration.java b/src/main/java/org/fiddlemc/fiddle/configuration/FiddleWorldConfiguration.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..ad2b35278ee7ef1460e2a76d2953d3fce72d52d8
+index 0000000000000000000000000000000000000000..fbcccc1d76dd3ad0c0dc6c0ee35cfdf4c8442e64
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/configuration/FiddleWorldConfiguration.java
-@@ -0,0 +1,33 @@
+@@ -0,0 +1,35 @@
 +// Fiddle - Fiddle configuration - world configuration
 +
 +package org.fiddlemc.fiddle.configuration;
@@ -900,26 +905,28 @@ index 0000000000000000000000000000000000000000..ad2b35278ee7ef1460e2a76d2953d3fc
 +import com.mojang.logging.LogUtils;
 +import io.papermc.paper.configuration.Configuration;
 +import io.papermc.paper.configuration.ConfigurationPart;
-+import io.papermc.paper.configuration.PaperConfigurations;
-+import net.minecraft.resources.ResourceLocation;
++import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
 +import org.slf4j.Logger;
-+import org.spigotmc.SpigotWorldConfig;
-+import org.spongepowered.configurate.objectmapping.meta.Setting;
++import org.spongepowered.configurate.objectmapping.meta.*;
++import org.spongepowered.configurate.objectmapping.*;
++
++import java.util.*;
 +
 +@SuppressWarnings({"FieldCanBeLocal", "FieldMayBeFinal", "NotNullFieldNotInitialized", "InnerClassMayBeStatic"})
 +public class FiddleWorldConfiguration extends ConfigurationPart {
 +    private static final Logger LOGGER = LogUtils.getLogger();
 +    public static final int CURRENT_VERSION = 1;
 +
-+    private transient final SpigotWorldConfig spigotConfig;
-+    private transient final ResourceLocation worldKey;
-+    public FiddleWorldConfiguration(SpigotWorldConfig spigotConfig, ResourceLocation worldKey) {
++    private transient final org.spigotmc.SpigotWorldConfig spigotConfig;
++    private transient final net.minecraft.resources.ResourceLocation worldKey;
++    public FiddleWorldConfiguration(org.spigotmc.SpigotWorldConfig spigotConfig, net.minecraft.resources.ResourceLocation worldKey) {
 +        this.spigotConfig = spigotConfig;
 +        this.worldKey = worldKey;
 +    }
 +
 +    public boolean isDefault() {
-+        return this.worldKey.equals(PaperConfigurations.WORLD_DEFAULTS_KEY);
++        return this.worldKey.equals(io.papermc.paper.configuration.PaperConfigurations.WORLD_DEFAULTS_KEY);
 +    }
 +
 +    @Setting(Configuration.VERSION_FIELD)

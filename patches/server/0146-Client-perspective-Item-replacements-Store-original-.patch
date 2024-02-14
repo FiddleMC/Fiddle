@@ -13,10 +13,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/network/FriendlyByteBuf.java b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
-index 87365b1b649344bc4457c2a059ffc7ab3dd5cc47..64fcac659073c043d12649b89cb775cd2524afa4 100644
+index d0d4c0b16410d4fdba27928c737f963182229c0b..850b9b546d0d46e7600bac5e3c3d7ada0608cc98 100644
 --- a/src/main/java/net/minecraft/network/FriendlyByteBuf.java
 +++ b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
-@@ -789,6 +789,12 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -785,6 +785,12 @@ public class FriendlyByteBuf extends ByteBuf {
              ItemStack itemstack = new ItemStack(item, b0);
  
              itemstack.setTag(this.readNbt());
@@ -30,24 +30,16 @@ index 87365b1b649344bc4457c2a059ffc7ab3dd5cc47..64fcac659073c043d12649b89cb775cd
              if (false && itemstack.getTag() != null) { // Paper - This is no longer needed with raw NBT being handled in metadata
                  CraftItemStack.setItemMeta(itemstack, CraftItemStack.getItemMeta(itemstack));
 diff --git a/src/main/java/org/fiddlemc/fiddle/packet/item/ItemStackInPacketReplacer.java b/src/main/java/org/fiddlemc/fiddle/packet/item/ItemStackInPacketReplacer.java
-index ee483678e2ca3a88e9bff6f2e80bfc7e87b03b6f..f450a50aebe1226a4876f4334c85852b968f391a 100644
+index 34159926feeff887cf6baddafbf2845111abaaf1..6ecd3c2e6505c03151a901aed1ffdeaaf7ee1ba1 100644
 --- a/src/main/java/org/fiddlemc/fiddle/packet/item/ItemStackInPacketReplacer.java
 +++ b/src/main/java/org/fiddlemc/fiddle/packet/item/ItemStackInPacketReplacer.java
-@@ -10,6 +10,7 @@ import net.minecraft.network.chat.contents.TranslatableContents;
- import net.minecraft.network.protocol.Packet;
- import net.minecraft.world.item.Item;
- import net.minecraft.world.item.ItemStack;
-+import net.minecraft.world.level.GameType;
- import org.bukkit.craftbukkit.inventory.CraftMetaItem;
- import org.fiddlemc.fiddle.packet.ClientPerspective;
- import org.fiddlemc.fiddle.packet.deepreplacement.ClientPerspectiveAndSettingsSupplier;
-@@ -152,6 +153,14 @@ public final class ItemStackInPacketReplacer {
+@@ -151,6 +151,14 @@ public final class ItemStackInPacketReplacer {
              }
          }
  
 +        // Fiddle start - client perspective - item replacements - store original in NBT
 +        if (replacement != null) {
-+            if (clientPerspectiveAndSettings.getGameMode() == GameType.CREATIVE) {
++            if (clientPerspectiveAndSettings.getGameMode() == net.minecraft.world.level.GameType.CREATIVE) {
 +                OriginalItemStacksInNBT.storeOriginalInNBT(replacement, original);
 +            }
 +        }
@@ -58,10 +50,10 @@ index ee483678e2ca3a88e9bff6f2e80bfc7e87b03b6f..f450a50aebe1226a4876f4334c85852b
  
 diff --git a/src/main/java/org/fiddlemc/fiddle/packet/item/OriginalItemStacksInNBT.java b/src/main/java/org/fiddlemc/fiddle/packet/item/OriginalItemStacksInNBT.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..427bd0585a34d84351c859807e636ee08e54e64b
+index 0000000000000000000000000000000000000000..b26d948aba25ae95b67bb84ef64c69a4df5dccc7
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/packet/item/OriginalItemStacksInNBT.java
-@@ -0,0 +1,69 @@
+@@ -0,0 +1,68 @@
 +// Fiddle - client perspective - item replacements - store original in NBT
 +
 +package org.fiddlemc.fiddle.packet.item;
@@ -69,7 +61,6 @@ index 0000000000000000000000000000000000000000..427bd0585a34d84351c859807e636ee0
 +import net.minecraft.nbt.CompoundTag;
 +import net.minecraft.nbt.Tag;
 +import net.minecraft.world.item.ItemStack;
-+import org.jetbrains.annotations.NotNull;
 +import org.jetbrains.annotations.Nullable;
 +
 +/**
@@ -83,13 +74,13 @@ index 0000000000000000000000000000000000000000..427bd0585a34d84351c859807e636ee0
 +        throw new RuntimeException();
 +    }
 +
-+    private static final @NotNull String ORIGINAL_ITEM_KEY = "ServerSide";
++    private static final String ORIGINAL_ITEM_KEY = "ServerSide";
 +
 +    /**
 +     * Stores the given {@code original} {@link ItemStack} in the {@linkplain ItemStack#getOrCreateTag() NBT}
 +     * of the {@code replacement} {@link ItemStack} (modifying the {@code replacement} {@link ItemStack} in-place).
 +     */
-+    public static void storeOriginalInNBT(@NotNull ItemStack replacement, @NotNull ItemStack original) {
++    public static void storeOriginalInNBT(ItemStack replacement, ItemStack original) {
 +        // Turn the original item into a tag
 +        var originalAsTag = new CompoundTag();
 +        original.save(originalAsTag);

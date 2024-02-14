@@ -8,30 +8,22 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacer.java b/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacer.java
-index c558ce8183e54dd10da8a86849944b49db14769e..1e49ee61c1143ab5a358becd18629d163c1ce3a9 100644
+index 2d90d8d2dac7bedbf472f3a5af8493621b003c9b..1a32ad9eee713cc0b334b6f9be79c05aaadd2cbe 100644
 --- a/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacer.java
 +++ b/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacer.java
-@@ -11,6 +11,7 @@ import net.minecraft.network.chat.MutableComponent;
- import net.minecraft.network.chat.contents.TranslatableContents;
- import net.minecraft.world.item.ItemStack;
- import org.fiddlemc.fiddle.packet.item.ItemStackInPacketContext;
-+import org.fiddlemc.fiddle.packet.locale.ServerSideTranslations;
- import org.jetbrains.annotations.NotNull;
- import org.jetbrains.annotations.Nullable;
- 
-@@ -426,8 +427,7 @@ public final class DeepReplacer {
+@@ -425,8 +425,7 @@ public final class DeepReplacer {
      }
  
-     private static @NotNull ComponentContents replaceTranslatableContents(@NotNull TranslatableContents value, @Nullable String locale) {
+     private static ComponentContents replaceTranslatableContents(TranslatableContents value, @Nullable String locale) {
 -        // TODO call implementation
 -        return value;
-+        return ServerSideTranslations.replace(value, locale); // Fiddle - client perspective - localization - store server-side translations
++        return org.fiddlemc.fiddle.packet.locale.ServerSideTranslations.replace(value, locale); // Fiddle - client perspective - localization - store server-side translations
      }
  
  }
 diff --git a/src/main/java/org/fiddlemc/fiddle/packet/locale/ServerSideTranslations.java b/src/main/java/org/fiddlemc/fiddle/packet/locale/ServerSideTranslations.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..fc29efeb7344c1fbf41bbfa4d0b955ad5202e626
+index 0000000000000000000000000000000000000000..0531bde1d5d5f24452e50a70fd71a2c5bd5f137d
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/packet/locale/ServerSideTranslations.java
 @@ -0,0 +1,196 @@
@@ -63,8 +55,8 @@ index 0000000000000000000000000000000000000000..fc29efeb7344c1fbf41bbfa4d0b955ad
 +        throw new RuntimeException();
 +    }
 +
-+    public final static @NotNull String defaultLocaleLanguage = getLocaleLanguage(Language.DEFAULT);
-+    public final static @NotNull String defaultLocaleRegion = getLocaleRegion(Language.DEFAULT);
++    public final static String defaultLocaleLanguage = getLocaleLanguage(Language.DEFAULT);
++    public final static String defaultLocaleRegion = getLocaleRegion(Language.DEFAULT);
 +
 +    /**
 +     * The desired translation strings for keys that exist in vanilla.
@@ -81,26 +73,26 @@ index 0000000000000000000000000000000000000000..fc29efeb7344c1fbf41bbfa4d0b955ad
 +     *     <li>The desired translated value as a string.</li>
 +     * </ul>
 +     */
-+    private static final @NotNull Map<@NotNull String, @NotNull Map<@NotNull String, @NotNull Map<@NotNull String, @NotNull String>>> vanillaKeyTranslations = new HashMap<>(1);
++    private static final Map<@NotNull String, @NotNull Map<@NotNull String, @NotNull Map<@NotNull String, @NotNull String>>> vanillaKeyTranslations = new HashMap<>(1);
 +
 +    /**
 +     * The desired translation strings for keys that do not exist in vanilla.
 +     * <br>
 +     * The structure is analogous to {@link #vanillaKeyTranslations}.
 +     */
-+    private static final @NotNull Map<@NotNull String, @NotNull Map<@NotNull String, @NotNull Map<@NotNull String, @NotNull String>>> addedKeyTranslations = new HashMap<>(1);
++    private static final Map<@NotNull String, @NotNull Map<@NotNull String, @NotNull Map<@NotNull String, @NotNull String>>> addedKeyTranslations = new HashMap<>(1);
 +
-+    private static void registerTranslation(@NotNull Map<@NotNull String, @NotNull Map<@NotNull String, @NotNull Map<@NotNull String, @NotNull String>>> map, @NotNull String locale, @NotNull String key, @NotNull String translation) {
++    private static void registerTranslation(Map<@NotNull String, @NotNull Map<@NotNull String, @NotNull Map<@NotNull String, @NotNull String>>> map, String locale, String key, String translation) {
 +        String localeLanguage = getLocaleLanguage(locale);
 +        String localeRegion = getLocaleRegion(locale);
 +        map.computeIfAbsent(key, $ -> new HashMap<>(1)).computeIfAbsent(localeLanguage, $ -> new HashMap<>(1)).put(localeRegion, translation);
 +    }
 +
-+    public static void registerVanillaTranslationReplacement(@NotNull String locale, @NotNull String key, @NotNull String translation) {
++    public static void registerVanillaTranslationReplacement(String locale, String key, String translation) {
 +        registerTranslation(vanillaKeyTranslations, locale, key, translation);
 +    }
 +
-+    public static void registerAddedTranslation(@NotNull String locale, @NotNull String key, @NotNull String translation) {
++    public static void registerAddedTranslation(String locale, String key, String translation) {
 +        registerTranslation(addedKeyTranslations, locale, key, translation);
 +    }
 +
@@ -110,7 +102,7 @@ index 0000000000000000000000000000000000000000..fc29efeb7344c1fbf41bbfa4d0b955ad
 +     *
 +     * @return The value found, or null if no value was found.
 +     */
-+    private static @Nullable String getKeyTranslation(@NotNull Map<@NotNull String, @NotNull Map<@NotNull String, @NotNull Map<@NotNull String, @NotNull String>>> map, @NotNull String translationKey, @NotNull String localeLanguage, @NotNull String localeRegion, boolean goFurtherThanGivenLocale) {
++    private static @Nullable String getKeyTranslation(Map<@NotNull String, @NotNull Map<@NotNull String, @NotNull Map<@NotNull String, @NotNull String>>> map, String translationKey, String localeLanguage, String localeRegion, boolean goFurtherThanGivenLocale) {
 +        var translationsForKey = map.get(translationKey);
 +        if (translationsForKey == null) {
 +            return null;
@@ -150,7 +142,7 @@ index 0000000000000000000000000000000000000000..fc29efeb7344c1fbf41bbfa4d0b955ad
 +        return null;
 +    }
 +
-+    private static @NotNull String getLocaleLanguage(@Nullable String locale) {
++    private static String getLocaleLanguage(@Nullable String locale) {
 +        if (locale == null) {
 +            return "";
 +        }
@@ -158,7 +150,7 @@ index 0000000000000000000000000000000000000000..fc29efeb7344c1fbf41bbfa4d0b955ad
 +        return underscoreIndexInLocale == -1 ? locale : underscoreIndexInLocale == 0 ? "" : locale.substring(0, underscoreIndexInLocale);
 +    }
 +
-+    private static @NotNull String getLocaleRegion(@Nullable String locale) {
++    private static String getLocaleRegion(@Nullable String locale) {
 +        if (locale == null) {
 +            return "";
 +        }
@@ -190,7 +182,7 @@ index 0000000000000000000000000000000000000000..fc29efeb7344c1fbf41bbfa4d0b955ad
 +     *     <li>Any translation</li>
 +     * </ul>
 +     */
-+    public static @NotNull ComponentContents replace(@NotNull TranslatableContents translatableContents, @Nullable String locale) {
++    public static ComponentContents replace(TranslatableContents translatableContents, @Nullable String locale) {
 +
 +        String translationKey = translatableContents.getKey();
 +        if (translationKey == null) {
@@ -221,7 +213,7 @@ index 0000000000000000000000000000000000000000..fc29efeb7344c1fbf41bbfa4d0b955ad
 +    /**
 +     * @return Whether there is a replacement that would be applied for the given translation key and locale.
 +     */
-+    public static boolean hasTranslatableReplacement(@NotNull String translationKey, @Nullable String locale) {
++    public static boolean hasTranslatableReplacement(String translationKey, @Nullable String locale) {
 +
 +        String localeLanguage = getLocaleLanguage(locale);
 +        String localeRegion = getLocaleRegion(locale);

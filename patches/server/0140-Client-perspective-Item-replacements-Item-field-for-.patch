@@ -8,7 +8,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/world/item/Item.java b/src/main/java/net/minecraft/world/item/Item.java
-index 3146c8319f140f7a2802b8b83cc5a48a1cfa4c14..4bb3e81deb88e66345a282e09802e34d12ce0ac7 100644
+index 965144138d2764c4026cc7e90c87e8becd385f73..a96872dc4b6d65e76cd8b6d7d288a1df152e425f 100644
 --- a/src/main/java/net/minecraft/world/item/Item.java
 +++ b/src/main/java/net/minecraft/world/item/Item.java
 @@ -125,6 +125,21 @@ public class Item implements FeatureElement, ItemLike {
