@@ -7,11 +7,11 @@ Subject: [PATCH] Client perspective - Localization - Store server-side
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
-diff --git a/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacer.java b/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacer.java
-index 2d90d8d2dac7bedbf472f3a5af8493621b003c9b..1a32ad9eee713cc0b334b6f9be79c05aaadd2cbe 100644
---- a/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacer.java
-+++ b/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacer.java
-@@ -425,8 +425,7 @@ public final class DeepReplacer {
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacements.java b/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacements.java
+index ce36e17aab17d4cfcc06ecf3d97370f656191755..50e09dd10bbcc47b46898b18686f1ee2e045c643 100644
+--- a/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacements.java
++++ b/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacements.java
+@@ -431,8 +431,7 @@ public final class DeepReplacements {
      }
  
      private static ComponentContents replaceTranslatableContents(TranslatableContents value, @Nullable String locale) {

@@ -13,7 +13,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/network/FriendlyByteBuf.java b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
-index 354c6635b183ff77364bd09aa768c65dae658d2a..6b9fdb2319c3b61989d6a207f4b9f862af49ad0f 100644
+index 304a44530163b4650be55e6033518650e9771cbd..e8ce57b582c53645c9761120031c20fa3ef928fc 100644
 --- a/src/main/java/net/minecraft/network/FriendlyByteBuf.java
 +++ b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
 @@ -790,6 +790,12 @@ public class FriendlyByteBuf extends ByteBuf {
@@ -30,7 +30,7 @@ index 354c6635b183ff77364bd09aa768c65dae658d2a..6b9fdb2319c3b61989d6a207f4b9f862
              if (false && itemstack.getTag() != null) { // Paper - This is no longer needed with raw NBT being handled in metadata
                  CraftItemStack.setItemMeta(itemstack, CraftItemStack.getItemMeta(itemstack));
 diff --git a/src/main/java/org/fiddlemc/fiddle/packet/item/ItemStackInPacketReplacer.java b/src/main/java/org/fiddlemc/fiddle/packet/item/ItemStackInPacketReplacer.java
-index 34159926feeff887cf6baddafbf2845111abaaf1..6ecd3c2e6505c03151a901aed1ffdeaaf7ee1ba1 100644
+index 43e8b4c304c395ffb8af53529cd3fe127de25fe2..92e7fa3a4c46001a283d4b8b52d6cd306053d140 100644
 --- a/src/main/java/org/fiddlemc/fiddle/packet/item/ItemStackInPacketReplacer.java
 +++ b/src/main/java/org/fiddlemc/fiddle/packet/item/ItemStackInPacketReplacer.java
 @@ -151,6 +151,14 @@ public final class ItemStackInPacketReplacer {
@@ -39,7 +39,7 @@ index 34159926feeff887cf6baddafbf2845111abaaf1..6ecd3c2e6505c03151a901aed1ffdeaa
  
 +        // Fiddle start - client perspective - item replacements - store original in NBT
 +        if (replacement != null) {
-+            if (clientPerspectiveAndSettings.getGameMode() == net.minecraft.world.level.GameType.CREATIVE) {
++            if (replacementContext.getGameMode() == net.minecraft.world.level.GameType.CREATIVE) {
 +                OriginalItemStacksInNBT.storeOriginalInNBT(replacement, original);
 +            }
 +        }

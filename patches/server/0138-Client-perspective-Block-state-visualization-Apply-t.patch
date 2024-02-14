@@ -1,0 +1,157 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Mon, 1 Jan 2024 20:30:52 +0100
+Subject: [PATCH] Client perspective - Block state visualization - Apply to
+ chunk packets - Visualization step after anti-x-ray
+
+Inserts a step into the process of preparing chunk packets to be sent, after anti-x-ray, where the visualization of block states is applied to that chunk packet, before it is marked ready.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketBlockController.java b/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketBlockController.java
+index 061041006c88ba0a7583c60e0dffac93a711f01f..35eb6be651f3795ab899f39ec746a7721431a1ba 100644
+--- a/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketBlockController.java
++++ b/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketBlockController.java
+@@ -34,7 +34,7 @@ public class ChunkPacketBlockController {
+     }
+ 
+     public void modifyBlocks(ClientboundLevelChunkWithLightPacket chunkPacket, @org.jetbrains.annotations.Nullable ChunkPacketInfoAntiXray chunkPacketInfo) { // Fiddle - client perspective - block state visualization - apply to chunk packets - every ChunkPacketInfo is ChunkPacketInfoAntiXray - the parameter type is always ChunkPacketInfoAntiXray, and is non-null if anti-x-ray is to be applied (but if it is non-null, still no anti-x-ray would be applied if this controller never applies anti-x-ray)
+-        chunkPacket.setReady(true);
++        chunkPacket.onAntiXrayFinish(); // Fiddle - client perspective - block state visualization - apply to chunk packets - no anti-x-ray needs to be applied because this controller never applies anti-x-ray
+     }
+ 
+     public void onBlockChange(Level level, BlockPos blockPos, BlockState newBlockState, BlockState oldBlockState, int flags, int maxUpdateDepth) {
+diff --git a/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketBlockControllerAntiXray.java b/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketBlockControllerAntiXray.java
+index 9367e1e6c5a7db16f4398d2d7475dd7d1b056e96..14e18e504cfd1a9ecc89f10f09cd9b3a2bb1acdb 100644
+--- a/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketBlockControllerAntiXray.java
++++ b/src/main/java/com/destroystokyo/paper/antixray/ChunkPacketBlockControllerAntiXray.java
+@@ -183,7 +183,7 @@ public final class ChunkPacketBlockControllerAntiXray extends ChunkPacketBlockCo
+     public void modifyBlocks(ClientboundLevelChunkWithLightPacket chunkPacket, @org.jetbrains.annotations.Nullable ChunkPacketInfoAntiXray chunkPacketInfo) { // If and only if the given info instance is non-null, anti-x-ray will be applied (it may be null for packets sent to players that are exempt for anti-x-ray)
+         if (chunkPacketInfo == null || !chunkPacketInfo.applyAntiXray) {
+             // Fiddle end - client perspective - block state visualization - apply to chunk packets - every ChunkPacketInfo is ChunkPacketInfoAntiXray
+-            chunkPacket.setReady(true);
++            chunkPacket.onAntiXrayFinish(); // Fiddle - client perspective - block state visualization - apply to chunk packets - no anti-x-ray needs to be applied to this chunk packet
+             return;
+         }
+ 
+@@ -383,7 +383,7 @@ public final class ChunkPacketBlockControllerAntiXray extends ChunkPacketBlockCo
+             }
+         }
+ 
+-        chunkPacketInfoAntiXray.getChunkPacket().setReady(true);
++        chunkPacketInfoAntiXray.getChunkPacket().onAntiXrayFinish(); // Fiddle - client perspective - block state visualization - apply to chunk packets - anti-x-ray finished
+     }
+ 
+     private void obfuscateLayer(int y, BitStorageReader bitStorageReader, BitStorageWriter bitStorageWriter, boolean[] solid, boolean[] obfuscate, int[] presetBlockStateBits, boolean[][] current, boolean[][] next, boolean[][] nextNext, LevelChunkSection[] nearbyChunkSections, IntSupplier random) {
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
+index aa1e848ae52d3426c3077ce3741f62ae81c8e25b..94a9d2d3ba016d1b56ee2cdad75f1594f428e2a8 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
+@@ -20,15 +20,58 @@ public class ClientboundLevelChunkWithLightPacket extends org.fiddlemc.fiddle.pa
+     public @Nullable net.minecraft.server.level.ServerLevel level;
+     // Fiddle end - block state visualization - apply to chunk packets - store ChunkPacketInfo and chunk details
+     // Paper start - Async-Anti-Xray - Ready flag for the connection
+-    private volatile boolean ready;
++    // Fiddle start - client perspective - block state visualization - apply to chunk packets
++    /**
++     * This is set to true with the single call to {@link #onApplyVisualizationFinish}.
++     * <br>
++     * This field used to be the {@code ready} field.
++     */
++    private volatile boolean hasApplyVisualizationFinished;
++
++    /**
++     * This is incremented by both the single call to {@link #postSetConnectionAdaptForClient}.
++     * and the single call to {@link #onAntiXrayFinish}.
++     * <p>
++     *     This exists because the applyinh visualization task may be attempted to be started from several threads
++     *     at the same time: namely the thread that has finished the anti-x-ray
++     *     (thereby invoking {@link #onAntiXrayFinish}) and the thread that is attempting to send the packet
++     *     to the connection (thereby invoking {@link #postSetConnectionAdaptForClient}).
++     * </p>
++     */
++    private java.util.concurrent.atomic.AtomicInteger targetClientConnectionIsInitializedAndAntiXrayHasFinished = new java.util.concurrent.atomic.AtomicInteger();
++    // Fiddle start - client perspective - block state visualization - apply to chunk packets
+ 
+     @Override
+     public boolean isReady() {
+-        return this.ready;
++        return this.hasApplyVisualizationFinished; // Fiddle - client perspective - block state visualization - apply to chunk packets
++    }
++
++    // Fiddle start - client perspective - block state visualization - apply to chunk packets
++    /**
++     * This is called when anti-x-ray has finished processing (or if it didn't need to be applied),
++     * so we can now apply the visualizations.
++     * <br>
++     * Invocations of this method used to be invocations of {@code setReady(true)}.
++     * <p>
++     *     This immediately starts the task of applying block state visualization to this packet data,
++     *     if {@linkplain #postSetConnectionAdaptForClient the target connection was already initialized}.
++     * </p>
++     */
++    public void onAntiXrayFinish() {
++        if (this.targetClientConnectionIsInitializedAndAntiXrayHasFinished.incrementAndGet() == 2) {
++            this.startApplyVisualizationTask();
++        }
+     }
+ 
+-    public void setReady(boolean ready) {
+-        this.ready = ready;
++    /**
++     * Called when applying the visualization has finished (or if it didn't need to be applied),
++     * so the packet is now ready to be sent.
++     * <br>
++     * The effect of this method is the same as the effect would have been of calling {@code setReady(true)}.
++     */
++    private void onApplyVisualizationFinish() {
++        this.hasApplyVisualizationFinished = true;
++        // Fiddle end - client perspective - block state visualization - apply to chunk packets
+     }
+     // Paper end
+ 
+@@ -71,6 +114,43 @@ public class ClientboundLevelChunkWithLightPacket extends org.fiddlemc.fiddle.pa
+         this.lightData.write(buf);
+     }
+ 
++    // Fiddle start - client perspective - block state visualization - apply to chunk packets
++    /**
++     * Called by {@link ClientboundLevelChunkWithLightPacket} when the target client connection has been stored in it.
++     * This is called exactly once.
++     * <p>
++     *     This immediately starts the task of applying block state visualization to this packet data,
++     *     if {@linkplain #onAntiXrayFinish anti-x-ray has already finished}.
++     * </p
++     */
++    @Override
++    protected Packet<ClientGamePacketListener> postSetConnectionAdaptForClient(net.minecraft.network.Connection connection) {
++        boolean startTask;
++        if (this.targetClientConnectionIsInitializedAndAntiXrayHasFinished.incrementAndGet() == 2) {
++            this.startApplyVisualizationTask();
++        }
++        return this;
++    }
++
++    /**
++     * Starts the task of applying visualizations to this chunk packet data.
++     * <p>
++     *     This is called exactly once.
++     *     It is called either from {@link #onAntiXrayFinish} or from {@link #postSetConnectionAdaptForClient}.
++     * </p>
++     */
++    private void startApplyVisualizationTask() {
++        // Always apply the visualization on the main thread, analogous to what currently happens for anti-x-ray
++        if (!org.bukkit.Bukkit.isPrimaryThread()) {
++            // Plugins?
++            net.minecraft.server.MinecraftServer.getServer().scheduleOnMain(this::startApplyVisualizationTask);
++            return;
++        }
++        org.fiddlemc.fiddle.packet.block.SetUpVisualizationForChunkPackets.setUpAndModifyBuffer(this);
++        this.onApplyVisualizationFinish();
++    }
++    // Fiddle end - client perspective - block state visualization - apply to chunk packets
++
+     @Override
+     public void handle(ClientGamePacketListener listener) {
+         listener.handleLevelChunkWithLight(this);

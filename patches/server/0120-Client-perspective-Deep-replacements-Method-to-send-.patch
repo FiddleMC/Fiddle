@@ -11,7 +11,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index 6b3520b0a2b5a03e5be440b6bea96070fe0cb7a5..3efbe919ff25fd738ed6ba01f297f0f8bc49a13a 100644
+index 21b31b0cef30b38d9fcb0d990c3de34d26e260d6..11db6d28df1c60af1744833239915b3c1ad3f502 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
 @@ -2783,4 +2783,32 @@ public class ServerPlayer extends Player {

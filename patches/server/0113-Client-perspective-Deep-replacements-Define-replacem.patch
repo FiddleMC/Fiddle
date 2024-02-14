@@ -1,18 +1,18 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
 Date: Sat, 29 Jul 2023 10:15:40 +0200
-Subject: [PATCH] Client perspective - Deep replacements - Define deep
- replacement scope
+Subject: [PATCH] Client perspective - Deep replacements - Define replacement
+ scope
 
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacementScope.java b/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacementScope.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..303f2ff8b790166371cab71e30045ab37ff4aa5a
+index 0000000000000000000000000000000000000000..e6d4f12307c3415b1196bd47ce1a68418c013609
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacementScope.java
-@@ -0,0 +1,145 @@
+@@ -0,0 +1,143 @@
 +// Fiddle - client perspective - deep replacements - scope
 +
 +package org.fiddlemc.fiddle.packet.deepreplacement;
@@ -25,12 +25,10 @@ index 0000000000000000000000000000000000000000..303f2ff8b790166371cab71e30045ab3
 +import org.jetbrains.annotations.Nullable;
 +
 +/**
-+ * Represents the scope of the actions that need to be taken by a deep replacement step,
-+ * allowing it to forego some or all replacements.
++ * Represents the scope of the actions that need to be taken by an invocation of deep replacement,
++ * allowing the foregoing of some actions or skipping replacement altogether.
 + * <br>
 + * All instances of this class are pre-created and cached in {@link #values}.
-+ * <br>
-+ * Note that when a {@link DeepReplacementScope} different from {@link #NOTHING} is passed.
 + */
 +public final class DeepReplacementScope {
 +
@@ -96,16 +94,16 @@ index 0000000000000000000000000000000000000000..303f2ff8b790166371cab71e30045ab3
 +        return values[this.indexInValues & (~4)];
 +    }
 +
-+    public DeepReplacementScope withoutUnnecessaryReplacements(@Nullable ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings) {
++    public DeepReplacementScope withoutUnnecessaryReplacements(@Nullable DeepReplacementContext replacementContext) {
 +        // If there are already no replacements, we do not have to remove any
 +        if (this == DeepReplacementScope.NOTHING) {
 +            return this;
 +        }
 +        // Do not make any replacements if no perspective is present
-+        if (clientPerspectiveAndSettings == null) {
++        if (replacementContext == null) {
 +            return DeepReplacementScope.NOTHING;
 +        }
-+        var perspectiveOrNull = clientPerspectiveAndSettings.getPerspectiveOrNull();
++        var perspectiveOrNull = replacementContext.getPerspectiveOrNull();
 +        if (perspectiveOrNull == null) {
 +            return DeepReplacementScope.NOTHING;
 +        }

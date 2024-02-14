@@ -1,27 +1,26 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
-Date: Sat, 10 Feb 2024 11:01:28 +0100
+Date: Sat, 10 Feb 2024 10:59:19 +0100
 Subject: [PATCH] Client perspective - Block state visualization - Level event
- data - Block brush completion
+ data - Block break particles
 
-Registers `LevelEvent.PARTICLES_AND_SOUND_BRUSH_BLOCK_COMPLETE` as a level event type where the data represents a block state.
+Registers `LevelEvent.PARTICLES_DESTROY_BLOCK` as a level event type where the data represents a block state.
 
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelEventPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelEventPacket.java
-index 9a18265f7ab69077d4199f5013846511587a83a0..e447801333cf4ad744e2b4e22fa9404f7296aee2 100644
+index 77bf1cd34da27372ffd00c098e1e630236dc2caa..9a18265f7ab69077d4199f5013846511587a83a0 100644
 --- a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelEventPacket.java
 +++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelEventPacket.java
-@@ -8,9 +8,11 @@ public class ClientboundLevelEventPacket extends org.fiddlemc.fiddle.packet.Clon
+@@ -7,8 +7,10 @@ import net.minecraft.network.protocol.Packet;
+ public class ClientboundLevelEventPacket extends org.fiddlemc.fiddle.packet.CloningPacketWithExplicitTargetClientConnection<ClientGamePacketListener> { // Fiddle - client perspective - level event data value replacements - store connection explicitly
      // Fiddle start - client perspective - block state visualization - level event data - data can be BlockState
      private final static int[] typesWhereDataIsBlockState = {
-         net.minecraft.world.level.block.LevelEvent.PARTICLES_DESTROY_BLOCK, // Fiddle - client perspective - block state visualization - level event data - block break particles
-+        net.minecraft.world.level.block.LevelEvent.PARTICLES_AND_SOUND_BRUSH_BLOCK_COMPLETE, // Fiddle - client perspective - block state visualization - level event data - block brush complete
++        net.minecraft.world.level.block.LevelEvent.PARTICLES_DESTROY_BLOCK, // Fiddle - client perspective - block state visualization - level event data - block break particles
      };
      private final static org.fiddlemc.fiddle.packet.block.BlockStateVisualizationSetupper.BlockStateVisualizationPurpose[] blockStateVisualizationPurposeForTypes = {
-         org.fiddlemc.fiddle.packet.block.BlockStateVisualizationSetupper.BlockStateVisualizationPurpose.PARTICLE, // Fiddle - client perspective - block state visualization - level event data - block break particles
-+        org.fiddlemc.fiddle.packet.block.BlockStateVisualizationSetupper.BlockStateVisualizationPurpose.PARTICLE, // Fiddle - client perspective - block state visualization - level event data - block brush complete
++        org.fiddlemc.fiddle.packet.block.BlockStateVisualizationSetupper.BlockStateVisualizationPurpose.PARTICLE, // Fiddle - client perspective - block state visualization - level event data - block break particles
      };
      // Fiddle end - client perspective - block state visualization - level event data - data can be BlockState
      private final int type;

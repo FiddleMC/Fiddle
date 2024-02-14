@@ -38,7 +38,7 @@ index 7b4947aa2cdd7f359184689bf348560bde1016dd..b1ad8bea989510bedfdf6674362336e1
          this.pos = pos;
          this.blockState = state;
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index dcd84b941fd781bc9d6daa955b5e5452d1681b9f..29bb593de97596bd2027ba73900cb92b469ed7a4 100644
+index 3de1597e494b5504eff762cbc15d0e32f34abcb7..c1a50c080bf82c6a42e9a97b1102a3463b3f1476 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
 @@ -2820,4 +2820,29 @@ public class ServerPlayer extends Player {

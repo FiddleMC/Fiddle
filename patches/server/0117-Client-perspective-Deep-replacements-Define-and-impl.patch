@@ -1,153 +1,25 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
-Date: Sat, 29 Jul 2023 13:28:41 +0200
-Subject: [PATCH] Client perspective - Deep replacements - Necessary
- replacement hooks
+Date: Sat, 29 Jul 2023 13:28:41 +0000
+Subject: [PATCH] Client perspective - Deep replacements - Define and implement
+ replacements
+
+Defines the deep replacements that are necessary (or useful for efficiency) to be applied
+to data written to the network, and implements them.
+
+These functions are specifically based on what is needed in the subsequent "Client perspective - Deep replacements - Invoke replacements" patch.
+No invocation of these functions is added yet.
 
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
-diff --git a/src/main/java/net/minecraft/nbt/CompoundTag.java b/src/main/java/net/minecraft/nbt/CompoundTag.java
-index e9aeb22ed30261514ee92d429b76b4aa9892c461..d8f17e1779e7dfe4b373f84d07dbe6b669fc61c7 100644
---- a/src/main/java/net/minecraft/nbt/CompoundTag.java
-+++ b/src/main/java/net/minecraft/nbt/CompoundTag.java
-@@ -182,6 +182,12 @@ public class CompoundTag implements Tag {
- 
-     @Override
-     public void write(DataOutput output, @org.jetbrains.annotations.Nullable org.fiddlemc.fiddle.packet.deepreplacement.ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope replacementScope) throws IOException {
-+        replacementScope = replacementScope.withoutUnnecessaryReplacements(clientPerspectiveAndSettings); // Remove unnecessary replacements
-+        if (replacementScope != org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope.NOTHING) {
-+            org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacer.replaceTag(this, clientPerspectiveAndSettings, replacementScope).write(output, clientPerspectiveAndSettings, org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope.NOTHING);
-+            return;
-+        }
-+        // Fiddle end - client perspective - deep replacements - hooks for replacements - insert hook in CompoundTag#write
-         // Fiddle end - client perspective - deep replacements - pass scope
-         for(String string : this.tags.keySet()) {
-             Tag tag = this.tags.get(string);
-diff --git a/src/main/java/net/minecraft/nbt/ListTag.java b/src/main/java/net/minecraft/nbt/ListTag.java
-index d70b0257ed990444a531e65cb275bbacc50b96b1..22de2910669807024a30bf8a935de829ea5fc4a2 100644
---- a/src/main/java/net/minecraft/nbt/ListTag.java
-+++ b/src/main/java/net/minecraft/nbt/ListTag.java
-@@ -162,6 +162,13 @@ public class ListTag extends CollectionTag<Tag> {
- 
-     @Override
-     public void write(DataOutput output, @org.jetbrains.annotations.Nullable org.fiddlemc.fiddle.packet.deepreplacement.ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope replacementScope) throws IOException {
-+        // Fiddle start - client perspective - deep replacements - hooks for replacements - insert hook in ListTag#write
-+        replacementScope = replacementScope.withoutUnnecessaryReplacements(clientPerspectiveAndSettings); // Remove unnecessary replacements
-+        if (replacementScope != org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope.NOTHING) {
-+            org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacer.replaceTag(this, clientPerspectiveAndSettings, replacementScope).write(output, clientPerspectiveAndSettings, org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope.NOTHING);
-+            return;
-+        }
-+        // Fiddle end - client perspective - deep replacements - hooks for replacements - insert hook in ListTag#write
-         // Fiddle end - client perspective - deep replacements - pass scope
-         if (this.list.isEmpty()) {
-             this.type = 0;
-diff --git a/src/main/java/net/minecraft/nbt/StringTag.java b/src/main/java/net/minecraft/nbt/StringTag.java
-index 0ad7ffe53b26136bd0aada84db3fe6662162c305..f8828df70a993323c12617f97224f074789ec8de 100644
---- a/src/main/java/net/minecraft/nbt/StringTag.java
-+++ b/src/main/java/net/minecraft/nbt/StringTag.java
-@@ -73,6 +73,13 @@ public class StringTag implements Tag {
- 
-     @Override
-     public void write(DataOutput output, @org.jetbrains.annotations.Nullable org.fiddlemc.fiddle.packet.deepreplacement.ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope replacementScope) throws IOException {
-+        // Fiddle start - client perspective - deep replacements - hooks for replacements - insert hook in StringTag#write
-+        replacementScope = replacementScope.withoutUnnecessaryReplacements(clientPerspectiveAndSettings); // Remove unnecessary replacements
-+        if (replacementScope != org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope.NOTHING) {
-+            org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacer.replaceTag(this, clientPerspectiveAndSettings, replacementScope).write(output, clientPerspectiveAndSettings, org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope.NOTHING);
-+            return;
-+        }
-+        // Fiddle end - client perspective - deep replacements - hooks for replacements - insert hook in StringTag#write
-         // Fiddle end - client perspective - deep replacements - pass scope
-         output.writeUTF(this.data);
-     }
-diff --git a/src/main/java/net/minecraft/network/FriendlyByteBuf.java b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
-index 715aa4ae6e1e1ccdac7ae55e6946973f8bb2b4ad..354c6635b183ff77364bd09aa768c65dae658d2a 100644
---- a/src/main/java/net/minecraft/network/FriendlyByteBuf.java
-+++ b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
-@@ -601,6 +601,12 @@ public class FriendlyByteBuf extends ByteBuf {
-     }
- 
-     public FriendlyByteBuf writeComponent(Component text, org.fiddlemc.fiddle.packet.deepreplacement.ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope replacementScope) {
-+        // Fiddle start - client perspective - deep replacements - hooks for replacements - insert hook in FriendlyByteBuf#writeComponent
-+        replacementScope = replacementScope.withoutUnnecessaryReplacements(clientPerspectiveAndSettings); // Remove unnecessary replacements
-+        if (replacementScope != org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope.NOTHING) {
-+            return this.writeComponent(org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacer.replaceComponent(text, clientPerspectiveAndSettings, replacementScope), clientPerspectiveAndSettings, org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope.NOTHING);
-+        }
-+        // Fiddle end - client perspective - deep replacements - hooks for replacements - insert hook in FriendlyByteBuf#writeComponent
-         // Fiddle end - client perspective - deep replacements - pass scope
-         if (text instanceof io.papermc.paper.adventure.AdventureComponent adv) {
-             return this.writeComponent(adv.adventure$component());
-@@ -748,6 +754,12 @@ public class FriendlyByteBuf extends ByteBuf {
-         if (stack.isEmpty() || stack.getItem() == null) { // CraftBukkit - NPE fix itemstack.getItem()
-             this.writeBoolean(false);
-         } else {
-+            // Fiddle start - client perspective - deep replacements - hooks for replacements - insert hook in FriendlyByteBuf#writeItem
-+            replacementScope = replacementScope.withoutUnnecessaryReplacements(clientPerspectiveAndSettings); // Remove unnecessary replacements
-+            if (replacementScope != org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope.NOTHING) {
-+                return this.writeItem(org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacer.replaceItemStack(stack, itemStackInPackContext, clientPerspectiveAndSettings, replacementScope), itemStackInPackContext, clientPerspectiveAndSettings, org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope.NOTHING);
-+            }
-+            // Fiddle end - client perspective - deep replacements - hooks for replacements - insert hook in FriendlyByteBuf#writeItem
-             this.writeBoolean(true);
-             Item item = stack.getItem();
- 
-diff --git a/src/main/java/net/minecraft/network/Utf8String.java b/src/main/java/net/minecraft/network/Utf8String.java
-index 2c001d99a207cab3a7c4fdbed533ad8e4e2fb819..88cf9fe24c4c7d17260812f1ac6b730a5fa07a3d 100644
---- a/src/main/java/net/minecraft/network/Utf8String.java
-+++ b/src/main/java/net/minecraft/network/Utf8String.java
-@@ -30,7 +30,28 @@ public class Utf8String {
-         }
-     }
- 
--    public static void write(ByteBuf buf, CharSequence string, int length, boolean canBeRawJsonText, boolean canBeSNBT, org.fiddlemc.fiddle.packet.deepreplacement.ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope replacementScope) { // Fiddle - client perspective - deep replacements - pass scope
-+    // Fiddle start - client perspective - deep replacements - hooks for replacements - insert hook in Utf8String#write
-+    public static void write(ByteBuf buf, String string, int length, boolean canBeRawJsonText, boolean canBeSNBT, org.fiddlemc.fiddle.packet.deepreplacement.ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope replacementScope) { // Fiddle - client perspective - deep replacements - pass scope
-+        replacementScope = replacementScope.withoutUnnecessaryReplacements(clientPerspectiveAndSettings); // Remove unnecessary replacements
-+        if (replacementScope != org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope.NOTHING) {
-+            String modifiedString;
-+            if (canBeRawJsonText) {
-+                if (canBeSNBT) {
-+                    modifiedString = org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacer.replaceRawJSONTextOrSNBT(string, clientPerspectiveAndSettings, replacementScope);
-+                } else {
-+                    modifiedString = org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacer.replaceRawJSONText(string, clientPerspectiveAndSettings, replacementScope);
-+                }
-+            } else {
-+                if (canBeSNBT) {
-+                    modifiedString = org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacer.replaceSNBT(string, clientPerspectiveAndSettings, replacementScope);
-+                } else {
-+                    modifiedString = string;
-+                }
-+            }
-+            write(buf, modifiedString, length, canBeRawJsonText, canBeSNBT, clientPerspectiveAndSettings, org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope.NOTHING);
-+            return;
-+        }
-+        // Fiddle end - client perspective - deep replacements - hooks for replacements - insert hook in Utf8String#write
-         if (string.length() > length) {
-             throw new EncoderException("String too big (was " + string.length() + " characters, max " + length + ")");
-         } else {
-diff --git a/src/main/java/net/minecraft/network/chat/Component.java b/src/main/java/net/minecraft/network/chat/Component.java
-index d3a80d0a23be762c05931ae8001d98e43cab2b4a..aa9eb198f3bb5223fec7bbf010d43666f5a59d90 100644
---- a/src/main/java/net/minecraft/network/chat/Component.java
-+++ b/src/main/java/net/minecraft/network/chat/Component.java
-@@ -101,6 +101,12 @@ public interface Component extends Message, FormattedText, Iterable<Component> {
-         return new MutableComponent(this.getContents(), new ArrayList(this.getSiblings()), this.getStyle());
-     }
- 
-+    // Fiddle start - client perspective - deep replacements - hooks for replacements - copy component with new contents
-+    default MutableComponent withContents(ComponentContents contents) {
-+        return new MutableComponent(contents, this.getSiblings(), this.getStyle());
-+    }
-+    // Fiddle end - client perspective - deep replacements - hooks for replacements - copy component with new contents
-+
-     FormattedCharSequence getVisualOrderText();
- 
-     @Override
-diff --git a/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacer.java b/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacer.java
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacements.java b/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacements.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..2d90d8d2dac7bedbf472f3a5af8493621b003c9b
+index 0000000000000000000000000000000000000000..ce36e17aab17d4cfcc06ecf3d97370f656191755
 --- /dev/null
-+++ b/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacer.java
-@@ -0,0 +1,432 @@
-+// Fiddle - client perspective - deep replacements - hooks for replacements
++++ b/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacements.java
+@@ -0,0 +1,438 @@
++// Fiddle - client perspective - deep replacements - define and implement replacements
 +
 +package org.fiddlemc.fiddle.packet.deepreplacement;
 +
@@ -166,11 +38,17 @@ index 0000000000000000000000000000000000000000..2d90d8d2dac7bedbf472f3a5af849362
 +
 +/**
 + * A class providing static functionality for applying the possible deep replacements.
++ * <br>
++ * A value to apply replacements to, a {@link DeepReplacementContext} that determines the replacement values
++ * (and may allow for skipping of unnecessary steps for that context),
++ * and a {@link DeepReplacementScope} to allow for efficient skipping of steps that are no longer necessary
++ * in the current chain of deep replacement invocations,
++ * form the input to each deep replacement invocation.
 + */
 +@SuppressWarnings("StringEquality")
-+public final class DeepReplacer {
++public final class DeepReplacements {
 +
-+    private DeepReplacer() {
++    private DeepReplacements() {
 +        throw new RuntimeException();
 +    }
 +
@@ -178,12 +56,12 @@ index 0000000000000000000000000000000000000000..2d90d8d2dac7bedbf472f3a5af849362
 +     * Attempts to apply {@link #replaceRawJSONText} and {@link #replaceSNBT},
 +     * in that order, and returns the first result that is different from the given value.
 +     */
-+    public static String replaceRawJSONTextOrSNBT(String value, ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, DeepReplacementScope replacementScope) {
-+        var modifiedValue = replaceRawJSONText(value, clientPerspectiveAndSettings, replacementScope);
++    public static String replaceRawJSONTextOrSNBT(String value, DeepReplacementContext context, DeepReplacementScope scope) {
++        var modifiedValue = replaceRawJSONText(value, context, scope);
 +        if (modifiedValue != value) {
 +            return modifiedValue;
 +        }
-+        return replaceSNBT(value, clientPerspectiveAndSettings, replacementScope);
++        return replaceSNBT(value, context, scope);
 +    }
 +
 +    /**
@@ -192,23 +70,23 @@ index 0000000000000000000000000000000000000000..2d90d8d2dac7bedbf472f3a5af849362
 +     * When no replacements have been made (and as such, the returned string is {@linkplain Object#equals equal}
 +     * to the given {@code value}), this method will make a strong effort to return the given {@code value} instance.
 +     */
-+    public static String replaceRawJSONText(String value, ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, DeepReplacementScope replacementScope) {
++    public static String replaceRawJSONText(String value, DeepReplacementContext context, DeepReplacementScope scope) {
 +
 +        // We only need to replace in hover events if there are any present, which there can only be if a specific substring is present
-+        if (replacementScope.attemptToReplaceInHoverEvents && !value.contains("\"hoverEvent")) {
-+            replacementScope = replacementScope.withoutAttemptToReplaceInHoverEvents();
++        if (scope.attemptToReplaceInHoverEvents && !value.contains("\"hoverEvent")) {
++            scope = scope.withoutAttemptToReplaceInHoverEvents();
 +        }
 +        // We never need to replace blocks in raw JSON text, and we only need to replace items if there are any present, which there can only be in raw JSON text for hover events of the show_item type
-+        if (replacementScope.attemptToReplaceItemsAndBlocks && !(replacementScope.attemptToReplaceInHoverEvents && value.contains("show_item"))) {
-+            replacementScope = replacementScope.withoutAttemptToReplaceItemsAndBlocks();
++        if (scope.attemptToReplaceItemsAndBlocks && !(scope.attemptToReplaceInHoverEvents && value.contains("show_item"))) {
++            scope = scope.withoutAttemptToReplaceItemsAndBlocks();
 +        }
 +        // We only need to replace translatables if there are any present, which there can only be if a specific substring is present
-+        if (replacementScope.attemptToReplaceTranslatables && !value.contains("\"translate")) {
-+            replacementScope = replacementScope.withoutAttemptToReplaceTranslatables();
++        if (scope.attemptToReplaceTranslatables && !value.contains("\"translate")) {
++            scope = scope.withoutAttemptToReplaceTranslatables();
 +        }
 +
 +        // Skip if we have no replacements to make
-+        if (!replacementScope.canMakeAnyReplacements()) {
++        if (!scope.canMakeAnyReplacements()) {
 +            return value;
 +        }
 +
@@ -224,7 +102,7 @@ index 0000000000000000000000000000000000000000..2d90d8d2dac7bedbf472f3a5af849362
 +            // If the string represents null, no replacements need to be made
 +            return value;
 +        }
-+        var modifiedComponent = replaceComponent(component, clientPerspectiveAndSettings, replacementScope);
++        var modifiedComponent = replaceComponent(component, context, scope);
 +        if (modifiedComponent == component) {
 +            // If no changes were made, we return the given value instance
 +            return value;
@@ -240,10 +118,10 @@ index 0000000000000000000000000000000000000000..2d90d8d2dac7bedbf472f3a5af849362
 +     * When no replacements have been made (and as such, the returned component is {@linkplain Object#equals equal}
 +     * to the given {@code value}), this method will make a strong effort to return the given {@code value} instance.
 +     */
-+    public static Component replaceComponent(Component value, ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, DeepReplacementScope replacementScope) {
++    public static Component replaceComponent(Component value, DeepReplacementContext context, DeepReplacementScope scope) {
 +
 +        // Skip if we have no replacements to make
-+        if (!replacementScope.canMakeAnyReplacements()) {
++        if (!scope.canMakeAnyReplacements()) {
 +            return value;
 +        }
 +
@@ -256,7 +134,7 @@ index 0000000000000000000000000000000000000000..2d90d8d2dac7bedbf472f3a5af849362
 +        for (int i = 0; i < siblings.size(); i++) {
 +            var sibling = siblings.get(i);
 +            // Make necessary replacements in the sibling
-+            var modifiedSibling = replaceComponent(sibling, clientPerspectiveAndSettings, replacementScope);
++            var modifiedSibling = replaceComponent(sibling, context, scope);
 +            if (modifiedSibling == sibling) {
 +                // If the sibling was unchanged, continue
 +                continue;
@@ -271,7 +149,7 @@ index 0000000000000000000000000000000000000000..2d90d8d2dac7bedbf472f3a5af849362
 +        }
 +
 +        // Modify the style (specifically, the hover event) if necessary
-+        if (replacementScope.attemptToReplaceInHoverEvents) {
++        if (scope.attemptToReplaceInHoverEvents) {
 +            var style = value.getStyle();
 +            var hoverEvent = style.getHoverEvent();
 +            if (hoverEvent != null) {
@@ -285,20 +163,20 @@ index 0000000000000000000000000000000000000000..2d90d8d2dac7bedbf472f3a5af849362
 +                    var showTextValue = hoverEvent.getValue(HoverEvent.Action.SHOW_TEXT);
 +                    if (showTextValue != null) {
 +                        // Note that we never have to transitively replace in hover events, and thereby also do not have to replace any nested items or blocks
-+                        var modifiedShowTextValue = replaceComponent(showTextValue, clientPerspectiveAndSettings, replacementScope.withoutAttemptToReplaceItemsAndBlocks().withoutAttemptToReplaceInHoverEvents());
++                        var modifiedShowTextValue = replaceComponent(showTextValue, context, scope.withoutAttemptToReplaceItemsAndBlocks().withoutAttemptToReplaceInHoverEvents());
 +                        if (modifiedShowTextValue != showTextValue) {
 +                            modifiedHoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, modifiedShowTextValue);
 +                        }
 +                    }
 +                } else if (hoverAction == HoverEvent.Action.SHOW_ITEM) {
 +                    // Replace the item
-+                    if (replacementScope.attemptToReplaceItemsAndBlocks) {
++                    if (scope.attemptToReplaceItemsAndBlocks) {
 +                        var showItemValue = hoverEvent.getValue(HoverEvent.Action.SHOW_ITEM);
 +                        if (showItemValue != null) {
 +                            try {
 +                                var showItemItemStack = showItemValue.getItemStack();
 +                                // Note that we never have to transitively replace in hover events
-+                                var modifiedShowItemItemStack = replaceItemStack(showItemItemStack, clientPerspectiveAndSettings, replacementScope.withoutAttemptToReplaceInHoverEvents());
++                                var modifiedShowItemItemStack = replaceItemStack(showItemItemStack, context, scope.withoutAttemptToReplaceInHoverEvents());
 +                                if (modifiedShowItemItemStack != showItemItemStack) {
 +                                    modifiedHoverEvent = new HoverEvent(HoverEvent.Action.SHOW_ITEM, new HoverEvent.ItemStackInfo(modifiedShowItemItemStack));
 +                                }
@@ -314,7 +192,7 @@ index 0000000000000000000000000000000000000000..2d90d8d2dac7bedbf472f3a5af849362
 +                        if (showEntityValue.name != null && showEntityValue.name.isPresent()) {
 +                            var showEntityValueName = showEntityValue.name.get();
 +                            // Note that we never have to transitively replace in hover events, and thereby also do not have to replace any nested items or blocks
-+                            var modifiedName = replaceComponent(showEntityValueName, clientPerspectiveAndSettings, replacementScope.withoutAttemptToReplaceItemsAndBlocks().withoutAttemptToReplaceInHoverEvents());
++                            var modifiedName = replaceComponent(showEntityValueName, context, scope.withoutAttemptToReplaceItemsAndBlocks().withoutAttemptToReplaceInHoverEvents());
 +                            if (modifiedName != showEntityValueName) {
 +                                modifiedHoverEvent = new HoverEvent(HoverEvent.Action.SHOW_ENTITY, new HoverEvent.EntityTooltipInfo(showEntityValue.type, showEntityValue.id, modifiedName));
 +                            }
@@ -333,7 +211,7 @@ index 0000000000000000000000000000000000000000..2d90d8d2dac7bedbf472f3a5af849362
 +        }
 +
 +        // Modify the contents if necessary (specifically, if they are translatable)
-+        if (replacementScope.attemptToReplaceTranslatables) {
++        if (scope.attemptToReplaceTranslatables) {
 +            var contents = value.getContents();
 +            if (contents instanceof TranslatableContents translatableContents) {
 +
@@ -345,9 +223,9 @@ index 0000000000000000000000000000000000000000..2d90d8d2dac7bedbf472f3a5af849362
 +                    var argument = arguments[argumentI];
 +                    Object modifiedArgument;
 +                    if (argument instanceof String argumentAsString) {
-+                        modifiedArgument = replaceRawJSONText(argumentAsString, clientPerspectiveAndSettings, replacementScope);
++                        modifiedArgument = replaceRawJSONText(argumentAsString, context, scope);
 +                    } else if (argument instanceof Component argumentAsComponent) {
-+                        modifiedArgument = replaceComponent(argumentAsComponent, clientPerspectiveAndSettings, replacementScope);
++                        modifiedArgument = replaceComponent(argumentAsComponent, context, scope);
 +                    } else {
 +                        modifiedArgument = argument;
 +                    }
@@ -367,7 +245,7 @@ index 0000000000000000000000000000000000000000..2d90d8d2dac7bedbf472f3a5af849362
 +                var translatableContentsWithModifiedArguments = modifiedArguments != null ? new TranslatableContents(translatableContents.getKey(), translatableContents.getFallback(), modifiedArguments) : translatableContents;
 +
 +                // Attempt to apply translations on the server
-+                var modifiedContents = replaceTranslatableContents(translatableContentsWithModifiedArguments, clientPerspectiveAndSettings.getLocale());
++                var modifiedContents = replaceTranslatableContents(translatableContentsWithModifiedArguments, context.getLocale());
 +                if (modifiedContents != contents) {
 +                    // Replace the contents with the modified contents
 +                    modifiedValueOrNull = (modifiedValueOrNull != null ? modifiedValueOrNull : value).withContents(modifiedContents);
@@ -388,10 +266,10 @@ index 0000000000000000000000000000000000000000..2d90d8d2dac7bedbf472f3a5af849362
 +     * When no replacements have been made (and as such, the returned string is {@linkplain Object#equals equal}
 +     * to the given {@code value}), this method will make a strong effort to return the given {@code value} instance.
 +     */
-+    public static String replaceSNBT(String value, ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, DeepReplacementScope replacementScope) {
++    public static String replaceSNBT(String value, DeepReplacementContext context, DeepReplacementScope scope) {
 +
 +        // Skip if we have no replacements to make
-+        if (!replacementScope.canMakeAnyReplacements()) {
++        if (!scope.canMakeAnyReplacements()) {
 +            return value;
 +        }
 +
@@ -410,7 +288,7 @@ index 0000000000000000000000000000000000000000..2d90d8d2dac7bedbf472f3a5af849362
 +        }
 +
 +        // Perform replacements on the tag
-+        var modifiedTag = replaceTag(tag, clientPerspectiveAndSettings, replacementScope);
++        var modifiedTag = replaceTag(tag, context, scope);
 +        if (modifiedTag == tag) {
 +            // If no changes were made, we return the given value instance
 +            return value;
@@ -426,17 +304,17 @@ index 0000000000000000000000000000000000000000..2d90d8d2dac7bedbf472f3a5af849362
 +     * When no replacements have been made (and as such, the returned tag is {@linkplain Object#equals equal}
 +     * to the given {@code value}), this method will make a strong effort to return the given {@code value} instance.
 +     */
-+    public static Tag replaceTag(Tag value, ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, DeepReplacementScope replacementScope) {
++    public static Tag replaceTag(Tag value, DeepReplacementContext context, DeepReplacementScope scope) {
 +
 +        // Skip if we have no replacements to make
-+        if (!replacementScope.canMakeAnyReplacements()) {
++        if (!scope.canMakeAnyReplacements()) {
 +            return value;
 +        }
 +
 +        if (value.getId() == Tag.TAG_COMPOUND && value instanceof CompoundTag compoundValue) {
 +
 +            // Potentially, the tag represents an item: we simply assume this is possible only if it has the right keys
-+            if (replacementScope.attemptToReplaceItemsAndBlocks) {
++            if (scope.attemptToReplaceItemsAndBlocks) {
 +                var keys = compoundValue.getAllKeys();
 +                if (compoundValue.contains("id", Tag.TAG_STRING) && compoundValue.contains("Count", Tag.TAG_BYTE)) {
 +                    boolean hasOnlyValidKeys = true;
@@ -470,7 +348,7 @@ index 0000000000000000000000000000000000000000..2d90d8d2dac7bedbf472f3a5af849362
 +
 +                        try {
 +                            var itemStack = ItemStack.of(compoundValue);
-+                            var modifiedItemStack = replaceItemStack(itemStack, clientPerspectiveAndSettings, replacementScope);
++                            var modifiedItemStack = replaceItemStack(itemStack, context, scope);
 +                            if (modifiedItemStack != itemStack) {
 +                                // Copy the given value, but clear the id, count and tag in advance
 +                                var modifiedValue = compoundValue.copy();
@@ -494,7 +372,7 @@ index 0000000000000000000000000000000000000000..2d90d8d2dac7bedbf472f3a5af849362
 +            @Nullable CompoundTag modifiedValue = null;
 +            for (var key : compoundValue.getAllKeys()) {
 +                var subvalue = compoundValue.get(key);
-+                var modifiedSubvalue = replaceTag(subvalue, clientPerspectiveAndSettings, replacementScope);
++                var modifiedSubvalue = replaceTag(subvalue, context, scope);
 +                if (modifiedSubvalue == subvalue) {
 +                    // If the subvalue was unchanged, continue
 +                    continue;
@@ -524,7 +402,7 @@ index 0000000000000000000000000000000000000000..2d90d8d2dac7bedbf472f3a5af849362
 +            @Nullable ListTag modifiedValue = null;
 +            for (int i = 0; i < listValue.size(); i++) {
 +                var subvalue = listValue.get(i);
-+                var modifiedSubvalue = replaceTag(subvalue, clientPerspectiveAndSettings, replacementScope);
++                var modifiedSubvalue = replaceTag(subvalue, context, scope);
 +                if (modifiedSubvalue != subvalue) {
 +                    // Instantiate the modified value
 +                    if (modifiedValue == null) {
@@ -549,7 +427,7 @@ index 0000000000000000000000000000000000000000..2d90d8d2dac7bedbf472f3a5af849362
 +
 +            // The string may be a serialized component or stringified NBT
 +            var text = stringValue.getAsString();
-+            var modifiedText = replaceRawJSONTextOrSNBT(text, clientPerspectiveAndSettings, replacementScope);
++            var modifiedText = replaceRawJSONTextOrSNBT(text, context, scope);
 +            if (modifiedText != text) {
 +                return StringTag.valueOf(modifiedText);
 +            }
@@ -561,7 +439,7 @@ index 0000000000000000000000000000000000000000..2d90d8d2dac7bedbf472f3a5af849362
 +
 +    }
 +
-+    public static ItemStack replaceItemStack(ItemStack value, ItemStackInPacketContext itemStackInPacketContext, ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, DeepReplacementScope replacementScope) {
++    public static ItemStack replaceItemStack(ItemStack value, ItemStackInPacketContext itemStackInPacketContext, DeepReplacementContext context, DeepReplacementScope scope) {
 +        // TODO call implementation
 +        return value;
 +    }
@@ -569,8 +447,8 @@ index 0000000000000000000000000000000000000000..2d90d8d2dac7bedbf472f3a5af849362
 +    /**
 +     * Nested {@link ItemStack}s always have the {@link ItemStackInPacketContext#DEFAULT} context.
 +     */
-+    private static ItemStack replaceItemStack(ItemStack value, ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, DeepReplacementScope replacementScope) {
-+        return replaceItemStack(value, ItemStackInPacketContext.DEFAULT, clientPerspectiveAndSettings, replacementScope);
++    private static ItemStack replaceItemStack(ItemStack value, DeepReplacementContext context, DeepReplacementScope scope) {
++        return replaceItemStack(value, ItemStackInPacketContext.DEFAULT, context, scope);
 +    }
 +
 +    private static ComponentContents replaceTranslatableContents(TranslatableContents value, @Nullable String locale) {

@@ -8,7 +8,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/inventory/CraftMetaItem.java b/src/main/java/org/bukkit/craftbukkit/inventory/CraftMetaItem.java
-index 8eae41077dc370e2286efaad4b9878c8ec04460e..e961b062ce9ec0272c22da190d438a189686fa3e 100644
+index 536e80886c2393edaf526f460f49dae8c3b40295..da4f8e59cb5157a82a54d517ee42c6d2313ca8db 100644
 --- a/src/main/java/org/bukkit/craftbukkit/inventory/CraftMetaItem.java
 +++ b/src/main/java/org/bukkit/craftbukkit/inventory/CraftMetaItem.java
 @@ -114,9 +114,11 @@ import java.util.Collections;
@@ -53,17 +53,17 @@ index 8eae41077dc370e2286efaad4b9878c8ec04460e..e961b062ce9ec0272c22da190d438a18
      static final ItemMetaKey ENCHANTMENTS = new ItemMetaKey("Enchantments", "enchants");
      @Specific(Specific.To.NBT)
      static final ItemMetaKey ENCHANTMENTS_ID = new ItemMetaKey("id");
-diff --git a/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacer.java b/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacer.java
-index 1a32ad9eee713cc0b334b6f9be79c05aaadd2cbe..25c6f1ff6b5f7a692820eaebf10fbab685c9cea7 100644
---- a/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacer.java
-+++ b/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacer.java
-@@ -413,8 +413,7 @@ public final class DeepReplacer {
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacements.java b/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacements.java
+index 50e09dd10bbcc47b46898b18686f1ee2e045c643..7f01be7a658b8f69f2f2ae067096ec63deac81bf 100644
+--- a/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacements.java
++++ b/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacements.java
+@@ -419,8 +419,7 @@ public final class DeepReplacements {
      }
  
-     public static ItemStack replaceItemStack(ItemStack value, ItemStackInPacketContext itemStackInPacketContext, ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, DeepReplacementScope replacementScope) {
+     public static ItemStack replaceItemStack(ItemStack value, ItemStackInPacketContext itemStackInPacketContext, DeepReplacementContext context, DeepReplacementScope scope) {
 -        // TODO call implementation
 -        return value;
-+        return org.fiddlemc.fiddle.packet.item.ItemStackInPacketReplacer.replace(value, itemStackInPacketContext, clientPerspectiveAndSettings, replacementScope); // Fiddle - client perspective - item replacements
++        return org.fiddlemc.fiddle.packet.item.ItemStackInPacketReplacer.replace(value, itemStackInPacketContext, context, scope); // Fiddle - client perspective - item replacements
      }
  
      /**
@@ -163,7 +163,7 @@ index 0000000000000000000000000000000000000000..9c7162be75b5d07a203a5304c46eb435
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/packet/item/ItemStackInPacketReplacer.java b/src/main/java/org/fiddlemc/fiddle/packet/item/ItemStackInPacketReplacer.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..34159926feeff887cf6baddafbf2845111abaaf1
+index 0000000000000000000000000000000000000000..43e8b4c304c395ffb8af53529cd3fe127de25fe2
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/packet/item/ItemStackInPacketReplacer.java
 @@ -0,0 +1,159 @@
@@ -181,9 +181,9 @@ index 0000000000000000000000000000000000000000..34159926feeff887cf6baddafbf28451
 +import net.minecraft.world.item.ItemStack;
 +import org.bukkit.craftbukkit.inventory.CraftMetaItem;
 +import org.fiddlemc.fiddle.packet.ClientPerspective;
-+import org.fiddlemc.fiddle.packet.deepreplacement.ClientPerspectiveAndSettingsSupplier;
++import org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementContext;
 +import org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope;
-+import org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacer;
++import org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacements;
 +import org.fiddlemc.fiddle.packet.locale.ServerSideTranslations;
 +import org.jetbrains.annotations.Nullable;
 +
@@ -209,7 +209,7 @@ index 0000000000000000000000000000000000000000..34159926feeff887cf6baddafbf28451
 +     * </ul>
 +     * i.e. the given {@link ItemStack} is not modified in-place.
 +     */
-+    public static ItemStack replace(ItemStack original, ItemStackInPacketContext context, ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, DeepReplacementScope replacementScope) {
++    public static ItemStack replace(ItemStack original, ItemStackInPacketContext context, DeepReplacementContext replacementContext, DeepReplacementScope replacementScope) {
 +
 +        // Skip if we have no replacements to make
 +        if (!replacementScope.canMakeAnyReplacements()) {
@@ -231,7 +231,7 @@ index 0000000000000000000000000000000000000000..34159926feeff887cf6baddafbf28451
 +            visualHandle = ((ItemVisualHandleProvider) visualHandleOrProvider).getDesiredVisualHandle(original);
 +        }
 +        if (visualHandle != null) {
-+            var replacementItemAndCustomModelData = visualHandle.getReplacementItemAndCustomModelData(clientPerspectiveAndSettings.getPerspective(), context.typeAndCustomModelDataMapping);
++            var replacementItemAndCustomModelData = visualHandle.getReplacementItemAndCustomModelData(replacementContext.getPerspective(), context.typeAndCustomModelDataMapping);
 +            if (replacementItemAndCustomModelData != null) {
 +                Item existingItem;
 +                int existingCustomModelData = 0;
@@ -268,7 +268,7 @@ index 0000000000000000000000000000000000000000..34159926feeff887cf6baddafbf28451
 +            var originalName = originalItem.getName(original);
 +            if (originalName.getContents() instanceof TranslatableContents translatableContents) {
 +                String translationKey = translatableContents.getKey();
-+                if (ServerSideTranslations.hasTranslatableReplacement(translationKey, clientPerspectiveAndSettings.getLocale())) {
++                if (ServerSideTranslations.hasTranslatableReplacement(translationKey, replacementContext.getLocale())) {
 +                    // Only if there is not already a custom display name
 +                    boolean hasCustomDisplayName = false;
 +                    {
@@ -311,7 +311,7 @@ index 0000000000000000000000000000000000000000..34159926feeff887cf6baddafbf28451
 +        var tag = (replacement != null ? replacement : original).getTag();
 +        if (tag != null) {
 +            // We never need to replace in hover events for an item stack tag
-+            var modifiedTag = DeepReplacer.replaceTag(tag, clientPerspectiveAndSettings, replacementScope.withoutAttemptToReplaceInHoverEvents());
++            var modifiedTag = DeepReplacements.replaceTag(tag, replacementContext, replacementScope.withoutAttemptToReplaceInHoverEvents());
 +            if (modifiedTag != tag && modifiedTag instanceof CompoundTag modifiedCompoundTag) {
 +                if (replacement == null) {
 +                    replacement = original.copy();

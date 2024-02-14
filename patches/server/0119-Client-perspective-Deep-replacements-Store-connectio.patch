@@ -58,7 +58,7 @@ index 3944852921335c78a04a9dc301882ab5b152b1ed..f0c68c01b06b9472e56484a7b028d22a
          this.type = buf.readById(BuiltInRegistries.BLOCK_ENTITY_TYPE);
          this.tag = buf.readNbt();
 diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundCommandSuggestionsPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundCommandSuggestionsPacket.java
-index 8f62c67e28cad5cb240f8a9328e92fbea71c1725..8dfbede37b0c1bd67600194ea0ace92305031f04 100644
+index 46520459e6736ebcf88c068a1521f5a3820233df..2067315b4ccf13f5e0ab0c41c99de0957b1c6890 100644
 --- a/src/main/java/net/minecraft/network/protocol/game/ClientboundCommandSuggestionsPacket.java
 +++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundCommandSuggestionsPacket.java
 @@ -9,16 +9,18 @@ import net.minecraft.network.chat.Component;

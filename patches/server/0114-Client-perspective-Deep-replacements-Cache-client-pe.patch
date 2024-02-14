@@ -8,14 +8,14 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/network/FriendlyByteBuf.java b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
-index 42ada45bc640b780581c908282939f3a9ccf2831..5db33782c60d1b16bcfefaba5ace8e81c734ae20 100644
+index 42ada45bc640b780581c908282939f3a9ccf2831..9edac88eaf09929a29591aac237587df44a2a738 100644
 --- a/src/main/java/net/minecraft/network/FriendlyByteBuf.java
 +++ b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
 @@ -102,6 +102,8 @@ public class FriendlyByteBuf extends ByteBuf {
      public @Nullable java.lang.ref.WeakReference<net.minecraft.network.protocol.@org.jetbrains.annotations.NotNull Packet<?>> writingPacket;
      // Fiddle end - client perspective - packets are modifiable - store explicit perspective and locale - FriendlyByteBuf
  
-+    private @Nullable org.fiddlemc.fiddle.packet.deepreplacement.ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettingsSupplier; // Fiddle - client perspective - deep replacements - perspective and settings supplier - cache in FriendlyByteBuf
++    private @Nullable org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementContext replacementContextSupplier; // Fiddle - client perspective - deep replacements - context - cache in FriendlyByteBuf
 +
      public FriendlyByteBuf(ByteBuf parent) {
          this.source = parent;
@@ -24,13 +24,13 @@ index 42ada45bc640b780581c908282939f3a9ccf2831..5db33782c60d1b16bcfefaba5ace8e81
      }
      // Fiddle end - client perspective - packets are modifiable - expose target client properties - can be used by FriendlyByteBuf
  
-+    // Fiddle start - client perspective - deep replacements - perspective and settings supplier - cache in FriendlyByteBuf
-+    public org.fiddlemc.fiddle.packet.deepreplacement.ClientPerspectiveAndSettingsSupplier getClientPerspectiveAndSettingsSupplier() {
-+        if (this.clientPerspectiveAndSettingsSupplier == null) {
-+            this.clientPerspectiveAndSettingsSupplier = org.fiddlemc.fiddle.packet.deepreplacement.ClientPerspectiveAndSettingsSupplier.forFriendlyByteBuf(this);
++    // Fiddle start - client perspective - deep replacements - context - cache in FriendlyByteBuf
++    public org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementContext getDeepReplacementContext() {
++        if (this.replacementContextSupplier == null) {
++            this.replacementContextSupplier = org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementContext.forFriendlyByteBuf(this);
 +        }
-+        return this.clientPerspectiveAndSettingsSupplier;
++        return this.replacementContextSupplier;
 +    }
-+    // Fiddle end - client perspective - deep replacements - perspective and settings supplier - cache in FriendlyByteBuf
++    // Fiddle end - client perspective - deep replacements - context - cache in FriendlyByteBuf
 +
  }

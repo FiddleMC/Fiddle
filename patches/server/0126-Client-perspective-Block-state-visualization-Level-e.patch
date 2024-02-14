@@ -1,26 +1,131 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
-Date: Sat, 10 Feb 2024 10:59:19 +0100
+Date: Sat, 10 Feb 2024 13:49:51 +0100
 Subject: [PATCH] Client perspective - Block state visualization - Level event
- data - Block break particles
+ data - Data can be BlockState
 
-Registers `LevelEvent.PARTICLES_DESTROY_BLOCK` as a level event type where the data represents a block state.
+Allows the data of level events (`ClientboundLevelEventPacket.data`) to be a `BlockState` instance,
+and provides the implementation of turning it into an integer value for all event types (`ClientboundLevelEventPacket.type`) that can possibly come with a `BlockState` as data.
 
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelEventPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelEventPacket.java
-index 77bf1cd34da27372ffd00c098e1e630236dc2caa..9a18265f7ab69077d4199f5013846511587a83a0 100644
+index 11de2041b07914b2868a818acb756dc729eaf59c..77bf1cd34da27372ffd00c098e1e630236dc2caa 100644
 --- a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelEventPacket.java
 +++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelEventPacket.java
-@@ -7,8 +7,10 @@ import net.minecraft.network.protocol.Packet;
+@@ -5,6 +5,12 @@ import net.minecraft.network.FriendlyByteBuf;
+ import net.minecraft.network.protocol.Packet;
+ 
  public class ClientboundLevelEventPacket extends org.fiddlemc.fiddle.packet.CloningPacketWithExplicitTargetClientConnection<ClientGamePacketListener> { // Fiddle - client perspective - level event data value replacements - store connection explicitly
-     // Fiddle start - client perspective - block state visualization - level event data - data can be BlockState
-     private final static int[] typesWhereDataIsBlockState = {
-+        net.minecraft.world.level.block.LevelEvent.PARTICLES_DESTROY_BLOCK, // Fiddle - client perspective - block state visualization - level event data - block break particles
-     };
-     private final static org.fiddlemc.fiddle.packet.block.BlockStateVisualizationSetupper.BlockStateVisualizationPurpose[] blockStateVisualizationPurposeForTypes = {
-+        org.fiddlemc.fiddle.packet.block.BlockStateVisualizationSetupper.BlockStateVisualizationPurpose.PARTICLE, // Fiddle - client perspective - block state visualization - level event data - block break particles
-     };
-     // Fiddle end - client perspective - block state visualization - level event data - data can be BlockState
++    // Fiddle start - client perspective - block state visualization - level event data - data can be BlockState
++    private final static int[] typesWhereDataIsBlockState = {
++    };
++    private final static org.fiddlemc.fiddle.packet.block.BlockStateVisualizationSetupper.BlockStateVisualizationPurpose[] blockStateVisualizationPurposeForTypes = {
++    };
++    // Fiddle end - client perspective - block state visualization - level event data - data can be BlockState
      private final int type;
+     private final BlockPos pos;
+     private final Object data; // Fiddle - client perspective - level event data value replacements - data can be generic
+@@ -34,6 +40,32 @@ public class ClientboundLevelEventPacket extends org.fiddlemc.fiddle.packet.Clon
+ 
+     @Override
+     protected boolean canSkipCloning() {
++        // Fiddle start - client perspective - block state visualization - level event data - data can be BlockState
++        for (int i = 0; i < typesWhereDataIsBlockState.length; i++) {
++            if (this.type == typesWhereDataIsBlockState[i]) {
++                // We can skip cloning if the data that will be sent is always the same
++                // First determine the state that will be sent
++                var state = this.getDataAsBlockState();
++                net.minecraft.world.level.block.state.BlockState stateToSend;
++                if (state.visualizationSetupper == null) {
++                    stateToSend = state;
++                } else {
++                    var purpose = blockStateVisualizationPurposeForTypes[i];
++                    stateToSend = state.visualizationSetupper.setUp(state, purpose);
++                    if (stateToSend == null) {
++                        // The state that will be sent cannot be certainly known, so we cannot skip cloning
++                        return false;
++                    }
++                }
++                if (org.fiddlemc.fiddle.packet.ClientPerspective.getSinglePacketBlockStateId(stateToSend) == -1) {
++                    // The id that will be sent for the state cannot be certainly known, so we cannot skip cloning
++                    return false;
++                }
++                // The same id will be sent to everyone, so we can skip cloning
++                return true;
++            }
++        }
++        // Fiddle end - client perspective - block state visualization - level event data - data can be BlockState
+         // Fiddle start - client perspective - level event data value replacements - data can be generic
+         if (!(this.data instanceof Integer)) {
+             // Whether cloning can be skipped must already have been determined
+@@ -67,6 +99,51 @@ public class ClientboundLevelEventPacket extends org.fiddlemc.fiddle.packet.Clon
+     }
+ 
+     public int getData() {
++        // Fiddle start - client perspective - block state visualization - level event data - data can be BlockState
++        for (int i = 0; i < typesWhereDataIsBlockState.length; i++) {
++            if (this.type == typesWhereDataIsBlockState[i]) {
++                // Apply the desired visualization
++                var state = this.getDataAsBlockState();
++                net.minecraft.world.level.block.state.BlockState stateToSend;
++                if (state.visualizationSetupper == null) {
++                    stateToSend = state;
++                } else {
++                    var purpose = blockStateVisualizationPurposeForTypes[i];
++                    var player = this.getExplicitTargetClientConnection().getPlayer();
++                    var level = (net.minecraft.server.level.ServerLevel) player.level();
++                    if (level == null) {
++                        level = net.minecraft.server.MinecraftServer.getServer().getAllLevels().iterator().next(); // This fallback shouldn't be necessary, but it could occur when packets are sent with bad timing
++                    }
++                    var clientPerspective = this.getExplicitTargetClientPerspective();
++                    var definitelyHasNoVisualizationDifferentThanItself = state.visualizationSetupper.preCheckWhetherDefinitelyHasNoVisualizationDifferentThanItself(state, player, clientPerspective, purpose);
++                    if (definitelyHasNoVisualizationDifferentThanItself == null) {
++                        definitelyHasNoVisualizationDifferentThanItself = state.visualizationSetupper.preCheckWhetherDefinitelyHasNoVisualizationDifferentThanItself(level, state, player, clientPerspective, purpose);
++                        if (definitelyHasNoVisualizationDifferentThanItself == null) {
++                            definitelyHasNoVisualizationDifferentThanItself = state.visualizationSetupper.preCheckWhetherDefinitelyHasNoVisualizationDifferentThanItself(level, this.pos.getX(), this.pos.getY(), this.pos.getZ(), state, player, clientPerspective, purpose);
++                        }
++                    }
++                    if (definitelyHasNoVisualizationDifferentThanItself) {
++                        stateToSend = state;
++                    } else {
++                        stateToSend = state.visualizationSetupper.setUp(state, player, clientPerspective, org.fiddlemc.fiddle.packet.block.BlockStateVisualizationSetupper.BlockStateVisualizationPurpose.PARTICLE);
++                        if (stateToSend == null) {
++                            stateToSend = state.visualizationSetupper.setUp(level, state, player, clientPerspective, org.fiddlemc.fiddle.packet.block.BlockStateVisualizationSetupper.BlockStateVisualizationPurpose.PARTICLE);
++                            if (stateToSend == null) {
++                                stateToSend = state.visualizationSetupper.setUp(level, this.pos.getX(), this.pos.getY(), this.pos.getZ(), state, player, clientPerspective, org.fiddlemc.fiddle.packet.block.BlockStateVisualizationSetupper.BlockStateVisualizationPurpose.PARTICLE);
++                            }
++                        }
++                    }
++                }
++                // Turn the state to send into an id that the client can interpret
++                int singleValue = org.fiddlemc.fiddle.packet.ClientPerspective.getSinglePacketBlockStateId(stateToSend);
++                if (singleValue != -1) {
++                    return singleValue;
++                }
++                var clientPerspective = this.getExplicitTargetClientPerspective();
++                return clientPerspective.getPacketBlockStateId(stateToSend);
++            }
++        }
++        // Fiddle end - client perspective - block state visualization - level event data - data can be BlockState
+         // Fiddle start - client perspective - level event data value replacements - data can be generic
+         if (!(this.data instanceof Integer)) {
+             throw new IllegalStateException("Could not determine getData() for non-integer data of type " + this.data.getClass().getName() + ": " + this.data);
+@@ -78,4 +155,16 @@ public class ClientboundLevelEventPacket extends org.fiddlemc.fiddle.packet.Clon
+     public BlockPos getPos() {
+         return this.pos;
+     }
++
++    // Fiddle start - client perspective - block state visualization - level event data - data can be BlockState
++    private net.minecraft.world.level.block.state.BlockState getDataAsBlockState() {
++        if (this.data instanceof net.minecraft.world.level.block.state.BlockState blockState) {
++            return blockState;
++        }
++        // Reverse Block#getId
++        return net.minecraft.world.level.block.Block.BLOCK_STATE_REGISTRY.byId((int) this.data);
++    }
++    // Fiddle end - client perspective - block state visualization - level event data - data can be BlockState
++
+ }
++
