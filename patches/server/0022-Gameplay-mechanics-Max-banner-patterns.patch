@@ -12,10 +12,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/world/inventory/LoomMenu.java b/src/main/java/net/minecraft/world/inventory/LoomMenu.java
-index 146006af2af0881de199a0607a1b8f33de4c3f4f..beefd6a459fe8c60b6150deb8328473918e8dc54 100644
+index c1c9cfd3f77b2dbbc39741d629c7dfb24a48d4f6..228b998ff6f4186ab46b80fbb3b6013505311ed7 100644
 --- a/src/main/java/net/minecraft/world/inventory/LoomMenu.java
 +++ b/src/main/java/net/minecraft/world/inventory/LoomMenu.java
-@@ -263,7 +263,14 @@ public class LoomMenu extends AbstractContainerMenu {
+@@ -264,7 +264,14 @@ public class LoomMenu extends AbstractContainerMenu {
  
              if (holder != null) {
                  CompoundTag nbttagcompound = BlockItem.getBlockEntityData(itemstack);

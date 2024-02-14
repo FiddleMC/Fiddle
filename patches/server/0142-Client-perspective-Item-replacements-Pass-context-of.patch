@@ -81,7 +81,7 @@ index 06498788c169133bd563c5a87192b71802c4d4df..133fafa48e305c5ac990d05e5c7ec430
  
          @Override
 diff --git a/src/main/java/net/minecraft/network/syncher/SynchedEntityData.java b/src/main/java/net/minecraft/network/syncher/SynchedEntityData.java
-index a043c382c37058032548a5192e17f5f816abe5a6..8ab2c370ebe5f9dc432c5ea86610ea74cf27744f 100644
+index 58b602e550258c1062ee940bc46538dac95d8979..789def02994ce88e6267a8955d10c57bc376a0c6 100644
 --- a/src/main/java/net/minecraft/network/syncher/SynchedEntityData.java
 +++ b/src/main/java/net/minecraft/network/syncher/SynchedEntityData.java
 @@ -279,7 +279,7 @@ public class SynchedEntityData {
@@ -127,10 +127,10 @@ index a043c382c37058032548a5192e17f5f816abe5a6..8ab2c370ebe5f9dc432c5ea86610ea74
          }
  
 diff --git a/src/main/java/net/minecraft/server/level/ServerEntity.java b/src/main/java/net/minecraft/server/level/ServerEntity.java
-index 35674f92a67f93382103c2766df4b678ba5c862f..250d529ed8043b69e7eebbf9c73bcc92239454ab 100644
+index 529ab44baaf573b97cf7e89560c548642733188f..81819292fc9f67a784e6bd35a18e94b8df9e535e 100644
 --- a/src/main/java/net/minecraft/server/level/ServerEntity.java
 +++ b/src/main/java/net/minecraft/server/level/ServerEntity.java
-@@ -297,7 +297,7 @@ public class ServerEntity {
+@@ -303,7 +303,7 @@ public class ServerEntity {
          this.yHeadRotp = Mth.floor(this.entity.getYHeadRot() * 256.0F / 360.0F);
          sender.accept(packet);
          if (this.trackedDataValues != null) {
@@ -139,7 +139,7 @@ index 35674f92a67f93382103c2766df4b678ba5c862f..250d529ed8043b69e7eebbf9c73bcc92
          }
  
          boolean flag = this.trackDelta;
-@@ -374,7 +374,7 @@ public class ServerEntity {
+@@ -380,7 +380,7 @@ public class ServerEntity {
  
          if (list != null) {
              this.trackedDataValues = datawatcher.getNonDefaultValues();
@@ -149,13 +149,13 @@ index 35674f92a67f93382103c2766df4b678ba5c862f..250d529ed8043b69e7eebbf9c73bcc92
  
          if (this.entity instanceof LivingEntity) {
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index 26ee8f19a3f7d722060170c4e2c5c1aa8c03d28d..6574f0eaaa255bbb88ed147d0843c97c612344fb 100644
+index 906eded9a2ab61737a30cfe89292a71237ce4eb7..f6347f9793d4f44cef497cfb1a156da6dca33640 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
-@@ -4922,4 +4922,11 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
+@@ -4912,4 +4912,11 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
          return ((net.minecraft.server.level.ServerChunkCache) level.getChunkSource()).isPositionTicking(this);
      }
-     // Paper end
+     // Paper end - Expose entity id counter
 +
 +    // Fiddle start - client perspective - item replacements - pass context of items in item frames
 +    public org.fiddlemc.fiddle.packet.item.ItemStackInPacketContext getItemStackInPacketContext() {
@@ -165,7 +165,7 @@ index 26ee8f19a3f7d722060170c4e2c5c1aa8c03d28d..6574f0eaaa255bbb88ed147d0843c97c
 +
  }
 diff --git a/src/main/java/net/minecraft/world/entity/decoration/ItemFrame.java b/src/main/java/net/minecraft/world/entity/decoration/ItemFrame.java
-index 69912c5b300b67394dce3876d2d96872033cf156..6184b01f036534a8927e1195a14313b329c092b8 100644
+index 80303f9466b8c7097151be313afc9a383693d18a..6342d28fcb6476fd5f5662d48f69f738178d7c93 100644
 --- a/src/main/java/net/minecraft/world/entity/decoration/ItemFrame.java
 +++ b/src/main/java/net/minecraft/world/entity/decoration/ItemFrame.java
 @@ -544,4 +544,12 @@ public class ItemFrame extends HangingEntity {

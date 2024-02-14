@@ -89,7 +89,7 @@ index 31dfc95700dbfe0740b2ec13c16cbb867144efeb..631992ffc7a8409000c5401ae0db80b3
      public T[] getPresetValues(int chunkSectionIndex) {
          return (T[]) presetValues[chunkSectionIndex];
 diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java
-index 3e345ff48cc57a11f50402b9c75b9546b7621563..1e75184943a9874190495eef971aafceb70a8177 100644
+index b05afa6344d3d68d8aadd2cb1d5a72ef049d6f9d..a4229dd69906cdf8c6a8b8885df0e3424a22de3e 100644
 --- a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java
 +++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java
 @@ -28,7 +28,7 @@ public class ClientboundLevelChunkPacketData {
@@ -100,9 +100,9 @@ index 3e345ff48cc57a11f50402b9c75b9546b7621563..1e75184943a9874190495eef971aafce
 +    public byte[] buffer; // Fiddle - client perspective - block state visualization - apply to chunk packets - call setup for all blocks in chunk packet - private -> public, final -> non-final
      public int bufferUsedLength; // Fiddle - client perspective - block state visualization - apply to chunk packets - chunk packet data can use buffer partially
      private final List<ClientboundLevelChunkPacketData.BlockEntityInfo> blockEntitiesData;
-     // Paper start
+     // Paper start - Handle oversized block entities in chunks
 diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
-index 303fe6a1feb15e86e879d568becaee3d6b4cd9e6..0941332b538ee732d51d0442a4af7856a2103493 100644
+index a02c0217fc221684d6b2a09b3a408a511f8cee19..aa1e848ae52d3426c3077ce3741f62ae81c8e25b 100644
 --- a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
 +++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
 @@ -40,7 +40,7 @@ public class ClientboundLevelChunkWithLightPacket extends org.fiddlemc.fiddle.pa
@@ -115,7 +115,7 @@ index 303fe6a1feb15e86e879d568becaee3d6b4cd9e6..0941332b538ee732d51d0442a4af7856
          // Fiddle start - block state visualization - apply to chunk packets - store ChunkPacketInfo and chunk details
          this.chunkPacketInfo = chunkPacketInfo;
 diff --git a/src/main/java/net/minecraft/util/SimpleBitStorage.java b/src/main/java/net/minecraft/util/SimpleBitStorage.java
-index e4d0d7e8fc58b8f9f614d74a141e452166e0364c..dd8d05bd5de473d70dd074e1af4b5494b65dd8f2 100644
+index 453c1d7e01970fd817d27f59c3b00ffc70e8ca0c..2ffada355965b1121a55493f9291fa2fed069ac6 100644
 --- a/src/main/java/net/minecraft/util/SimpleBitStorage.java
 +++ b/src/main/java/net/minecraft/util/SimpleBitStorage.java
 @@ -72,6 +72,16 @@ public class SimpleBitStorage implements BitStorage {
@@ -133,10 +133,10 @@ index e4d0d7e8fc58b8f9f614d74a141e452166e0364c..dd8d05bd5de473d70dd074e1af4b5494
 +    // Fiddle end - client perspective - block state visualization - apply to chunk packets - call setup for all blocks in chunk packet - packet buffer length calculation
 +
      private int cellIndex(int index) {
-         //long l = Integer.toUnsignedLong(this.divideMul); // Paper
-         //long m = Integer.toUnsignedLong(this.divideAdd); // Paper
+         //long l = Integer.toUnsignedLong(this.divideMul); // Paper - Perf: Optimize SimpleBitStorage
+         //long m = Integer.toUnsignedLong(this.divideAdd); // Paper - Perf: Optimize SimpleBitStorage
 diff --git a/src/main/java/net/minecraft/world/level/chunk/LevelChunkSection.java b/src/main/java/net/minecraft/world/level/chunk/LevelChunkSection.java
-index 0847248507b5a9b374fea8270380511f1dc9f802..a78d1447eec2eb39be2bf2a860753568bc459138 100644
+index ed35745d72e5b5d615d2b64e98388ca96be98452..9ff3e44ea85309196aa00e1496768cd60f428df6 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/LevelChunkSection.java
 +++ b/src/main/java/net/minecraft/world/level/chunk/LevelChunkSection.java
 @@ -200,9 +200,14 @@ public class LevelChunkSection {

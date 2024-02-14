@@ -16,10 +16,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-index a139e20ddfb460b81c2d652800a24efefd823913..ceae9737059585c896396de9608b3903a7d85c92 100644
+index 6a8e622aa58fea296a293ab9b654f6194d28b71f..4678e5cb78ff8a412ebd34e01760f6308d244822 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-@@ -73,6 +73,125 @@ public final class CraftMagicNumbers implements UnsafeValues {
+@@ -78,6 +78,125 @@ public final class CraftMagicNumbers implements UnsafeValues {
  
      private CraftMagicNumbers() {}
  
@@ -145,7 +145,7 @@ index a139e20ddfb460b81c2d652800a24efefd823913..ceae9737059585c896396de9608b3903
      // Paper start
      @Override
      public net.kyori.adventure.text.flattener.ComponentFlattener componentFlattener() {
-@@ -686,4 +805,97 @@ public final class CraftMagicNumbers implements UnsafeValues {
+@@ -732,4 +851,97 @@ public final class CraftMagicNumbers implements UnsafeValues {
          public static final int TAG_INT_ARRAY = 11;
          public static final int TAG_ANY_NUMBER = 99;
      }

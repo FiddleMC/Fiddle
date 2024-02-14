@@ -27,10 +27,10 @@ As part of: Paper (https://github.com/PaperMC/Paper)
 Licensed under: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 
 diff --git a/src/main/java/co/aikar/timings/TimingsExport.java b/src/main/java/co/aikar/timings/TimingsExport.java
-index a2f71a6d1a9e98133dff6cd0f625da9435a8af14..808b85c91a24aeb61585b150cdca3e72050becd9 100644
+index 7620c72a4c243cbeea245203ce03a97cbfa7d922..81186ff818d983672ae67b0005fa45d6b2454776 100644
 --- a/src/main/java/co/aikar/timings/TimingsExport.java
 +++ b/src/main/java/co/aikar/timings/TimingsExport.java
-@@ -242,7 +242,10 @@ public class TimingsExport extends Thread {
+@@ -240,7 +240,10 @@ public class TimingsExport extends Thread {
          parent.put("config", createObject(
              pair("spigot", mapAsJSON(Bukkit.spigot().getSpigotConfig(), null)),
              pair("bukkit", mapAsJSON(Bukkit.spigot().getBukkitConfig(), null)),

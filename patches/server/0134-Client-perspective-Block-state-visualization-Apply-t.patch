@@ -18,7 +18,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java
-index 29c499810af7f95f16331385fa6faab4eace9e81..3e345ff48cc57a11f50402b9c75b9546b7621563 100644
+index 9e81015e3128ed1c994760cdb7854306c1b0f364..b05afa6344d3d68d8aadd2cb1d5a72ef049d6f9d 100644
 --- a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java
 +++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java
 @@ -29,6 +29,7 @@ public class ClientboundLevelChunkPacketData {
@@ -27,7 +27,7 @@ index 29c499810af7f95f16331385fa6faab4eace9e81..3e345ff48cc57a11f50402b9c75b9546
      private final byte[] buffer;
 +    public int bufferUsedLength; // Fiddle - client perspective - block state visualization - apply to chunk packets - chunk packet data can use buffer partially
      private final List<ClientboundLevelChunkPacketData.BlockEntityInfo> blockEntitiesData;
-     // Paper start
+     // Paper start - Handle oversized block entities in chunks
      private final java.util.List<net.minecraft.network.protocol.Packet<?>> extraPackets = new java.util.ArrayList<>();
 @@ -54,6 +55,7 @@ public class ClientboundLevelChunkPacketData {
          }

@@ -7,7 +7,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index c7816095987677489f8414899b33ddf68a6a54a5..2cec876b56ae3ee5592584dfce8d115245971178 100644
+index b5ed2583bb95a56837d8ed157510141493daba83..b51e6617d469b36b98461a805db8c7d3ecf11cdc 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
 @@ -193,6 +193,8 @@ public class Main {
@@ -36,7 +36,7 @@ index c7816095987677489f8414899b33ddf68a6a54a5..2cec876b56ae3ee5592584dfce8d1152
              /*
              IRegistryCustom.Dimension iregistrycustom_dimension = worldstem.registries().compositeAccess();
 diff --git a/src/main/java/org/bukkit/craftbukkit/Main.java b/src/main/java/org/bukkit/craftbukkit/Main.java
-index d8d15aae4719caeec9a3c5c31b06bddce710641b..b951b64f3cbc492f89999df0d86e512d41227220 100644
+index 8a9b68705bfe61dbcdac91d64a0ec390b42c02f7..75ba88b5a064e9196dc4a881c62a16413c22ce0c 100644
 --- a/src/main/java/org/bukkit/craftbukkit/Main.java
 +++ b/src/main/java/org/bukkit/craftbukkit/Main.java
 @@ -18,6 +18,13 @@ public class Main {
@@ -50,7 +50,7 @@ index d8d15aae4719caeec9a3c5c31b06bddce710641b..b951b64f3cbc492f89999df0d86e512d
 +    private static final String defaultPluginsFolderName = "plugins";
 +    // Fiddle end - read packs - scan for packs - command line arguments
 +
-     // Paper start - Hijack log manager to ensure logging on shutdown
+     // Paper start - Reset loggers after shutdown
      static {
          System.setProperty("java.util.logging.manager", "io.papermc.paper.log.CustomLogManager");
 @@ -43,12 +50,20 @@ public class Main {

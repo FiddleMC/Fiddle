@@ -10,7 +10,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/packs/PathPackResources.java b/src/main/java/net/minecraft/server/packs/PathPackResources.java
-index 4822f94ce183a99ad9e0d1bdc6c5708d958f6104..c1215d5a809b4c0b50e13cfa38611429ad22408e 100644
+index 3edd14ce90edf98798b89921ad18547809de5d2c..cde57cd39eaa645f614978a23c5c3bbb3f5f6aa8 100644
 --- a/src/main/java/net/minecraft/server/packs/PathPackResources.java
 +++ b/src/main/java/net/minecraft/server/packs/PathPackResources.java
 @@ -108,6 +108,11 @@ public class PathPackResources extends AbstractPackResources {
@@ -22,7 +22,7 @@ index 4822f94ce183a99ad9e0d1bdc6c5708d958f6104..c1215d5a809b4c0b50e13cfa38611429
 +                    continue;
 +                }
 +                // Fiddle end - ignore system directories
-                 // Paper start
+                 // Paper start - Improve logging and errors
                  if (!Files.isDirectory(path2)) {
                      LOGGER.error("Invalid directory entry: {} in {}.", string, this.root, new java.nio.file.NotDirectoryException(string));
 diff --git a/src/main/java/net/minecraft/server/packs/repository/FolderRepositorySource.java b/src/main/java/net/minecraft/server/packs/repository/FolderRepositorySource.java

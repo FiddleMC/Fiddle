@@ -57,10 +57,10 @@ index 2c31c8d55d716b1660412218d5287da672ab45f6..11de2041b07914b2868a818acb756dc7
  
      public BlockPos getPos() {
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index 1f1d357be3dde0f1beb2ae3a91439e73ef12cdb4..f824dfdf81ded11dbc2220ac848e85d17a13ae76 100644
+index d15d6cd0a178526c32720c771b03cc3272c6c02c..7a740c91b1b9d49ccb8854adc4f2bafff0d75e36 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
-@@ -1835,7 +1835,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
+@@ -1815,7 +1815,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
      }
  
      @Override
@@ -70,7 +70,7 @@ index 1f1d357be3dde0f1beb2ae3a91439e73ef12cdb4..f824dfdf81ded11dbc2220ac848e85d1
      }
  
 diff --git a/src/main/java/net/minecraft/server/level/WorldGenRegion.java b/src/main/java/net/minecraft/server/level/WorldGenRegion.java
-index 14a5492428eac823a295ef3746d0aca6fbdab4ec..7d0ec0741f4497aa27574802032abe6113bfd24a 100644
+index 5ece375eaf6bcc61864997a389bb5e24625e4505..3709bbe5a731fa584e7d22f295a028c8898c6f8e 100644
 --- a/src/main/java/net/minecraft/server/level/WorldGenRegion.java
 +++ b/src/main/java/net/minecraft/server/level/WorldGenRegion.java
 @@ -486,7 +486,7 @@ public class WorldGenRegion implements WorldGenLevel {
@@ -133,7 +133,7 @@ index 86a20c91beff6b27e6ec886e49ba902b216106f2..25512e786da0ed05b54804b474809f5b
      }
  
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/DummyGeneratorAccess.java b/src/main/java/org/bukkit/craftbukkit/util/DummyGeneratorAccess.java
-index a5e34c25e00e7f770bcb6e15ed0bbfe8f369a68a..72e9e9b332b0c5965d03814c04ea7a7765c81d6c 100644
+index 819a67aa19c6bd624f5ed28d09b35ff2c151749a..82b89b86a342f18e7629910b7678f2b24448b2fc 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/DummyGeneratorAccess.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/DummyGeneratorAccess.java
 @@ -114,7 +114,7 @@ public class DummyGeneratorAccess implements WorldGenLevel {

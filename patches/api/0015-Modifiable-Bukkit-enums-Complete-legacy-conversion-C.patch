@@ -15,10 +15,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/UnsafeValues.java b/src/main/java/org/bukkit/UnsafeValues.java
-index 715c5e27d9448d7e44cb12e843bf340303513367..39c2bf249ecd8e6702b472b8ddca9945c20d76ec 100644
+index 58ca289b0492bffe0c47b3db90795bbd2d4a12a7..c0d5c8737de452f87a8d0c168972b3c4b510bb10 100644
 --- a/src/main/java/org/bukkit/UnsafeValues.java
 +++ b/src/main/java/org/bukkit/UnsafeValues.java
-@@ -39,8 +39,23 @@ public interface UnsafeValues {
+@@ -43,8 +43,23 @@ public interface UnsafeValues {
      void reportTimings(); // Paper
      Material toLegacy(Material material);
  

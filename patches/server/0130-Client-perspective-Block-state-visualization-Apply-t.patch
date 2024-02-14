@@ -109,11 +109,11 @@ index 80a2dfb266ae1221680a7b24fee2f7e2a8330b7d..7af24ff6eed0a0592f3e37476ced6ec1
  
      public LevelChunk[] getNearbyChunks() {
 diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java
-index 6fea470456059b21982ad1f35d5a2a2e2a098a31..4fc29b7e04e2c0fd27972a931adffe9919069731 100644
+index b41417b4c8ab2ad7dbfa5f5a9405856f6363c7e2..904607bfe2bf0b248e88863f03d5323d0aeb788d 100644
 --- a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java
 +++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java
 @@ -34,8 +34,7 @@ public class ClientboundLevelChunkPacketData {
-     // Paper end
+     // Paper end - Handle oversized block entities in chunks
  
      // Paper start - Anti-Xray - Add chunk packet info
 -    @Deprecated @io.papermc.paper.annotation.DoNotUse public ClientboundLevelChunkPacketData(LevelChunk chunk) { this(chunk, null); }
@@ -133,7 +133,7 @@ index 6fea470456059b21982ad1f35d5a2a2e2a098a31..4fc29b7e04e2c0fd27972a931adffe99
  
          for(LevelChunkSection levelChunkSection : chunk.getSections()) {
 diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
-index 43472855136f26b282d94fd241853d862a19ae17..3c7cf38cc9f26fda6c71eb140a506432e5b3da1d 100644
+index fc230d835f9aa526a4b179d36d921f0fec348aa8..ff0e55b53062793d6e462870146471ad8884831b 100644
 --- a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
 +++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
 @@ -32,7 +32,10 @@ public class ClientboundLevelChunkWithLightPacket implements Packet<ClientGamePa
@@ -149,7 +149,7 @@ index 43472855136f26b282d94fd241853d862a19ae17..3c7cf38cc9f26fda6c71eb140a506432
          // Paper end
          this.lightData = new ClientboundLightUpdatePacketData(chunkPos, lightProvider, skyBits, blockBits);
 diff --git a/src/main/java/net/minecraft/world/level/chunk/LevelChunkSection.java b/src/main/java/net/minecraft/world/level/chunk/LevelChunkSection.java
-index f0de72afad4bb571153436399386a6a8a70582a6..0847248507b5a9b374fea8270380511f1dc9f802 100644
+index 796bbef3544e06b8e7aac7e8ac5f740a2613f4bd..ed35745d72e5b5d615d2b64e98388ca96be98452 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/LevelChunkSection.java
 +++ b/src/main/java/net/minecraft/world/level/chunk/LevelChunkSection.java
 @@ -199,8 +199,7 @@ public class LevelChunkSection {
@@ -163,17 +163,17 @@ index f0de72afad4bb571153436399386a6a8a70582a6..0847248507b5a9b374fea8270380511f
          this.states.write(buf, chunkPacketInfo, chunkSectionIndex);
          this.biomes.write(buf, null, chunkSectionIndex);
 diff --git a/src/main/java/net/minecraft/world/level/chunk/PalettedContainer.java b/src/main/java/net/minecraft/world/level/chunk/PalettedContainer.java
-index 16fbc633de3a1d9e5e8c65ae107397a6f0e50811..c918c2ea8a6c6f71b3b707841f621378304a9452 100644
+index 983799520ce052d98c9231f4f7925492d4f7d5c9..c8ed94948b068b7c777723443bc46733f94619b6 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/PalettedContainer.java
 +++ b/src/main/java/net/minecraft/world/level/chunk/PalettedContainer.java
 @@ -237,16 +237,14 @@ public class PalettedContainer<T> implements PaletteResize<T>, PalettedContainer
  
-     // Paper start - Anti-Xray - Add chunk packet info
+     // Paper start - Anti-Xray; Add chunk packet info
      @Override
 -    @Deprecated @io.papermc.paper.annotation.DoNotUse public void write(FriendlyByteBuf buf) { this.write(buf, null, 0); }
 -    @Override
--    public synchronized void write(FriendlyByteBuf buf, @Nullable com.destroystokyo.paper.antixray.ChunkPacketInfo<T> chunkPacketInfo, int chunkSectionIndex) { // Paper - synchronize
-+    public synchronized void write(FriendlyByteBuf buf, @Nullable com.destroystokyo.paper.antixray.ChunkPacketInfoAntiXray chunkPacketInfo, int chunkSectionIndex) { // Paper - synchronize // Fiddle - client perspective - block state visualization - apply to chunk packets - every ChunkPacketInfo is ChunkPacketInfoAntiXray - the parameter type is always ChunkPacketInfoAntiXray, and it is filled with data by this method if it is non-null
+-    public synchronized void write(FriendlyByteBuf buf, @Nullable com.destroystokyo.paper.antixray.ChunkPacketInfo<T> chunkPacketInfo, int chunkSectionIndex) { // Paper - Synchronize
++    public synchronized void write(FriendlyByteBuf buf, @Nullable com.destroystokyo.paper.antixray.ChunkPacketInfoAntiXray chunkPacketInfo, int chunkSectionIndex) { // Paper - Synchronize // Fiddle - client perspective - block state visualization - apply to chunk packets - every ChunkPacketInfo is ChunkPacketInfoAntiXray - the parameter type is always ChunkPacketInfoAntiXray, and it is filled with data by this method if it is non-null
          this.acquire();
  
          try {

@@ -71,7 +71,7 @@ index af1ae3dacb628da23f7d2988c6e76d3fb2d64103..5cc7c084694c6834ae112d2ef663518e
          for (int i = 0; i < items.length; i++) {
              if (items[i] != null && items[i].getType() == material) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemFactory.java b/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemFactory.java
-index 090ba0b85fe72419c419cc72b5584ec391c0cfa1..9849bcce386a7fdb48d87677d183c266cce5ed4c 100644
+index 71aac5d4cf29cea9daa378fc8ac584750de4d1ca..9d3035f0fb04003ef632135fa8449f1fc4a52c8d 100644
 --- a/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemFactory.java
 +++ b/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemFactory.java
 @@ -47,7 +47,7 @@ public final class CraftItemFactory implements ItemFactory {
@@ -93,10 +93,10 @@ index 090ba0b85fe72419c419cc72b5584ec391c0cfa1..9849bcce386a7fdb48d87677d183c266
          case AIR:
              return null;
 diff --git a/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemStack.java b/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemStack.java
-index 9dac41e4a93911f920204ed72ce9fe419b5bf696..24df57c32f8449e9f7bbb0d9ab0218b5f049e5e8 100644
+index 870954fc59efdc1e0c6b5047f5a89dfaf7522d0e..31f3072d051285d792ed2cc11cab2902e6052c57 100644
 --- a/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemStack.java
 +++ b/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemStack.java
-@@ -686,7 +686,7 @@ public final class CraftItemStack extends ItemStack {
+@@ -692,7 +692,7 @@ public final class CraftItemStack extends ItemStack {
          if (this.handle == null || that.handle == null) {
              return false;
          }
@@ -119,7 +119,7 @@ index 7ff690f386b7fb9e090c86a28f649119505af7b9..783f4b70319e924b2eab949d8b705305
  
          return super.updateMaterial(material);
 diff --git a/src/main/java/org/bukkit/craftbukkit/legacy/CraftLegacy.java b/src/main/java/org/bukkit/craftbukkit/legacy/CraftLegacy.java
-index 2677e21d8239bf0361a3bc5c9a50c328e54d70f6..d9f731d605add107c0235c8f8db009bb924fb8a2 100644
+index fde9aadd6c688b9797a6755f9d214918047598a0..df4bd3d1a74be65d2b1ab9c7b8feff9ddc36bfd0 100644
 --- a/src/main/java/org/bukkit/craftbukkit/legacy/CraftLegacy.java
 +++ b/src/main/java/org/bukkit/craftbukkit/legacy/CraftLegacy.java
 @@ -165,16 +165,12 @@ public final class CraftLegacy {
@@ -169,10 +169,10 @@ index c8dde75de231b5fdde88f5bc111c21883d9c3f49..c788b24c8030a69f1428b751d218e250
  
      public static Material[] modern_values() {
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-index 6feb2002c67fed8a5113644a50a53895d232b40c..0d2f13ab56dd10d24487f2a4fe29765497275af5 100644
+index c9741e4d0b5a228c0f3251a9af45e53b2c2da068..2b385909268285140b58c01b03f57e4422486612 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-@@ -183,7 +183,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
+@@ -188,7 +188,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
  
      public static Item getItem(Material material) {
          if (material != null && material.isLegacy()) {
@@ -181,7 +181,7 @@ index 6feb2002c67fed8a5113644a50a53895d232b40c..0d2f13ab56dd10d24487f2a4fe297654
          }
  
          return CraftMagicNumbers.MATERIAL_ITEM.get(material);
-@@ -191,7 +191,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
+@@ -196,7 +196,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
  
      public static Block getBlock(Material material) {
          if (material != null && material.isLegacy()) {
@@ -190,7 +190,7 @@ index 6feb2002c67fed8a5113644a50a53895d232b40c..0d2f13ab56dd10d24487f2a4fe297654
          }
  
          return CraftMagicNumbers.MATERIAL_BLOCK.get(material);
-@@ -227,12 +227,12 @@ public final class CraftMagicNumbers implements UnsafeValues {
+@@ -232,12 +232,12 @@ public final class CraftMagicNumbers implements UnsafeValues {
  
      @Override
      public Material fromLegacy(Material material) {

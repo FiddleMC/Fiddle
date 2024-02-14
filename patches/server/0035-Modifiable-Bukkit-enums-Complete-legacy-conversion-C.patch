@@ -11,10 +11,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-index 0d2f13ab56dd10d24487f2a4fe29765497275af5..a139e20ddfb460b81c2d652800a24efefd823913 100644
+index 2b385909268285140b58c01b03f57e4422486612..6a8e622aa58fea296a293ab9b654f6194d28b71f 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-@@ -230,6 +230,13 @@ public final class CraftMagicNumbers implements UnsafeValues {
+@@ -235,6 +235,13 @@ public final class CraftMagicNumbers implements UnsafeValues {
          return this.fromLegacy(material, false); // Fiddle - modifiable Bukkit enums - Material - make legacy conversion complete - conversion is explicitly for item or block
      }
  

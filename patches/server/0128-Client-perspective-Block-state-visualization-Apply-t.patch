@@ -40,7 +40,7 @@ index b1ad8bea989510bedfdf6674362336e1fcdfc66a..d73bd60cad84bbfdf4ac2d6def2cb1d2
          this.blockState = buf.readById(Block.BLOCK_STATE_REGISTRY);
      }
 diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundSectionBlocksUpdatePacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundSectionBlocksUpdatePacket.java
-index e3f355c85eb7cc8c1683e3009502c10a5ed32daa..8724e49fe73993fcb3838e766e9c1b21c07d8ff0 100644
+index ccdc2345465313991f065e1176b58fb7d5e8722f..8790022b2f20d5d2778ea59d785e21a65e820d3c 100644
 --- a/src/main/java/net/minecraft/network/protocol/game/ClientboundSectionBlocksUpdatePacket.java
 +++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundSectionBlocksUpdatePacket.java
 @@ -11,7 +11,7 @@ import net.minecraft.world.level.block.Block;
@@ -78,7 +78,7 @@ index e3f355c85eb7cc8c1683e3009502c10a5ed32daa..8724e49fe73993fcb3838e766e9c1b21
  
 @@ -61,6 +64,7 @@ public class ClientboundSectionBlocksUpdatePacket implements Packet<ClientGamePa
  
-     // Paper start
+     // Paper start - Multi Block Change API
      public ClientboundSectionBlocksUpdatePacket(SectionPos sectionPos, it.unimi.dsi.fastutil.shorts.Short2ObjectMap<BlockState> blockChanges) {
 +        super(); // Fiddle - client perspective - block state visualization - apply to block update packets - store connection explicitly - section blocks update
          this.sectionPos = sectionPos;

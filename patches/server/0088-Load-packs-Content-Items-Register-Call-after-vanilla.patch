@@ -12,7 +12,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Bootstrap.java b/src/main/java/net/minecraft/server/Bootstrap.java
-index e594bcb5fbaf349a2475257477f4a3a5cd7a3f8b..7cdf2c16f42207441b412c08985cd6a119eb9db4 100644
+index 6610e86ba19f439acd02f2f35af5e5c74461b5ca..61d4e5d7d3b5757283ac770e288c3f0704758751 100644
 --- a/src/main/java/net/minecraft/server/Bootstrap.java
 +++ b/src/main/java/net/minecraft/server/Bootstrap.java
 @@ -88,6 +88,7 @@ public class Bootstrap {
@@ -22,4 +22,4 @@ index e594bcb5fbaf349a2475257477f4a3a5cd7a3f8b..7cdf2c16f42207441b412c08985cd6a1
 +                    org.fiddlemc.fiddle.pack.load.fiddlecontent.item.ItemByDefinitionLoader.INSTANCE.register(readContentDefinitions.get(org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.item.ItemDefinition.TYPE)); // Fiddle - load packs - items - register - call after vanilla bootstrap
                      // Paper start
                      BuiltInRegistries.bootStrap(() -> {
-                         io.papermc.paper.world.worldgen.OptionallyFlatBedrockConditionSource.bootstrap(); // Paper - optional flat bedrock
+                         io.papermc.paper.world.worldgen.OptionallyFlatBedrockConditionSource.bootstrap(); // Paper - Flat bedrock generator settings

@@ -65,11 +65,6 @@ run/
 
 fiddle-server
 fiddle-api
-Paperclip.jar
-paperclip.jar
-paperclip-*.jar
-paperclip.properties
+paper-api-generator
 
 !gradle/wrapper/gradle-wrapper.jar
-
-test-plugin.settings.gradle.kts

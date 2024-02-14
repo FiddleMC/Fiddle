@@ -7,7 +7,11 @@ import kotlin.io.path.writeLines
 plugins {
     java
     `maven-publish`
+
+    // Nothing special about this, just keep it up to date
     id("com.github.johnrengelman.shadow") version "8.1.1" apply false
+
+    // In general, keep this version in sync with upstream. Sometimes a newer version than upstream might work, but an older version is extremely likely to break.
     id("io.papermc.paperweight.patcher") version "1.5.11"
     id("com.github.ManifestClasspath") version "0.1.0-RELEASE"
 }
@@ -22,9 +26,9 @@ repositories {
 }
 
 dependencies {
-    remapper("net.fabricmc:tiny-remapper:0.8.10:fat")
-    decompiler("net.minecraftforge:forgeflower:2.0.627.2")
-    paperclip("io.papermc:paperclip:3.0.3")
+    remapper("net.fabricmc:tiny-remapper:0.8.10:fat") // Must be kept in sync with upstream
+    decompiler("net.minecraftforge:forgeflower:2.0.627.2") // Must be kept in sync with upstream
+    paperclip("io.papermc:paperclip:3.0.3") // You probably want this to be kept in sync with upstream
 }
 
 allprojects {
@@ -69,6 +73,12 @@ paperweight {
 
             serverPatchDir = layout.projectDirectory.dir("patches/server")
             serverOutputDir = layout.projectDirectory.dir("fiddle-server") // Fiddle - build changes
+        }
+        patchTasks.register("generatedApi") {
+            isBareDirectory = true
+            upstreamDirPath = "paper-api-generator/generated"
+            patchDir = layout.projectDirectory.dir("patches/generatedApi")
+            outputDir = layout.projectDirectory.dir("paper-api-generator/generated")
         }
     }
 }

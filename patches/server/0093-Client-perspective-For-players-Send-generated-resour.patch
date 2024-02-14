@@ -8,7 +8,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/network/Connection.java b/src/main/java/net/minecraft/network/Connection.java
-index 2ae08b21c63490bbf8cd870f9585d82ed131f815..af63954c14eff664ced930da3ab03241cf9e9c43 100644
+index 4716f8bd8a64d4f20f0d5957c1e7fabf63020f43..5dca3544bb284d48180b8818e18cfb3311460839 100644
 --- a/src/main/java/net/minecraft/network/Connection.java
 +++ b/src/main/java/net/minecraft/network/Connection.java
 @@ -120,6 +120,7 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
@@ -20,7 +20,7 @@ index 2ae08b21c63490bbf8cd870f9585d82ed131f815..af63954c14eff664ced930da3ab03241
      // Paper start - add utility methods
      public final net.minecraft.server.level.ServerPlayer getPlayer() {
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServerProperties.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServerProperties.java
-index 1643186bcb2caf5d29fd551afd35830726dbb80a..4a2c334768abc0c5bbd2f97db4bc71b2062f0b4b 100644
+index bab2471616404821671264ccefd729cab8d0bf58..90bc7a0148dad3996197b6aeacf01e4788cba4dd 100644
 --- a/src/main/java/net/minecraft/server/dedicated/DedicatedServerProperties.java
 +++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServerProperties.java
 @@ -167,6 +167,7 @@ public class DedicatedServerProperties extends Settings<DedicatedServerPropertie
@@ -32,7 +32,7 @@ index 1643186bcb2caf5d29fd551afd35830726dbb80a..4a2c334768abc0c5bbd2f97db4bc71b2
          // Paper start - Configurable rcon ip
          final String rconIp = this.getStringRaw("rcon.ip");
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index a3037dccab32597aa99e1590e1ea42fcec06bb0c..18efaf7da221fa0bf758d5136592bb78179af7f9 100644
+index 58591bf2f63b9c5e97d9ce4188dff3366968a178..3298f9dfca0ec39cbe71014d9352e0d1f1ca1862 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
 @@ -286,6 +286,8 @@ public class ServerPlayer extends Player {
@@ -45,7 +45,7 @@ index a3037dccab32597aa99e1590e1ea42fcec06bb0c..18efaf7da221fa0bf758d5136592bb78
          return this.viewDistances.get();
      }
 diff --git a/src/main/java/net/minecraft/server/network/ServerConfigurationPacketListenerImpl.java b/src/main/java/net/minecraft/server/network/ServerConfigurationPacketListenerImpl.java
-index ea8053c90601cb15d53a1e8fec2b4bcd12a9e1c4..af978eae8064fc0eda51edbc38eada590d62918b 100644
+index 26d8eac74ee7b7adbd4f2f8f0e35c0dcd59f3d93..7736269f96238819aef5a4fef81249b3506f5741 100644
 --- a/src/main/java/net/minecraft/server/network/ServerConfigurationPacketListenerImpl.java
 +++ b/src/main/java/net/minecraft/server/network/ServerConfigurationPacketListenerImpl.java
 @@ -43,6 +43,7 @@ public class ServerConfigurationPacketListenerImpl extends ServerCommonPacketLis
@@ -92,10 +92,10 @@ index ea8053c90601cb15d53a1e8fec2b4bcd12a9e1c4..af978eae8064fc0eda51edbc38eada59
  
      }
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index da63b4050be25dcb91d04df8c2fcc643cbb0751d..d3b70339869858e1f1db113488726b4d03bd9d05 100644
+index 206520f6f20b2e48b1eefdd4edb26510b88e4c92..bc731fe740196472baca631f2956b28a743ec0a0 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -2355,34 +2355,48 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -2358,34 +2358,48 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
          this.getHandle().connection.send(packet);
      }
  
@@ -149,7 +149,7 @@ index da63b4050be25dcb91d04df8c2fcc643cbb0751d..d3b70339869858e1f1db113488726b4d
  
          this.setResourcePack(UUID.nameUUIDFromBytes(url.getBytes(StandardCharsets.UTF_8)), url, hash, prompt, force);
      }
-@@ -2407,6 +2421,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -2422,6 +2436,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
      public void setResourcePack(final UUID uuid, final String url, final byte[] hashBytes, final net.kyori.adventure.text.Component prompt, final boolean force) {
          Preconditions.checkArgument(uuid != null, "Resource pack UUID cannot be null");
          Preconditions.checkArgument(url != null, "Resource pack URL cannot be null");

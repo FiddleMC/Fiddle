@@ -39,13 +39,13 @@ index 9c49395c084acabe5bbf4d2b0421c93ab2dfddaf..67a67710736a023b1dfb01771f21576a
 +
  }
 diff --git a/src/main/java/org/bukkit/UnsafeValues.java b/src/main/java/org/bukkit/UnsafeValues.java
-index a4b38f284d4fea7df7f9df9bf44e4f68fefaf20f..715c5e27d9448d7e44cb12e843bf340303513367 100644
+index 9a65c4f614a6c358d74491794d7b25172a00bc11..58ca289b0492bffe0c47b3db90795bbd2d4a12a7 100644
 --- a/src/main/java/org/bukkit/UnsafeValues.java
 +++ b/src/main/java/org/bukkit/UnsafeValues.java
-@@ -260,4 +260,21 @@ public interface UnsafeValues {
+@@ -300,4 +300,21 @@ public interface UnsafeValues {
+     // Paper end - lifecycle event API
  
-     String getStatisticCriteriaKey(@NotNull org.bukkit.Statistic statistic);
-     // Paper end
+     @NotNull java.util.List<net.kyori.adventure.text.Component> computeTooltipLines(@NotNull ItemStack itemStack, @NotNull io.papermc.paper.inventory.tooltip.TooltipContext tooltipContext, @Nullable org.bukkit.entity.Player player); // Paper - expose itemstack tooltip lines
 +
 +    // Fiddle start - flags for vanilla content - API - block
 +    /**
@@ -65,10 +65,10 @@ index a4b38f284d4fea7df7f9df9bf44e4f68fefaf20f..715c5e27d9448d7e44cb12e843bf3403
 +
  }
 diff --git a/src/main/java/org/bukkit/block/data/BlockData.java b/src/main/java/org/bukkit/block/data/BlockData.java
-index 647536e1f1a323447dc510b2406bb39c22083945..3fa75448092e5da7a660bea0828ceabb3d040ae9 100644
+index fb4c7cf0f67f3e4227d17f6702ae7b7bf1c110ab..00e44c57c29b47a564ad85dab224bfadbf0bada8 100644
 --- a/src/main/java/org/bukkit/block/data/BlockData.java
 +++ b/src/main/java/org/bukkit/block/data/BlockData.java
-@@ -304,4 +304,12 @@ public interface BlockData extends Cloneable {
+@@ -314,4 +314,12 @@ public interface BlockData extends Cloneable {
       */
      boolean isRandomlyTicked();
      // Paper end - Tick API

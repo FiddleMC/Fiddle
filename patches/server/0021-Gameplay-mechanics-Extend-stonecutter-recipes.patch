@@ -11,11 +11,11 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index de4b523766e3359194656bc768cec6ea542fe117..98e71be556be6dc40cf307b1a1741ca2fea0be42 100644
+index cb27dd0396ee0bb7f1c8aca338f06adf9c4c944e..6fd08200c4292c2cd90ed1f21a2cb2a2653ca259 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
 @@ -345,6 +345,7 @@ public class Main {
-             Class.forName(net.minecraft.world.entity.npc.VillagerTrades.class.getName());// Paper - load this sync so it won't fail later async
+             Class.forName(net.minecraft.world.entity.npc.VillagerTrades.class.getName()); // Paper - load this sync so it won't fail later async
              final DedicatedServer dedicatedserver = (DedicatedServer) MinecraftServer.spin((thread) -> {
                  DedicatedServer dedicatedserver1 = new DedicatedServer(optionset, worldLoader.get(), thread, convertable_conversionsession, resourcepackrepository, worldstem, dedicatedserversettings, DataFixers.getDataFixer(), services, LoggerChunkProgressListener::new);
 +                dedicatedserver1.getRecipeManager().canAddAdditionalRecipesFromNowOn(); // Fiddle - gameplay mechanics - automatically extend stonecutter recipes
@@ -37,15 +37,16 @@ index 4103ddf16164e3992fef0765d368282572537e29..71856beb8430b0d70960715633cfac04
                      handler.accept((RecipeHolder) optional.get());
                  }
 diff --git a/src/main/java/net/minecraft/world/item/crafting/RecipeManager.java b/src/main/java/net/minecraft/world/item/crafting/RecipeManager.java
-index b81e1802c8dcc8ebdef96d70088c18379598a66b..4f96102b3dba7c5617763bf68bfac2d3f947369f 100644
+index d87124f5356180a37e581febc6141fdc5f1395a7..cce2207ce8c8b86ee718064d26d7222a4b2a743f 100644
 --- a/src/main/java/net/minecraft/world/item/crafting/RecipeManager.java
 +++ b/src/main/java/net/minecraft/world/item/crafting/RecipeManager.java
 @@ -84,19 +84,607 @@ public class RecipeManager extends SimpleJsonResourceReloadListener {
              return entry1.getValue(); // CraftBukkit // Paper - decompile fix - *shrugs internally* // todo: is this needed anymore?
          }));
          this.byName = Maps.newHashMap(builder.build()); // CraftBukkit
+-        RecipeManager.LOGGER.info("Loaded {} recipes", this.byName.size()); // Paper - Improve logging and errors; log correct number of recipes
 +        this.byNameWasSet(); // Fiddle - gameplay mechanics - automatically extend stonecutter recipes
-         RecipeManager.LOGGER.info("Loaded {} recipes", this.byName.size()); // Paper - log correct number of recipes
++        RecipeManager.LOGGER.info("Loaded {} recipes", this.byName.size());// Paper - Improve logging and errors; log correct number of recipes
      }
  
 +    // Fiddle start - gameplay mechanics - automatically extend stonecutter recipes

@@ -10,10 +10,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/world/level/block/state/BlockBehaviour.java b/src/main/java/net/minecraft/world/level/block/state/BlockBehaviour.java
-index 3ab8b99837b1d1faea722c598b0228b2780be8b1..016b1e3e3825f891989a5fbcbb876a84c6d3dd71 100644
+index 2892e586146cbc560f0bcf4b9af6d0575cb0a82e..726e8b93003420c880c75c2ae9b91d75ffae7868 100644
 --- a/src/main/java/net/minecraft/world/level/block/state/BlockBehaviour.java
 +++ b/src/main/java/net/minecraft/world/level/block/state/BlockBehaviour.java
-@@ -84,20 +84,28 @@ import net.minecraft.world.phys.shapes.VoxelShape;
+@@ -83,20 +83,28 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  public abstract class BlockBehaviour implements FeatureElement {
  
      protected static final Direction[] UPDATE_SHAPE_ORDER = new Direction[]{Direction.WEST, Direction.EAST, Direction.NORTH, Direction.SOUTH, Direction.DOWN, Direction.UP};

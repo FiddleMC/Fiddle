@@ -12,7 +12,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java
-index 4fc29b7e04e2c0fd27972a931adffe9919069731..29c499810af7f95f16331385fa6faab4eace9e81 100644
+index 904607bfe2bf0b248e88863f03d5323d0aeb788d..9e81015e3128ed1c994760cdb7854306c1b0f364 100644
 --- a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java
 +++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkPacketData.java
 @@ -21,6 +21,12 @@ import net.minecraft.world.level.levelgen.Heightmap;
@@ -29,7 +29,7 @@ index 4fc29b7e04e2c0fd27972a931adffe9919069731..29c499810af7f95f16331385fa6faab4
      private final byte[] buffer;
      private final List<ClientboundLevelChunkPacketData.BlockEntityInfo> blockEntitiesData;
 @@ -34,7 +40,10 @@ public class ClientboundLevelChunkPacketData {
-     // Paper end
+     // Paper end - Handle oversized block entities in chunks
  
      // Paper start - Anti-Xray - Add chunk packet info
 -    public ClientboundLevelChunkPacketData(LevelChunk chunk, @Nullable com.destroystokyo.paper.antixray.ChunkPacketInfoAntiXray chunkPacketInfo) { // Fiddle - client perspective - block state visualization - apply to chunk packets - every ChunkPacketInfo is ChunkPacketInfoAntiXray - the parameter type is always ChunkPacketInfoAntiXray, and is non-null if anti-x-ray is to be applied (but if it is non-null, still no anti-x-ray would be applied if the used ChunkPacketBlockController never applies anti-x-ray)
@@ -53,7 +53,7 @@ index 4fc29b7e04e2c0fd27972a931adffe9919069731..29c499810af7f95f16331385fa6faab4
          if (this.heightmaps == null) {
              throw new RuntimeException("Can't read heightmap in packet for [" + x + ", " + z + "]");
 diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
-index fea39d2ef11f8ca0c8b3b00e09442809d74129d9..48b1508bb3fcff8b3dbd24ea3fda11d534270c0e 100644
+index d4d5116b46c63bcc1b2a86c1b75cd0c09d0a71fd..7e496a59eb37af014ca34791b22ab4fde77f4852 100644
 --- a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
 +++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
 @@ -37,7 +37,7 @@ public class ClientboundLevelChunkWithLightPacket extends org.fiddlemc.fiddle.pa

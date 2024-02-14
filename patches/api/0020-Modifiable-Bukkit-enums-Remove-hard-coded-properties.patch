@@ -197,10 +197,10 @@ index 9381f7fac49050b8f4b87961211c44846dbf4813..4d8bc07045b6a432d9e0734eed10b06e
              case LEGACY_SAPLING:
              case LEGACY_POWERED_RAIL:
 diff --git a/src/main/java/org/bukkit/UnsafeValues.java b/src/main/java/org/bukkit/UnsafeValues.java
-index 43e601eb881faaabee5b88b731a7240db1ecfad2..0f4baeb39f0c228fff41ddb9633238a616c4741c 100644
+index b738d2a3233882737570797102d9166a935eedfd..f183fb4131c9ee029f1982c8804461dd458dd091 100644
 --- a/src/main/java/org/bukkit/UnsafeValues.java
 +++ b/src/main/java/org/bukkit/UnsafeValues.java
-@@ -307,6 +307,8 @@ public interface UnsafeValues {
+@@ -347,6 +347,8 @@ public interface UnsafeValues {
  
      boolean isAir(Material material);
  
