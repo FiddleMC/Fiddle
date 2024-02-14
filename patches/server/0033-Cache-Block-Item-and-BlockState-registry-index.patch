@@ -39,7 +39,7 @@ index 7c7201393c49d2abc4ef7089f0caf1e19ce42894..f2cdd4c79bf8a415bfdb0e3533c7912c
          return item == null ? 0 : BuiltInRegistries.ITEM.getId(item);
      }
 diff --git a/src/main/java/net/minecraft/world/level/block/Block.java b/src/main/java/net/minecraft/world/level/block/Block.java
-index a608ec6ac4eb34c0894095516aa63a1c44900121..2c8e0d2ad0d3f46456d9a9be844908cffc0e1ab2 100644
+index 933b9f3245fbf2a0d3e1bf3dddd4ea4166801f2c..b051b1ebee70e9aa2077d5dc8b9a9459ecf4cad4 100644
 --- a/src/main/java/net/minecraft/world/level/block/Block.java
 +++ b/src/main/java/net/minecraft/world/level/block/Block.java
 @@ -127,6 +127,22 @@ public class Block extends BlockBehaviour implements ItemLike {
@@ -66,10 +66,10 @@ index a608ec6ac4eb34c0894095516aa63a1c44900121..2c8e0d2ad0d3f46456d9a9be844908cf
      private static final ThreadLocal<Object2ByteLinkedOpenHashMap<Block.BlockStatePairKey>> OCCLUSION_CACHE = ThreadLocal.withInitial(() -> {
          Object2ByteLinkedOpenHashMap<Block.BlockStatePairKey> object2bytelinkedopenhashmap = new Object2ByteLinkedOpenHashMap<Block.BlockStatePairKey>(2048, 0.25F) {
 diff --git a/src/main/java/net/minecraft/world/level/block/state/BlockState.java b/src/main/java/net/minecraft/world/level/block/state/BlockState.java
-index acb458e03bfffdae406eae99eb81ce0c3078c9ea..786a4d38be67d28edf5fe446aec296631999e708 100644
+index 14abe3eae628d13e88bfe8e74e180834d3325153..d080b9759afe283d79227076eea3b075af37c0cd 100644
 --- a/src/main/java/net/minecraft/world/level/block/state/BlockState.java
 +++ b/src/main/java/net/minecraft/world/level/block/state/BlockState.java
-@@ -21,6 +21,23 @@ public class BlockState extends BlockBehaviour.BlockStateBase {
+@@ -20,6 +20,23 @@ public class BlockState extends BlockBehaviour.BlockStateBase {
          return this.cachedMaterial;
      }
      // Paper end - optimise getType calls

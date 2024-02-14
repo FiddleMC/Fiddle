@@ -8,10 +8,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index a97ca4420491ec77e2785b72734302a11a4a7fa7..4f42c4f96ea726c697ce97847e3cb312c20c85e9 100644
+index 3efbe919ff25fd738ed6ba01f297f0f8bc49a13a..dcd84b941fd781bc9d6daa955b5e5452d1681b9f 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-@@ -2147,7 +2147,10 @@ public class ServerPlayer extends Player {
+@@ -2148,7 +2148,10 @@ public class ServerPlayer extends Player {
              PlayerChangedMainHandEvent event = new PlayerChangedMainHandEvent(this.getBukkitEntity(), this.getMainArm() == HumanoidArm.LEFT ? MainHand.LEFT : MainHand.RIGHT);
              this.server.server.getPluginManager().callEvent(event);
          }
@@ -23,7 +23,7 @@ index a97ca4420491ec77e2785b72734302a11a4a7fa7..4f42c4f96ea726c697ce97847e3cb312
              PlayerLocaleChangeEvent event = new PlayerLocaleChangeEvent(this.getBukkitEntity(), clientOptions.language());
              this.server.server.getPluginManager().callEvent(event);
              this.server.server.getPluginManager().callEvent(new com.destroystokyo.paper.event.player.PlayerLocaleChangeEvent(this.getBukkitEntity(), this.language, clientOptions.language())); // Paper
-@@ -2159,6 +2162,12 @@ public class ServerPlayer extends Player {
+@@ -2160,6 +2163,12 @@ public class ServerPlayer extends Player {
      public void updateOptionsNoEvents(ClientInformation clientOptions) {
          // Paper end
          this.language = clientOptions.language();

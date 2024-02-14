@@ -8,10 +8,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/inventory/CraftMetaItem.java b/src/main/java/org/bukkit/craftbukkit/inventory/CraftMetaItem.java
-index 2ded472dbf0ed5ad3205e1dc8cbb20e1482a6ff6..c31ed46d3ab9d6377442704997f42f72da562241 100644
+index 8eae41077dc370e2286efaad4b9878c8ec04460e..e961b062ce9ec0272c22da190d438a189686fa3e 100644
 --- a/src/main/java/org/bukkit/craftbukkit/inventory/CraftMetaItem.java
 +++ b/src/main/java/org/bukkit/craftbukkit/inventory/CraftMetaItem.java
-@@ -113,9 +113,11 @@ import java.util.Collections;
+@@ -114,9 +114,11 @@ import java.util.Collections;
   * <li> SerializableMeta.Deserializers deserializer()
   */
  @DelegateDeserialization(CraftMetaItem.SerializableMeta.class)
@@ -25,7 +25,7 @@ index 2ded472dbf0ed5ad3205e1dc8cbb20e1482a6ff6..c31ed46d3ab9d6377442704997f42f72
  
          @Retention(RetentionPolicy.SOURCE)
          @Target(ElementType.FIELD)
-@@ -129,7 +131,7 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
+@@ -130,7 +132,7 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
          }
  
          final String BUKKIT;
@@ -34,7 +34,7 @@ index 2ded472dbf0ed5ad3205e1dc8cbb20e1482a6ff6..c31ed46d3ab9d6377442704997f42f72
  
          ItemMetaKey(final String both) {
              this(both, both);
-@@ -242,12 +244,14 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
+@@ -243,12 +245,14 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
          }
      }
  

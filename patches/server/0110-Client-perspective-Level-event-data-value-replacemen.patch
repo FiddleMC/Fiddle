@@ -57,16 +57,16 @@ index 2c31c8d55d716b1660412218d5287da672ab45f6..11de2041b07914b2868a818acb756dc7
  
      public BlockPos getPos() {
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index cc7f2d52fbaac1b9ce792c1a3ff45f697030405b..7f6bbf4a35f60cee821bed545ad99f2bbe477c02 100644
+index 1f1d357be3dde0f1beb2ae3a91439e73ef12cdb4..f824dfdf81ded11dbc2220ac848e85d17a13ae76 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
-@@ -1830,7 +1830,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
+@@ -1835,7 +1835,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
      }
  
      @Override
 -    public void levelEvent(@Nullable Player player, int eventId, BlockPos pos, int data) {
 +    public void levelEvent(@Nullable Player player, int eventId, BlockPos pos, Object data) { // Fiddle - client perspective - level event data value replacements - data can be generic
-         this.server.getPlayerList().broadcast(player, (double) pos.getX(), (double) pos.getY(), (double) pos.getZ(), 64.0D, this.dimension(), new ClientboundLevelEventPacket(eventId, pos, data, false));
+         this.server.getPlayerList().broadcast(player, (double) pos.getX(), (double) pos.getY(), (double) pos.getZ(), 64.0D, this.dimension(), new ClientboundLevelEventPacket(eventId, pos, data, false)); // Paper - diff on change (the 64.0 distance is used as defaults for sound ranges in spigot config for ender dragon, end portal and wither)
      }
  
 diff --git a/src/main/java/net/minecraft/server/level/WorldGenRegion.java b/src/main/java/net/minecraft/server/level/WorldGenRegion.java
@@ -114,10 +114,10 @@ index bd9ac874b2d4333bc5c3a79657d63f1bd41fd8c8..2393a6636aa32da862d81c45d6050b90
  
      default void gameEvent(@Nullable Entity entity, GameEvent event, Vec3 pos) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/DelegatedGeneratorAccess.java b/src/main/java/org/bukkit/craftbukkit/util/DelegatedGeneratorAccess.java
-index a650411e3fa7e2a045ac55502c77028be348acf1..65e2f2052ffac0029527854bc3275983e35a2a1c 100644
+index 86a20c91beff6b27e6ec886e49ba902b216106f2..25512e786da0ed05b54804b474809f5b607bf0f0 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/DelegatedGeneratorAccess.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/DelegatedGeneratorAccess.java
-@@ -214,12 +214,12 @@ public abstract class DelegatedGeneratorAccess implements WorldGenLevel {
+@@ -216,12 +216,12 @@ public abstract class DelegatedGeneratorAccess implements WorldGenLevel {
      }
  
      @Override

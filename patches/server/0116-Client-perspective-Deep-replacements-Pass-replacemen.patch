@@ -8,7 +8,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/nbt/CompoundTag.java b/src/main/java/net/minecraft/nbt/CompoundTag.java
-index e464ada187fd1f15efef29a0e5033aeb0c688059..164484b7175719072dc79add8e7243156c0fbb0b 100644
+index 4c8f2dbdd6e384be026ae1c890096f89fd744eb0..e9aeb22ed30261514ee92d429b76b4aa9892c461 100644
 --- a/src/main/java/net/minecraft/nbt/CompoundTag.java
 +++ b/src/main/java/net/minecraft/nbt/CompoundTag.java
 @@ -176,9 +176,16 @@ public class CompoundTag implements Tag {
@@ -44,10 +44,10 @@ index e464ada187fd1f15efef29a0e5033aeb0c688059..164484b7175719072dc79add8e724315
      }
  
 diff --git a/src/main/java/net/minecraft/nbt/ListTag.java b/src/main/java/net/minecraft/nbt/ListTag.java
-index c6877c7167dd5b1c61c776b0c7865d9064e69202..a4b19798235a4125820f680eb0c07c63f35dd77f 100644
+index 24ad8d22b5180cd7d7f793e3074e438f9192448f..d70b0257ed990444a531e65cb275bbacc50b96b1 100644
 --- a/src/main/java/net/minecraft/nbt/ListTag.java
 +++ b/src/main/java/net/minecraft/nbt/ListTag.java
-@@ -148,6 +148,13 @@ public class ListTag extends CollectionTag<Tag> {
+@@ -156,6 +156,13 @@ public class ListTag extends CollectionTag<Tag> {
  
      @Override
      public void write(DataOutput output) throws IOException {
@@ -61,12 +61,12 @@ index c6877c7167dd5b1c61c776b0c7865d9064e69202..a4b19798235a4125820f680eb0c07c63
          if (this.list.isEmpty()) {
              this.type = 0;
          } else {
-@@ -158,7 +165,7 @@ public class ListTag extends CollectionTag<Tag> {
-         output.writeInt(this.list.size());
+@@ -169,7 +176,7 @@ public class ListTag extends CollectionTag<Tag> {
+         while (iterator.hasNext()) {
+             Tag nbtbase = (Tag) iterator.next();
  
-         for(Tag tag : this.list) {
--            tag.write(output);
-+            tag.write(output, clientPerspectiveAndSettings, replacementScope); // Fiddle end - client perspective - deep replacements - pass scope
+-            nbtbase.write(output);
++            nbtbase.write(output, clientPerspectiveAndSettings, replacementScope); // Fiddle end - client perspective - deep replacements - pass scope
          }
  
      }
@@ -159,7 +159,7 @@ index 0c3fb39dfff42cc322b82c6da885d39f866aee41..95556e90baa420e5c00d922575ef2983
      String toString();
  
 diff --git a/src/main/java/net/minecraft/network/FriendlyByteBuf.java b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
-index 545878d17c4d421b4bb97b85e62d42ddc75c4d75..ad6753c5dd6a316ad1e7ab405f2e65b16af87f21 100644
+index 5db33782c60d1b16bcfefaba5ace8e81c734ae20..715aa4ae6e1e1ccdac7ae55e6946973f8bb2b4ad 100644
 --- a/src/main/java/net/minecraft/network/FriendlyByteBuf.java
 +++ b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
 @@ -127,11 +127,22 @@ public class FriendlyByteBuf extends ByteBuf {
@@ -186,9 +186,9 @@ index 545878d17c4d421b4bb97b85e62d42ddc75c4d75..ad6753c5dd6a316ad1e7ab405f2e65b1
          return this;
      }
  
-@@ -560,21 +571,54 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -565,21 +576,54 @@ public class FriendlyByteBuf extends ByteBuf {
  
-     // Paper start - adventure
+     // Paper start - adventure; support writing adventure components directly and server-side translations
      public FriendlyByteBuf writeComponent(final net.kyori.adventure.text.Component component) {
 -        return this.writeWithCodec(NbtOps.INSTANCE, io.papermc.paper.adventure.PaperAdventure.localizedCodec(this.adventure$locale), component);
 +        // Fiddle start - client perspective - deep replacements - pass scope
@@ -223,7 +223,7 @@ index 545878d17c4d421b4bb97b85e62d42ddc75c4d75..ad6753c5dd6a316ad1e7ab405f2e65b1
  
 -        return this.writeWithCodec(NbtOps.INSTANCE, ComponentSerialization.localizedCodec(this.adventure$locale), text);
 +        return this.writeWithCodec(NbtOps.INSTANCE, ComponentSerialization.localizedCodec(this.adventure$locale), text, clientPerspectiveAndSettings, replacementScope); // Fiddle - client perspective - deep replacements - pass scope
-         // Paper end - adventure
+         // Paper end - adventure; support writing adventure components directly and server-side translations
      }
      // Paper start - deprecated Tab List & Title APIs
      @Deprecated
@@ -244,7 +244,7 @@ index 545878d17c4d421b4bb97b85e62d42ddc75c4d75..ad6753c5dd6a316ad1e7ab405f2e65b1
      }
      // Paper end - deprecated Tab List & Title APIs
  
-@@ -627,12 +671,23 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -632,12 +676,23 @@ public class FriendlyByteBuf extends ByteBuf {
      }
  
      public FriendlyByteBuf writeNbt(@Nullable Tag nbt) {
@@ -269,7 +269,7 @@ index 545878d17c4d421b4bb97b85e62d42ddc75c4d75..ad6753c5dd6a316ad1e7ab405f2e65b1
              return this;
          } catch (Exception ioexception) { // CraftBukkit - IOException -> Exception
              throw new EncoderException(ioexception);
-@@ -662,6 +717,29 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -667,6 +722,29 @@ public class FriendlyByteBuf extends ByteBuf {
      }
  
      public FriendlyByteBuf writeItem(ItemStack stack) {
@@ -299,7 +299,7 @@ index 545878d17c4d421b4bb97b85e62d42ddc75c4d75..ad6753c5dd6a316ad1e7ab405f2e65b1
          if (stack.isEmpty() || stack.getItem() == null) { // CraftBukkit - NPE fix itemstack.getItem()
              this.writeBoolean(false);
          } else {
-@@ -680,7 +758,7 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -685,7 +763,7 @@ public class FriendlyByteBuf extends ByteBuf {
                  nbttagcompound = stack.getTag();
              }
  
@@ -308,7 +308,7 @@ index 545878d17c4d421b4bb97b85e62d42ddc75c4d75..ad6753c5dd6a316ad1e7ab405f2e65b1
          }
  
          return this;
-@@ -717,7 +795,26 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -722,7 +800,26 @@ public class FriendlyByteBuf extends ByteBuf {
      }
  
      public FriendlyByteBuf writeUtf(String s, int maxLength) {
@@ -336,7 +336,7 @@ index 545878d17c4d421b4bb97b85e62d42ddc75c4d75..ad6753c5dd6a316ad1e7ab405f2e65b1
          return this;
      }
  
-@@ -726,7 +823,7 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -731,7 +828,7 @@ public class FriendlyByteBuf extends ByteBuf {
      }
  
      public FriendlyByteBuf writeResourceLocation(ResourceLocation id) {
@@ -345,7 +345,7 @@ index 545878d17c4d421b4bb97b85e62d42ddc75c4d75..ad6753c5dd6a316ad1e7ab405f2e65b1
          return this;
      }
  
-@@ -838,7 +935,7 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -843,7 +940,7 @@ public class FriendlyByteBuf extends ByteBuf {
  
      public void writeGameProfile(GameProfile gameProfile) {
          this.writeUUID(gameProfile.getId());
@@ -354,7 +354,7 @@ index 545878d17c4d421b4bb97b85e62d42ddc75c4d75..ad6753c5dd6a316ad1e7ab405f2e65b1
          this.writeGameProfileProperties(gameProfile.getProperties());
      }
  
-@@ -866,9 +963,11 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -871,9 +968,11 @@ public class FriendlyByteBuf extends ByteBuf {
      }
  
      public void writeProperty(Property property) {
@@ -369,7 +369,7 @@ index 545878d17c4d421b4bb97b85e62d42ddc75c4d75..ad6753c5dd6a316ad1e7ab405f2e65b1
      }
  
      public boolean isContiguous() {
-@@ -1764,4 +1863,16 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -1769,4 +1868,16 @@ public class FriendlyByteBuf extends ByteBuf {
      }
      // Fiddle end - client perspective - deep replacements - perspective and settings supplier - cache in FriendlyByteBuf
  

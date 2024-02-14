@@ -21,10 +21,10 @@ Licensed (except for image files) under: GPL-3.0 (https://www.gnu.org/licenses/g
 Gale - https://galemc.org
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index fdcf7a5fca03085140323a8d46dfb20a2cbdee09..e21c5979b993e6d39c681ac2762250d6825a1605 100644
+index 006420a7166426a091e5e6ec89d7b10d5f7c1490..83080dba1ead32117b3d2acd7f82c3aa274d9152 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
-@@ -232,3 +232,22 @@ tasks.registerRunTask("runDev") {
+@@ -231,3 +231,22 @@ tasks.registerRunTask("runDev") {
      classpath(runtimeClasspathForRunDev)
      jvmArgs("-DPaper.isRunDev=true")
  }

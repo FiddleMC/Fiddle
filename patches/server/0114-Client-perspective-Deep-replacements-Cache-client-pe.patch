@@ -8,7 +8,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/network/FriendlyByteBuf.java b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
-index af73b6f3fc9f9467bee4703652103c02b20f8dca..545878d17c4d421b4bb97b85e62d42ddc75c4d75 100644
+index 42ada45bc640b780581c908282939f3a9ccf2831..5db33782c60d1b16bcfefaba5ace8e81c734ae20 100644
 --- a/src/main/java/net/minecraft/network/FriendlyByteBuf.java
 +++ b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
 @@ -102,6 +102,8 @@ public class FriendlyByteBuf extends ByteBuf {
@@ -20,7 +20,7 @@ index af73b6f3fc9f9467bee4703652103c02b20f8dca..545878d17c4d421b4bb97b85e62d42dd
      public FriendlyByteBuf(ByteBuf parent) {
          this.source = parent;
      }
-@@ -1753,4 +1755,13 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -1758,4 +1760,13 @@ public class FriendlyByteBuf extends ByteBuf {
      }
      // Fiddle end - client perspective - packets are modifiable - expose target client properties - can be used by FriendlyByteBuf
  

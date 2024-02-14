@@ -8,7 +8,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index 98e71be556be6dc40cf307b1a1741ca2fea0be42..95f0f4da39786f4ed097628496c9edd18c9242d2 100644
+index 34e60855b01cc7722132a8b5bef6795bb2c34c99..5396d2571dbc900e0c96fa36e513537bdb0f2bbd 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
 @@ -152,6 +152,34 @@ public class Main {
@@ -44,5 +44,5 @@ index 98e71be556be6dc40cf307b1a1741ca2fea0be42..95f0f4da39786f4ed097628496c9edd1
 +            // Fiddle end - modifiable Bukkit enums - inject runtime versions - common utilities
 +
              dedicatedserversettings.forceSave();
-             // Paper start - load config files for access below if needed
+             // Paper start - load config files early for access below if needed
              org.bukkit.configuration.file.YamlConfiguration bukkitConfiguration = io.papermc.paper.configuration.PaperConfigurations.loadLegacyConfigFile((File) optionset.valueOf("bukkit-settings"));

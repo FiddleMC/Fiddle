@@ -12,10 +12,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/world/level/block/state/BlockState.java b/src/main/java/net/minecraft/world/level/block/state/BlockState.java
-index 786a4d38be67d28edf5fe446aec296631999e708..3290e0fe397d630cecb309eeef94a913264e76fb 100644
+index d080b9759afe283d79227076eea3b075af37c0cd..9b3d7fa1801d267ee0eca0c6899c826a91d23a05 100644
 --- a/src/main/java/net/minecraft/world/level/block/state/BlockState.java
 +++ b/src/main/java/net/minecraft/world/level/block/state/BlockState.java
-@@ -72,4 +72,14 @@ public class BlockState extends BlockBehaviour.BlockStateBase {
+@@ -71,4 +71,14 @@ public class BlockState extends BlockBehaviour.BlockStateBase {
      protected BlockState asState() {
          return this;
      }

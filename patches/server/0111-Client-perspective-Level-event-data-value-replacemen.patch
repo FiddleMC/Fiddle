@@ -11,10 +11,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftEffect.java b/src/main/java/org/bukkit/craftbukkit/CraftEffect.java
-index 4ce0e1e557a844fb3add866a257a8424885f7d43..875debd9d15a83c3d296bac1a47b25ac7a1a3f7a 100644
+index 457e9093adb99d31ffc7f061d8c858f98c5d0572..8a5dd44bca94e678a42eb66a0a1400907c19a8c2 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftEffect.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftEffect.java
-@@ -12,8 +12,10 @@ import org.bukkit.craftbukkit.util.CraftMagicNumbers;
+@@ -13,8 +13,10 @@ import org.bukkit.craftbukkit.inventory.CraftItemType;
  import org.bukkit.potion.Potion;
  
  public class CraftEffect {
@@ -28,7 +28,7 @@ index 4ce0e1e557a844fb3add866a257a8424885f7d43..875debd9d15a83c3d296bac1a47b25ac
          case PARTICLES_SCULK_CHARGE: // Paper - add missing effects
          case TRIAL_SPAWNER_DETECT_PLAYER: // Paper - add missing effects
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
-index 03eab4e7c2648c722c25387ec9353e8dafc09618..098a9c816ad13f6c3a20f1f62e1c1e0f4433f9c0 100644
+index f785e7b366175a32c834e1ebb56166a6fdcca3da..d1ade24340aaade6c77c1ebe0b1c8ac18aced317 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
 @@ -1462,7 +1462,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
@@ -41,7 +41,7 @@ index 03eab4e7c2648c722c25387ec9353e8dafc09618..098a9c816ad13f6c3a20f1f62e1c1e0f
      }
  
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index 18d441bb968f35b48ccbb618647d34959384e337..5df25e413b473067f5941ce9323b1f940e0aa386 100644
+index d3b70339869858e1f1db113488726b4d03bd9d05..86b95f5814d733c38133b2451455c94175ef15fb 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 @@ -887,7 +887,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {

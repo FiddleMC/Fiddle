@@ -7,10 +7,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index a0341afce6624cb29ae28abb352af2c797366cee..148b9ed0b7e715c6e17cf9ea877fce8a1c8b9823 100644
+index cdd722220aa4b12b4f2ccac5dccc606e8528e497..9ce56741e92ed69d9ee9e3017d7fe9a9f7cc572b 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
-@@ -65,6 +65,14 @@ dependencies {
+@@ -64,6 +64,14 @@ dependencies {
      testImplementation("org.mockito:mockito-core:5.5.0")
  
      implementation("net.bytebuddy:byte-buddy:1.14.11") // Fiddle - modifiable Bukkit enums - inject runtime versions - depend on ByteBuddy

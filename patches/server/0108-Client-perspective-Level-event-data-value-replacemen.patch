@@ -16,10 +16,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/network/FriendlyByteBuf.java b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
-index 2b2857c7187da956947fc236e1f796150166e8f9..af73b6f3fc9f9467bee4703652103c02b20f8dca 100644
+index 98f0aa4a00875909c45b133b51eeb8b77e1d4fc0..42ada45bc640b780581c908282939f3a9ccf2831 100644
 --- a/src/main/java/net/minecraft/network/FriendlyByteBuf.java
 +++ b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
-@@ -160,6 +160,28 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -165,6 +165,28 @@ public class FriendlyByteBuf extends ByteBuf {
          }
      }
  

@@ -8,7 +8,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/nbt/CompoundTag.java b/src/main/java/net/minecraft/nbt/CompoundTag.java
-index 164484b7175719072dc79add8e7243156c0fbb0b..c9cbc094405033f0c13275b4818d3e7ea473cb18 100644
+index e9aeb22ed30261514ee92d429b76b4aa9892c461..d8f17e1779e7dfe4b373f84d07dbe6b669fc61c7 100644
 --- a/src/main/java/net/minecraft/nbt/CompoundTag.java
 +++ b/src/main/java/net/minecraft/nbt/CompoundTag.java
 @@ -182,6 +182,12 @@ public class CompoundTag implements Tag {
@@ -25,10 +25,10 @@ index 164484b7175719072dc79add8e7243156c0fbb0b..c9cbc094405033f0c13275b4818d3e7e
          for(String string : this.tags.keySet()) {
              Tag tag = this.tags.get(string);
 diff --git a/src/main/java/net/minecraft/nbt/ListTag.java b/src/main/java/net/minecraft/nbt/ListTag.java
-index a4b19798235a4125820f680eb0c07c63f35dd77f..679f3a8767ae21f22b9e71cdc42225a4f49cc1b3 100644
+index d70b0257ed990444a531e65cb275bbacc50b96b1..22de2910669807024a30bf8a935de829ea5fc4a2 100644
 --- a/src/main/java/net/minecraft/nbt/ListTag.java
 +++ b/src/main/java/net/minecraft/nbt/ListTag.java
-@@ -154,6 +154,13 @@ public class ListTag extends CollectionTag<Tag> {
+@@ -162,6 +162,13 @@ public class ListTag extends CollectionTag<Tag> {
  
      @Override
      public void write(DataOutput output, @org.jetbrains.annotations.Nullable org.fiddlemc.fiddle.packet.deepreplacement.ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope replacementScope) throws IOException {
@@ -61,10 +61,10 @@ index 0ad7ffe53b26136bd0aada84db3fe6662162c305..f8828df70a993323c12617f97224f074
          output.writeUTF(this.data);
      }
 diff --git a/src/main/java/net/minecraft/network/FriendlyByteBuf.java b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
-index ad6753c5dd6a316ad1e7ab405f2e65b16af87f21..d0d4c0b16410d4fdba27928c737f963182229c0b 100644
+index 715aa4ae6e1e1ccdac7ae55e6946973f8bb2b4ad..354c6635b183ff77364bd09aa768c65dae658d2a 100644
 --- a/src/main/java/net/minecraft/network/FriendlyByteBuf.java
 +++ b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
-@@ -596,6 +596,12 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -601,6 +601,12 @@ public class FriendlyByteBuf extends ByteBuf {
      }
  
      public FriendlyByteBuf writeComponent(Component text, org.fiddlemc.fiddle.packet.deepreplacement.ClientPerspectiveAndSettingsSupplier clientPerspectiveAndSettings, org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope replacementScope) {
@@ -77,7 +77,7 @@ index ad6753c5dd6a316ad1e7ab405f2e65b16af87f21..d0d4c0b16410d4fdba27928c737f9631
          // Fiddle end - client perspective - deep replacements - pass scope
          if (text instanceof io.papermc.paper.adventure.AdventureComponent adv) {
              return this.writeComponent(adv.adventure$component());
-@@ -743,6 +749,12 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -748,6 +754,12 @@ public class FriendlyByteBuf extends ByteBuf {
          if (stack.isEmpty() || stack.getItem() == null) { // CraftBukkit - NPE fix itemstack.getItem()
              this.writeBoolean(false);
          } else {

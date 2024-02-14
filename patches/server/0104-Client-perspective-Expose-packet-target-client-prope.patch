@@ -8,7 +8,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/network/FriendlyByteBuf.java b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
-index b13bc90b28b02f5e80d935bfcba727f92c5e4c4f..2b2857c7187da956947fc236e1f796150166e8f9 100644
+index b863249ff7e13cf4939c8961601f0564c62fd661..98f0aa4a00875909c45b133b51eeb8b77e1d4fc0 100644
 --- a/src/main/java/net/minecraft/network/FriendlyByteBuf.java
 +++ b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
 @@ -95,6 +95,13 @@ public class FriendlyByteBuf extends ByteBuf {
@@ -25,7 +25,7 @@ index b13bc90b28b02f5e80d935bfcba727f92c5e4c4f..2b2857c7187da956947fc236e1f79615
      public FriendlyByteBuf(ByteBuf parent) {
          this.source = parent;
      }
-@@ -1670,4 +1677,58 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -1675,4 +1682,58 @@ public class FriendlyByteBuf extends ByteBuf {
              };
          }
      }
@@ -85,7 +85,7 @@ index b13bc90b28b02f5e80d935bfcba727f92c5e4c4f..2b2857c7187da956947fc236e1f79615
 +
  }
 diff --git a/src/main/java/net/minecraft/network/PacketEncoder.java b/src/main/java/net/minecraft/network/PacketEncoder.java
-index d364bd57b1675c8b21d781c2bc16c3e65800455c..4b967624e16292c04f301a3942327479d25a574d 100644
+index b5b228e67284baad3639b283595427a819bb1a44..411b006bf158c3a89c9fdb8039d74cf3680c3733 100644
 --- a/src/main/java/net/minecraft/network/PacketEncoder.java
 +++ b/src/main/java/net/minecraft/network/PacketEncoder.java
 @@ -34,6 +34,7 @@ public class PacketEncoder extends MessageToByteEncoder<Packet<?>> {
@@ -94,5 +94,5 @@ index d364bd57b1675c8b21d781c2bc16c3e65800455c..4b967624e16292c04f301a3942327479
                  FriendlyByteBuf friendlyByteBuf = new FriendlyByteBuf(byteBuf);
 +                friendlyByteBuf.writingPacket = new java.lang.ref.WeakReference<>(packet); // Fiddle - client perspective - packets are modifiable - expose target client properties - can be used by FriendlyByteBuf
                  friendlyByteBuf.writeVarInt(i);
-                 friendlyByteBuf.adventure$locale = channelHandlerContext.channel().attr(io.papermc.paper.adventure.PaperAdventure.LOCALE_ATTRIBUTE).get(); // Paper
+                 friendlyByteBuf.adventure$locale = channelHandlerContext.channel().attr(io.papermc.paper.adventure.PaperAdventure.LOCALE_ATTRIBUTE).get(); // Paper - adventure; set player's locale
  

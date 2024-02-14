@@ -13,7 +13,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/inventory/CraftInventory.java b/src/main/java/org/bukkit/craftbukkit/inventory/CraftInventory.java
-index 3b0d3e9a067fccb10122c273aaf658ba240aa716..54d68e01c7db9da2363319d18517bc3ab1ee92b1 100644
+index af1ae3dacb628da23f7d2988c6e76d3fb2d64103..5cc7c084694c6834ae112d2ef663518e7f78b4a6 100644
 --- a/src/main/java/org/bukkit/craftbukkit/inventory/CraftInventory.java
 +++ b/src/main/java/org/bukkit/craftbukkit/inventory/CraftInventory.java
 @@ -103,7 +103,7 @@ public class CraftInventory implements Inventory {
@@ -71,10 +71,10 @@ index 3b0d3e9a067fccb10122c273aaf658ba240aa716..54d68e01c7db9da2363319d18517bc3a
          for (int i = 0; i < items.length; i++) {
              if (items[i] != null && items[i].getType() == material) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemFactory.java b/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemFactory.java
-index c77634ec9c4e7a9eaacc81de7f95e9452b393a52..fc78b5642c11fe4d07f2272f6e27f210318b5875 100644
+index 090ba0b85fe72419c419cc72b5584ec391c0cfa1..9849bcce386a7fdb48d87677d183c266cce5ed4c 100644
 --- a/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemFactory.java
 +++ b/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemFactory.java
-@@ -48,7 +48,7 @@ public final class CraftItemFactory implements ItemFactory {
+@@ -47,7 +47,7 @@ public final class CraftItemFactory implements ItemFactory {
  
      @Override
      public boolean isApplicable(ItemMeta meta, Material type) {
@@ -83,7 +83,7 @@ index c77634ec9c4e7a9eaacc81de7f95e9452b393a52..fc78b5642c11fe4d07f2272f6e27f210
          if (type == null || meta == null) {
              return false;
          }
-@@ -65,7 +65,7 @@ public final class CraftItemFactory implements ItemFactory {
+@@ -64,7 +64,7 @@ public final class CraftItemFactory implements ItemFactory {
      }
  
      private ItemMeta getItemMeta(Material material, CraftMetaItem meta) {
@@ -93,10 +93,10 @@ index c77634ec9c4e7a9eaacc81de7f95e9452b393a52..fc78b5642c11fe4d07f2272f6e27f210
          case AIR:
              return null;
 diff --git a/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemStack.java b/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemStack.java
-index 32da455eb46d09a846bae5270b32a6d6d6b962fd..7fd2e86427ea2fe8b65b1306de59e0dc47b2c465 100644
+index 9dac41e4a93911f920204ed72ce9fe419b5bf696..24df57c32f8449e9f7bbb0d9ab0218b5f049e5e8 100644
 --- a/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemStack.java
 +++ b/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemStack.java
-@@ -677,7 +677,7 @@ public final class CraftItemStack extends ItemStack {
+@@ -686,7 +686,7 @@ public final class CraftItemStack extends ItemStack {
          if (this.handle == null || that.handle == null) {
              return false;
          }

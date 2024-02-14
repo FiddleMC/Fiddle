@@ -19,10 +19,10 @@ Licensed (except for image files) under: GPL-3.0 (https://www.gnu.org/licenses/g
 Gale - https://galemc.org
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 20cdb0325ff47d661af5a86bed9992c33dde6a0e..fdcf7a5fca03085140323a8d46dfb20a2cbdee09 100644
+index da110b07ee815e8028f87783dc2e30ee16c96512..006420a7166426a091e5e6ec89d7b10d5f7c1490 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
-@@ -88,7 +88,7 @@ tasks.jar {
+@@ -87,7 +87,7 @@ tasks.jar {
          attributes(
              "Main-Class" to "org.bukkit.craftbukkit.Main",
              "Implementation-Title" to "CraftBukkit",
@@ -45,7 +45,7 @@ index c5d5648f4ca603ef2b1df723b58f9caf4dd3c722..67027b528f12874b37138d149c859c49
                  .completer(new ConsoleCommandCompleter(this.server))
                  .option(LineReader.Option.COMPLETE_IN_WORD, true);
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 34f19ac897a30c0c4e3ab406013fcca1c8b7db93..4ba114a9301c3d35be6a97730421fee5b0e8a9c9 100644
+index 2ea52c9aad51967bfefc3fe08073a004f65a9451..c19bd6ccdd976cd7e086cf76ca7b69d67efec55e 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -954,7 +954,13 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
@@ -63,7 +63,7 @@ index 34f19ac897a30c0c4e3ab406013fcca1c8b7db93..4ba114a9301c3d35be6a97730421fee5
              while (this.getRunningThread().isAlive()) {
                  this.getRunningThread().stop();
                  try {
-@@ -1866,7 +1872,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1852,7 +1858,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
      @DontObfuscate
      public String getServerModName() {
@@ -73,7 +73,7 @@ index 34f19ac897a30c0c4e3ab406013fcca1c8b7db93..4ba114a9301c3d35be6a97730421fee5
  
      public SystemReport fillSystemReport(SystemReport details) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index e011cfcdda2e0a609d4158b0454bdf046b04c9d9..154a34bc7a85d391d413dce26606a0adc2acd698 100644
+index 0b68bd21b0e45d556ec9ae0a51507987dfed559c..2beaf4e00ec7e7db3e392e3288e6ec660c382184 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 @@ -264,7 +264,7 @@ import javax.annotation.Nullable; // Paper

@@ -546,7 +546,7 @@ index 8f23276796037d048eb114952891a01a40971b3e..f48e783fe810ac57510f8e9dcfeaa02c
          return new InnerClassFieldDiscoverer(Collections.emptyMap());
      }
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index 7573c12a77797146c51ef2dfe4b2a636df45e21a..fc6f1c7bff66c55bc9704b73fd7c432a43a4bb22 100644
+index 2568272a10c0d92bc49c0c244b10791db7bfae2b..5664ff92d13767755241d3c5e3d77a8c76965d54 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
 @@ -128,6 +128,11 @@ public class Main {
@@ -562,26 +562,26 @@ index 7573c12a77797146c51ef2dfe4b2a636df45e21a..fc6f1c7bff66c55bc9704b73fd7c432a
              Bootstrap.bootStrap();
              Bootstrap.validate();
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 4ba114a9301c3d35be6a97730421fee5b0e8a9c9..fd6284fa42ba9d388fa5ac92d501f4eb28eb5ec9 100644
+index c19bd6ccdd976cd7e086cf76ca7b69d67efec55e..1fb2bc9a82051b0afe521afb4a62ff3bf0a0c96e 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -305,7 +305,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      private static final int SAMPLE_INTERVAL = 20; // Paper
      public final double[] recentTps = new double[ 3 ];
      // Spigot end
--    public final io.papermc.paper.configuration.PaperConfigurations paperConfigurations;
-+    public final io.papermc.paper.configuration.PaperConfigurations.OriginalPaperConfigurations paperConfigurations; // Fiddle - Fiddle configuration
-     public static long currentTickLong = 0L; // Paper
+-    public final io.papermc.paper.configuration.PaperConfigurations paperConfigurations; // Paper - add paper configuration files
++    public final io.papermc.paper.configuration.PaperConfigurations.OriginalPaperConfigurations paperConfigurations; // Paper - add paper configuration files // Fiddle - Fiddle configuration
+     public static long currentTickLong = 0L; // Paper - track current tick as a long
  
      public volatile Thread shutdownThread; // Paper
 diff --git a/src/main/java/net/minecraft/server/Services.java b/src/main/java/net/minecraft/server/Services.java
-index a5450eeeab5a6b0ab273810063806d11107d6b26..62be1f708f4c4d282536da159f648c1668b292d7 100644
+index d89c624554ab08bd1b33a3f62b52aa57aaafb8b4..3ce1c19dc40b02424b8264678eb50e76934c6255 100644
 --- a/src/main/java/net/minecraft/server/Services.java
 +++ b/src/main/java/net/minecraft/server/Services.java
 @@ -11,14 +11,14 @@ import net.minecraft.server.players.GameProfileCache;
  import net.minecraft.util.SignatureValidator;
  
- // Paper start
+ // Paper start - add paper configuration files
 -public record Services(MinecraftSessionService sessionService, ServicesKeySet servicesKeySet, GameProfileRepository profileRepository, GameProfileCache profileCache, @javax.annotation.Nullable io.papermc.paper.configuration.PaperConfigurations paperConfigurations) {
 +public record Services(MinecraftSessionService sessionService, ServicesKeySet servicesKeySet, GameProfileRepository profileRepository, GameProfileCache profileCache, @javax.annotation.Nullable io.papermc.paper.configuration.PaperConfigurations.OriginalPaperConfigurations paperConfigurations) { // Fiddle - Fiddle configuration
  
@@ -594,17 +594,17 @@ index a5450eeeab5a6b0ab273810063806d11107d6b26..62be1f708f4c4d282536da159f648c16
 +    public io.papermc.paper.configuration.PaperConfigurations.OriginalPaperConfigurations paperConfigurations() { // Fiddle - Fiddle configuration
          return java.util.Objects.requireNonNull(this.paperConfigurations);
      }
-     // Paper end
+     // Paper end - add paper configuration files
 @@ -30,8 +30,8 @@ public record Services(MinecraftSessionService sessionService, ServicesKeySet se
-         GameProfileCache gameProfileCache = new GameProfileCache(gameProfileRepository, userCacheFile); // Paper
-         // Paper start
+         GameProfileCache gameProfileCache = new GameProfileCache(gameProfileRepository, userCacheFile); // Paper - use specified user cache file
+         // Paper start - load paper config files from cli options
          final java.nio.file.Path legacyConfigPath = ((File) optionSet.valueOf("paper-settings")).toPath();
 -        final java.nio.file.Path configDirPath = ((File) optionSet.valueOf("paper-settings-directory")).toPath();
 -        io.papermc.paper.configuration.PaperConfigurations paperConfigurations = io.papermc.paper.configuration.PaperConfigurations.setup(legacyConfigPath, configDirPath, rootDirectory.toPath(), (File) optionSet.valueOf("spigot-settings"));
 +        final java.nio.file.Path configDirPath = getConfigDirPath(optionSet); // Fiddle - Fiddle configuration - load Fiddle global configuration before bootstrap
 +        var paperConfigurations = io.papermc.paper.configuration.PaperConfigurations.setup(legacyConfigPath, configDirPath, rootDirectory.toPath(), (File) optionSet.valueOf("spigot-settings")); // Fiddle - Fiddle configuration
          return new Services(minecraftSessionService, authenticationService.getServicesKeySet(), gameProfileRepository, gameProfileCache, paperConfigurations);
-         // Paper end
+         // Paper end - load paper config files from cli options
      }
 @@ -44,4 +44,11 @@ public record Services(MinecraftSessionService sessionService, ServicesKeySet se
      public boolean canValidateProfileKeys() {
@@ -619,40 +619,40 @@ index a5450eeeab5a6b0ab273810063806d11107d6b26..62be1f708f4c4d282536da159f648c16
 +
  }
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-index 58536aabf607015939a1326f80207c0a06eed8ff..04d5891abf7eef4d973d74c59d8826e860b4f020 100644
+index c1402d4dfbddc14ca748efa24e7d62d81abf4e58..0d100182b0fba7ae51c189860eb7629bbf7fffb8 100644
 --- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-@@ -208,6 +208,9 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
-         io.papermc.paper.util.ObfHelper.INSTANCE.getClass(); // Paper - load mappings for stacktrace deobf and etc.
-         paperConfigurations.initializeGlobalConfiguration(this.registryAccess());
-         paperConfigurations.initializeWorldDefaultsConfiguration(this.registryAccess());
+@@ -209,6 +209,9 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+         this.paperConfigurations.initializeGlobalConfiguration(this.registryAccess());
+         this.paperConfigurations.initializeWorldDefaultsConfiguration(this.registryAccess());
+         // Paper end - initialize global and world-defaults configuration
 +        // Fiddle start - Fiddle configuration
 +        org.fiddlemc.fiddle.configuration.FiddleConfigurations.get(this.options).initializeWorldDefaultsConfiguration(this.registryAccess());
 +        // Fiddle end - Fiddle configuration
-         // Paper start - moved up to right after PlayerList creation but before file load/save
+         // Paper start - convert old users earlier after PlayerList creation but before file load/save
          if (this.convertOldUsers()) {
              this.getProfileCache().save(false); // Paper
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index b78a9628a88f2a495ef6de74446a02a14d41a1f6..cc7f2d52fbaac1b9ce792c1a3ff45f697030405b 100644
+index 0567fbf194d3dfef3f2348c4b1f69ac857dc5648..1f1d357be3dde0f1beb2ae3a91439e73ef12cdb4 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
-@@ -693,7 +693,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
+@@ -697,7 +697,7 @@ public class ServerLevel extends Level implements WorldGenLevel {
          // Holder holder = worlddimension.type(); // CraftBukkit - decompile error
  
          // Objects.requireNonNull(minecraftserver); // CraftBukkit - decompile error
--        super(iworlddataserver, resourcekey, minecraftserver.registryAccess(), worlddimension.type(), minecraftserver::getProfiler, false, flag, i, minecraftserver.getMaxChainedNeighborUpdates(), gen, biomeProvider, env, spigotConfig -> minecraftserver.paperConfigurations.createWorldConfig(io.papermc.paper.configuration.PaperConfigurations.createWorldContextMap(convertable_conversionsession.levelDirectory.path(), iworlddataserver.getLevelName(), resourcekey.location(), spigotConfig, minecraftserver.registryAccess())), executor); // Paper - Async-Anti-Xray - Pass executor
-+        super(iworlddataserver, resourcekey, minecraftserver.registryAccess(), worlddimension.type(), minecraftserver::getProfiler, false, flag, i, minecraftserver.getMaxChainedNeighborUpdates(), gen, biomeProvider, env, spigotConfig -> minecraftserver.paperConfigurations.createWorldConfig(io.papermc.paper.configuration.PaperConfigurations.createWorldContextMap(convertable_conversionsession.levelDirectory.path(), iworlddataserver.getLevelName(), resourcekey.location(), spigotConfig, minecraftserver.registryAccess())), spigotConfig -> org.fiddlemc.fiddle.configuration.FiddleConfigurations.get(null).createWorldConfig(io.papermc.paper.configuration.PaperConfigurations.createWorldContextMap(convertable_conversionsession.levelDirectory.path(), iworlddataserver.getLevelName(), resourcekey.location(), spigotConfig, minecraftserver.registryAccess())), executor); // Paper - Async-Anti-Xray - Pass executor // Fiddle - Fiddle configuration
+-        super(iworlddataserver, resourcekey, minecraftserver.registryAccess(), worlddimension.type(), minecraftserver::getProfiler, false, flag, i, minecraftserver.getMaxChainedNeighborUpdates(), gen, biomeProvider, env, spigotConfig -> minecraftserver.paperConfigurations.createWorldConfig(io.papermc.paper.configuration.PaperConfigurations.createWorldContextMap(convertable_conversionsession.levelDirectory.path(), iworlddataserver.getLevelName(), resourcekey.location(), spigotConfig, minecraftserver.registryAccess())), executor); // Paper - create paper world configs; Async-Anti-Xray: Pass executor
++        super(iworlddataserver, resourcekey, minecraftserver.registryAccess(), worlddimension.type(), minecraftserver::getProfiler, false, flag, i, minecraftserver.getMaxChainedNeighborUpdates(), gen, biomeProvider, env, spigotConfig -> minecraftserver.paperConfigurations.createWorldConfig(io.papermc.paper.configuration.PaperConfigurations.createWorldContextMap(convertable_conversionsession.levelDirectory.path(), iworlddataserver.getLevelName(), resourcekey.location(), spigotConfig, minecraftserver.registryAccess())), spigotConfig -> org.fiddlemc.fiddle.configuration.FiddleConfigurations.get(null).createWorldConfig(io.papermc.paper.configuration.PaperConfigurations.createWorldContextMap(convertable_conversionsession.levelDirectory.path(), iworlddataserver.getLevelName(), resourcekey.location(), spigotConfig, minecraftserver.registryAccess())), executor); // Paper - create paper world configs; Async-Anti-Xray: Pass executor // Fiddle - Fiddle configuration
          this.pvpMode = minecraftserver.isPvpAllowed();
          this.convertable = convertable_conversionsession;
          this.uuid = WorldUUID.getUUID(convertable_conversionsession.levelDirectory.path().toFile());
 diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
-index 0b56e5f7f18fc4286992af22d402205b771165a3..85a7f8e4c1150a911639e07eb0b1ea3fde3070f2 100644
+index afd2e9bcdf94f3511bcd68cab5e72284f07fd016..4c2901cc6fcc5825d11278825be247b982f5ba9a 100644
 --- a/src/main/java/net/minecraft/world/level/Level.java
 +++ b/src/main/java/net/minecraft/world/level/Level.java
 @@ -177,6 +177,12 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
          return this.paperConfig;
      }
-     // Paper end
+     // Paper end - add paper world config
 +    // Fiddle start - Fiddle configuration
 +    private final org.fiddlemc.fiddle.configuration.FiddleWorldConfiguration fiddleConfig;
 +    public org.fiddlemc.fiddle.configuration.FiddleWorldConfiguration fiddleConfig() {
@@ -666,16 +666,16 @@ index 0b56e5f7f18fc4286992af22d402205b771165a3..85a7f8e4c1150a911639e07eb0b1ea3f
  
      public abstract ResourceKey<LevelStem> getTypeKey();
  
--    protected Level(WritableLevelData worlddatamutable, ResourceKey<Level> resourcekey, RegistryAccess iregistrycustom, Holder<DimensionType> holder, Supplier<ProfilerFiller> supplier, boolean flag, boolean flag1, long i, int j, org.bukkit.generator.ChunkGenerator gen, org.bukkit.generator.BiomeProvider biomeProvider, org.bukkit.World.Environment env, java.util.function.Function<org.spigotmc.SpigotWorldConfig, io.papermc.paper.configuration.WorldConfiguration> paperWorldConfigCreator, java.util.concurrent.Executor executor) { // Paper - Async-Anti-Xray - Pass executor
-+    protected Level(WritableLevelData worlddatamutable, ResourceKey<Level> resourcekey, RegistryAccess iregistrycustom, Holder<DimensionType> holder, Supplier<ProfilerFiller> supplier, boolean flag, boolean flag1, long i, int j, org.bukkit.generator.ChunkGenerator gen, org.bukkit.generator.BiomeProvider biomeProvider, org.bukkit.World.Environment env, java.util.function.Function<org.spigotmc.SpigotWorldConfig, io.papermc.paper.configuration.WorldConfiguration> paperWorldConfigCreator, java.util.function.Function<org.spigotmc.SpigotWorldConfig, org.fiddlemc.fiddle.configuration.FiddleWorldConfiguration> fiddleWorldConfigCreator, java.util.concurrent.Executor executor) { // Paper - Async-Anti-Xray - Pass executor // Fiddle - Fiddle configuration
+-    protected Level(WritableLevelData worlddatamutable, ResourceKey<Level> resourcekey, RegistryAccess iregistrycustom, Holder<DimensionType> holder, Supplier<ProfilerFiller> supplier, boolean flag, boolean flag1, long i, int j, org.bukkit.generator.ChunkGenerator gen, org.bukkit.generator.BiomeProvider biomeProvider, org.bukkit.World.Environment env, java.util.function.Function<org.spigotmc.SpigotWorldConfig, io.papermc.paper.configuration.WorldConfiguration> paperWorldConfigCreator, java.util.concurrent.Executor executor) { // Paper - create paper world config; Async-Anti-Xray: Pass executor
++    protected Level(WritableLevelData worlddatamutable, ResourceKey<Level> resourcekey, RegistryAccess iregistrycustom, Holder<DimensionType> holder, Supplier<ProfilerFiller> supplier, boolean flag, boolean flag1, long i, int j, org.bukkit.generator.ChunkGenerator gen, org.bukkit.generator.BiomeProvider biomeProvider, org.bukkit.World.Environment env, java.util.function.Function<org.spigotmc.SpigotWorldConfig, io.papermc.paper.configuration.WorldConfiguration> paperWorldConfigCreator, java.util.function.Function<org.spigotmc.SpigotWorldConfig, org.fiddlemc.fiddle.configuration.FiddleWorldConfiguration> fiddleWorldConfigCreator, java.util.concurrent.Executor executor) { // Paper - create paper world config; Async-Anti-Xray: Pass executor // Fiddle - Fiddle configuration
          this.spigotConfig = new org.spigotmc.SpigotWorldConfig(((net.minecraft.world.level.storage.PrimaryLevelData) worlddatamutable).getLevelName()); // Spigot
-         this.paperConfig = paperWorldConfigCreator.apply(this.spigotConfig); // Paper
+         this.paperConfig = paperWorldConfigCreator.apply(this.spigotConfig); // Paper - create paper world config
 +        this.fiddleConfig = fiddleWorldConfigCreator.apply(this.spigotConfig); // Fiddle - Fiddle configuration
          this.generator = gen;
          this.world = new CraftWorld((ServerLevel) this, gen, biomeProvider, env);
  
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 154a34bc7a85d391d413dce26606a0adc2acd698..fd7d812c1e7d8928645259422c2bad0bb3d748c2 100644
+index 2beaf4e00ec7e7db3e392e3288e6ec660c382184..fecf540919f97182eb77ba7c8f0910d41bc9932a 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 @@ -1037,6 +1037,7 @@ public final class CraftServer implements Server {

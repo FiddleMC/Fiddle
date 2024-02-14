@@ -56,7 +56,7 @@ index f692149d91b525bda6dc79d489d7496ea24037e8..1cc0c79ea3df283a1713eb5ed24d4709
              ((BlockItem)item).registerBlocks(Item.BY_BLOCK, item);
          }
 diff --git a/src/main/java/net/minecraft/world/level/block/Block.java b/src/main/java/net/minecraft/world/level/block/Block.java
-index 4d50dd92a7f3187ee1d8edb926e7c273c8156549..1cf54034251c5f9cb7e936a0ffd25a38f8b01c06 100644
+index a4b51821d8bcf9fdb7ff5e200c33ac2c565eece1..244591a211e45d4c0ad2555a79a1889c3d7e4d53 100644
 --- a/src/main/java/net/minecraft/world/level/block/Block.java
 +++ b/src/main/java/net/minecraft/world/level/block/Block.java
 @@ -130,6 +130,32 @@ public class Block extends BlockBehaviour implements ItemLike {
@@ -122,10 +122,10 @@ index 4d5bc4d46fa90de1d89e15bd5dc053d22e07a3d9..473b6769c50b74ed01267cecb0c504c3
                  blockState.initCache();
              }
 diff --git a/src/main/java/net/minecraft/world/level/block/state/BlockState.java b/src/main/java/net/minecraft/world/level/block/state/BlockState.java
-index a9b0f5950b6f97ea4c2a1075946b92008b62c9d9..acb458e03bfffdae406eae99eb81ce0c3078c9ea 100644
+index e33a4ade1dd40ba482e2ca51c3b3ddad284106c3..14abe3eae628d13e88bfe8e74e180834d3325153 100644
 --- a/src/main/java/net/minecraft/world/level/block/state/BlockState.java
 +++ b/src/main/java/net/minecraft/world/level/block/state/BlockState.java
-@@ -25,6 +25,32 @@ public class BlockState extends BlockBehaviour.BlockStateBase {
+@@ -24,6 +24,32 @@ public class BlockState extends BlockBehaviour.BlockStateBase {
          super(block, propertyMap, codec);
      }
  
