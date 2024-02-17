@@ -10,10 +10,10 @@ Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/PackFiddleContentDefinitionScanner.java b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/PackFiddleContentDefinitionScanner.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..ca9ab567d1e7e9e4faaa0af0685d8eb254d7f9b4
+index 0000000000000000000000000000000000000000..1338da413fa4b7826810135c4a6c0d97fcd80408
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/PackFiddleContentDefinitionScanner.java
-@@ -0,0 +1,107 @@
+@@ -0,0 +1,103 @@
 +// Fiddle - read packs - content definitions - scan from packs
 +
 +package org.fiddlemc.fiddle.pack.read.fiddlecontent.definition;
@@ -26,7 +26,6 @@ index 0000000000000000000000000000000000000000..ca9ab567d1e7e9e4faaa0af0685d8eb2
 +import org.fiddlemc.fiddle.pack.FiddlePack;
 +import org.fiddlemc.fiddle.pack.read.ContentNamespacedKeyValidation;
 +import org.fiddlemc.fiddle.pack.exception.PackException;
-+import org.fiddlemc.fiddle.pack.read.SystemFiles;
 +import org.fiddlemc.fiddle.pack.read.filesprovider.RegularFileInPack;
 +import org.jetbrains.annotations.NotNull;
 +import org.slf4j.Logger;
@@ -62,9 +61,6 @@ index 0000000000000000000000000000000000000000..ca9ab567d1e7e9e4faaa0af0685d8eb2
 +        List<Pair<RegularFileInPack, String>> subNamespacedFolderFiles = new ArrayList<>(0);
 +        for (var namespaceFolder : contentFolder.getTopLevelDirectories()) {
 +            var namespace = namespaceFolder.getName();
-+            if (SystemFiles.isSystemDirectory(namespace)) {
-+                continue;
-+            }
 +            if (!ContentNamespacedKeyValidation.isValidNamespace(namespace)) {
 +                LOGGER.warn("Ignored invalid namespace folder in Fiddle pack: {} in {}", contentFolderName + "/" + namespace, pack.filesProvider().getLocation());
 +                continue;
@@ -74,9 +70,9 @@ index 0000000000000000000000000000000000000000..ca9ab567d1e7e9e4faaa0af0685d8eb2
 +                continue;
 +            }
 +            for (var subNamespaceFolderFile : subNamespaceFolder.getTopLevelRegularFiles()) {
-+                var path = subNamespaceFolderFile.getName();
-+                if (!ContentNamespacedKeyValidation.isValidPathJSONFilename(path)) {
-+                    LOGGER.warn("Ignored invalid file name in Fiddle pack: {} in {}", contentFolderName + "/" + namespace + "/" + subNamespaceFolderName + "/" + path, pack.filesProvider().getLocation());
++                var filename = subNamespaceFolderFile.getName();
++                if (!ContentNamespacedKeyValidation.isValidPathJSONFilename(filename)) {
++                    LOGGER.warn("Ignored invalid file name in Fiddle pack: {} in {}", contentFolderName + "/" + namespace + "/" + subNamespaceFolderName + "/" + filename, pack.filesProvider().getLocation());
 +                    continue;
 +                }
 +                subNamespacedFolderFiles.add(Pair.of(subNamespaceFolderFile, namespace));

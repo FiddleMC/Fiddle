@@ -9,10 +9,10 @@ Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/filesprovider/directory/DirectoryFiddlePackFilesProvider.java b/src/main/java/org/fiddlemc/fiddle/pack/read/filesprovider/directory/DirectoryFiddlePackFilesProvider.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..f05a767ecf279e4ff8e60fcf58be6bea22c71b81
+index 0000000000000000000000000000000000000000..0c3ca7d2522eb95beedb7ec3c73d4190070c9c7d
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/read/filesprovider/directory/DirectoryFiddlePackFilesProvider.java
-@@ -0,0 +1,93 @@
+@@ -0,0 +1,94 @@
 +// Fiddle - read packs - pack files - directory packs
 +
 +package org.fiddlemc.fiddle.pack.read.filesprovider.directory;
@@ -75,6 +75,7 @@ index 0000000000000000000000000000000000000000..f05a767ecf279e4ff8e60fcf58be6bea
 +        } else {
 +            List<FileInDirectoryPack> topLevelFiles = Arrays.stream(directoryFiles)
 +                .map(file -> file.isDirectory() ? new DirectoryInDirectoryPack(this, file) : new RegularFileInDirectoryPack(this, file))
++                .filter(file -> !file.isSystemFileOrDirectory())
 +                .toList();
 +            this.files.addAll(topLevelFiles);
 +            return topLevelFiles;

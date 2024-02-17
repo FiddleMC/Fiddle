@@ -161,15 +161,18 @@ index 0000000000000000000000000000000000000000..b7c6b74452d075a633a9a5ea8fb63f6d
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/filesprovider/FileInPack.java b/src/main/java/org/fiddlemc/fiddle/pack/read/filesprovider/FileInPack.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..4d2b83db135a987a12bd58f31d6f5a4242b10a1c
+index 0000000000000000000000000000000000000000..6228747a1bd27796fc949c82510d47c5585410bf
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/read/filesprovider/FileInPack.java
-@@ -0,0 +1,23 @@
+@@ -0,0 +1,39 @@
 +// Fiddle - read packs - pack files - provider interface
 +
 +package org.fiddlemc.fiddle.pack.read.filesprovider;
 +
 +import org.fiddlemc.fiddle.pack.exception.PackException;
++import org.fiddlemc.fiddle.pack.read.SystemFilesAndDirectories;
++
++import java.util.stream.Stream;
 +
 +/**
 + * A common base class for {@link RegularFileInPack} and {@link DirectoryInPack}.
@@ -187,13 +190,26 @@ index 0000000000000000000000000000000000000000..4d2b83db135a987a12bd58f31d6f5a42
 +     */
 +    String getName() throws PackException;
 +
++    default boolean isSystemFileOrDirectory() {
++        try {
++            var filename = this.getName();
++            return this.isDirectory() ? SystemFilesAndDirectories.isSystemDirectory(filename) : SystemFilesAndDirectories.isSystemFile(filename);
++        } catch (PackException ignored) {
++        }
++        return false;
++    }
++
++    static <T extends FileInPack> Stream<T> filterOutSystemFilesAndDirectories(Stream<T> files) {
++        return files.filter(file -> !file.isSystemFileOrDirectory());
++    }
++
 +}
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/filesprovider/PackFilesContainer.java b/src/main/java/org/fiddlemc/fiddle/pack/read/filesprovider/PackFilesContainer.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..a37ea02af73c1e912ffaf2834cae7713e9cf5797
+index 0000000000000000000000000000000000000000..2aa09f3350cb0134df831a60c05e7a66f5dbbe9f
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/read/filesprovider/PackFilesContainer.java
-@@ -0,0 +1,220 @@
+@@ -0,0 +1,222 @@
 +// Fiddle - read packs - pack files - provider interface
 +
 +package org.fiddlemc.fiddle.pack.read.filesprovider;
@@ -392,14 +408,15 @@ index 0000000000000000000000000000000000000000..a37ea02af73c1e912ffaf2834cae7713
 +    }
 +
 +    static <T extends FileInPack> @Nullable T getByNameOutOfFiles(Stream<T> files, String name) {
-+        return files.filter(file -> {
++        return FileInPack.filterOutSystemFilesAndDirectories(files.filter(file -> {
 +            try {
 +                if (file.getName().equals(name)) {
 +                    return true;
 +                }
-+            } catch (PackException ignored) {}
++            } catch (PackException ignored) {
++            }
 +            return false;
-+        }).findFirst().orElse(null);
++        })).findFirst().orElse(null);
 +    }
 +
 +    static <T extends FileInPack> @Nullable T getByNameOutOfFiles(Iterable<T> files, String name) {
@@ -408,7 +425,8 @@ index 0000000000000000000000000000000000000000..a37ea02af73c1e912ffaf2834cae7713
 +                if (file.getName().equals(name)) {
 +                    return file;
 +                }
-+            } catch (PackException ignored) {}
++            } catch (PackException ignored) {
++            }
 +        }
 +        return null;
 +    }

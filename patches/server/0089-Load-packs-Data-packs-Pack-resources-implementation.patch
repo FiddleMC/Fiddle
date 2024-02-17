@@ -41,10 +41,10 @@ index c6e897377a80133df3039394a66e3fcc30886675..29e03b22f44306c5d8b91283c6994184
      }
 diff --git a/src/main/java/org/fiddlemc/fiddle/pack/load/data/FiddlePackResources.java b/src/main/java/org/fiddlemc/fiddle/pack/load/data/FiddlePackResources.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..24579d95613f30f40b48b29145df27a2f8d4c341
+index 0000000000000000000000000000000000000000..afb649d174430dd064bd4da06b945b1d82893ef5
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/pack/load/data/FiddlePackResources.java
-@@ -0,0 +1,200 @@
+@@ -0,0 +1,199 @@
 +// Fiddle - load packs - data packs - pack resources
 +
 +package org.fiddlemc.fiddle.pack.load.data;
@@ -71,7 +71,6 @@ index 0000000000000000000000000000000000000000..24579d95613f30f40b48b29145df27a2
 +import org.slf4j.Logger;
 +
 +import javax.annotation.Nullable;
-+import java.io.IOException;
 +import java.io.InputStream;
 +import java.util.*;
 +
