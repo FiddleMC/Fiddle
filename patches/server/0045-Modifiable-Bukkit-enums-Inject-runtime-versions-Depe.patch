@@ -8,7 +8,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 8ba9e9577dbc8cc597183fe5647335cfa76891c5..cdd722220aa4b12b4f2ccac5dccc606e8528e497 100644
+index e6da4f6be4b6776e88fd7c2c5d77ad4d30c4418b..a6642f9992bacca9d1b5f523062e10987e0c1f31 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -62,6 +62,8 @@ dependencies {
@@ -16,7 +16,7 @@ index 8ba9e9577dbc8cc597183fe5647335cfa76891c5..cdd722220aa4b12b4f2ccac5dccc606e
      testImplementation("org.hamcrest:hamcrest:2.2")
      testImplementation("org.mockito:mockito-core:5.5.0")
 +
-+    implementation("net.bytebuddy:byte-buddy:1.14.11") // Fiddle - modifiable Bukkit enums - inject runtime versions - depend on ByteBuddy
++    implementation("net.bytebuddy:byte-buddy:1.14.12") // Fiddle - modifiable Bukkit enums - inject runtime versions - depend on ByteBuddy
  }
  
  val craftbukkitPackageVersion = "1_20_R3" // Paper

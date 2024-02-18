@@ -84,7 +84,7 @@ index f5b71bb88fa0d277e280307577008a70aa6d102d..4c3591ac2badab50fee81afe4db2f5ca
      @Nullable
      public static Material matchMaterial(@NotNull final String name, boolean legacyName) {
 diff --git a/src/main/java/org/fiddlemc/fiddle/material/MaterialNameAndKeyConversion.java b/src/main/java/org/fiddlemc/fiddle/material/MaterialNameAndKeyConversion.java
-index 3c992c62764cb54e36a0409dd922dc48aaef1928..5a72421d3e60d493f0f2b6a0a3f75c078476d215 100644
+index e8e2bb441ad21cd86e5d2cece263c9d5c26f12ec..3f0d813bcdedeaa947a767266846425df824576d 100644
 --- a/src/main/java/org/fiddlemc/fiddle/material/MaterialNameAndKeyConversion.java
 +++ b/src/main/java/org/fiddlemc/fiddle/material/MaterialNameAndKeyConversion.java
 @@ -43,6 +43,121 @@ public final class MaterialNameAndKeyConversion {
@@ -209,7 +209,7 @@ index 3c992c62764cb54e36a0409dd922dc48aaef1928..5a72421d3e60d493f0f2b6a0a3f75c07
      // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - key
      /**
       * @throws IllegalArgumentException If the given {@code material} is {@linkplain Material#isLegacy() legacy}.
-@@ -86,7 +201,20 @@ public final class MaterialNameAndKeyConversion {
+@@ -93,7 +208,20 @@ public final class MaterialNameAndKeyConversion {
       */
      public static @org.jetbrains.annotations.Nullable Material matchMaterial(final String name, boolean legacyName) {
          // Based on the original org.bukkit.Material#matchMaterial(String, boolean)

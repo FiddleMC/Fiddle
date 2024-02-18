@@ -7,13 +7,13 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index cdd722220aa4b12b4f2ccac5dccc606e8528e497..9ce56741e92ed69d9ee9e3017d7fe9a9f7cc572b 100644
+index a6642f9992bacca9d1b5f523062e10987e0c1f31..8c39e06c0902ec37fe7621f4b09ec1fdf29e77c9 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -64,6 +64,14 @@ dependencies {
      testImplementation("org.mockito:mockito-core:5.5.0")
  
-     implementation("net.bytebuddy:byte-buddy:1.14.11") // Fiddle - modifiable Bukkit enums - inject runtime versions - depend on ByteBuddy
+     implementation("net.bytebuddy:byte-buddy:1.14.12") // Fiddle - modifiable Bukkit enums - inject runtime versions - depend on ByteBuddy
 +    // Fiddle start - read packs - depend on 7-Zip-JBinding
 +    implementation("net.sf.sevenzipjbinding:sevenzipjbinding:16.02-2.01")
 +    implementation("net.sf.sevenzipjbinding:sevenzipjbinding-all-platforms:16.02-2.01")

@@ -10,10 +10,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index 8e458f20e8abd133e5ad7e977e541f9292323cf5..c88336f4d2590387dbe4dc2f78f1283743275461 100644
+index 89f95494d276f54fe753eb3caa35e2cc58c1ffa3..9f2c74ca4fbb740e298c88ae47a1a36a8436582f 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
-@@ -200,6 +200,16 @@ public class Main {
+@@ -152,6 +152,16 @@ public class Main {
              }
              // Fiddle end - read packs - prevent duplicate packs
  

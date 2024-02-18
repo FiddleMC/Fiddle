@@ -11,10 +11,10 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index 97bb0a847beddde90af8d69b9db50751bbf8e40f..1c7a11a8614eda03816d47c5c4461cbb0f085716 100644
+index 7b932fcee235acf2e7ee56003b90c84e7136c146..28c28156f130360953418baa5d2327aa34f62bb6 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
-@@ -283,6 +283,11 @@ public class Main {
+@@ -251,6 +251,11 @@ public class Main {
                  }).build())
                  .make()
                  .load(ClassLoader.getSystemClassLoader(), net.bytebuddy.dynamic.loading.ClassLoadingStrategy.Default.INJECTION);

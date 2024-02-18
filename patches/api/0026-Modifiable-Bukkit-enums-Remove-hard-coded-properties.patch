@@ -101,7 +101,7 @@ index 3b35bfb2d4610069f00617a25fc00f12fa92fd40..362baf8edfbf4a4e721c3884a382ef82
          Class[]::new,
          material -> {
 diff --git a/src/main/java/org/fiddlemc/fiddle/material/MaterialNameAndKeyConversion.java b/src/main/java/org/fiddlemc/fiddle/material/MaterialNameAndKeyConversion.java
-index 6573b10a9210a1598804a3da60542b10be993d67..3c992c62764cb54e36a0409dd922dc48aaef1928 100644
+index 6573b10a9210a1598804a3da60542b10be993d67..e8e2bb441ad21cd86e5d2cece263c9d5c26f12ec 100644
 --- a/src/main/java/org/fiddlemc/fiddle/material/MaterialNameAndKeyConversion.java
 +++ b/src/main/java/org/fiddlemc/fiddle/material/MaterialNameAndKeyConversion.java
 @@ -27,7 +27,23 @@ public final class MaterialNameAndKeyConversion {
@@ -128,7 +128,7 @@ index 6573b10a9210a1598804a3da60542b10be993d67..3c992c62764cb54e36a0409dd922dc48
      /**
       * @throws IllegalArgumentException If the given {@code material} is {@linkplain Material#isLegacy() legacy}.
       */
-@@ -37,4 +53,51 @@ public final class MaterialNameAndKeyConversion {
+@@ -37,4 +53,58 @@ public final class MaterialNameAndKeyConversion {
      }
      // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - key
  
@@ -138,6 +138,13 @@ index 6573b10a9210a1598804a3da60542b10be993d67..3c992c62764cb54e36a0409dd922dc48
 +    }
 +
 +    public static @org.jetbrains.annotations.Nullable Material getMaterial(String name, boolean legacyName) {
++        // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - make getMaterial behave like matchMaterial
++        // Edited: make getMaterial behave fully like matchMaterial
++        return matchMaterial(name, legacyName);
++    }
++
++    private static @org.jetbrains.annotations.Nullable Material getMaterialOriginal(String name, boolean legacyName) {
++        // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - make getMaterial behave like matchMaterial
 +        // Based on the original org.bukkit.Material#getMaterial(String, boolean)
 +        if (legacyName) {
 +            if (!name.startsWith(MaterialLegacyNameChecker.LEGACY_MATERIAL_PREFIX)) {
@@ -175,7 +182,7 @@ index 6573b10a9210a1598804a3da60542b10be993d67..3c992c62764cb54e36a0409dd922dc48
 +        filtered = filtered.toUpperCase(java.util.Locale.ENGLISH);
 +
 +        filtered = filtered.replaceAll("\\s+", "_").replaceAll("\\W", "");
-+        return getMaterial(filtered, legacyName);
++        return getMaterialOriginal(filtered, legacyName); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - make getMaterial behave like matchMaterial
 +    }
 +    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - matchMaterial
 +
