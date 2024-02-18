@@ -10,6 +10,21 @@ This patch has an analogous patch in `fiddle-api` with the same name.
 License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
+diff --git a/src/main/java/org/fiddlemc/fiddle/bytebuddy/package-info.java b/src/main/java/org/fiddlemc/fiddle/bytebuddy/package-info.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..d59a43ab5087f87d434c2a8d63ea48ea31344ea2
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/bytebuddy/package-info.java
+@@ -0,0 +1,9 @@
++@ParametersAreNonnullByDefault
++@MethodsReturnNonnullByDefault
++@FieldsAreNonnullByDefault
++package org.fiddlemc.fiddle.bytebuddy;
++
++import net.minecraft.FieldsAreNonnullByDefault;
++import net.minecraft.MethodsReturnNonnullByDefault;
++
++import javax.annotation.ParametersAreNonnullByDefault;
 diff --git a/src/main/java/org/fiddlemc/fiddle/configuration/package-info.java b/src/main/java/org/fiddlemc/fiddle/configuration/package-info.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..4b5406690afdcaaf33bba4f8055a6b99693e01ff

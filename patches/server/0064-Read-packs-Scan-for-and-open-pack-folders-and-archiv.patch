@@ -7,7 +7,7 @@ License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
-index 67bbd4d0d895c400110bc743c40afab8f3b2f243..6f1e10bb4bf6ea99a7287a99a350830caa181a10 100644
+index b605fdd91a3f6ee204ab7e710effff2e6a798c63..57a1cae73e8fa9e01c4852037596e5bae9ea206d 100644
 --- a/src/main/java/net/minecraft/server/Main.java
 +++ b/src/main/java/net/minecraft/server/Main.java
 @@ -145,6 +145,8 @@ public class Main {
@@ -19,7 +19,7 @@ index 67bbd4d0d895c400110bc743c40afab8f3b2f243..6f1e10bb4bf6ea99a7287a99a350830c
              io.papermc.paper.plugin.PluginInitializerManager.load(optionset); // Paper
              Bootstrap.bootStrap();
              Bootstrap.validate();
-@@ -436,6 +438,15 @@ public class Main {
+@@ -422,6 +424,15 @@ public class Main {
              }
  
              org.fiddlemc.fiddle.pack.read.StartupPackLoadPhase.endStartupLoadPhase(); // Fiddle - read packs - startup load phase - end after initial read
