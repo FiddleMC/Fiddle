@@ -16,10 +16,10 @@ Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/java/org/fiddlemc/fiddle/material/OrderedEmptyMaterial.java b/src/main/java/org/fiddlemc/fiddle/material/OrderedEmptyMaterial.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..1f399711d91de87bf40e06536fdd2fcf9ff25450
+index 0000000000000000000000000000000000000000..71aa6c5362964634c6b27f088146ed5380f38685
 --- /dev/null
 +++ b/src/main/java/org/fiddlemc/fiddle/material/OrderedEmptyMaterial.java
-@@ -0,0 +1,1937 @@
+@@ -0,0 +1,1943 @@
 +// Fiddle start - modifiable Bukkit enums - Material - remember original order
 +
 +package org.fiddlemc.fiddle.material;
@@ -27,12 +27,18 @@ index 0000000000000000000000000000000000000000..1f399711d91de87bf40e06536fdd2fcf
 +import org.bukkit.Material;
 +
 +/**
-+ * This is an enum with the same order of names as the original {@link Material} source file.
-+ * This can be used at runtime to make sure the runtime {@link Material} version has the same order of values
-+ * as the original source file.
-+ * @deprecated For internal use only.
++ * Do not use for any reason.
++ * This enum is for internal purposes only:
++ * use {@link Material} instead.
++ * <p>
++ *     An enum with the same order of names as the original {@link Material} source file.
++ *     This can be used at runtime to make sure the runtime {@link Material} version has the same order of values
++ *     as the original source file.
++ * </p>
++ *
++ * @apiNote Internal Use Only
 + */
-+@Deprecated(forRemoval = true)
++@org.jetbrains.annotations.ApiStatus.Internal
 +public enum OrderedEmptyMaterial {
 +    AIR,
 +    STONE,

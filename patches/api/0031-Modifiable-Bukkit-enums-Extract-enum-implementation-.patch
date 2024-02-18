@@ -657,30 +657,10 @@ index 80190abd184dddb08df8502adeb667d1809f8de0..297a9c95040b0d4f300b324a010cd3dc
      // Fiddle end - flags for vanilla content - API - item
  
 diff --git a/src/main/java/org/fiddlemc/fiddle/material/AbstractMaterial.java b/src/main/java/org/fiddlemc/fiddle/material/AbstractMaterial.java
-index c5232856b5537b21751f93d3b5d48c17c3fe9e83..f9fbb353553027e47e355b2a7742df1eac4aed19 100644
+index 5e427faae4728a91c59e937cac3ceb5c1629722d..5a087e947af45a21ec27fb2e37c7f27351712981 100644
 --- a/src/main/java/org/fiddlemc/fiddle/material/AbstractMaterial.java
 +++ b/src/main/java/org/fiddlemc/fiddle/material/AbstractMaterial.java
-@@ -8,9 +8,16 @@ import org.bukkit.Translatable;
- import org.jetbrains.annotations.NotNull;
- 
- /**
-- * An interface that provides default implementations for most {@link Material} methods.
-- * This interface, while it itself reference the {@link Material} class, can be loaded by a ClassLoader
-- * without the {@link Material} class being loaded.
-+ * Do not use for any reason.
-+ * This interface is for internal purposes only:
-+ * use {@link Material} instead.
-+ * <p>
-+ *     An interface that provides default implementations for most {@link Material} methods.
-+ *     This interface, while it itself reference the {@link Material} class, can be loaded by a ClassLoader
-+ *     without the {@link Material} class being loaded.
-+ * </p>
-+ *
-+ * @apiNote Internal Use Only
-  */
- public interface AbstractMaterial extends Keyed, Translatable, net.kyori.adventure.translation.Translatable {
- 
-@@ -18,4 +25,253 @@ public interface AbstractMaterial extends Keyed, Translatable, net.kyori.adventu
+@@ -26,4 +26,253 @@ public interface AbstractMaterial extends Keyed, Translatable, net.kyori.adventu
  
      @NotNull String name();
  
