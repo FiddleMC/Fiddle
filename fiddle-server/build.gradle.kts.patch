@@ -1,0 +1,230 @@
+--- a/paper-server/build.gradle.kts
++++ b/paper-server/build.gradle.kts
+@@ -1,14 +_,17 @@
+-import io.papermc.fill.model.BuildChannel
++// import io.papermc.fill.model.BuildChannel // Fiddle - Project setup - Remove Fill
+ import io.papermc.paperweight.attribute.DevBundleOutput
+ import io.papermc.paperweight.util.*
+ import java.time.Instant
++import kotlin.io.path.deleteRecursively
++import kotlin.io.path.readLines
++import kotlin.io.path.writeLines
+ 
+ plugins {
+     `java-library`
+     `maven-publish`
+     idea
+     id("io.papermc.paperweight.core")
+-    id("io.papermc.fill.gradle") version "1.0.10"
++    // id("io.papermc.fill.gradle") version "1.0.10" // Fiddle - Project setup - Remove Fill
+ }
+ 
+ val paperMavenPublicUrl = "https://repo.papermc.io/repository/maven-public/"
+@@ -22,6 +_,18 @@
+     minecraftVersion = providers.gradleProperty("mcVersion")
+     gitFilePatches = false
+ 
++    // Fiddle start - Project setup - Set up Paperweight
++    val fiddle = forks.register("fiddle") {
++        upstream.patchDir("paperServer") {
++            upstreamPath = "paper-server"
++            excludes = setOf("src/minecraft", "patches", "build.gradle.kts")
++            patchesDir = rootDirectory.dir("fiddle-server/paper-patches")
++            outputDir = rootDirectory.dir("paper-server")
++        }
++    }
++    activeFork = fiddle
++    // Fiddle end - Project setup - Set up Paperweight
++
+     spigot {
+         enabled = true
+         buildDataRef = "17f77cee7117ab9d6175f088ae8962bfd04e61a9"
+@@ -56,6 +_,7 @@
+     @get:Inject
+     abstract val archiveOperations: ArchiveOperations
+ }
++
+ val services = objects.newInstance<Services>()
+ 
+ if (project.providers.gradleProperty("publishDevBundle").isPresent) {
+@@ -104,7 +_,21 @@
+     }
+ }
+ 
+-val log4jPlugins = sourceSets.create("log4jPlugins")
++// Fiddle start - Project setup - Set project directory references
++sourceSets {
++    main {
++        java { srcDir("../paper-server/src/main/java") }
++        resources { srcDir("../paper-server/src/main/resources") }
++    }
++    test {
++        java { srcDir("../paper-server/src/test/java") }
++        resources { srcDir("../paper-server/src/test/resources") }
++    }
++}
++val log4jPlugins = sourceSets.create("log4jPlugins") {
++    java { srcDir("../paper-server/src/log4jPlugins/java") }
++}
++// Fiddle end - Project setup - Set project directory references
+ configurations.named(log4jPlugins.compileClasspathConfigurationName) {
+     extendsFrom(configurations.compileClasspath.get())
+ }
+@@ -117,6 +_,7 @@
+ 
+ // Configure mockito agent that is needed in newer java versions
+ val mockitoAgent = configurations.register("mockitoAgent")
++
+ abstract class MockitoAgentProvider : CommandLineArgumentProvider {
+     @get:CompileClasspath
+     abstract val fileCollection: ConfigurableFileCollection
+@@ -127,7 +_,7 @@
+ }
+ 
+ dependencies {
+-    implementation(project(":paper-api"))
++    implementation(project(":fiddle-api")) // Fiddle - Project setup - Set up Gradle project
+     implementation("ca.spottedleaf:concurrentutil:0.0.8")
+     implementation("org.jline:jline-terminal-ffm:3.27.1") // use ffm on java 22+
+     implementation("org.jline:jline-terminal-jni:3.27.1") // fall back to jni on java 21
+@@ -168,7 +_,9 @@
+     testImplementation("org.junit.platform:junit-platform-suite-engine:1.12.2")
+     testImplementation("org.hamcrest:hamcrest:2.2")
+     testImplementation("org.mockito:mockito-core:5.14.1")
+-    mockitoAgent("org.mockito:mockito-core:5.14.1") { isTransitive = false } // Configure mockito agent that is needed in newer java versions
++    mockitoAgent("org.mockito:mockito-core:5.14.1") {
++        isTransitive = false
++    } // Configure mockito agent that is needed in newer java versions
+     testImplementation("org.ow2.asm:asm-tree:9.8")
+     testImplementation("org.junit-pioneer:junit-pioneer:2.2.0") // CartesianTest
+ 
+@@ -191,21 +_,22 @@
+         val git = Git(rootProject.layout.projectDirectory.path)
+         val mcVersion = rootProject.providers.gradleProperty("mcVersion").get()
+         val build = System.getenv("BUILD_NUMBER") ?: null
+-        val buildTime = providers.environmentVariable("BUILD_STARTED_AT").map(Instant::parse).orElse(Instant.EPOCH).get()
++        val buildTime = if (build != null) Instant.now() else Instant.EPOCH // Purpur
+         val gitHash = git.exec(providers, "rev-parse", "--short=7", "HEAD").get().trim()
+         val implementationVersion = "$mcVersion-${build ?: "DEV"}-$gitHash"
+         val date = git.exec(providers, "show", "-s", "--format=%ci", gitHash).get().trim()
+         val gitBranch = git.exec(providers, "rev-parse", "--abbrev-ref", "HEAD").get().trim()
+         attributes(
+             "Main-Class" to "org.bukkit.craftbukkit.Main",
+-            "Implementation-Title" to "Paper",
++            "Implementation-Title" to "Fiddle", // Fiddle - Branding changes - Rename server brand
+             "Implementation-Version" to implementationVersion,
+-            "Implementation-Vendor" to date,
+-            "Specification-Title" to "Paper",
++            "Implementation-Build-Date" to date, // Fiddle - Project setup - Include Git date as "Implementation-Build-Date"
++            "Implementation-Vendor" to "FiddleMC & contributors", // Fiddle - Branding changes - Rename server brand
++            "Specification-Title" to "Fiddle", // Fiddle - Branding changes - Rename server brand
+             "Specification-Version" to project.version,
+-            "Specification-Vendor" to "Paper Team",
+-            "Brand-Id" to "papermc:paper",
+-            "Brand-Name" to "Paper",
++            "Specification-Vendor" to "FiddleMC & contributors", // Fiddle - Branding changes - Rename server brand
++            "Brand-Id" to "fiddlemc:fiddle", // Fiddle - Branding changes - Rename server brand
++            "Brand-Name" to "Fiddle", // Fiddle - Branding changes - Rename server brand
+             "Build-Number" to (build ?: ""),
+             "Build-Time" to buildTime.toString(),
+             "Git-Branch" to gitBranch,
+@@ -264,7 +_,8 @@
+     jvmArgumentProviders.add(provider)
+ }
+ 
+-val generatedDir: java.nio.file.Path = layout.projectDirectory.dir("src/generated/java").asFile.toPath()
++val generatedDir: java.nio.file.Path =
++    layout.projectDirectory.dir("../paper-server/src/generated/java").asFile.toPath() // Fiddle - Project setup - Set project directory references
+ idea {
+     module {
+         generatedSourceDirs.add(generatedDir.toFile())
+@@ -356,6 +_,21 @@
+     mainClass.set(null as String?)
+ }
+ 
++// Fiddle start - Project setup - Hide annoying compilation warnings
++tasks.withType<JavaCompile> {
++    options.compilerArgs.addAll(
++        listOf(
++            "-Xlint:-dep-ann",
++            "-Xlint:-deprecation",
++            "-Xlint:-module",
++            "-Xlint:-removal",
++        )
++    )
++}
++// Fiddle end - Project setup - Hide annoying compilation warnings
++
++// Fiddle start - Project setup - Remove Fill
++/*
+ fill {
+     project("paper")
+     versionFamily(paperweight.minecraftVersion.map { it.split(".", "-").takeWhile { part -> part.toIntOrNull() != null }.take(2).joinToString(".") })
+@@ -372,3 +_,67 @@
+         }
+     }
+ }
++*/
++// Fiddle end - Project setup - Remove Fill
++
++// Fiddle - Modifiable Bukkit enums - Inject runtime versions - Add module opens to server JAR
++val extendedManifestElements: List<Pair<String, String>> = listOf(
++    "Add-Opens" to "java.base/java.lang"
++)
++
++if (extendedManifestElements.isNotEmpty()) {
++    for (jar in listOf(
++        "server" to null,
++        "bundler" to "mojmap",
++        // "paperclip" to "mojmap", // Currently not necessary since it inherits from the bundler JAR
++        "bundler" to "reobf",
++        // "paperclip" to "reobf", // Currently not necessary since it inherits from the bundler JAR
++    )) {
++        val taskName =
++            if (jar.first == "server")
++                "includeMappings"
++            else "create${
++                jar.second!!.replaceFirstChar(Char::uppercase)
++            }${
++                jar.first.replaceFirstChar(Char::uppercase)
++            }Jar"
++        tasks.named(taskName) {
++            doLast {
++
++                project.logger.lifecycle("Adding extended manifest elements to ${jar.second?.let { "$it " } ?: ""}${jar.first} JAR...")
++
++                val jarName = listOfNotNull(
++                    rootProject.name,
++                    jar.first,
++                    project.version,
++                    jar.second,
++                ).joinToString("-") + ".jar"
++
++                val jarFile = layout.buildDirectory.file("libs/$jarName").get().asFile.toPath()
++
++                val tempUnpackDir = findOutputDir(jarFile)
++
++                try {
++                    unzip(jarFile, tempUnpackDir)
++
++                    val manifestFile = tempUnpackDir.resolve("META-INF/MANIFEST.MF")
++                    manifestFile.writeLines(ArrayList(manifestFile.readLines()).also { lines ->
++                        lines.addAll(
++                            lines.indexOfFirst { line -> line.startsWith("Main-Class:") } + 1,
++                            extendedManifestElements.map { "${it.first}: ${it.second}" }
++                        )
++                    })
++
++                    ensureDeleted(jarFile)
++
++                    zip(tempUnpackDir, jarFile)
++                } finally {
++                    @OptIn(kotlin.io.path.ExperimentalPathApi::class)
++                    tempUnpackDir.deleteRecursively()
++                }
++
++            }
++        }
++    }
++}
++// Fiddle end - Modifiable Bukkit enums - Inject runtime versions - Add module opens to server JAR

@@ -1,27 +1,38 @@
-.gradle/
-build/
+# JVM crash related
+core.*
+hs_err_pid*
 
-# Eclipse stuff
+# Intellij
+/.idea/*
+!/.idea/runConfigurations
+!/.idea/icon.svg
+*.iml
+*.ipr
+*.iws
+out/
+
+# Eclipse
 .classpath
 .project
 .settings/
-
-# VSCode stuff
-.vscode/
 
 # netbeans
 nbproject/
 nbactions.xml
 
+# Gradle
+!gradle-wrapper.jar
+.gradle/
+build/
+*/build/
+
 # we use maven!
 build.xml
 
-# maven
+# Maven
+log/
 target/
 dependency-reduced-pom.xml
-
-# vim
-.*.sw[a-p]
 
 # various other potential build files
 build/
@@ -29,42 +40,23 @@ bin/
 dist/
 manifest.mf
 
-/work/Temp/
-work/1.*
-work/Minecraft
-work/BuildData
-work/Bukkit
-work/CraftBukkit
-work/Paperclip
-work/Spigot
-work/Spigot-Server
-work/Spigot-API
-work/*.jar
-work/test-server
-work/ForgeFlower
-
-# Mac filesystem dust
+# Mac
 .DS_Store/
 .DS_Store
 
-# intellij
-*.iml
-*.ipr
-*.iws
-.idea/
-out/
-
-# JetBrains Fleet
-.fleet/
+# vim
+.*.sw[a-p]
 
 # Linux temp files
 *~
 
 # other stuff
-run/
+/run
 
-fiddle-server
-fiddle-api
-paper-api-generator
-
-!gradle/wrapper/gradle-wrapper.jar
+/fiddle-server/build.gradle.kts
+/fiddle-server/src/minecraft
+/paper-server
+/fiddle-api/build.gradle.kts
+/paper-api
+*.jar
+test-plugin.settings.gradle.kts

@@ -1,51 +1,72 @@
-import io.papermc.paperweight.util.path
-import org.gradle.configurationcache.extensions.capitalized
-import kotlin.io.path.deleteRecursively
-import kotlin.io.path.readLines
-import kotlin.io.path.writeLines
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
-    java
-    `maven-publish`
-
-    // Nothing special about this, just keep it up to date
-    id("com.github.johnrengelman.shadow") version "8.1.1" apply false
-
-    // In general, keep this version in sync with upstream. Sometimes a newer version than upstream might work, but an older version is extremely likely to break.
-    id("io.papermc.paperweight.patcher") version "1.5.11"
-    id("com.github.ManifestClasspath") version "0.1.0-RELEASE"
+    id("io.papermc.paperweight.patcher") version "2.0.0-beta.19"
 }
 
-val paperMavenPublicUrl = "https://repo.papermc.io/repository/maven-public/"
+paperweight {
+    upstreams.paper {
+        ref = providers.gradleProperty("paperRef")
 
-repositories {
-    mavenCentral()
-    maven(paperMavenPublicUrl) {
-        content { onlyForConfigurations(configurations.paperclip.name) }
-    }
-}
-
-dependencies {
-    remapper("net.fabricmc:tiny-remapper:0.8.10:fat") // Must be kept in sync with upstream
-    decompiler("net.minecraftforge:forgeflower:2.0.627.2") // Must be kept in sync with upstream
-    paperclip("io.papermc:paperclip:3.0.3") // You probably want this to be kept in sync with upstream
-}
-
-allprojects {
-    apply(plugin = "java")
-    apply(plugin = "maven-publish")
-
-    java {
-        toolchain {
-            languageVersion = JavaLanguageVersion.of(17)
+        patchFile {
+            path = "paper-server/build.gradle.kts"
+            // Fiddle start - Project setup - Set up Paperweight
+            outputFile = file("fiddle-server/build.gradle.kts")
+            patchFile = file("fiddle-server/build.gradle.kts.patch")
+            // Fiddle end - Project setup - Set up Paperweight
+        }
+        patchFile {
+            path = "paper-api/build.gradle.kts"
+            // Fiddle start - Project setup - Set up Paperweight
+            outputFile = file("fiddle-api/build.gradle.kts")
+            patchFile = file("fiddle-api/build.gradle.kts.patch")
+            // Fiddle end - Project setup - Set up Paperweight
+        }
+        patchDir("paperApi") {
+            upstreamPath = "paper-api"
+            excludes = setOf("build.gradle.kts")
+            patchesDir = file("fiddle-api/paper-patches") // Fiddle - Project setup - Set up Paperweight
+            outputDir = file("paper-api")
         }
     }
 }
 
+val paperMavenPublicUrl = "https://repo.papermc.io/repository/maven-public/"
+
 subprojects {
+    apply(plugin = "java-library")
+    apply(plugin = "maven-publish")
+
+    extensions.configure<JavaPluginExtension> {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(21)
+        }
+    }
+
+    repositories {
+        mavenCentral()
+        maven(paperMavenPublicUrl)
+    }
+
+    tasks.withType<AbstractArchiveTask>().configureEach {
+        isPreserveFileTimestamps = false
+        isReproducibleFileOrder = true
+    }
     tasks.withType<JavaCompile> {
         options.encoding = Charsets.UTF_8.name()
-        options.release = 17
+        options.release = 21
+        options.isFork = true
+        // Fiddle start - Project setup - Hide annoying compilation warnings
+        options.compilerArgs.addAll(
+            listOf(
+                "-Xlint:-dep-ann",
+                "-Xlint:-deprecation",
+                "-Xlint:-module",
+                "-Xlint:-removal",
+            )
+        )
+        // Fiddle end - Project setup - Hide annoying compilation warnings
     }
     tasks.withType<Javadoc> {
         options.encoding = Charsets.UTF_8.name()
@@ -53,124 +74,22 @@ subprojects {
     tasks.withType<ProcessResources> {
         filteringCharset = Charsets.UTF_8.name()
     }
-
-    repositories {
-        mavenCentral()
-        maven(paperMavenPublicUrl)
-    }
-}
-
-paperweight {
-    serverProject = project(":fiddle-server") // Fiddle - build changes
-
-    remapRepo = paperMavenPublicUrl
-    decompileRepo = paperMavenPublicUrl
-
-    usePaperUpstream(providers.gradleProperty("paperRef")) {
-        withPaperPatcher {
-            apiPatchDir = layout.projectDirectory.dir("patches/api")
-            apiOutputDir = layout.projectDirectory.dir("fiddle-api") // Fiddle - build changes
-
-            serverPatchDir = layout.projectDirectory.dir("patches/server")
-            serverOutputDir = layout.projectDirectory.dir("fiddle-server") // Fiddle - build changes
-        }
-        patchTasks.register("generatedApi") {
-            isBareDirectory = true
-            upstreamDirPath = "paper-api-generator/generated"
-            patchDir = layout.projectDirectory.dir("patches/generatedApi")
-            outputDir = layout.projectDirectory.dir("paper-api-generator/generated")
+    tasks.withType<Test> {
+        testLogging {
+            showStackTraces = true
+            exceptionFormat = TestExceptionFormat.FULL
+            events(TestLogEvent.STANDARD_OUT)
         }
     }
-}
 
-// Uncomment while updating for a new Minecraft version
-//tasks.withType<CollectATsFromPatches> {
-//    extraPatchDir.set(layout.projectDirectory.dir("patches/unapplied/server"))
-//}
-
-// Fiddle start - branding changes - license - package into jar
-for (classifier in arrayOf("mojmap", "reobf")) {
-    // Based on io.papermc.paperweight.taskcontainers.BundlerJarTasks
-    tasks.named("create${classifier.capitalized()}PaperclipJar") {
-        doLast {
-
-            // Based on io.papermc.paperweight.taskcontainers.BundlerJarTasks
-            val jarName = listOfNotNull(
-                project.name,
-                "paperclip",
-                project.version,
-                classifier
-            ).joinToString("-") + ".jar"
-
-            // Based on io.papermc.paperweight.taskcontainers.BundlerJarTasks
-            val zipFile = layout.buildDirectory.file("libs/$jarName").path
-
-            val rootDir = io.papermc.paperweight.util.findOutputDir(zipFile)
-
-            try {
-                io.papermc.paperweight.util.unzip(zipFile, rootDir)
-
-                val licenseFileName = "LICENSE.txt"
-                project(":fiddle-server").projectDir.resolve(licenseFileName).copyTo(rootDir.resolve(licenseFileName).toFile())
-
-                io.papermc.paperweight.util.ensureDeleted(zipFile)
-
-                io.papermc.paperweight.util.zip(rootDir, zipFile)
-            } finally {
-                @OptIn(kotlin.io.path.ExperimentalPathApi::class)
-                rootDir.deleteRecursively()
+    extensions.configure<PublishingExtension> {
+        repositories {
+            /*
+            maven("https://repo.papermc.io/repository/maven-snapshots/") {
+                name = "paperSnapshots"
+                credentials(PasswordCredentials::class)
             }
-
+             */
         }
     }
 }
-// Fiddle end - branding changes - license - package into jar
-
-// Fiddle start - extend jar manifest
-val extendedManifestElements: List<Pair<String, String>> = listOf(
-    "Add-Opens" to "java.base/java.lang" // Fiddle - modifiable Bukkit enums - inject runtime versions - add module opens to server jar
-)
-
-if (extendedManifestElements.isNotEmpty()) {
-    for (classifier in arrayOf("mojmap", "reobf")) {
-        // Based on io.papermc.paperweight.taskcontainers.BundlerJarTasks
-        tasks.named("create${classifier.capitalized()}BundlerJar") {
-            doLast {
-
-                // Based on io.papermc.paperweight.taskcontainers.BundlerJarTasks
-                val jarName = listOfNotNull(
-                    project.name,
-                    "bundler",
-                    project.version,
-                    classifier
-                ).joinToString("-") + ".jar"
-
-                // Based on io.papermc.paperweight.taskcontainers.BundlerJarTasks
-                val zipFile = layout.buildDirectory.file("libs/$jarName").path
-
-                val rootDir = io.papermc.paperweight.util.findOutputDir(zipFile)
-
-                try {
-                    io.papermc.paperweight.util.unzip(zipFile, rootDir)
-
-                    val manifestFile = rootDir.resolve("META-INF/MANIFEST.MF")
-                    manifestFile.writeLines(ArrayList(manifestFile.readLines()).apply {
-                        addAll(
-                            indexOfFirst { it.startsWith("Main-Class:") } + 1,
-                            extendedManifestElements.map { "${it.first}: ${it.second}" }
-                        )
-                    })
-
-                    io.papermc.paperweight.util.ensureDeleted(zipFile)
-
-                    io.papermc.paperweight.util.zip(rootDir, zipFile)
-                } finally {
-                    @OptIn(kotlin.io.path.ExperimentalPathApi::class)
-                    rootDir.deleteRecursively()
-                }
-
-            }
-        }
-    }
-}
-// Fiddle end - extend jar manifest

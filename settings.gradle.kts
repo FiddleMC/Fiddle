@@ -1,5 +1,3 @@
-import java.util.Locale
-
 pluginManagement {
     repositories {
         gradlePluginPortal()
@@ -8,11 +6,11 @@ pluginManagement {
 }
 
 plugins {
-    id("org.gradle.toolchains.foojay-resolver-convention") version "0.7.0"
+    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
+// Fiddle start - Project setup - Check for Git
 if (!file(".git").exists()) {
-    // Fiddle start - build changes
     val errorText = """
         
         =====================[ ERROR ]=====================
@@ -29,16 +27,13 @@ if (!file(".git").exists()) {
          for further information on building and modifying Paper forks.
         ===================================================
     """.trimIndent()
-    // Fiddle end - build changes
     error(errorText)
 }
+// Fiddle end - Project setup - Check for Git
 
-// Fiddle start - build changes
+// Fiddle start - Set up Gradle project
 rootProject.name = "fiddle"
 
-for (name in listOf("fiddle-api", "fiddle-server")) {
-    // Fiddle end - build changes
-    val projName = name.lowercase(Locale.ENGLISH)
-    include(projName)
-    findProject(":$projName")!!.projectDir = file(name)
-}
+include("fiddle-api")
+include("fiddle-server")
+// Fiddle end - Set up Gradle project
