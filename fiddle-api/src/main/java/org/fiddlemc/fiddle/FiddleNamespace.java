@@ -1,5 +1,3 @@
-// Fiddle - Define namespace
-
 package org.fiddlemc.fiddle;
 
 import org.bukkit.NamespacedKey;

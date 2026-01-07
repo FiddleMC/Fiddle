@@ -1,0 +1,30 @@
+--- a/src/main/java/io/papermc/paper/ServerBuildInfoImpl.java
++++ b/src/main/java/io/papermc/paper/ServerBuildInfoImpl.java
+@@ -42,15 +_,12 @@
+         this(
+             getManifestAttribute(manifest, ATTRIBUTE_BRAND_ID)
+                 .map(Key::key)
+-                .orElse(BRAND_PAPER_ID),
++                .orElse(org.fiddlemc.fiddle.FiddleBrandId.BRAND_FIDDLE_ID), // Fiddle - Branding changes - Rename server brand
+             getManifestAttribute(manifest, ATTRIBUTE_BRAND_NAME)
+-                .orElse(BRAND_PAPER_NAME),
++                .orElse(org.fiddlemc.fiddle.FiddleBrandName.BRAND_FIDDLE_NAME), // Fiddle - Branding changes - Rename server brand
+             SharedConstants.getCurrentVersion().id(),
+             SharedConstants.getCurrentVersion().name(),
+-            getManifestAttribute(manifest, ATTRIBUTE_BUILD_NUMBER)
+-                .map(Integer::parseInt)
+-                .map(OptionalInt::of)
+-                .orElse(OptionalInt.empty()),
++            OptionalInt.empty(), // Fiddle - Branding changes - Version fetcher - Do not attempt to get build number
+             getManifestAttribute(manifest, ATTRIBUTE_BUILD_TIME)
+                 .map(Instant::parse)
+                 .orElse(Main.BOOT_TIME),
+@@ -61,7 +_,7 @@
+ 
+     @Override
+     public boolean isBrandCompatible(final @NotNull Key brandId) {
+-        return brandId.equals(this.brandId);
++        return brandId.equals(this.brandId) || brandId.equals(BRAND_PAPER_ID); // Fiddle - Branding changes - Rename server brand - Fiddles does not break public Paper APIs
+     }
+ 
+     @Override

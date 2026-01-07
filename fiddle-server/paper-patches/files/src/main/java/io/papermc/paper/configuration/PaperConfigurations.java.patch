@@ -1,0 +1,27 @@
+--- a/src/main/java/io/papermc/paper/configuration/PaperConfigurations.java
++++ b/src/main/java/io/papermc/paper/configuration/PaperConfigurations.java
+@@ -178,7 +_,7 @@
+             .defaultOptions(PaperConfigurations::defaultOptions);
+     }
+ 
+-    private static ConfigurationOptions defaultOptions(ConfigurationOptions options) {
++    public static ConfigurationOptions defaultOptions(ConfigurationOptions options) { // Fiddle - Configuration - Make public
+         return options.serializers(builder -> builder
+             .register(MapSerializer.TYPE, new MapSerializer(false))
+             .register(new EnumValueSerializer())
+@@ -340,13 +_,13 @@
+         }
+     }
+ 
+-    private static List<Definition<? extends Annotation, ?, ? extends FieldProcessor.Factory<?, ?>>> defaultFieldProcessors() {
++    public static List<Definition<? extends Annotation, ?, ? extends FieldProcessor.Factory<?, ?>>> defaultFieldProcessors() { // Fiddle - Configuration - Make public
+         return List.of(
+             MergeMap.DEFINITION
+         );
+     }
+ 
+-    private static ContextMap createWorldContextMap(ServerLevel level) {
++    public static ContextMap createWorldContextMap(ServerLevel level) { // Fiddle - Configuration - Make public
+         return createWorldContextMap(level.levelStorageAccess.levelDirectory.path(), level.serverLevelData.getLevelName(), level.dimension().identifier(), level.spigotConfig, level.registryAccess(), level.getGameRules());
+     }
+ 

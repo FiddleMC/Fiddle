@@ -1,0 +1,14 @@
+--- a/net/minecraft/server/Main.java
++++ b/net/minecraft/server/Main.java
+@@ -105,6 +_,11 @@
+                 JvmProfiler.INSTANCE.start(Environment.SERVER);
+             }
+ 
++            // Fiddle start - Configuration - Load global configuration before bootstrap
++            var fiddleConfigurations = org.fiddlemc.fiddle.configuration.FiddleConfigurations.get(optionSet);
++            fiddleConfigurations.initializeGlobalConfiguration(null);
++            // Fiddle end - Configuration - Load global configuration before bootstrap
++
+             io.papermc.paper.plugin.PluginInitializerManager.load(optionSet); // Paper
+             Bootstrap.bootStrap();
+             Bootstrap.validate();

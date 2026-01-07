@@ -1,0 +1,22 @@
+--- a/net/minecraft/server/Services.java
++++ b/net/minecraft/server/Services.java
+@@ -44,7 +_,7 @@
+         UserNameToIdResolver userNameToIdResolver = new CachedUserNameToIdResolver(gameProfileRepository, userCacheFile); // Paper
+         // Paper start - load paper config files from cli options
+         final java.nio.file.Path legacyConfigPath = ((File) optionSet.valueOf("paper-settings")).toPath();
+-        final java.nio.file.Path configDirPath = ((File) optionSet.valueOf("paper-settings-directory")).toPath();
++        final java.nio.file.Path configDirPath = getConfigDirPath(optionSet); // Fiddle - Configuration - Load global configuration before bootstrap - Extract config dir path getter to method
+         io.papermc.paper.configuration.PaperConfigurations paperConfigurations = io.papermc.paper.configuration.PaperConfigurations.setup(legacyConfigPath, configDirPath, profileRepository.toPath(), (File) optionSet.valueOf("spigot-settings"));
+         PaperServices paperServices = new PaperServices(
+             paperConfigurations,
+@@ -62,4 +_,10 @@
+     public boolean canValidateProfileKeys() {
+         return !this.servicesKeySet.keys(ServicesKeyType.PROFILE_KEY).isEmpty();
+     }
++
++    // Fiddle start - Configuration - Load global configuration before bootstrap - Extract config dir path getter to method
++    public static java.nio.file.Path getConfigDirPath(joptsimple.OptionSet optionSet) {
++        return ((File) optionSet.valueOf("paper-settings-directory")).toPath();
++    }
++    // Fiddle end - Configuration - Load global configuration before bootstrap - Extract config dir path getter to method
+ }

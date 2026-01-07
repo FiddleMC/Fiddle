@@ -1,0 +1,11 @@
+--- a/src/main/java/io/papermc/paper/configuration/mapping/InnerClassFieldDiscoverer.java
++++ b/src/main/java/io/papermc/paper/configuration/mapping/InnerClassFieldDiscoverer.java
+@@ -81,7 +_,7 @@
+     }
+ 
+     @SuppressWarnings("unchecked")
+-    private static InnerClassFieldDiscoverer create(final Map<Class<?>, Object> overrides, final List<Definition<?, ?, ? extends FieldProcessor.Factory<?, ?>>> fieldProcessors) {
++    public static InnerClassFieldDiscoverer create(final Map<Class<?>, Object> overrides, final List<Definition<?, ?, ? extends FieldProcessor.Factory<?, ?>>> fieldProcessors) { // Fiddle - Configuration - Make public
+         final Map<Class<? extends Annotation>, List<Definition<?, ?, ? extends FieldProcessor.Factory<?, ?>>>> processors = new LinkedHashMap<>();
+         for (final Definition<?, ?, ? extends FieldProcessor.Factory<?, ?>> definition : fieldProcessors) {
+             processors.computeIfAbsent(definition.annotation(), k -> new ArrayList<>()).add(definition);
