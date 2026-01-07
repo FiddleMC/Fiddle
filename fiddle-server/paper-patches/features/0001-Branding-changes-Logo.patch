@@ -2,7 +2,16 @@ From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Martijn Muijsers <martijnmuijsers@live.nl>
 Date: Tue, 6 Jan 2026 21:50:14 +0100
 Subject: [PATCH] Branding changes - Logo
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
+Replaces Paper logo with the Fiddle logo.
+This logo image file will be packaged into the server JAR and used as the application icon.
+
+No license is given for image files.
+Image files are copyright (©) their respective authors.
+Fiddle - https://fiddlemc.org
 
 diff --git a/src/main/resources/logo.png b/src/main/resources/logo.png
 index 8b924977b7886df9ab8790b1e4ff9b1c04a2af45..800bed3c40d3e2db4a7aced53099dff30cef0862 100644

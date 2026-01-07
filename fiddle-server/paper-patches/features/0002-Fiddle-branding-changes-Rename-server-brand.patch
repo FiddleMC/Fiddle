@@ -1,0 +1,26 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Wed, 7 Jan 2026 12:56:32 +0100
+Subject: [PATCH] Fiddle branding changes - Rename server brand
+
+Replaces the branding of the server from "Paper" to "Fiddle" wherever relevant and/or appropriate.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/io/papermc/paper/ServerBuildInfoImpl.java b/src/main/java/io/papermc/paper/ServerBuildInfoImpl.java
+index 74ffdc823e66fc5ec027c4b7c462382bcbfe2be2..7c8a415981ebfdd2ba5cfd72e9e250f5b4944287 100644
+--- a/src/main/java/io/papermc/paper/ServerBuildInfoImpl.java
++++ b/src/main/java/io/papermc/paper/ServerBuildInfoImpl.java
+@@ -42,9 +42,9 @@ public record ServerBuildInfoImpl(
+         this(
+             getManifestAttribute(manifest, ATTRIBUTE_BRAND_ID)
+                 .map(Key::key)
+-                .orElse(BRAND_PAPER_ID),
++                .orElse(org.fiddlemc.fiddle.FiddleBrandId.BRAND_FIDDLE_ID), // Fiddle - Branding changes - Rename server brand
+             getManifestAttribute(manifest, ATTRIBUTE_BRAND_NAME)
+-                .orElse(BRAND_PAPER_NAME),
++                .orElse(org.fiddlemc.fiddle.FiddleBrandName.BRAND_FIDDLE_NAME), // Fiddle - Branding changes - Rename server brand
+             SharedConstants.getCurrentVersion().id(),
+             SharedConstants.getCurrentVersion().name(),
+             getManifestAttribute(manifest, ATTRIBUTE_BUILD_NUMBER)
