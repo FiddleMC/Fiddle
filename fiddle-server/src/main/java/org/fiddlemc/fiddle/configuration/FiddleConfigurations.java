@@ -50,6 +50,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.VisibleForTesting;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -294,6 +296,17 @@ public final class FiddleConfigurations extends Configurations<FiddleGlobalConfi
         } catch (final IOException ex) {
             throw new RuntimeException("Could not setup FiddleConfigurations", ex);
         }
+    }
+
+    @Deprecated
+    public YamlConfiguration createLegacyObject(final MinecraftServer server) {
+        YamlConfiguration global = YamlConfiguration.loadConfiguration(this.globalFolder.resolve(this.globalConfigFileName).toFile());
+        ConfigurationSection worlds = global.createSection("__________WORLDS__________");
+        worlds.set("__defaults__", YamlConfiguration.loadConfiguration(this.globalFolder.resolve(this.defaultWorldConfigFileName).toFile()));
+        for (ServerLevel level : server.getAllLevels()) {
+            worlds.set(level.getWorld().getName(), YamlConfiguration.loadConfiguration(getWorldConfigFile(level).toFile()));
+        }
+        return global;
     }
 
     @VisibleForTesting

@@ -27,4 +27,6 @@ public class FiddleGlobalConfiguration extends ConfigurationPart {
 
     @Setting(Configuration.VERSION_FIELD)
     public int version = CURRENT_VERSION;
+
+    public boolean _enabled = false;
 }

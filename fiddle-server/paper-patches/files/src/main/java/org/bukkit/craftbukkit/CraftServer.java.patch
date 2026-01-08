@@ -8,3 +8,18 @@
          for (ServerLevel world : this.console.getAllLevels()) {
              // world.serverLevelData.setDifficulty(config.difficulty); // Paper - per level difficulty
              world.setSpawnSettings(world.serverLevelData.getDifficulty() != Difficulty.PEACEFUL && world.getGameRules().get(GameRules.SPAWN_MONSTERS)); // Paper - per level difficulty (from MinecraftServer#setDifficulty(ServerLevel, Difficulty, boolean))
+@@ -2728,6 +_,14 @@
+         public YamlConfiguration getPaperConfig() {
+             return CraftServer.this.console.paperConfigurations.createLegacyObject(CraftServer.this.console);
+         }
++
++        // Fiddle start - Configuration - API
++        @Override
++        public YamlConfiguration getFiddleConfig()
++        {
++            return org.fiddlemc.fiddle.configuration.FiddleConfigurations.get(null).createLegacyObject(CraftServer.this.console);
++        }
++        // Fiddle end - Configuration - API
+ 
+         @Override
+         public void restart() {
