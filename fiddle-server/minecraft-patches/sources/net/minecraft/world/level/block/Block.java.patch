@@ -1,0 +1,78 @@
+--- a/net/minecraft/world/level/block/Block.java
++++ b/net/minecraft/world/level/block/Block.java
+@@ -78,7 +_,7 @@
+     public static final MapCodec<Block> CODEC = simpleCodec(Block::new);
+     private static final Logger LOGGER = LogUtils.getLogger();
+     private final Holder.Reference<Block> builtInRegistryHolder = BuiltInRegistries.BLOCK.createIntrusiveHolder(this);
+-    public static final IdMapper<BlockState> BLOCK_STATE_REGISTRY = new IdMapper<>();
++    public static final org.fiddlemc.fiddle.minecraft.registries.BlockStateRegistry BLOCK_STATE_REGISTRY = org.fiddlemc.fiddle.minecraft.registries.BlockStateRegistry.get(); // Fiddle - Custom registries for blocks and items
+     private static final LoadingCache<VoxelShape, Boolean> SHAPE_FULL_BLOCK_CACHE = CacheBuilder.newBuilder()
+         .maximumSize(512L)
+         .weakKeys()
+@@ -144,6 +_,66 @@
+     protected MapCodec<? extends Block> codec() {
+         return CODEC;
+     }
++
++    // Fiddle start - Cache block and item values
++    /**
++     * The {@link net.minecraft.resources.Identifier} with which this block is registered in the
++     * {@link BuiltInRegistries#BLOCK}.
++     * <p>
++     * This will be null until initialized in
++     * {@link org.fiddlemc.fiddle.minecraft.registries.BlockRegistry#register}.
++     * </p>
++     */
++    public net.minecraft.resources.Identifier keyInBlockRegistry = null;
++
++    /**
++     * The {@linkplain net.minecraft.core.Registry#getId index} at which this block is registered in
++     * {@link BuiltInRegistries#BLOCK}.
++     * <p>
++     * This will be -1 until initialized in
++     * {@link org.fiddlemc.fiddle.minecraft.registries.BlockRegistry#register}.
++     * </p>
++     */
++    public int indexInBlockRegistry = -1;
++
++    /**
++     * The {@linkplain net.minecraft.core.Registry#getId index} at which this block is registered in
++     * {@link org.fiddlemc.fiddle.minecraft.registries.VanillaOnlyBlockRegistry}.
++     * <p>
++     * This will be -1 until initialized in
++     * {@link org.fiddlemc.fiddle.minecraft.registries.VanillaOnlyBlockRegistry#add}.
++     * </p>
++     */
++    public int indexInVanillaOnlyBlockRegistry = -1;
++    // Fiddle end - Cache block and item values
++
++    // Fiddle start - Vanilla flag
++    private boolean isVanilla;
++
++    /**
++     * Returns whether this block is present in vanilla.
++     * <p>
++     * This does not take into account whether any details of this block, such as its properties,
++     * are different (were modified) from vanilla.
++     * </p>
++     *
++     * @return Whether this block is present in vanilla.
++     */
++    public boolean isVanilla() {
++        return this.isVanilla;
++    }
++
++    /**
++     * Sets {@link #isVanilla} to true.
++     * <p>
++     * This must only be called at most once,
++     * before the block is registered to {@link BuiltInRegistries#BLOCK}.
++     * </p>
++     */
++    public void markAsVanilla() {
++        this.isVanilla = true;
++    }
++    // Fiddle end - Vanilla flag
+ 
+     public static int getId(@Nullable BlockState state) {
+         if (state == null) {

@@ -1,0 +1,25 @@
+--- a/src/main/java/org/bukkit/Server.java
++++ b/src/main/java/org/bukkit/Server.java
+@@ -2425,6 +_,22 @@
+         }
+         // Paper end
+ 
++        // Fiddle start - Configuration - API
++        /**
++         * @deprecated Server config options may be renamed or removed without notice. Prefer using existing API
++         *  wherever possible, rather than directly reading from a server config.
++         *
++         * @see #getServerConfig()
++         * @return The server's Fiddle config.
++         */
++        @Deprecated(since = "1.21.4", forRemoval = true)
++        @NotNull
++        public org.bukkit.configuration.file.YamlConfiguration getFiddleConfig()
++        {
++            throw new UnsupportedOperationException("Not supported yet.");
++        }
++        // Fiddle end - Configuration - API
++
+         /**
+          * Sends the component to the player
+          *

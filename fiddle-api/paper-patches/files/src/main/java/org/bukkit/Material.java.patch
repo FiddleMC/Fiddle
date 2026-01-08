@@ -1,0 +1,110 @@
+--- a/src/main/java/org/bukkit/Material.java
++++ b/src/main/java/org/bukkit/Material.java
+@@ -658,7 +_,7 @@
+     ACACIA_STAIRS(-1, Stairs.class),
+     ACACIA_TRAPDOOR(-1, TrapDoor.class),
+     ACACIA_WALL_HANGING_SIGN(-1, WallHangingSign.class),
+-    ACACIA_WALL_SIGN(-1, 16, WallSign.class),
++    ACACIA_WALL_SIGN(-1, WallSign.class), // Fiddle - Simply Material declarations - Remove explicit wall sign max stack size
+     ACACIA_WOOD(-1, Orientable.class),
+     ACTIVATOR_RAIL(-1, RedstoneRail.class),
+     ALLIUM(-1),
+@@ -694,7 +_,7 @@
+     BAMBOO_STAIRS(-1, Stairs.class),
+     BAMBOO_TRAPDOOR(-1, TrapDoor.class),
+     BAMBOO_WALL_HANGING_SIGN(-1, WallHangingSign.class),
+-    BAMBOO_WALL_SIGN(-1, 16, WallSign.class),
++    BAMBOO_WALL_SIGN(-1, WallSign.class), // Fiddle - Simply Material declarations - Remove explicit wall sign max stack size
+     BARREL(-1, Barrel.class),
+     BARRIER(-1, Waterlogged.class),
+     BASALT(-1, Orientable.class),
+@@ -722,7 +_,7 @@
+     BIRCH_STAIRS(-1, Stairs.class),
+     BIRCH_TRAPDOOR(-1, TrapDoor.class),
+     BIRCH_WALL_HANGING_SIGN(-1, WallHangingSign.class),
+-    BIRCH_WALL_SIGN(-1, 16, WallSign.class),
++    BIRCH_WALL_SIGN(-1, WallSign.class), // Fiddle - Simply Material declarations - Remove explicit wall sign max stack size
+     BIRCH_WOOD(-1, Orientable.class),
+     BLACK_BANNER(-1, 16, Rotatable.class),
+     BLACK_BED(-1, 1, Bed.class),
+@@ -825,7 +_,7 @@
+     CHERRY_STAIRS(-1, Stairs.class),
+     CHERRY_TRAPDOOR(-1, TrapDoor.class),
+     CHERRY_WALL_HANGING_SIGN(-1, WallHangingSign.class),
+-    CHERRY_WALL_SIGN(-1, 16, WallSign.class),
++    CHERRY_WALL_SIGN(-1, WallSign.class), // Fiddle - Simply Material declarations - Remove explicit wall sign max stack size
+     CHERRY_WOOD(-1, Orientable.class),
+     CHEST(-1, Chest.class),
+     CHIPPED_ANVIL(-1, Directional.class),
+@@ -904,7 +_,7 @@
+     CRIMSON_STEM(-1, Orientable.class),
+     CRIMSON_TRAPDOOR(-1, TrapDoor.class),
+     CRIMSON_WALL_HANGING_SIGN(-1, WallHangingSign.class),
+-    CRIMSON_WALL_SIGN(-1, 16, WallSign.class),
++    CRIMSON_WALL_SIGN(-1, WallSign.class), // Fiddle - Simply Material declarations - Remove explicit wall sign max stack size
+     CRYING_OBSIDIAN(-1),
+     CUT_COPPER(-1),
+     CUT_COPPER_SLAB(-1, Slab.class),
+@@ -945,7 +_,7 @@
+     DARK_OAK_STAIRS(-1, Stairs.class),
+     DARK_OAK_TRAPDOOR(-1, TrapDoor.class),
+     DARK_OAK_WALL_HANGING_SIGN(-1, WallHangingSign.class),
+-    DARK_OAK_WALL_SIGN(-1, 16, WallSign.class),
++    DARK_OAK_WALL_SIGN(-1, WallSign.class), // Fiddle - Simply Material declarations - Remove explicit wall sign max stack size
+     DARK_OAK_WOOD(-1, Orientable.class),
+     DARK_PRISMARINE(-1),
+     DARK_PRISMARINE_SLAB(-1, Slab.class),
+@@ -1136,7 +_,7 @@
+     JUNGLE_STAIRS(-1, Stairs.class),
+     JUNGLE_TRAPDOOR(-1, TrapDoor.class),
+     JUNGLE_WALL_HANGING_SIGN(-1, WallHangingSign.class),
+-    JUNGLE_WALL_SIGN(-1, 16, WallSign.class),
++    JUNGLE_WALL_SIGN(-1, WallSign.class), // Fiddle - Simply Material declarations - Remove explicit wall sign max stack size
+     JUNGLE_WOOD(-1, Orientable.class),
+     KELP(-1, Ageable.class),
+     KELP_PLANT(-1),
+@@ -1233,7 +_,7 @@
+     MANGROVE_STAIRS(-1, Stairs.class),
+     MANGROVE_TRAPDOOR(-1, TrapDoor.class),
+     MANGROVE_WALL_HANGING_SIGN(-1, WallHangingSign.class),
+-    MANGROVE_WALL_SIGN(-1, 16, WallSign.class),
++    MANGROVE_WALL_SIGN(-1, WallSign.class), // Fiddle - Simply Material declarations - Remove explicit wall sign max stack size
+     MANGROVE_WOOD(-1, Orientable.class),
+     MEDIUM_AMETHYST_BUD(-1, AmethystCluster.class),
+     MELON(-1),
+@@ -1287,7 +_,7 @@
+     OAK_STAIRS(-1, Stairs.class),
+     OAK_TRAPDOOR(-1, TrapDoor.class),
+     OAK_WALL_HANGING_SIGN(-1, WallHangingSign.class),
+-    OAK_WALL_SIGN(-1, 16, WallSign.class),
++    OAK_WALL_SIGN(-1, WallSign.class), // Fiddle - Simply Material declarations - Remove explicit wall sign max stack size
+     OAK_WOOD(-1, Orientable.class),
+     OBSERVER(-1, Observer.class),
+     OBSIDIAN(-1),
+@@ -1345,7 +_,7 @@
+     PALE_OAK_STAIRS(-1, Stairs.class),
+     PALE_OAK_TRAPDOOR(-1, TrapDoor.class),
+     PALE_OAK_WALL_HANGING_SIGN(-1, WallHangingSign.class),
+-    PALE_OAK_WALL_SIGN(-1, 16, WallSign.class),
++    PALE_OAK_WALL_SIGN(-1, WallSign.class), // Fiddle - Simply Material declarations - Remove explicit wall sign max stack size
+     PALE_OAK_WOOD(-1, Orientable.class),
+     PEARLESCENT_FROGLIGHT(-1, Orientable.class),
+     PEONY(-1, Bisected.class),
+@@ -1592,7 +_,7 @@
+     SPRUCE_STAIRS(-1, Stairs.class),
+     SPRUCE_TRAPDOOR(-1, TrapDoor.class),
+     SPRUCE_WALL_HANGING_SIGN(-1, WallHangingSign.class),
+-    SPRUCE_WALL_SIGN(-1, 16, WallSign.class),
++    SPRUCE_WALL_SIGN(-1, WallSign.class), // Fiddle - Simply Material declarations - Remove explicit wall sign max stack size
+     SPRUCE_WOOD(-1, Orientable.class),
+     STICKY_PISTON(-1, Piston.class),
+     STONE(-1),
+@@ -1689,7 +_,7 @@
+     WARPED_STEM(-1, Orientable.class),
+     WARPED_TRAPDOOR(-1, TrapDoor.class),
+     WARPED_WALL_HANGING_SIGN(-1, WallHangingSign.class),
+-    WARPED_WALL_SIGN(-1, 16, WallSign.class),
++    WARPED_WALL_SIGN(-1, WallSign.class), // Fiddle - Simply Material declarations - Remove explicit wall sign max stack size
+     WARPED_WART_BLOCK(-1),
+     WATER(-1, Levelled.class),
+     WATER_CAULDRON(-1, Levelled.class),

@@ -1,0 +1,17 @@
+--- a/net/minecraft/core/registries/BuiltInRegistries.java
++++ b/net/minecraft/core/registries/BuiltInRegistries.java
+@@ -172,12 +_,12 @@
+     public static final Registry<SoundEvent> SOUND_EVENT = registerSimple(Registries.SOUND_EVENT, registry -> SoundEvents.ITEM_PICKUP);
+     public static final DefaultedRegistry<Fluid> FLUID = registerDefaultedWithIntrusiveHolders(Registries.FLUID, "empty", registry -> Fluids.EMPTY);
+     public static final Registry<MobEffect> MOB_EFFECT = registerSimple(Registries.MOB_EFFECT, MobEffects::bootstrap);
+-    public static final DefaultedRegistry<Block> BLOCK = registerDefaultedWithIntrusiveHolders(Registries.BLOCK, "air", registry -> Blocks.AIR);
++    public static final org.fiddlemc.fiddle.minecraft.registries.BlockRegistry BLOCK = internalRegister(Registries.BLOCK, org.fiddlemc.fiddle.minecraft.registries.BlockRegistry.get(), registry -> Blocks.AIR); // Fiddle - Custom registries for blocks and items
+     public static final Registry<DebugSubscription<?>> DEBUG_SUBSCRIPTION = registerSimple(Registries.DEBUG_SUBSCRIPTION, DebugSubscriptions::bootstrap);
+     public static final DefaultedRegistry<EntityType<?>> ENTITY_TYPE = registerDefaultedWithIntrusiveHolders(
+         Registries.ENTITY_TYPE, "pig", registry -> EntityType.PIG
+     );
+-    public static final DefaultedRegistry<Item> ITEM = registerDefaultedWithIntrusiveHolders(Registries.ITEM, "air", registry -> Items.AIR);
++    public static final org.fiddlemc.fiddle.minecraft.registries.ItemRegistry ITEM = internalRegister(Registries.ITEM, org.fiddlemc.fiddle.minecraft.registries.ItemRegistry.get(), registry -> Items.AIR); // Fiddle - Custom registries for blocks and items
+     public static final Registry<Potion> POTION = registerSimple(Registries.POTION, Potions::bootstrap);
+     public static final Registry<ParticleType<?>> PARTICLE_TYPE = registerSimple(Registries.PARTICLE_TYPE, registry -> ParticleTypes.BLOCK);
+     public static final Registry<BlockEntityType<?>> BLOCK_ENTITY_TYPE = registerSimpleWithIntrusiveHolders(

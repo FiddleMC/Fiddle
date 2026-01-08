@@ -1,0 +1,19 @@
+--- a/net/minecraft/world/item/Items.java
++++ b/net/minecraft/world/item/Items.java
+@@ -2467,10 +_,13 @@
+ 
+     public static Item registerItem(ResourceKey<Item> key, Function<Item.Properties, Item> factory, Item.Properties properties) {
+         Item item = factory.apply(properties.setId(key));
+-        if (item instanceof BlockItem blockItem) {
+-            blockItem.registerBlocks(Item.BY_BLOCK, item);
+-        }
++        // Fiddle start - Custom registries for blocks and items - Register block items in ItemRegistry#register
++        // if (item instanceof BlockItem blockItem) {
++        //     blockItem.registerBlocks(Item.BY_BLOCK, item);
++        // }
++        // Fiddle end - Custom registries for blocks and items - Register block items in ItemRegistry#register
+ 
++        item.markAsVanilla(); // Fiddle - Vanilla flag
+         return Registry.register(BuiltInRegistries.ITEM, key, item);
+     }
+ }

@@ -1,0 +1,69 @@
+--- a/net/minecraft/world/item/Item.java
++++ b/net/minecraft/world/item/Item.java
+@@ -120,6 +_,66 @@
+         return item == null ? 0 : BuiltInRegistries.ITEM.getId(item);
+     }
+ 
++    // Fiddle start - Cache block and item values
++    /**
++     * The {@link net.minecraft.resources.Identifier} with which this item is registered in
++     * {@link BuiltInRegistries#ITEM}.
++     * <p>
++     * This will be null until initialized in
++     * {@link org.fiddlemc.fiddle.minecraft.registries.ItemRegistry#register}.
++     * </p>
++     */
++    public net.minecraft.resources.Identifier keyInItemRegistry = null;
++
++    /**
++     * The {@linkplain net.minecraft.core.Registry#getId index} at which this item is registered in
++     * {@link BuiltInRegistries#ITEM}.
++     * <p>
++     * This will be -1 until initialized in
++     * {@link org.fiddlemc.fiddle.minecraft.registries.ItemRegistry#register}.
++     * </p>
++     */
++    public int indexInItemRegistry = -1;
++
++    /**
++     * The {@linkplain net.minecraft.core.Registry#getId index} at which this item is registered in
++     * {@link org.fiddlemc.fiddle.minecraft.registries.VanillaOnlyItemRegistry}.
++     * <p>
++     * This will be -1 until initialized in
++     * {@link org.fiddlemc.fiddle.minecraft.registries.VanillaOnlyItemRegistry#add}.
++     * </p>
++     */
++    public int indexInVanillaOnlyItemRegistry = -1;
++    // Fiddle end - Cache block and item values
++
++    // Fiddle start - Vanilla flag
++    private boolean isVanilla;
++
++    /**
++     * Returns whether this item is present in vanilla.
++     * <p>
++     * This does not take into account whether any details of this item, such as its properties,
++     * are different (were modified) from vanilla.
++     * </p>
++     *
++     * @return Whether this item is present in vanilla.
++     */
++    public boolean isVanilla() {
++        return this.isVanilla;
++    }
++
++    /**
++     * Sets {@link #isVanilla} to true.
++     * <p>
++     * This must only be called at most once,
++     * before the item is registered to {@link BuiltInRegistries#ITEM}.
++     * </p>
++     */
++    public void markAsVanilla() {
++        this.isVanilla = true;
++    }
++    // Fiddle end - Vanilla flag
++
+     public static Item byId(int id) {
+         return BuiltInRegistries.ITEM.byId(id);
+     }
