@@ -1,0 +1,14 @@
+--- a/src/main/java/org/bukkit/craftbukkit/block/CraftBlockType.java
++++ b/src/main/java/org/bukkit/craftbukkit/block/CraftBlockType.java
+@@ -251,4 +_,11 @@
+         return this.getHandle().hasCollision;
+     }
+     // Paper end - hasCollision API
++
++    // Fiddle start - Vanilla flag - API
++    @Override
++    public boolean isVanilla() {
++        return this.getHandle().isVanilla();
++    }
++    // Fiddle end - Vanilla flag - API
+ }

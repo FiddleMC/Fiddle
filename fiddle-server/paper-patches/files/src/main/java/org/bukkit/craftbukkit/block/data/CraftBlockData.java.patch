@@ -1,0 +1,14 @@
+--- a/src/main/java/org/bukkit/craftbukkit/block/data/CraftBlockData.java
++++ b/src/main/java/org/bukkit/craftbukkit/block/data/CraftBlockData.java
+@@ -797,4 +_,11 @@
+     public boolean isReplaceable() {
+         return this.state.canBeReplaced();
+     }
++
++    // Fiddle start - Vanilla flag - API
++    @Override
++    public boolean isVanilla() {
++        return this.state.isVanilla();
++    }
++    // Fiddle end - Vanilla flag - API
+ }

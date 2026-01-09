@@ -42,7 +42,7 @@
 +    /**
 +     * Returns whether this item is present in vanilla.
 +     * <p>
-+     * This does not take into account whether any details of this item, such as its properties,
++     * This does not take into account whether any details of this item, such as its max stack size,
 +     * are different (were modified) from vanilla.
 +     * </p>
 +     *

@@ -52,7 +52,7 @@
 +    /**
 +     * Returns whether this block is present in vanilla.
 +     * <p>
-+     * This does not take into account whether any details of this block, such as its properties,
++     * This does not take into account whether any details of this block, such as its hardness,
 +     * are different (were modified) from vanilla.
 +     * </p>
 +     *

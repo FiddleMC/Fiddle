@@ -32,7 +32,7 @@
 +    /**
 +     * Returns whether this block state is present in vanilla.
 +     * <p>
-+     * This does not take into account whether any details of this block state, such as its properties,
++     * This does not take into account whether any details of this block state, such as its collision box,
 +     * are different (were modified) from vanilla.
 +     * </p>
 +     *
