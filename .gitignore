@@ -55,6 +55,8 @@ manifest.mf
 
 /fiddle-server/build.gradle.kts
 /fiddle-server/src/minecraft
+/fiddle-server/map-color-cache.dat
+/fiddle-server/logs
 /paper-server
 /fiddle-api/build.gradle.kts
 /paper-api
