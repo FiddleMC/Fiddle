@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Fixes up all file patches, then rebuilds all patches (in IntelliJ, right-click -> Run 'fixupAndRebuild')
+
+./fixup
+./rebuild

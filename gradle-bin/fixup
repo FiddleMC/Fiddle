@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# Fixes up all file patches (in IntelliJ, right-click -> Run 'fixup')
+
+cd ..
+./gradlew fixupPaperApiFilePatches || true
+./gradlew :fiddle-server:fixupMinecraftResourcePatches || true
+./gradlew :fiddle-server:fixupMinecraftSourcePatches || true
+./gradlew :fiddle-server:fixupPaperServerFilePatches || true
+cd gradle-bin

@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# Applies all patches (in IntelliJ, right-click -> Run 'apply')
+
+cd ..
+./gradlew applyAllPatches
+cd gradle-bin

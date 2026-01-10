@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Rebuilds all patches (in IntelliJ, right-click -> Run 'rebuild')
+
+cd ..
+./gradlew rebuildPaperPatches
+./gradlew rebuildPaperSingleFilePatches
+./gradlew :fiddle-server:rebuildMinecraftPatches
+./gradlew :fiddle-server:rebuildAllServerPatches
+./gradlew :fiddle-server:rebuildServerPatches
+cd gradle-bin
