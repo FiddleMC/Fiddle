@@ -138,6 +138,15 @@
  idea {
      module {
          generatedSourceDirs.add(generatedDir.toFile())
+@@ -289,7 +_,7 @@
+         .dir(providers.gradleProperty("paper.runWorkDir").getOrElse("run"))
+         .asFile
+     javaLauncher.set(project.javaToolchains.launcherFor {
+-        languageVersion.set(JavaLanguageVersion.of(21))
++        languageVersion.set(JavaLanguageVersion.of(25))
+         vendor.set(JvmVendorSpec.JETBRAINS)
+     })
+     jvmArgs("-XX:+AllowEnhancedClassRedefinition")
 @@ -356,6 +_,21 @@
      mainClass.set(null as String?)
  }

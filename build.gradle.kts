@@ -42,7 +42,7 @@ subprojects {
 
     extensions.configure<JavaPluginExtension> {
         toolchain {
-            languageVersion = JavaLanguageVersion.of(21)
+            languageVersion = JavaLanguageVersion.of(25) // Fiddle - Project setup - Java 25
         }
     }
 
@@ -57,7 +57,7 @@ subprojects {
     }
     tasks.withType<JavaCompile> {
         options.encoding = Charsets.UTF_8.name()
-        options.release = 21
+        options.release = 25 // Fiddle - Project setup - Java 25
         options.isFork = true
         // Fiddle start - Project setup - Hide annoying compilation warnings
         options.compilerArgs.addAll(

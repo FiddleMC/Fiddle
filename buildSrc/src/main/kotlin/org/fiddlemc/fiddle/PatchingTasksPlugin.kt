@@ -3,42 +3,39 @@ import org.gradle.api.Project
 
 class FullPatchingPlugin : Plugin<Project> {
     override fun apply(project: Project) {
+        val projectName = project.rootProject.name
 
-        // These tasks already exist in the project
         val applyTasks = listOf(
             "applyAllPatches"
         )
         val fixupTasks = listOf(
-            "fixupMinecraftResourcePatches",
-            "fixupMinecraftSourcePatches",
             "fixupPaperApiFilePatches",
-            "fixupPaperServerFilePatches",
+            ":$projectName-server:fixupMinecraftResourcePatches",
+            ":$projectName-server:fixupMinecraftSourcePatches",
+            ":$projectName-server:fixupPaperServerFilePatches",
         )
         val rebuildTasks = listOf(
-            "rebuildMinecraftPatches",
-            "rebuildAllServerPatches",
             "rebuildPaperPatches",
             "rebuildPaperSingleFilePatches",
-            "rebuildServerPatches",
+            ":$projectName-server:rebuildMinecraftPatches",
+            ":$projectName-server:rebuildAllServerPatches",
+            ":$projectName-server:rebuildServerPatches",
         )
 
         val applyTask = project.tasks.register("apply") {
             group = "full patching"
             dependsOn(applyTasks)
         }
-
-        val fixupTask = project.tasks.register("fixup") {
+        project.tasks.register("fixup") {
             group = "full patching"
             dependsOn(fixupTasks)
         }
-
-        val rebuildTask = project.tasks.register("rebuild") {
+        project.tasks.register("rebuild") {
             group = "full patching"
             dependsOn(rebuildTasks)
             mustRunAfter(fixupTasks)
         }
-
-        val fixupAndRebuildTask = project.tasks.register("fixupAndRebuild") {
+        project.tasks.register("fixupAndRebuild") {
             group = "full patching"
             dependsOn(rebuildTasks)
         }
