@@ -5,6 +5,8 @@ plugins {
     id("io.papermc.paperweight.patcher") version "2.0.0-beta.19"
 }
 
+apply<FullPatchingPlugin>() // Fiddle - Project setup - Add full patching tasks
+
 paperweight {
     upstreams.paper {
         ref = providers.gradleProperty("paperRef")
