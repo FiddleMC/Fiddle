@@ -1,0 +1,48 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Fri, 5 Jan 2024 18:05:16 +0100
+Subject: [PATCH] Client perspective - Block state visualization - BlockState
+ field for visualization setupper
+
+Adds a field in `BlockState` to hold the visualization setupper for that state.
+
+Does not implement anything that sets or gets this value.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/world/level/block/state/BlockState.java b/src/main/java/net/minecraft/world/level/block/state/BlockState.java
+index d080b9759afe283d79227076eea3b075af37c0cd..9b3d7fa1801d267ee0eca0c6899c826a91d23a05 100644
+--- a/src/main/java/net/minecraft/world/level/block/state/BlockState.java
++++ b/src/main/java/net/minecraft/world/level/block/state/BlockState.java
+@@ -71,4 +71,14 @@ public class BlockState extends BlockBehaviour.BlockStateBase {
+     protected BlockState asState() {
+         return this;
+     }
++
++    // Fiddle start - client perspective - block state visualization - BlockState field for visualization setupper
++    /**
++     * The {@linkplain org.fiddlemc.fiddle.packet.block.BlockStateVisualizationSetupper}
++     * that can set up the visualizations for this {@link BlockState}.
++     * If null, there exist no replacements for this state, and it is always sent to clients as-is.
++     */
++    public @org.jetbrains.annotations.Nullable org.fiddlemc.fiddle.packet.block.BlockStateVisualizationSetupper visualizationSetupper = null;
++    // Fiddle end - client perspective - block state visualization - BlockState field for visualization setupper
++
+ }
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/block/OnePerCategoryBlockStateVisualizationSetupper.java b/src/main/java/org/fiddlemc/fiddle/packet/block/OnePerCategoryBlockStateVisualizationSetupper.java
+index 2b9fe6ea436d698bf5b8f420cb1302b5ec37b144..255f033ccb87e3e812e1ba7359d762ff05d5f181 100644
+--- a/src/main/java/org/fiddlemc/fiddle/packet/block/OnePerCategoryBlockStateVisualizationSetupper.java
++++ b/src/main/java/org/fiddlemc/fiddle/packet/block/OnePerCategoryBlockStateVisualizationSetupper.java
+@@ -40,7 +40,10 @@ public final class OnePerCategoryBlockStateVisualizationSetupper implements Bloc
+     /**
+      * Always return false;
+      * <br>
+-     * Could theoretically be true if all the possible replacements equal the given actual {@link BlockState}.
++     * <!-- // Fiddle start - client perspective - block state visualization - BlockState field for visualization setupper -->
++     * Could theoretically be true if all the possible replacements equal the given actual {@link BlockState},
++     * but in that case {@link BlockState#visualizationSetupper} should be set to null instead of to this setupper.
++     * <!-- // Fiddle end - client perspective - block state visualization - BlockState field for visualization setupper -->
+      */
+     @Override
+     public @NotNull Boolean preCheckWhetherDefinitelyHasNoVisualizationDifferentThanItself(

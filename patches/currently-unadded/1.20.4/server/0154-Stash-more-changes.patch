@@ -1,0 +1,654 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Mon, 23 Dec 2024 12:41:28 +0100
+Subject: [PATCH] Stash more changes
+
+
+diff --git a/src/main/java/net/minecraft/network/Connection.java b/src/main/java/net/minecraft/network/Connection.java
+index a2dfb66f27b33406ebe49d27b48faaf4fe794e9e..df98d6d80f3839a109379992b42d60feb796de72 100644
+--- a/src/main/java/net/minecraft/network/Connection.java
++++ b/src/main/java/net/minecraft/network/Connection.java
+@@ -433,8 +433,16 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+         this.sendPacket(packet, callbacks, flush, false);
+     }
+ 
+-    private void sendPacket(Packet<?> originalPacket, @Nullable PacketSendListener callbacks, boolean flush, boolean alreadyAdapted) {
++    private void sendPacket(Packet<?> originalPacket, @Nullable PacketSendListener callbacks, boolean originalFlush, boolean alreadyAdapted) {
+         var packet = alreadyAdapted ? originalPacket : originalPacket.adaptForClient(this);
++        var packetsToSendBefore = packet.getPacketsToSendBefore();
++        if (packetsToSendBefore != null) {
++            for (var packetToSendBefore : packetsToSendBefore) {
++                this.sendPacket(packetToSendBefore, null, false, false);
++            }
++        }
++        var packetsToSendAfter = packet.getPacketsToSendAfter();
++        boolean flush = originalFlush && (packetsToSendAfter == null || packetsToSendAfter.isEmpty());
+         // Fiddle end - client perspective - packets are modifiable - adapt packet before sending
+         ++this.sentPackets;
+         if (this.channel.eventLoop().inEventLoop()) {
+@@ -444,7 +452,13 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+                 this.doSendPacket(packet, callbacks, flush);
+             });
+         }
+-
++        // Fiddle start - client perspective - packets ar modifiable
++        if (packetsToSendAfter != null) {
++            for (int i = 0; i < packetsToSendAfter.size(); i++) {
++                this.sendPacket(packetsToSendAfter.get(i), null, originalFlush && i == packetsToSendAfter.size() - 1, false);
++            }
++        }
++        // Fiddle end - client perspective - packets ar modifiable
+     }
+ 
+     private void doSendPacket(Packet<?> packet, @Nullable PacketSendListener callbacks, boolean flush) {
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundBlockUpdatePacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundBlockUpdatePacket.java
+index 7feb7e3f7fb0e8e959005a58bcde2c084c650367..e4abaff7d78b1a9b182b5f2ea221af3da9e5db25 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundBlockUpdatePacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundBlockUpdatePacket.java
+@@ -52,7 +52,7 @@ public class ClientboundBlockUpdatePacket extends org.fiddlemc.fiddle.packet.Pac
+         }
+         var visualizationSetupper = this.blockState.visualizationSetupper;
+         BlockState stateToSend;
+-        if (visualizationSetupper == null) {
++        if (isVisualizationChange || visualizationSetupper == null) {
+             stateToSend = this.blockState;
+         } else {
+             stateToSend = visualizationSetupper.setUp(level, this.pos.getX(), this.pos.getY(), this.pos.getZ(), this.blockState, player, clientPerspective, org.fiddlemc.fiddle.packet.block.BlockStateVisualizationSetupper.BlockStateVisualizationPurpose.PHYSICAL);
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/BlockDefinitionParser.java b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/BlockDefinitionParser.java
+index 71f71e05589964c529ecdaaaae8eef540109567e..5548f3f812925c31b01f3eec9e0f681f0104ab0e 100644
+--- a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/BlockDefinitionParser.java
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/BlockDefinitionParser.java
+@@ -38,8 +38,8 @@ public final class BlockDefinitionParser
+         BlockPropertiesDefinition propertiesDefinition
+     ) throws PackException {
+         // Read the full block state
+-        var fullBlockStateString = blockJson.getAsStringIfPresent(fullBlockStateJsonKey, true, NamedJsonElement.BlankStringParseResult.THROW_EXCEPTION, null);
+-        var fullBlockState = fullBlockStateString == null ? null : new ResourceLocation(fullBlockStateString);
++        var fullBlockStateString = blockJson.getAsString(fullBlockStateJsonKey, true, NamedJsonElement.BlankStringParseResult.THROW_EXCEPTION, null);
++        var fullBlockState = new ResourceLocation(fullBlockStateString);
+ 
+         // Return the definition
+         return new BlockDefinition(resourceLocation, parent, propertiesDefinition, fullBlockState);
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/meta/FiddlePackMetaParser.java b/src/main/java/org/fiddlemc/fiddle/pack/read/meta/FiddlePackMetaParser.java
+index 34c0a2571b2210c07c04e00d553889b835133d27..76396a8b6683ce0f14b1960022a9e4bad339cf41 100644
+--- a/src/main/java/org/fiddlemc/fiddle/pack/read/meta/FiddlePackMetaParser.java
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/meta/FiddlePackMetaParser.java
+@@ -10,6 +10,7 @@ import org.fiddlemc.fiddle.pack.exception.PackException;
+ import org.fiddlemc.fiddle.pack.read.namedjson.NamedJsonElement;
+ 
+ import java.util.Objects;
++import java.util.stream.IntStream;
+ 
+ /**
+  * A utility to parse a {@link org.fiddlemc.fiddle.pack.FiddlePackMeta} instance from JSON.
+@@ -20,10 +21,10 @@ public final class FiddlePackMetaParser {
+         throw new RuntimeException();
+     }
+ 
+-    public static final int minFormat = 1;
+-    public static final int maxFormat = 1;
+-    public static final IntSet supportedResourcePackFormats = IntSet.of(13, 15);
+-    public static final IntSet supportedDataPackFormats = IntSet.of(12, 15);
++    public static final int minFormat = 2;
++    public static final int maxFormat = 2;
++    public static final IntSet supportedResourcePackFormats = IntStream.rangeClosed(21, 26).col
++    public static final IntSet supportedDataPackFormats = IntSet.of(15, 32);
+ 
+     public static final int displayNameMaxLength = 255;
+     public static final int technicalNameMaxLength = 191;
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/block/BlockStateVisualizationSetupper.java b/src/main/java/org/fiddlemc/fiddle/packet/block/BlockStateVisualizationSetupper.java
+index 54af4cde00d91306b0c72d1a5e2a0b990378fe42..4687c2be5af022fce516b634a36947362848a0e1 100644
+--- a/src/main/java/org/fiddlemc/fiddle/packet/block/BlockStateVisualizationSetupper.java
++++ b/src/main/java/org/fiddlemc/fiddle/packet/block/BlockStateVisualizationSetupper.java
+@@ -36,6 +36,44 @@ import java.util.List;
+  */
+ public abstract class BlockStateVisualizationSetupper {
+ 
++    /**
++     * @return Whether all visualizations made by this setupper
++     * for the given {@link BlockState} and {@link BlockStateVisualizationPurpose}
++     * are invariant to coordinates.
++     * <p>
++     *     This means that for any invocations on methods of this class that do not have coordinates parameters,
++     *     the returned result is the same as that of the corresponding approximation method that does not have
++     *     coordinates parameters.
++     * </p>
++     * <p>
++     *     This method can be used to see if there is a coordinates-invariant visualization.
++     *     In the case of chunk packets, this may mean that even when visualizations need to be applied,
++     *     the chunk packet's buffer does not need to be entirely rewritten (only its block state palette).
++     * </p>
++     */
++    public abstract boolean isCoordinatesInvariant(
++        BlockState actual,
++        BlockStateVisualizationPurpose purpose
++    );
++
++    /**
++     * @return Whether any visualizations made by this setupper
++     * for the given {@link BlockState} and {@link BlockStateVisualizationPurpose}
++     * involve more than returning a replacement {@link BlockState}.
++     * <p>
++     *     This means that there are no side effects to invoking {@link #setUpVisualization}, compared to
++     *     invoking {@link #getReplacementBlockState}.
++     * </p>
++     * <p>
++     *     This method can be used to quickly determine that individual setup for blocks may be skipped
++     *     in the case of chunk packets.
++     * </p>
++     */
++    public abstract boolean hasVisualizationsOtherThanBlockStateReplacements(
++        BlockState actual,
++        BlockStateVisualizationPurpose purpose
++    );
++
+     /**
+      * The same as
+      * {@link #preCheckWhetherDefinitelyHasNoVisualizationDifferentThanItself(BlockState, ServerPlayer, ClientPerspective, BlockStateVisualizationPurpose)},
+@@ -50,12 +88,14 @@ public abstract class BlockStateVisualizationSetupper {
+      *     and null otherwise.
+      * </p>
+      *
+-     * @see #internalApplyOrSetUpVisualization(BlockState, BlockStateVisualizationPurpose, boolean)
++     * @see #getReplacementBlockState(BlockState, BlockStateVisualizationPurpose)
+      */
+-    public abstract @Nullable Boolean preCheckWhetherDefinitelyHasNoVisualizationDifferentThanItself(
++    public @Nullable Boolean preCheckWhetherDefinitelyHasNoVisualizationDifferentThanItself(
+         BlockState actual,
+         BlockStateVisualizationPurpose purpose
+-    );
++    ) {
++        return null;
++    }
+ 
+     /**
+      * The same as
+@@ -71,7 +111,7 @@ public abstract class BlockStateVisualizationSetupper {
+      *     and null otherwise.
+      * </p>
+      *
+-     * @see #internalApplyOrSetUpVisualization(BlockState, ServerPlayer, ClientPerspective, BlockStateVisualizationPurpose, boolean)
++     * @see #getReplacementBlockState(BlockState, ServerPlayer, ClientPerspective, BlockStateVisualizationPurpose)
+      */
+     public @Nullable Boolean preCheckWhetherDefinitelyHasNoVisualizationDifferentThanItself(
+         BlockState actual,
+@@ -99,7 +139,7 @@ public abstract class BlockStateVisualizationSetupper {
+      *     and null otherwise.
+      * </p>
+      *
+-     * @see #internalApplyOrSetUpVisualization(ServerLevel, BlockState, ServerPlayer, ClientPerspective, BlockStateVisualizationPurpose, boolean)
++     * @see #getReplacementBlockState(ServerLevel, BlockState, ServerPlayer, ClientPerspective, BlockStateVisualizationPurpose)
+      */
+     public @Nullable Boolean preCheckWhetherDefinitelyHasNoVisualizationDifferentThanItself(
+         ServerLevel level,
+@@ -118,15 +158,17 @@ public abstract class BlockStateVisualizationSetupper {
+ 
+     /**
+      * Pre-checks whether any visualization for a given block state and perspective,
+-     * that does not always return the block state itself, will exist.
+-     * Implementations of this method may skip most of the checks that {@link #internalApplyOrSetUpVisualization} does,
++     * that does not always return the block state itself or has visualizations
++     * other than {@link BlockState} replacements, will exist.
++     * Implementations of this method may skip most of the checks that
++     * {@link #setUpVisualizationAndGetReplacementBlockState} does,
+      * to quickly determine if there are no replacements necessary in a chunk or chunk section at all.
+      *
+      * @return True if there are definitely no replacements for the given perspective.
+      * False if it could not be determined for sure that there are no replacements for the given perspective
+      * (i.e. because there in fact will certainly be).
+      *
+-     * @see #internalApplyOrSetUpVisualization(ServerLevel, int, int, int, BlockState, ServerPlayer, ClientPerspective, BlockStateVisualizationPurpose, boolean)
++     * @see #setUpVisualizationAndGetReplacementBlockState(ServerLevel, int, int, int, BlockState, ServerPlayer, ClientPerspective, BlockStateVisualizationPurpose, boolean)
+      */
+     public boolean preCheckWhetherDefinitelyHasNoVisualizationDifferentThanItself(
+         ServerLevel level,
+@@ -148,68 +190,80 @@ public abstract class BlockStateVisualizationSetupper {
+     }
+ 
+     /**
+-     * Calls {@link #internalApplyOrSetUpVisualization(BlockState, BlockStateVisualizationPurpose, boolean)}
+-     * with {@code doSetUp} being false.
++     * An approximation for
++     * {@link #getReplacementBlockState(BlockState, ServerPlayer, ClientPerspective, BlockStateVisualizationPurpose)},
++     * but with fewer parameters, for when more information is not available.
++     * <p>
++     *     This method can be used for visualizations that occur in a way not bound to any specific client perspective.
++     *     To accommodate those cases, implementations of this method must always return a non-null value for any
++     *     such occurrence in code.
++     *     <br>
++     *     As this method must be able to return approximations when needed,
++     *     this method returning a non-null value does not mean that it is already the best value:
++     *     a better value may be acquired by calling the method with more parameters.
++     * </p>
+      */
+-    public final @Nullable BlockState applyVisualization(
++    protected abstract @Nullable BlockState getReplacementBlockState(
+         BlockState actual,
+         BlockStateVisualizationPurpose purpose
+-    ) {
+-        var value = this.internalApplyOrSetUpVisualization(
+-            actual,
+-            purpose,
+-            false
+-        );
+-        return value instanceof BlockState blockState ? blockState : ((Pair<BlockState, ?>) value).first();
+-    }
++    );
+ 
+     /**
+-     * Calls {@link #internalApplyOrSetUpVisualization(BlockState, ServerPlayer, ClientPerspective, BlockStateVisualizationPurpose, boolean)}
+-     * with {@code doSetUp} being false.
++     * An approximation for
++     * {@link #getReplacementBlockState(ServerLevel, BlockState, ServerPlayer, ClientPerspective, BlockStateVisualizationPurpose)},
++     * but with fewer parameters, for when more information is not available.
++     * <p>
++     *     This method can be used for visualizations that occur in a way not bound to any specific location.
++     *     To accommodate those cases, implementations of this method must always return a non-null value for any
++     *     such occurrence in code.
++     *     <br>
++     *     As this method must be able to return approximations when needed,
++     *     this method returning a non-null value does not mean that it is already the best value:
++     *     a better value may be acquired by calling the method with more parameters.
++     * </p>
+      */
+-    public final @Nullable BlockState applyVisualization(
++    protected @Nullable BlockState getReplacementBlockState(
+         BlockState actual,
+         ServerPlayer player,
+         ClientPerspective clientPerspective,
+         BlockStateVisualizationPurpose purpose
+     ) {
+-        var value = this.internalApplyOrSetUpVisualization(
++        return this.getReplacementBlockState(
+             actual,
+-            player,
+-            clientPerspective,
+-            purpose,
+-            false
++            purpose
+         );
+-        return value instanceof BlockState blockState ? blockState : ((Pair<BlockState, ?>) value).first();
+     }
+ 
+     /**
+-     * Calls {@link #internalApplyOrSetUpVisualization(ServerLevel, BlockState, ServerPlayer, ClientPerspective, BlockStateVisualizationPurpose, boolean)}
+-     * with {@code doSetUp} being false.
++     * The same as
++     * {@link #getReplacementBlockState(ServerLevel, int, int, int, BlockState, ServerPlayer, ClientPerspective, BlockStateVisualizationPurpose, boolean)},
++     * but with fewer parameters, and {@code isPacketSend} false.
++     * <p>
++     *     This method can be used for visualizations that occur in a way not bound to any specific coordinates.
++     *     To accommodate those cases, implementations of this method must always return a non-null value for any
++     *     such occurrence in code.
++     * </p>
+      */
+-    public final @Nullable BlockState applyVisualization(
++    protected @Nullable BlockState getReplacementBlockState(
+         ServerLevel level,
+         BlockState actual,
+         ServerPlayer player,
+         ClientPerspective clientPerspective,
+         BlockStateVisualizationPurpose purpose
+     ) {
+-        var value = this.internalApplyOrSetUpVisualization(
+-            level,
++        return this.getReplacementBlockState(
+             actual,
+             player,
+             clientPerspective,
+-            purpose,
+-            false
++            purpose
+         );
+-        return value instanceof BlockState blockState ? blockState : ((Pair<BlockState, ?>) value).first();
+     }
+ 
+     /**
+      * Calls {@link #internalApplyOrSetUpVisualization(ServerLevel, int, int, int, BlockState, ServerPlayer, ClientPerspective, BlockStateVisualizationPurpose, boolean)}
+-     * with {@code doSetUp} being false.
++     * with {@code onlyComputeBlockState} being true.
+      */
+-    public final BlockState applyVisualization(
++    public final BlockState getReplacementBlockState(
+         ServerLevel level,
+         int x,
+         int y,
+@@ -228,16 +282,16 @@ public abstract class BlockStateVisualizationSetupper {
+             player,
+             clientPerspective,
+             purpose,
+-            false
++            true
+         );
+         return value instanceof BlockState blockState ? blockState : ((Pair<BlockState, ?>) value).first();
+     }
+ 
+     /**
+      * Calls {@link #internalApplyOrSetUpVisualization(BlockState, BlockStateVisualizationPurpose, boolean)}
+-     * with {@code doSetUp} being true.
++     * with {@code onlyComputeBlockState} being false.
+      */
+-    public final @Nullable Pair<BlockState, @Nullable Pair<@Nullable List<Packet>, @Nullable List<Packet>>> setUpVisualization(
++    public final @Nullable Pair<BlockState, @Nullable List<Packet>> setUpVisualization(
+         BlockState actual,
+         BlockStateVisualizationPurpose purpose
+     ) {
+@@ -245,7 +299,7 @@ public abstract class BlockStateVisualizationSetupper {
+         var value = this.internalApplyOrSetUpVisualization(
+             actual,
+             purpose,
+-            true
++            false
+         );
+         @Nullable List<Packet> additionalPackets = pollCaughtPackets();
+         return value instanceof Pair<?, ?> ? ((Pair<BlockState, Pair<List<Packet>, List<Packet>>>) value) : Pair.of((BlockState) value, null);
+@@ -253,7 +307,7 @@ public abstract class BlockStateVisualizationSetupper {
+ 
+     /**
+      * Calls {@link #internalApplyOrSetUpVisualization(BlockState, ServerPlayer, ClientPerspective, BlockStateVisualizationPurpose, boolean)}
+-     * with {@code doSetUp} being true.
++     * with {@code onlyComputeBlockState} being false.
+      */
+     public final @Nullable Pair<BlockState, @Nullable List<Packet<?>>> setUpVisualization(
+         BlockState actual,
+@@ -266,14 +320,14 @@ public abstract class BlockStateVisualizationSetupper {
+             player,
+             clientPerspective,
+             purpose,
+-            true
++            false
+         );
+         return value instanceof Pair<?, ?> ? ((Pair<BlockState, Pair<List<Packet>, List<Packet>>>) value) : Pair.of((BlockState) value, null);
+     }
+ 
+     /**
+      * Calls {@link #internalApplyOrSetUpVisualization(ServerLevel, BlockState, ServerPlayer, ClientPerspective, BlockStateVisualizationPurpose, boolean)}
+-     * with {@code doSetUp} being true.
++     * with {@code onlyComputeBlockState} being false.
+      */
+     public final @Nullable Pair<BlockState, @Nullable List<Packet<?>>> setUpVisualization(
+         ServerLevel level,
+@@ -288,14 +342,14 @@ public abstract class BlockStateVisualizationSetupper {
+             player,
+             clientPerspective,
+             purpose,
+-            true
++            false
+         );
+         return value instanceof Pair<?, ?> ? ((Pair<BlockState, Pair<List<Packet>, List<Packet>>>) value) : Pair.of((BlockState) value, null);
+     }
+ 
+     /**
+      * Calls {@link #internalApplyOrSetUpVisualization(ServerLevel, int, int, int, BlockState, ServerPlayer, ClientPerspective, BlockStateVisualizationPurpose, boolean)}
+-     * with {@code doSetUp} being true.
++     * with {@code onlyComputeBlockState} being false.
+      */
+     public final Pair<BlockState, @Nullable List<Packet<?>>> setUpVisualization(
+         ServerLevel level,
+@@ -316,90 +370,117 @@ public abstract class BlockStateVisualizationSetupper {
+             player,
+             clientPerspective,
+             purpose,
+-            true
++            false
+         );
+         return value instanceof Pair<?, ?> ? ((Pair<BlockState, Pair<List<Packet>, List<Packet>>>) value) : Pair.of((BlockState) value, null);
+     }
+ 
+     /**
+-     * The same as
+-     * {@link #internalApplyOrSetUpVisualization(BlockState, ServerPlayer, ClientPerspective, BlockStateVisualizationPurpose, boolean)},
+-     * but with even fewer parameters.
+-     * <p>
+-     *     This method can be used for visualizations that occur in a way not bound to any specific client perspective.
+-     *     To accommodate those cases, implementations of this method must always return a non-null value for any
+-     *     such occurrence in code.
+-     * </p>
+-     */
+-    protected abstract @Nullable Object internalApplyOrSetUpVisualization(
+-        BlockState actual,
+-        BlockStateVisualizationPurpose purpose,
+-        boolean doSetUp
+-    );
+-
+-    /**
+-     * The same as
+-     * {@link #internalApplyOrSetUpVisualization(ServerLevel, BlockState, ServerPlayer, ClientPerspective, BlockStateVisualizationPurpose, boolean)},
+-     * but with even fewer parameters.
+-     * <p>
+-     *     This method can be used for visualizations that occur in a way not bound to any specific location.
+-     *     To accommodate those cases, implementations of this method must always return a non-null value for any
+-     *     such occurrence in code.
+-     * </p>
+-     */
+-    protected @Nullable Object internalApplyOrSetUpVisualization(
+-        BlockState actual,
+-        ServerPlayer player,
+-        ClientPerspective clientPerspective,
+-        BlockStateVisualizationPurpose purpose,
+-        boolean doSetUp
+-    ) {
+-        return this.internalApplyOrSetUpVisualization(
+-            actual,
+-            purpose,
+-            doSetUp
+-        );
+-    }
+-
+-    /**
+-     * The same as
+-     * {@link #internalApplyOrSetUpVisualization(ServerLevel, int, int, int, BlockState, ServerPlayer, ClientPerspective, BlockStateVisualizationPurpose, boolean)},
+-     * but with fewer parameters.
++     * Returns the replacement {@link BlockState}, that is the basis of the desired visualization.
++     * If {@code isPacketSend} is true, then this method will also perform setup to keep the {@link BlockState}
++     * seen by the client up-to-date based on dynamic circumstances.
+      * <p>
+-     *     This method returns null, instead of a {@link BlockState}, if the visualization requires more information
+-     *     than available with these parameters.
++     *     This method is called with {@code isPacketSend} being true
++     *     every time (with {@link BlockStateVisualizationPurpose#PHYSICAL}) a block update is
++     *     sent to a player, except for when a block update is sent by some process maintaining the visualization
++     *     of a block set up using this method before, as part of a change in dynamic circumstances
++     *     (as mentioned above) that requires a different {@link BlockState} to be observed by the client.
++     *     <br>
++     *     In other words, if the block has remained visible to the player (i.e. not going out of view distance range),
++     *     and this method has already been called a previous time, leading to some setup having been performed for
++     *     the {@link BlockState} that was passed at that time, then when something different than a change in the
++     *     intended visualization of that previously sent block leads to a block state update packet  for that block
++     *     being sent to the player again (normally a change in the physical state of the block, but it could also
++     *     be an invocation of {@link Player#sendBlockChange}, for example), this method is called again.
+      * </p>
+      * <p>
+-     *     This method can be used for visualizations that occur in a way not bound to any specific coordinates.
+-     *     To accommodate those cases, implementations of this method must always return a non-null value for any
+-     *     such occurrence in code.
++     *     This method is called with {@code isPacketSend} being false when the returned {@link BlockState} will
++     *     not be used to send a visible state of the physical block to the client, but must be known to send
++     *     other packets or interpret serverbound packets, where such sending or interpreting depends on the
++     *     observations of the client. For example, block particles belonging to the physical block should match
++     *     with the block state the client sees, and the minimum block breaking time can be made flexible for
++     *     clients that are seeing a quicker-to-break block state.
+      * </p>
+      * <p>
+-     *     Additionally, this method can be used to see if there is a coordinates-invariant visualization.
+-     *     In the case of chunk packets, this may mean that even when visualizations need to be applied,
+-     *     the chunk packet's buffer does not need to be entirely rewritten (only its block state palette).
++     *     For {@link BlockStateVisualizationPurpose#PHYSICAL} purposes:
++     *     <br>
++     *     When needed to be able to dynamically update the visualization based on changing circumstances,
++     *     the implementation of this method must perform a setup that makes sure that some process listening for
++     *     a change in those circumstances sends a block change to the player without invoking any visualization setup
++     *     <!-- // Fiddle start - client perspective - block state visualization - ability to send visualization changes -->
++     *     again: by sending {@link net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket} with the
++     *     {@link net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket#isVisualizationChange} flag
++     *     set to true, which can be done with {@link ServerPlayer#sendVisualizationChangeBlockUpdate}.
++     *     <!-- // Fiddle end - client perspective - block state visualization - ability to send visualization changes -->
++     *     <br>
++     *     Additionally, if {@code isPacketSend} is true,
++     *     the implementation of this method must make sure to properly clean up any listeners
++     *     for a change in circumstances that may already exist for this particular client and block location
++     *     (due to a previous invocation of this method) and are no longer necessary.
++     *     This cleaning up falls within the responsibility of this method to allow implementations to prevent
++     *     doing a full cleanup of existing listeners, but rather re-using them, when possible
++     *     (for example, if both the old and new visualization require an item display entity to be shown, then
++     *     an update for the entity can be sent to the client - rather than both an entity despawn and spawn).
+      * </p>
++     *
++     * @param level The world of the block.
++     * @param x The x coordinate of the block.
++     * @param y The x coordinate of the block.
++     * @param z The x coordinate of the block.
++     * @param actual The actual state of the block.
++     *               Note that the actual state of the block is not necessarily its physical state if it were retrieved
++     *               from the world right now: it is the actual state as being the state that we wish the client to be
++     *               able to see as well as possible. The difference lies in the fact that this actual state must be
++     *               derived from the contents of a (potentially hypothetical) original packet that would be sent to
++     *               the client. For example, if a plugin calls {@link org.bukkit.entity.Player#sendBlockChange},
++     *               this method would be called with the {@code actual} state being that passed to the method,
++     *               not the physical state in the world. Similarly, if anti-x-ray makes a replacement for a block,
++     *               this method will be called with the {code actual} state being the replacement, not the original.
++     * @param player The player of the client that will be observing the block.
++     * @param clientPerspective The {@link ClientPerspective} of the given {@code player}.
++     *                          While this could be derived using {@link ServerPlayer#getClientPerspective},
++     *                          it is passed to this method for efficiency, as it is typically already known
++     *                          to the caller of this method.
++     *                          Note that it must be non-null: no block state visualization can be performed
++     *                          for a client with no known perspective yet.
++     * @param purpose The {@linkplain BlockStateVisualizationPurpose purpose} of the visualization.
++     *
++     * @return Either:
++     * <ul>
++     *     <li>the {@link BlockState} to send to the client as part of the packet that caused this visualization, or</li>
++     *     <li>
++     *         a {@link Pair} of the aforementioned {@link BlockState}, along with a list of {@link Packet}s to
++     *         be sent to achieve the desired visualization.
++     *     </li>
++     * </ul>
+      */
+-    protected @Nullable Object internalApplyOrSetUpVisualization(
++    protected BlockState getReplacementBlockState(
+         ServerLevel level,
++        int x,
++        int y,
++        int z,
+         BlockState actual,
+         ServerPlayer player,
+         ClientPerspective clientPerspective,
+         BlockStateVisualizationPurpose purpose,
+-        boolean doSetUp
++        boolean isPacketSend
+     ) {
+-        return this.internalApplyOrSetUpVisualization(
++        return this.getReplacementBlockState(
++            level,
+             actual,
+             player,
+             clientPerspective,
+-            purpose,
+-            doSetUp
++            purpose
+         );
+     }
+ 
+     /**
+-     * Performs the necessary setup of a client observing a block, of which the desired visualization
+-     * may or may not change based on dynamic circumstances.
++     * The same as the corresponding {@link #getReplacementBlockState}, but this returns a list of
++     * complementary {@link Packet}s that must be sent to achieve the desired visualization.
++     * <p>
++     *     This behaves like {@link #getReplacementBlockState} with {@code isPacketSend} true,
++     *     in that it perform all necessary setup do keep the returned packets up-to-date.
++     * </p>
+      * <p>
+      *     This method is called every time (with {@link BlockStateVisualizationPurpose#PHYSICAL}) a block update is
+      *     sent to a player, except for when a block update is sent by some process maintaining the visualization
+@@ -465,7 +546,7 @@ public abstract class BlockStateVisualizationSetupper {
+      *     </li>
+      * </ul>
+      */
+-    protected Object internalApplyOrSetUpVisualization(
++    protected BlockState getReplacementBlockState(
+         ServerLevel level,
+         int x,
+         int y,
+@@ -473,20 +554,18 @@ public abstract class BlockStateVisualizationSetupper {
+         BlockState actual,
+         ServerPlayer player,
+         ClientPerspective clientPerspective,
+-        BlockStateVisualizationPurpose purpose,
+-        boolean doSetUp
++        BlockStateVisualizationPurpose purpose
+     ) {
+-        return this.internalApplyOrSetUpVisualization(
++        return this.getReplacementBlockState(
+             level,
+             actual,
+             player,
+             clientPerspective,
+-            purpose,
+-            doSetUp
++            purpose
+         );
+     }
+ 
+-    enum BlockStateVisualizationPurpose {
++    public enum BlockStateVisualizationPurpose {
+         /**
+          * For block states that are the state of a physical block in a chunk,
+          * e.g. as part of chunk packets or individual block update packets.
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/block/OnePerCategoryBlockStateVisualizationSetupper.java b/src/main/java/org/fiddlemc/fiddle/packet/block/OnePerCategoryBlockStateVisualizationSetupper.java
+index 8422af8f745c483eef2ba74766ab8abfb75f57f4..1427faef6cb72c023260a453fdd99fd1f62cbaac 100644
+--- a/src/main/java/org/fiddlemc/fiddle/packet/block/OnePerCategoryBlockStateVisualizationSetupper.java
++++ b/src/main/java/org/fiddlemc/fiddle/packet/block/OnePerCategoryBlockStateVisualizationSetupper.java
+@@ -43,7 +43,7 @@ public final class OnePerCategoryBlockStateVisualizationSetupper extends BlockSt
+     }
+ 
+     /**
+-     * Always return false;
++     * Always return null.
+      * <br>
+      * <!-- // Fiddle start - client perspective - block state visualization - BlockState field for visualization setupper -->
+      * Could theoretically be true if all the possible replacements equal the given actual {@link BlockState},
+@@ -51,40 +51,15 @@ public final class OnePerCategoryBlockStateVisualizationSetupper extends BlockSt
+      * <!-- // Fiddle end - client perspective - block state visualization - BlockState field for visualization setupper -->
+      */
+     @Override
+-    public @NotNull Boolean preCheckWhetherDefinitelyHasNoVisualizationDifferentThanItself(
++    public @Nullable Boolean preCheckWhetherDefinitelyHasNoVisualizationDifferentThanItself(
+         BlockState actual,
+         BlockStateVisualizationPurpose purpose
+     ) {
+-        return false;
+-    }
+-
+-    @Override
+-    public @NotNull Boolean preCheckWhetherDefinitelyHasNoVisualizationDifferentThanItself(
+-        BlockState actual,
+-        ServerPlayer player,
+-        ClientPerspective clientPerspective,
+-        BlockStateVisualizationPurpose purpose
+-    ) {
+-        return this.replacements[clientPerspective.category.ordinal()] == actual;
++        return null;
+     }
+ 
+     @Override
+     public @NotNull Boolean preCheckWhetherDefinitelyHasNoVisualizationDifferentThanItself(
+-        ServerLevel level,
+-        BlockState actual,
+-        ServerPlayer player,
+-        ClientPerspective clientPerspective,
+-        BlockStateVisualizationPurpose purpose
+-    ) {
+-        return this.replacements[clientPerspective.category.ordinal()] == actual;
+-    }
+-
+-    @Override
+-    public boolean preCheckWhetherDefinitelyHasNoVisualizationDifferentThanItself(
+-        ServerLevel level,
+-        int x,
+-        int y,
+-        int z,
+         BlockState actual,
+         ServerPlayer player,
+         ClientPerspective clientPerspective,

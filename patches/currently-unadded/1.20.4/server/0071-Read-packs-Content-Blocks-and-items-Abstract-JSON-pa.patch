@@ -1,0 +1,90 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Thu, 25 Jan 2024 21:12:57 +0100
+Subject: [PATCH] Read packs - Content - Blocks and items - Abstract JSON
+ parser
+
+Adds the abstract `BlockOrItemDefinitionParser` class, that is a base for the block and item definition parsers, defined in the
+"Read packs - Content - Blocks - JSON parser" and "Read packs - Content - Items - JSON parser" patches.
+
+This also includes an abstract `BlockOrItemPropertiesDefinitionParser` class, that is a base for the corresponding properties parsers.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/blockoritem/BlockOrItemDefinitionParser.java b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/blockoritem/BlockOrItemDefinitionParser.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..ee3c05e73f6e1751c45ff6351c05444292091bfc
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/blockoritem/BlockOrItemDefinitionParser.java
+@@ -0,0 +1,44 @@
++// Fiddle - read packs - blocks and items - JSON parser
++
++package org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.blockoritem;
++
++import net.minecraft.resources.ResourceLocation;
++import org.fiddlemc.fiddle.pack.exception.PackException;
++import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.withparent.FiddleContentDefinitionParent;
++import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.withparent.FiddleContentDefinitionWithParentParser;
++import org.fiddlemc.fiddle.pack.read.namedjson.NamedJsonObject;
++
++public abstract class BlockOrItemDefinitionParser<PropertiesDefinition extends BlockOrItemPropertiesDefinition, T extends BlockOrItemDefinition<PropertiesDefinition>>
++    extends FiddleContentDefinitionWithParentParser<T> {
++
++    public static final String propertiesJsonKey = "properties";
++
++    private final BlockOrItemPropertiesDefinitionParser<PropertiesDefinition> propertiesParser;
++
++    protected BlockOrItemDefinitionParser(BlockOrItemPropertiesDefinitionParser<PropertiesDefinition> propertiesParser) {
++        super();
++        this.propertiesParser = propertiesParser;
++    }
++
++    protected abstract T parse(
++        ResourceLocation resourceLocation,
++        NamedJsonObject definitionJson,
++        FiddleContentDefinitionParent parent,
++        PropertiesDefinition propertiesDefinition
++    ) throws PackException;
++
++    @Override
++    protected final T parse(
++        ResourceLocation resourceLocation,
++        NamedJsonObject definitionJson,
++        FiddleContentDefinitionParent parent
++    ) throws PackException {
++        // Parse the properties
++        var propertiesJson = definitionJson.getAsJsonObjectIfPresent(propertiesJsonKey);
++        var propertiesDefinition = this.propertiesParser.parse(propertiesJson);
++
++        // Parse the rest
++        return this.parse(resourceLocation, definitionJson, parent, propertiesDefinition);
++    }
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/blockoritem/BlockOrItemPropertiesDefinitionParser.java b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/blockoritem/BlockOrItemPropertiesDefinitionParser.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..8a2d9457b8bdedde4015cb5f2ebc45082066fb04
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/blockoritem/BlockOrItemPropertiesDefinitionParser.java
+@@ -0,0 +1,20 @@
++// Fiddle - read packs - blocks and items - JSON parser
++
++package org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.blockoritem;
++
++import org.fiddlemc.fiddle.pack.exception.PackException;
++import org.fiddlemc.fiddle.pack.read.namedjson.NamedJsonObject;
++
++public abstract class BlockOrItemPropertiesDefinitionParser<PropertiesDefinition> {
++
++    protected abstract PropertiesDefinition actualParse(//TODO
++        NamedJsonObject propertiesJson
++    ) throws PackException;
++
++    public final PropertiesDefinition parse(
++        NamedJsonObject propertiesJson
++    ) throws PackException {
++        return this.actualParse(propertiesJson);
++    }
++
++}

@@ -1,0 +1,130 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Fri, 5 Jan 2024 17:34:50 +0100
+Subject: [PATCH] Client perspective - Block state visualization - Determine
+ and store desired setuppers
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
+index bea9d135e568ce9d709f29311bd10a7a3d26c8ff..b3f92920b020b305d5e7e21acedd36c58acc9234 100644
+--- a/src/main/java/net/minecraft/server/Main.java
++++ b/src/main/java/net/minecraft/server/Main.java
+@@ -169,6 +169,8 @@ public class Main {
+             Path path1 = Paths.get("server.properties");
+             DedicatedServerSettings dedicatedserversettings = new DedicatedServerSettings(optionset); // CraftBukkit - CLI argument support
+ 
++            org.fiddlemc.fiddle.pack.load.fiddlecontent.block.BlockStateVisualizationLoader.determineAndStore(); // Fiddle - client perspective - block state visualization - determine and store desired setuppers
++
+             // Fiddle start - modifiable Bukkit enums - inject runtime versions - common utilities
+             ClassLoader systemClassLoader = ClassLoader.getSystemClassLoader();
+             class InjectRuntimeClassVersionHelper {
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/load/fiddlecontent/block/BlockStateVisualizationLoader.java b/src/main/java/org/fiddlemc/fiddle/pack/load/fiddlecontent/block/BlockStateVisualizationLoader.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..ab03a942f6ba12bf81e06ed288c2631e04bf3d7c
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/load/fiddlecontent/block/BlockStateVisualizationLoader.java
+@@ -0,0 +1,102 @@
++// Fiddle - client perspective - block state visualization - determine and store desired setuppers
++
++package org.fiddlemc.fiddle.pack.load.fiddlecontent.block;
++
++import com.mojang.logging.LogUtils;
++import net.minecraft.core.registries.BuiltInRegistries;
++import net.minecraft.world.level.block.Block;
++import net.minecraft.world.level.block.Blocks;
++import net.minecraft.world.level.block.StairBlock;
++import net.minecraft.world.level.block.state.BlockState;
++import net.minecraft.world.level.block.state.StateDefinition;
++import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.block.BlockDefinition;
++import org.fiddlemc.fiddle.packet.block.OnePerCategoryBlockStateVisualizationSetupper;
++import org.slf4j.Logger;
++
++import java.util.List;
++import java.util.stream.Collectors;
++
++/**
++ * A utility class to determine and store the visualizations of {@link BlockState}s,
++ * based on their actual runtime details (which will have been based on their {@link Block}s being
++ * {@linkplain BlockByDefinitionLoader#register(List) loaded} from their definitions),
++ * any relevant settings in their {@linkplain BlockDefinition definition} (such as specific strategy settings
++ * for the visuals) and the corresponding visual assets.
++ */
++public final class BlockStateVisualizationLoader {
++
++    private BlockStateVisualizationLoader() {
++        throw new RuntimeException();
++    }
++
++    private static final Logger LOGGER = LogUtils.getLogger();
++
++    private static final Block archetypalCubeBlock = Blocks.STONE;
++    private static final Block archetypalStairsBlock = Blocks.STONE_STAIRS;
++
++    /**
++     * @return Whether for the given {@code state},
++     * there is at least one match in the given {@code stateDefinition} that has the same properties.
++     */
++    private static boolean stateHasPropertyMatchInDefinition(BlockState state, StateDefinition<Block, BlockState> stateDefinition) {
++        var stateProperties = state.getProperties().stream().collect(Collectors.toSet());
++        for (var stateInDefinition : stateDefinition.getPossibleStates()) {
++            if (stateProperties.equals(stateInDefinition.getProperties().stream().collect(Collectors.toSet()))) {
++                return true;
++            }
++        }
++        return false;
++    }
++
++    /**
++     * @return Whether the given state definitions have the same states w.r.t. their
++     * {@linkplain BlockState#getProperties properties}.
++     * In other words, whether for each state in either of the definitions, there is a state with the same
++     * property values in the other definition.
++     */
++    private static boolean stateDefinitionsMatch(StateDefinition<Block, BlockState> stateDefinition1, StateDefinition<Block, BlockState> stateDefinition2) {
++        return stateDefinition1.getPossibleStates().stream().allMatch(state -> stateHasPropertyMatchInDefinition(state, stateDefinition2)) &&
++            stateDefinition2.getPossibleStates().stream().allMatch(state -> stateHasPropertyMatchInDefinition(state, stateDefinition1));
++    }
++
++    /**
++     * @return Whether the state definitions of the given blocks
++     * {@linkplain #stateDefinitionsMatch(StateDefinition, StateDefinition) match}.
++     */
++    private static boolean stateDefinitionsMatch(Block block1, Block block2) {
++        return stateDefinitionsMatch(block1.getStateDefinition(), block2.getStateDefinition());
++    }
++
++    public static void determineAndStore() {
++        // TODO replace by actual implementation
++        for (var block : BuiltInRegistries.BLOCK) {
++            if (!block.isVanilla()) {
++                Block defaultReplacement;
++                Block withEnabledResourcePackReplacement;
++                if (block instanceof StairBlock && stateDefinitionsMatch(block, archetypalStairsBlock)) {
++                    defaultReplacement = Blocks.PURPUR_STAIRS;
++                    withEnabledResourcePackReplacement = Blocks.STONE_BRICK_STAIRS;
++                } else if (stateDefinitionsMatch(block, archetypalCubeBlock)) {
++                    defaultReplacement = Blocks.PURPLE_WOOL;
++                    withEnabledResourcePackReplacement = Blocks.STONE_BRICKS;
++                } else {
++                    defaultReplacement = Blocks.STONE;
++                    withEnabledResourcePackReplacement = defaultReplacement;
++                    LOGGER.warn("No visualization could be created for block '" + block.keyInBlockRegistry + "' because its type ('" + block.getClass().getName() + "') is not supported yet");
++                    LOGGER.warn("(Defaulting to the default state of '" + defaultReplacement.keyInBlockRegistry + "')");
++                }
++                for (var state : block.getStateDefinition().getPossibleStates()) {
++                    state.visualizationSetupper = new OnePerCategoryBlockStateVisualizationSetupper(perspective ->
++                        switch (perspective) {
++                            case JAVA_DEFAULT -> defaultReplacement.withPropertiesOf(state);
++                            case JAVA_WITH_ENABLED_RESOURCE_PACK ->
++                                withEnabledResourcePackReplacement.withPropertiesOf(state);
++                            case JAVA_WITH_FIDDLE_CLIENT_MOD -> state;
++                        }
++                    );
++                }
++            }
++        }
++    }
++
++}

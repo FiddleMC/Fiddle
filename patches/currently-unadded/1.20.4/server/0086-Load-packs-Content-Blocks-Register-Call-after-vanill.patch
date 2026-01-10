@@ -1,0 +1,25 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Thu, 25 Jan 2024 19:29:00 +0100
+Subject: [PATCH] Load packs - Content - Blocks - Register - Call after vanilla
+ bootstrap
+
+This calls the block registration defined in the patch "Load packs - Content - Blocks - Register - Implementation"
+with the blocks passed to the bootstrap in the patch "Load packs - Content - Definitions - Pass read definitions to bootstrap"
+at the appropriate time after the vanilla blocks have been bootstrapped, but before any plugin bootstrap code is called.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/server/Bootstrap.java b/src/main/java/net/minecraft/server/Bootstrap.java
+index f2a434720d1b9c56e68a1df9c7bc4ed6eb9cb38e..6610e86ba19f439acd02f2f35af5e5c74461b5ca 100644
+--- a/src/main/java/net/minecraft/server/Bootstrap.java
++++ b/src/main/java/net/minecraft/server/Bootstrap.java
+@@ -87,6 +87,7 @@ public class Bootstrap {
+                     EntitySelectorOptions.bootStrap();
+                     DispenseItemBehavior.bootStrap();
+                     CauldronInteraction.bootStrap();
++                    org.fiddlemc.fiddle.pack.load.fiddlecontent.block.BlockByDefinitionLoader.INSTANCE.register(readContentDefinitions.get(org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.block.BlockDefinition.TYPE)); // Fiddle - load packs - blocks - register - call after vanilla bootstrap
+                     // Paper start
+                     BuiltInRegistries.bootStrap(() -> {
+                         io.papermc.paper.world.worldgen.OptionallyFlatBedrockConditionSource.bootstrap(); // Paper - Flat bedrock generator settings

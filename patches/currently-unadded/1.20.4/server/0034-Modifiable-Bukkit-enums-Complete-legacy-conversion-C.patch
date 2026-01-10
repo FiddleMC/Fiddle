@@ -1,0 +1,244 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Mon, 8 Jan 2024 19:04:41 +0100
+Subject: [PATCH] Modifiable Bukkit enums - Complete legacy conversion -
+ Conversion is explicitly for item or block
+
+* Makes the `itemPriority` parameter of the `CraftLegacy.fromLegacy` method required.
+* Modifies occurrences of abovementioned method to explicitly specify a value for the parameter.
+
+This is, apart from the benefits of increased explicitness, so the full coverage of legacy conversion can be tested in the "Modifiable Bukkit enums - Complete legacy conversion - Test completeness" patch.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/bukkit/craftbukkit/inventory/CraftInventory.java b/src/main/java/org/bukkit/craftbukkit/inventory/CraftInventory.java
+index af1ae3dacb628da23f7d2988c6e76d3fb2d64103..5cc7c084694c6834ae112d2ef663518e7f78b4a6 100644
+--- a/src/main/java/org/bukkit/craftbukkit/inventory/CraftInventory.java
++++ b/src/main/java/org/bukkit/craftbukkit/inventory/CraftInventory.java
+@@ -103,7 +103,7 @@ public class CraftInventory implements Inventory {
+     @Override
+     public boolean contains(Material material) {
+         Preconditions.checkArgument(material != null, "Material cannot be null");
+-        material = CraftLegacy.fromLegacy(material);
++        material = CraftLegacy.fromLegacy(material, true); // Fiddle - modifiable Bukkit enums - Material - make legacy conversion complete - conversion is explicitly for item or block
+         for (ItemStack item : this.getStorageContents()) {
+             if (item != null && item.getType() == material) {
+                 return true;
+@@ -128,7 +128,7 @@ public class CraftInventory implements Inventory {
+     @Override
+     public boolean contains(Material material, int amount) {
+         Preconditions.checkArgument(material != null, "Material cannot be null");
+-        material = CraftLegacy.fromLegacy(material);
++        material = CraftLegacy.fromLegacy(material, true); // Fiddle - modifiable Bukkit enums - Material - make legacy conversion complete - conversion is explicitly for item or block
+         if (amount <= 0) {
+             return true;
+         }
+@@ -177,7 +177,7 @@ public class CraftInventory implements Inventory {
+     @Override
+     public HashMap<Integer, ItemStack> all(Material material) {
+         Preconditions.checkArgument(material != null, "Material cannot be null");
+-        material = CraftLegacy.fromLegacy(material);
++        material = CraftLegacy.fromLegacy(material, true); // Fiddle - modifiable Bukkit enums - Material - make legacy conversion complete - conversion is explicitly for item or block
+         HashMap<Integer, ItemStack> slots = new HashMap<>();
+ 
+         ItemStack[] inventory = this.getStorageContents();
+@@ -207,7 +207,7 @@ public class CraftInventory implements Inventory {
+     @Override
+     public int first(Material material) {
+         Preconditions.checkArgument(material != null, "Material cannot be null");
+-        material = CraftLegacy.fromLegacy(material);
++        material = CraftLegacy.fromLegacy(material, true); // Fiddle - modifiable Bukkit enums - Material - make legacy conversion complete - conversion is explicitly for item or block
+         ItemStack[] inventory = this.getStorageContents();
+         for (int i = 0; i < inventory.length; i++) {
+             ItemStack item = inventory[i];
+@@ -262,7 +262,7 @@ public class CraftInventory implements Inventory {
+ 
+     public int firstPartial(Material material) {
+         Preconditions.checkArgument(material != null, "Material cannot be null");
+-        material = CraftLegacy.fromLegacy(material);
++        material = CraftLegacy.fromLegacy(material, true); // Fiddle - modifiable Bukkit enums - Material - make legacy conversion complete - conversion is explicitly for item or block
+         ItemStack[] inventory = this.getStorageContents();
+         for (int i = 0; i < inventory.length; i++) {
+             ItemStack item = inventory[i];
+@@ -421,7 +421,7 @@ public class CraftInventory implements Inventory {
+     @Override
+     public void remove(Material material) {
+         Preconditions.checkArgument(material != null, "Material cannot be null");
+-        material = CraftLegacy.fromLegacy(material);
++        material = CraftLegacy.fromLegacy(material, true); // Fiddle - modifiable Bukkit enums - Material - make legacy conversion complete - conversion is explicitly for item or block
+         ItemStack[] items = this.getStorageContents();
+         for (int i = 0; i < items.length; i++) {
+             if (items[i] != null && items[i].getType() == material) {
+diff --git a/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemFactory.java b/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemFactory.java
+index 71aac5d4cf29cea9daa378fc8ac584750de4d1ca..9d3035f0fb04003ef632135fa8449f1fc4a52c8d 100644
+--- a/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemFactory.java
++++ b/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemFactory.java
+@@ -47,7 +47,7 @@ public final class CraftItemFactory implements ItemFactory {
+ 
+     @Override
+     public boolean isApplicable(ItemMeta meta, Material type) {
+-        type = CraftLegacy.fromLegacy(type); // This may be called from legacy item stacks, try to get the right material
++        type = CraftLegacy.fromLegacy(type, true); // This may be called from legacy item stacks, try to get the right material // Fiddle - modifiable Bukkit enums - Material - make legacy conversion complete - conversion is explicitly for item or block
+         if (type == null || meta == null) {
+             return false;
+         }
+@@ -64,7 +64,7 @@ public final class CraftItemFactory implements ItemFactory {
+     }
+ 
+     private ItemMeta getItemMeta(Material material, CraftMetaItem meta) {
+-        material = CraftLegacy.fromLegacy(material); // This may be called from legacy item stacks, try to get the right material
++        material = CraftLegacy.fromLegacy(material, true); // This may be called from legacy item stacks, try to get the right material // Fiddle - modifiable Bukkit enums - Material - make legacy conversion complete - conversion is explicitly for item or block
+         switch (material) {
+         case AIR:
+             return null;
+diff --git a/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemStack.java b/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemStack.java
+index 870954fc59efdc1e0c6b5047f5a89dfaf7522d0e..31f3072d051285d792ed2cc11cab2902e6052c57 100644
+--- a/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemStack.java
++++ b/src/main/java/org/bukkit/craftbukkit/inventory/CraftItemStack.java
+@@ -692,7 +692,7 @@ public final class CraftItemStack extends ItemStack {
+         if (this.handle == null || that.handle == null) {
+             return false;
+         }
+-        Material comparisonType = CraftLegacy.fromLegacy(that.getType()); // This may be called from legacy item stacks, try to get the right material
++        Material comparisonType = CraftLegacy.fromLegacy(that.getType(), true); // This may be called from legacy item stacks, try to get the right material // Fiddle - modifiable Bukkit enums - Material - make legacy conversion complete - conversion is explicitly for item or block
+         if (!(comparisonType == this.getType() && this.getDurability() == that.getDurability())) {
+             return false;
+         }
+diff --git a/src/main/java/org/bukkit/craftbukkit/inventory/CraftMetaSpawnEgg.java b/src/main/java/org/bukkit/craftbukkit/inventory/CraftMetaSpawnEgg.java
+index 7ff690f386b7fb9e090c86a28f649119505af7b9..783f4b70319e924b2eab949d8b70530571cb4bca 100644
+--- a/src/main/java/org/bukkit/craftbukkit/inventory/CraftMetaSpawnEgg.java
++++ b/src/main/java/org/bukkit/craftbukkit/inventory/CraftMetaSpawnEgg.java
+@@ -321,7 +321,7 @@ public class CraftMetaSpawnEgg extends CraftMetaItem implements SpawnEggMeta {
+                 this.entityTag.remove(CraftMetaSpawnEgg.ENTITY_ID.NBT);
+             }
+ 
+-            return CraftLegacy.fromLegacy(new MaterialData(Material.LEGACY_MONSTER_EGG, (byte) this.spawnedType.getTypeId()));
++            return CraftLegacy.fromLegacy(new MaterialData(Material.LEGACY_MONSTER_EGG, (byte) this.spawnedType.getTypeId()), true); // Fiddle - modifiable Bukkit enums - Material - make legacy conversion complete - conversion is explicitly for item or block
+         }
+ 
+         return super.updateMaterial(material);
+diff --git a/src/main/java/org/bukkit/craftbukkit/legacy/CraftLegacy.java b/src/main/java/org/bukkit/craftbukkit/legacy/CraftLegacy.java
+index fde9aadd6c688b9797a6755f9d214918047598a0..df4bd3d1a74be65d2b1ab9c7b8feff9ddc36bfd0 100644
+--- a/src/main/java/org/bukkit/craftbukkit/legacy/CraftLegacy.java
++++ b/src/main/java/org/bukkit/craftbukkit/legacy/CraftLegacy.java
+@@ -165,16 +165,12 @@ public final class CraftLegacy {
+         return (mappedData == null) ? new MaterialData(Material.LEGACY_AIR) : mappedData;
+     }
+ 
+-    public static Material fromLegacy(Material material) {
++    public static Material fromLegacy(Material material, boolean itemPriority) { // Fiddle - modifiable Bukkit enums - Material - make legacy conversion complete - conversion is explicitly for item or block
+         if (material == null || !material.isLegacy()) {
+             return material;
+         }
+ 
+-        return CraftLegacy.fromLegacy(new MaterialData(material));
+-    }
+-
+-    public static Material fromLegacy(MaterialData materialData) {
+-        return CraftLegacy.fromLegacy(materialData, false);
++        return CraftLegacy.fromLegacy(new MaterialData(material), itemPriority); // Fiddle - modifiable Bukkit enums - Material - make legacy conversion complete - conversion is explicitly for item or block
+     }
+ 
+     public static Material fromLegacy(MaterialData materialData, boolean itemPriority) {
+diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftLegacy.java b/src/main/java/org/bukkit/craftbukkit/util/CraftLegacy.java
+index c8dde75de231b5fdde88f5bc111c21883d9c3f49..c788b24c8030a69f1428b751d218e250d142a36c 100644
+--- a/src/main/java/org/bukkit/craftbukkit/util/CraftLegacy.java
++++ b/src/main/java/org/bukkit/craftbukkit/util/CraftLegacy.java
+@@ -14,16 +14,18 @@ public final class CraftLegacy {
+         //
+     }
+ 
+-    public static Material fromLegacy(Material material) {
++    public static Material fromLegacy(Material material, boolean itemPriority) { // Fiddle - modifiable Bukkit enums - Material - make legacy conversion complete - conversion is explicitly for item or block
+         if (material == null || !material.isLegacy()) {
+             return material;
+         }
+ 
+-        return org.bukkit.craftbukkit.legacy.CraftLegacy.fromLegacy(material);
++        return org.bukkit.craftbukkit.legacy.CraftLegacy.fromLegacy(material, itemPriority); // Fiddle - modifiable Bukkit enums - Material - make legacy conversion complete - conversion is explicitly for item or block
+     }
+ 
+-    public static Material fromLegacy(MaterialData materialData) {
+-        return org.bukkit.craftbukkit.legacy.CraftLegacy.fromLegacy(materialData);
++    // Fiddle start - modifiable Bukkit enums - Material - make legacy conversion complete - conversion is explicitly for item or block
++    public static Material fromLegacy(MaterialData materialData, boolean itemPriority) {
++        return org.bukkit.craftbukkit.legacy.CraftLegacy.fromLegacy(materialData, itemPriority);
++        // Fiddle end - modifiable Bukkit enums - Material - make legacy conversion complete - conversion is explicitly for item or block
+     }
+ 
+     public static Material[] modern_values() {
+diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
+index c9741e4d0b5a228c0f3251a9af45e53b2c2da068..2b385909268285140b58c01b03f57e4422486612 100644
+--- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
++++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
+@@ -188,7 +188,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
+ 
+     public static Item getItem(Material material) {
+         if (material != null && material.isLegacy()) {
+-            material = CraftLegacy.fromLegacy(material);
++            material = CraftLegacy.fromLegacy(material, true); // Fiddle - modifiable Bukkit enums - Material - make legacy conversion complete - conversion is explicitly for item or block
+         }
+ 
+         return CraftMagicNumbers.MATERIAL_ITEM.get(material);
+@@ -196,7 +196,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
+ 
+     public static Block getBlock(Material material) {
+         if (material != null && material.isLegacy()) {
+-            material = CraftLegacy.fromLegacy(material);
++            material = CraftLegacy.fromLegacy(material, false); // Fiddle - modifiable Bukkit enums - Material - make legacy conversion complete - conversion is explicitly for item or block
+         }
+ 
+         return CraftMagicNumbers.MATERIAL_BLOCK.get(material);
+@@ -232,12 +232,12 @@ public final class CraftMagicNumbers implements UnsafeValues {
+ 
+     @Override
+     public Material fromLegacy(Material material) {
+-        return CraftLegacy.fromLegacy(material);
++        return this.fromLegacy(material, false); // Fiddle - modifiable Bukkit enums - Material - make legacy conversion complete - conversion is explicitly for item or block
+     }
+ 
+     @Override
+     public Material fromLegacy(MaterialData material) {
+-        return CraftLegacy.fromLegacy(material);
++        return this.fromLegacy(material, false); // Fiddle - modifiable Bukkit enums - Material - make legacy conversion complete - conversion is explicitly for item or block
+     }
+ 
+     @Override
+diff --git a/src/test/java/org/bukkit/craftbukkit/legacy/LegacyTest.java b/src/test/java/org/bukkit/craftbukkit/legacy/LegacyTest.java
+index df3fe5809713160e50409a2603fce4204555ace4..09591eae6db7c9a7685eed668e246369f729bcdc 100644
+--- a/src/test/java/org/bukkit/craftbukkit/legacy/LegacyTest.java
++++ b/src/test/java/org/bukkit/craftbukkit/legacy/LegacyTest.java
+@@ -137,10 +137,10 @@ public class LegacyTest extends AbstractTestingBase {
+                 assertNotEquals(Material.LEGACY_AIR, converted.getItemType(), "Could not toLegacy " + material);
+ 
+                 if (!this.INVALIDATED_MATERIALS.contains(converted.getItemType())) {
+-                    assertNotEquals(Material.AIR, CraftLegacy.fromLegacy(converted), "Could not fromLegacy(toLegacy) " + converted + "(" + material + ")");
++                    assertNotEquals(Material.AIR, CraftLegacy.fromLegacy(converted, false), "Could not fromLegacy(toLegacy) " + converted + "(" + material + ")"); // Fiddle - modifiable Bukkit enums - Material - make legacy conversion complete - conversion is explicitly for item or block
+                 }
+                 if (!this.INVERSION_FAILS.contains(material)) {
+-                    assertEquals(material, CraftLegacy.fromLegacy(converted), "Could not fromLegacy(toLegacy) " + converted + "(" + material + ")");
++                    assertEquals(material, CraftLegacy.fromLegacy(converted, false), "Could not fromLegacy(toLegacy) " + converted + "(" + material + ")"); // Fiddle - modifiable Bukkit enums - Material - make legacy conversion complete - conversion is explicitly for item or block
+                 }
+             }
+         }
+@@ -152,8 +152,8 @@ public class LegacyTest extends AbstractTestingBase {
+     public void fromLegacyMaterial() {
+         for (Material material : Material.values()) {
+             if (!this.INVALIDATED_MATERIALS.contains(material) && material.isLegacy()) {
+-                Material converted = CraftLegacy.fromLegacy(material);
+-                assertNotEquals(Material.AIR, converted, "Could not fromLegacy " + material);
++                Material converted = CraftLegacy.fromLegacy(material, false);
++                assertNotEquals(Material.AIR, converted, "Could not fromLegacy " + material); // Fiddle - modifiable Bukkit enums - Material - make legacy conversion complete - conversion is explicitly for item or block
+ 
+                 assertNotEquals(Material.AIR, CraftLegacy.toLegacy(converted), "Could not toLegacy(fromLegacy) " + converted + "(" + material + ")");
+                 if (!this.INVERSION_FAILS.contains(material)) {
+@@ -162,7 +162,7 @@ public class LegacyTest extends AbstractTestingBase {
+             }
+         }
+ 
+-        assertEquals(Material.AIR, CraftLegacy.fromLegacy(Material.LEGACY_AIR), "Could not fromLegacy Air");
++        assertEquals(Material.AIR, CraftLegacy.fromLegacy(Material.LEGACY_AIR, false), "Could not fromLegacy Air"); // Fiddle - modifiable Bukkit enums - Material - make legacy conversion complete - conversion is explicitly for item or block
+     }
+ 
+     @Test

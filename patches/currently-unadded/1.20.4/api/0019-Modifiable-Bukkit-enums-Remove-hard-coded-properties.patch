@@ -1,0 +1,171 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Mon, 10 Jul 2023 22:05:08 +0200
+Subject: [PATCH] Modifiable Bukkit enums - Remove hard-coded properties -
+ Material - Max stack size, durability
+
+Modifies the `Material` properties `getMaxStackSize()` and `getMaxDurability()` so that they are no longer hard-coded.
+
+Determining the values of the properties instead relies on functions
+(either defined in `UnsafeValues`, and implemented in `CraftMagicNumbers` in the `fiddle-server` module, or defined and implemented in `MaterialDefaultImplementations`)
+matching the already existing checks in `org.bukkit.PerMaterialTest`.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
+index 708af8737010645c7837d6bd9cb650fd5fe3d35e..9381f7fac49050b8f4b87961211c44846dbf4813 100644
+--- a/src/main/java/org/bukkit/Material.java
++++ b/src/main/java/org/bukkit/Material.java
+@@ -4695,8 +4695,8 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+     private final int id;
+     private final Constructor<? extends MaterialData> ctor;
+     private static final Map<String, Material> BY_NAME = Maps.newHashMap();
+-    private final int maxStack;
+-    private final short durability;
++    private final int maxStackHardcoded;
++    private final short durabilityHardcoded;
+     public final Class<?> data;
+     private final boolean legacy;
+     private final NamespacedKey key;
+@@ -4723,8 +4723,8 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+ 
+     private Material(final int id, final int stack, final int durability, /*@NotNull*/ final Class<?> data) {
+         this.id = id;
+-        this.durability = (short) durability;
+-        this.maxStack = stack;
++        this.durabilityHardcoded = (short) durability;
++        this.maxStackHardcoded = stack;
+         this.data = data;
+         this.legacy = this.name().startsWith(LEGACY_PREFIX);
+         this.key = NamespacedKey.minecraft(this.name().toLowerCase(Locale.ROOT));
+@@ -4838,7 +4838,20 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+      * @return Maximum stack size for this material
+      */
+     public int getMaxStackSize() {
+-        return maxStack;
++        // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - max stack size
++        return Bukkit.getUnsafe().getMaxStackSize(this);
++    }
++
++    /**
++     * Do not use for any reason.
++     * This method is for internal testing purposes only.
++     *
++     * @apiNote Internal Use Only
++     */
++    @org.jetbrains.annotations.ApiStatus.Internal
++    public int getMaxStackSizeHardcoded() {
++        return this.maxStackHardcoded;
++        // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - max stack size
+     }
+ 
+     /**
+@@ -4847,7 +4860,35 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+      * @return Maximum durability for this material
+      */
+     public short getMaxDurability() {
+-        return durability;
++        // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - durability
++        return Bukkit.getUnsafe().getMaxDurability(this);
++    }
++
++    public boolean hasNonZeroMaxDurability() {
++        return org.fiddlemc.fiddle.material.MaterialDefaultImplementations.hasNonZeroMaxDurability(this);
++    }
++
++    /**
++     * Do not use for any reason.
++     * This method is for internal testing purposes only.
++     *
++     * @apiNote Internal Use Only
++     */
++    @org.jetbrains.annotations.ApiStatus.Internal
++    public short getMaxDurabilityHardcoded() {
++        return durabilityHardcoded;
++    }
++
++    /**
++     * Do not use for any reason.
++     * This method is for internal testing purposes only.
++     *
++     * @apiNote Internal Use Only
++     */
++    @org.jetbrains.annotations.ApiStatus.Internal
++    public short getMaxDurabilityLegacy() {
++        return org.fiddlemc.fiddle.material.MaterialDefaultImplementations.getMaxDurabilityLegacy(this);
++        // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - durability
+     }
+ 
+     /**
+diff --git a/src/main/java/org/bukkit/UnsafeValues.java b/src/main/java/org/bukkit/UnsafeValues.java
+index e868e78a39386977131ecf55ad837e2cfc14b298..b738d2a3233882737570797102d9166a935eedfd 100644
+--- a/src/main/java/org/bukkit/UnsafeValues.java
++++ b/src/main/java/org/bukkit/UnsafeValues.java
+@@ -332,6 +332,10 @@ public interface UnsafeValues {
+     boolean isVanillaItem(Material material);
+     // Fiddle end - flags for vanilla content - API - item
+ 
++    int getMaxStackSize(Material material); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - max stack size
++
++    short getMaxDurability(Material material); // Fiddle - modifiable Bukkit enums - Material - remove hard-coded properties - durability
++
+     // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
+     boolean isBlock(Material material);
+ 
+diff --git a/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java b/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
+index dd46f15c51747a06dee1302ec7f23f80d2c23826..906c7d9498969992f22cb669ad1c9cdf8bbd1011 100644
+--- a/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
++++ b/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
+@@ -21,6 +21,51 @@ public final class MaterialDefaultImplementations {
+         throw new RuntimeException();
+     }
+ 
++    // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - durability
++    public static boolean hasNonZeroMaxDurability(Material material) {
++        return material.getMaxDurability() != 0;
++    }
++
++    /**
++     * @throws IllegalArgumentException If the given {@code material} is not {@linkplain Material#isLegacy() legacy}.
++     */
++    public static short getMaxDurabilityLegacy(Material material) {
++        com.google.common.base.Preconditions.checkArgument(material.isLegacy(), "Cannot call getMaxDurabilityLegacy(Material) for Modern Material");
++        return switch (material) {
++            //<editor-fold defaultstate="collapsed" desc="getMaxDurabilityLegacy">
++            case LEGACY_IRON_SPADE, LEGACY_IRON_PICKAXE, LEGACY_IRON_AXE, LEGACY_IRON_SWORD, LEGACY_IRON_HOE -> 250;
++            case LEGACY_FLINT_AND_STEEL, LEGACY_FISHING_ROD -> 64;
++            case LEGACY_BOW -> 384;
++            case LEGACY_WOOD_SWORD, LEGACY_WOOD_PICKAXE, LEGACY_WOOD_SPADE, LEGACY_WOOD_AXE, LEGACY_WOOD_HOE -> 59;
++            case LEGACY_STONE_SWORD, LEGACY_STONE_SPADE, LEGACY_STONE_PICKAXE, LEGACY_STONE_AXE, LEGACY_STONE_HOE -> 131;
++            case LEGACY_DIAMOND_SWORD, LEGACY_DIAMOND_SPADE, LEGACY_DIAMOND_PICKAXE, LEGACY_DIAMOND_AXE, LEGACY_DIAMOND_HOE -> 1561;
++            case LEGACY_GOLD_SWORD, LEGACY_GOLD_SPADE, LEGACY_GOLD_PICKAXE, LEGACY_GOLD_AXE, LEGACY_GOLD_HOE -> 32;
++            case LEGACY_LEATHER_HELMET -> 55;
++            case LEGACY_LEATHER_CHESTPLATE -> 80;
++            case LEGACY_LEATHER_LEGGINGS -> 75;
++            case LEGACY_LEATHER_BOOTS -> 65;
++            case LEGACY_CHAINMAIL_HELMET, LEGACY_IRON_HELMET -> 165;
++            case LEGACY_CHAINMAIL_CHESTPLATE, LEGACY_IRON_CHESTPLATE -> 240;
++            case LEGACY_CHAINMAIL_LEGGINGS, LEGACY_IRON_LEGGINGS -> 225;
++            case LEGACY_CHAINMAIL_BOOTS, LEGACY_IRON_BOOTS -> 195;
++            case LEGACY_DIAMOND_HELMET -> 363;
++            case LEGACY_DIAMOND_CHESTPLATE -> 528;
++            case LEGACY_DIAMOND_LEGGINGS -> 495;
++            case LEGACY_DIAMOND_BOOTS -> 429;
++            case LEGACY_GOLD_HELMET -> 77;
++            case LEGACY_GOLD_CHESTPLATE -> 112;
++            case LEGACY_GOLD_LEGGINGS -> 105;
++            case LEGACY_GOLD_BOOTS -> 91;
++            case LEGACY_SHEARS -> 238;
++            case LEGACY_CARROT_STICK -> 25;
++            case LEGACY_SHIELD -> 336;
++            case LEGACY_ELYTRA -> 432; // Fiddle - correct legacy elytra durability
++            //</editor-fold>
++            default -> 0;
++        };
++    }
++    // Fiddle end - modifiable Bukkit enums - Material - remove hard-coded properties - durability
++
+     // Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - most properties
+     /**
+      * @throws IllegalArgumentException If the given {@code material}

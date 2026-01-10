@@ -1,0 +1,148 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sat, 29 Jul 2023 13:28:41 +0000
+Subject: [PATCH] Client perspective - Deep replacements - Invoke replacements
+
+Invokes a deep replacement of data written to the network at specific terminal points,
+so that all data written to the network is covered.
+
+The functions that are invoked are added in the "Client perspective - Deep replacements - Define replacements" patch,
+and the necessary scope and context parameters necessary for the invocations are passed to the right place in the "Client perspective - Deep replacements - Pass replacement parameters" patch.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/nbt/CompoundTag.java b/src/main/java/net/minecraft/nbt/CompoundTag.java
+index 7a0e4fc2bed825ea4a23c6e3bd6c1301cb975e2c..0f082190045f14642a7edc4396682c175be5090b 100644
+--- a/src/main/java/net/minecraft/nbt/CompoundTag.java
++++ b/src/main/java/net/minecraft/nbt/CompoundTag.java
+@@ -182,6 +182,12 @@ public class CompoundTag implements Tag {
+ 
+     @Override
+     public void write(DataOutput output, @org.jetbrains.annotations.Nullable org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementContext replacementContext, org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope replacementScope) throws IOException {
++        replacementScope = replacementScope.withoutUnnecessaryReplacements(replacementContext); // Remove unnecessary replacements
++        if (replacementScope != org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope.NOTHING) {
++            org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacements.replaceTag(this, replacementContext, replacementScope).write(output, replacementContext, org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope.NOTHING);
++            return;
++        }
++        // Fiddle end - client perspective - deep replacements - invoke replacements - insert hook in CompoundTag#write
+         // Fiddle end - client perspective - deep replacements - pass parameters
+         for(String string : this.tags.keySet()) {
+             Tag tag = this.tags.get(string);
+diff --git a/src/main/java/net/minecraft/nbt/ListTag.java b/src/main/java/net/minecraft/nbt/ListTag.java
+index 077cd77103d4ce886b7933e7a40afd1865ac5047..3e68ba1f4578d77a3b2b36464d631257933f8379 100644
+--- a/src/main/java/net/minecraft/nbt/ListTag.java
++++ b/src/main/java/net/minecraft/nbt/ListTag.java
+@@ -162,6 +162,13 @@ public class ListTag extends CollectionTag<Tag> {
+ 
+     @Override
+     public void write(DataOutput output, @org.jetbrains.annotations.Nullable org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementContext replacementContext, org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope replacementScope) throws IOException {
++        // Fiddle start - client perspective - deep replacements - invoke replacements - insert hook in ListTag#write
++        replacementScope = replacementScope.withoutUnnecessaryReplacements(replacementContext); // Remove unnecessary replacements
++        if (replacementScope != org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope.NOTHING) {
++            org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacements.replaceTag(this, replacementContext, replacementScope).write(output, replacementContext, org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope.NOTHING);
++            return;
++        }
++        // Fiddle end - client perspective - deep replacements - invoke replacements - insert hook in ListTag#write
+         // Fiddle end - client perspective - deep replacements - pass parameters
+         if (this.list.isEmpty()) {
+             this.type = 0;
+diff --git a/src/main/java/net/minecraft/nbt/StringTag.java b/src/main/java/net/minecraft/nbt/StringTag.java
+index e0246e897077cc8c9b8597fc518cb54685fe1f1a..1a414fe4e137a136956f31fec1a44de552fd0946 100644
+--- a/src/main/java/net/minecraft/nbt/StringTag.java
++++ b/src/main/java/net/minecraft/nbt/StringTag.java
+@@ -73,6 +73,13 @@ public class StringTag implements Tag {
+ 
+     @Override
+     public void write(DataOutput output, @org.jetbrains.annotations.Nullable org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementContext replacementContext, org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope replacementScope) throws IOException {
++        // Fiddle start - client perspective - deep replacements - invoke replacements - insert hook in StringTag#write
++        replacementScope = replacementScope.withoutUnnecessaryReplacements(replacementContext); // Remove unnecessary replacements
++        if (replacementScope != org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope.NOTHING) {
++            org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacements.replaceTag(this, replacementContext, replacementScope).write(output, replacementContext, org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope.NOTHING);
++            return;
++        }
++        // Fiddle end - client perspective - deep replacements - invoke replacements - insert hook in StringTag#write
+         // Fiddle end - client perspective - deep replacements - pass parameters
+         output.writeUTF(this.data);
+     }
+diff --git a/src/main/java/net/minecraft/network/FriendlyByteBuf.java b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
+index 3e9049440b9af5009a4b8d58bf56f03e48015761..304a44530163b4650be55e6033518650e9771cbd 100644
+--- a/src/main/java/net/minecraft/network/FriendlyByteBuf.java
++++ b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
+@@ -601,6 +601,12 @@ public class FriendlyByteBuf extends ByteBuf {
+     }
+ 
+     public FriendlyByteBuf writeComponent(Component text, org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementContext replacementContext, org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope replacementScope) {
++        // Fiddle start - client perspective - deep replacements - invoke replacements - insert hook in FriendlyByteBuf#writeComponent
++        replacementScope = replacementScope.withoutUnnecessaryReplacements(replacementContext); // Remove unnecessary replacements
++        if (replacementScope != org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope.NOTHING) {
++            return this.writeComponent(org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacements.replaceComponent(text, replacementContext, replacementScope), replacementContext, org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope.NOTHING);
++        }
++        // Fiddle end - client perspective - deep replacements - invoke replacements - insert hook in FriendlyByteBuf#writeComponent
+         // Fiddle end - client perspective - deep replacements - pass parameters
+         if (text instanceof io.papermc.paper.adventure.AdventureComponent adv) {
+             return this.writeComponent(adv.adventure$component());
+@@ -748,6 +754,12 @@ public class FriendlyByteBuf extends ByteBuf {
+         if (stack.isEmpty() || stack.getItem() == null) { // CraftBukkit - NPE fix itemstack.getItem()
+             this.writeBoolean(false);
+         } else {
++            // Fiddle start - client perspective - deep replacements - invoke replacements - insert hook in FriendlyByteBuf#writeItem
++            replacementScope = replacementScope.withoutUnnecessaryReplacements(replacementContext); // Remove unnecessary replacements
++            if (replacementScope != org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope.NOTHING) {
++                return this.writeItem(org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacements.replaceItemStack(stack, itemStackInPackContext, replacementContext, replacementScope), itemStackInPackContext, replacementContext, org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope.NOTHING);
++            }
++            // Fiddle end - client perspective - deep replacements - invoke replacements - insert hook in FriendlyByteBuf#writeItem
+             this.writeBoolean(true);
+             Item item = stack.getItem();
+ 
+diff --git a/src/main/java/net/minecraft/network/Utf8String.java b/src/main/java/net/minecraft/network/Utf8String.java
+index 63e6a65f4f51b21213122e614cd861b49ce09fb8..34aaf2198da4b5ef01e97afb78976d412d2cd399 100644
+--- a/src/main/java/net/minecraft/network/Utf8String.java
++++ b/src/main/java/net/minecraft/network/Utf8String.java
+@@ -30,7 +30,28 @@ public class Utf8String {
+         }
+     }
+ 
+-    public static void write(ByteBuf buf, CharSequence string, int length, boolean canBeRawJsonText, boolean canBeSNBT, org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementContext replacementContext, org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope replacementScope) { // Fiddle - client perspective - deep replacements - pass parameters
++    // Fiddle start - client perspective - deep replacements - invoke replacements - insert hook in Utf8String#write
++    public static void write(ByteBuf buf, String string, int length, boolean canBeRawJsonText, boolean canBeSNBT, org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementContext replacementContext, org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope replacementScope) { // Fiddle - client perspective - deep replacements - pass parameters
++        replacementScope = replacementScope.withoutUnnecessaryReplacements(replacementContext); // Remove unnecessary replacements
++        if (replacementScope != org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope.NOTHING) {
++            String modifiedString;
++            if (canBeRawJsonText) {
++                if (canBeSNBT) {
++                    modifiedString = org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacements.replaceRawJSONTextOrSNBT(string, replacementContext, replacementScope);
++                } else {
++                    modifiedString = org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacements.replaceRawJSONText(string, replacementContext, replacementScope);
++                }
++            } else {
++                if (canBeSNBT) {
++                    modifiedString = org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacements.replaceSNBT(string, replacementContext, replacementScope);
++                } else {
++                    modifiedString = string;
++                }
++            }
++            write(buf, modifiedString, length, canBeRawJsonText, canBeSNBT, replacementContext, org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope.NOTHING);
++            return;
++        }
++        // Fiddle end - client perspective - deep replacements - invoke replacements - insert hook in Utf8String#write
+         if (string.length() > length) {
+             throw new EncoderException("String too big (was " + string.length() + " characters, max " + length + ")");
+         } else {
+diff --git a/src/main/java/net/minecraft/network/chat/Component.java b/src/main/java/net/minecraft/network/chat/Component.java
+index d3a80d0a23be762c05931ae8001d98e43cab2b4a..0ca0437a292f8ea962e7a74e4f879bc76cee45c7 100644
+--- a/src/main/java/net/minecraft/network/chat/Component.java
++++ b/src/main/java/net/minecraft/network/chat/Component.java
+@@ -101,6 +101,12 @@ public interface Component extends Message, FormattedText, Iterable<Component> {
+         return new MutableComponent(this.getContents(), new ArrayList(this.getSiblings()), this.getStyle());
+     }
+ 
++    // Fiddle start - client perspective - deep replacements - invoke replacements - copy component with new contents
++    default MutableComponent withContents(ComponentContents contents) {
++        return new MutableComponent(contents, this.getSiblings(), this.getStyle());
++    }
++    // Fiddle end - client perspective - deep replacements - invoke replacements - copy component with new contents
++
+     FormattedCharSequence getVisualOrderText();
+ 
+     @Override

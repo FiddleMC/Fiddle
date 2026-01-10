@@ -1,0 +1,27 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Fri, 14 Apr 2023 18:00:01 +0200
+Subject: [PATCH] Read packs - Depend on 7-Zip-JBinding
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/build.gradle.kts b/build.gradle.kts
+index a6642f9992bacca9d1b5f523062e10987e0c1f31..8c39e06c0902ec37fe7621f4b09ec1fdf29e77c9 100644
+--- a/build.gradle.kts
++++ b/build.gradle.kts
+@@ -64,6 +64,14 @@ dependencies {
+     testImplementation("org.mockito:mockito-core:5.5.0")
+ 
+     implementation("net.bytebuddy:byte-buddy:1.14.12") // Fiddle - modifiable Bukkit enums - inject runtime versions - depend on ByteBuddy
++    // Fiddle start - read packs - depend on 7-Zip-JBinding
++    implementation("net.sf.sevenzipjbinding:sevenzipjbinding:16.02-2.01")
++    implementation("net.sf.sevenzipjbinding:sevenzipjbinding-all-platforms:16.02-2.01")
++    implementation("net.sf.sevenzipjbinding:sevenzipjbinding-linux-arm64:16.02-2.01")
++    implementation("net.sf.sevenzipjbinding:sevenzipjbinding-linux-armv5:16.02-2.01")
++    implementation("net.sf.sevenzipjbinding:sevenzipjbinding-linux-armv6:16.02-2.01")
++    implementation("net.sf.sevenzipjbinding:sevenzipjbinding-linux-armv71:16.02-2.01")
++    // Fiddle end - read packs - depend on 7-Zip-JBinding
+ }
+ 
+ val craftbukkitPackageVersion = "1_20_R3" // Paper

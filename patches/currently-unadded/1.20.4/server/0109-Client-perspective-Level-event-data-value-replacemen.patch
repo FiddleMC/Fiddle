@@ -1,0 +1,25 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sat, 10 Feb 2024 13:35:46 +0100
+Subject: [PATCH] Client perspective - Level event data value replacements -
+ Adapt packet data when writing
+
+A `ClientboundLevelEventPacket` will be written to a buffer with the return value of `getData()` method instead of the `data` field,
+so that the method can be expanded to include adaptations based on the target connection of the packet.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelEventPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelEventPacket.java
+index dc5d118ff78137339335dceef9fb1d123bd96411..2c31c8d55d716b1660412218d5287da672ab45f6 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelEventPacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelEventPacket.java
+@@ -43,7 +43,7 @@ public class ClientboundLevelEventPacket extends org.fiddlemc.fiddle.packet.Clon
+     public void write(FriendlyByteBuf buf) {
+         buf.writeInt(this.type);
+         buf.writeBlockPos(this.pos);
+-        buf.writeInt(this.data);
++        buf.writeInt(this.getData()); // Fiddle end - client perspective - store connection explicitly - allow written data to differ based on connection
+         buf.writeBoolean(this.globalEvent);
+     }
+ 

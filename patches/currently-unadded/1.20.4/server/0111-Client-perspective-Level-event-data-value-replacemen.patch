@@ -1,0 +1,55 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Thu, 4 Jan 2024 17:14:24 +0100
+Subject: [PATCH] Client perspective - Level event data value replacements -
+ Craft effect data value can be generic
+
+As an expansion to the "Client perspective - Level event data value replacements - Data can be generic" patch,
+this also allows the value returned by `CraftEffect.getDataValue` to have any type.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/bukkit/craftbukkit/CraftEffect.java b/src/main/java/org/bukkit/craftbukkit/CraftEffect.java
+index 457e9093adb99d31ffc7f061d8c858f98c5d0572..8a5dd44bca94e678a42eb66a0a1400907c19a8c2 100644
+--- a/src/main/java/org/bukkit/craftbukkit/CraftEffect.java
++++ b/src/main/java/org/bukkit/craftbukkit/CraftEffect.java
+@@ -13,8 +13,10 @@ import org.bukkit.craftbukkit.inventory.CraftItemType;
+ import org.bukkit.potion.Potion;
+ 
+ public class CraftEffect {
+-    public static <T> int getDataValue(Effect effect, T data) {
+-        int datavalue;
++    // Fiddle start - client perspective - level event data value replacements - craft effect data value can be generic
++    public static <T> Object getDataValue(Effect effect, T data) {
++        Object datavalue;
++        // Fiddle end - client perspective - level event data value replacements - craft effect data value can be generic
+         switch (effect) {
+         case PARTICLES_SCULK_CHARGE: // Paper - add missing effects
+         case TRIAL_SPAWNER_DETECT_PLAYER: // Paper - add missing effects
+diff --git a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
+index bfb178c69026e9759e9afaebb9da141b62d1f144..4b51ea9c99169c53a3a6f64f67a62c30443a2d63 100644
+--- a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
++++ b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
+@@ -1435,7 +1435,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+             Preconditions.checkArgument(effect.getData() == null || effect == Effect.ELECTRIC_SPARK, "Wrong kind of data for the %s effect", effect);
+         }
+ 
+-        int datavalue = CraftEffect.getDataValue(effect, data);
++        var datavalue = CraftEffect.getDataValue(effect, data); // Fiddle - client perspective - level event data value replacements - craft effect data value can be generic
+         this.playEffect(loc, effect, datavalue, radius);
+     }
+ 
+diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
+index bc731fe740196472baca631f2956b28a743ec0a0..66e38fdc02e732364bddec503b8d27bd12a05395 100644
+--- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
++++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
+@@ -851,7 +851,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+             Preconditions.checkArgument(effect.getData() == null || effect == Effect.ELECTRIC_SPARK, "Wrong kind of data for the %s effect", effect);
+         }
+ 
+-        int datavalue = CraftEffect.getDataValue(effect, data);
++        var datavalue = CraftEffect.getDataValue(effect, data); // Fiddle - client perspective - level event data value replacements - craft effect data value can be generic
+         this.playEffect(loc, effect, datavalue);
+     }
+ 

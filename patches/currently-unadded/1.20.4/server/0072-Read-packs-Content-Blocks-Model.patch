@@ -1,0 +1,358 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Thu, 25 Jan 2024 20:45:10 +0100
+Subject: [PATCH] Read packs - Content - Blocks - Model
+
+Adds a class `BlockDefinition`, that serves as the in-memory model of blocks defined in Fiddle packs.
+The block properties are modelled in a separate class `BlockPropertiesDefinition`.
+The possible bases for blocks are defined in `BlockDefinitionBase`.
+
+A JSON parser for these definitions is added in the "Read packs - Content - Blocks - JSON parser" patch,
+and the resulting definition instances can be then be loaded by corresponding loading procedures, added in the "Load packs - Content - Blocks - Register - Implementation" patch.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/FiddleContentDefinitionType.java b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/FiddleContentDefinitionType.java
+index 98dc3ff82ce6592a4edb33ad00200de169d680bd..c0e2018cff3e603fa2a73a2e152e0087682a3553 100644
+--- a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/FiddleContentDefinitionType.java
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/FiddleContentDefinitionType.java
+@@ -12,12 +12,31 @@ public class FiddleContentDefinitionType<T extends FiddleContentDefinition> {
+     /**
+      * The name of the folder corresponding to this type of resource,
+      * when it is in a namespace folder inside the <code>content</code> folder in a Fiddle pack.
++     * <!-- // Fiddle start - read packs - blocks - model -->
++     * <p>
++     *     For example, for
++     *     {@link org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.block.BlockDefinition#TYPE}
++     *     this is <code>blocks</code>,
++     *     as block definitions are read from the
++     *     <code>&lt;pack root&gt;/content/&lt;namespace&gt;/blocks</code> folder.
++     * </p>
++     * <!-- // Fiddle start - read packs - blocks - model -->
+      */
+     public final String contentSubNamespaceFolderName;
+ 
+     /**
+      * The identifier in a typed {@link ResourceLocation} path, that is used as a prefix together with the
+      * <code>/</code> character.
++     * <!-- // Fiddle start - read packs - blocks - model -->
++     * <p>
++     *     For example, for
++     *     {@link org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.block.BlockDefinition#TYPE}
++     *     this is <code>block</code>,
++     *     as a block with the untyped {@link ResourceLocation}
++     *     <code>masonry:tuff_bricks</code> would have the typed {@link ResourceLocation}
++     *     <code>masonry:block/tuff_bricks</code>.
++     * </p>
++     * <!-- // Fiddle start - read packs - blocks - model -->
+      */
+     public final String resourceLocationPathIdentifier;
+ 
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/BlockDefinition.java b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/BlockDefinition.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..899d30e4a04ecf32ca6d6cb62ef5667703265394
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/BlockDefinition.java
+@@ -0,0 +1,54 @@
++// Fiddle - read packs - blocks - model
++
++package org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.block;
++
++import net.minecraft.resources.ResourceLocation;
++import net.minecraft.world.level.block.Block;
++import net.minecraft.world.level.block.state.BlockState;
++import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.FiddleContentDefinitionType;
++import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.blockoritem.BlockOrItemDefinition;
++import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.withparent.FiddleContentDefinitionParent;
++import org.jetbrains.annotations.Nullable;
++
++import java.util.ArrayList;
++
++/**
++ * A blueprint of a {@link Block} to be added.
++ */
++public class BlockDefinition
++    extends BlockOrItemDefinition<BlockPropertiesDefinition> {
++
++    public static final FiddleContentDefinitionType<BlockDefinition> TYPE = new FiddleContentDefinitionType<>(
++        "blocks",
++        "block"
++    );
++
++    /**
++     * The untyped {@link ResourceLocation} pointing to a {@link Block}.
++     * <p>
++     *     This is only used if this definition is a shape of some other full block,
++     *     in which case this value must be non-null.
++     * </p>
++     * <p>
++     *     This is called a full block state, rather than a full block,
++     *     because it should reference a {@link BlockState} instead of a {@link Block}.
++     *     This is a TODO.
++     * </p>
++     */
++    public final @Nullable ResourceLocation fullBlockState;
++
++    public BlockDefinition(ResourceLocation untypedResourceLocation, FiddleContentDefinitionParent parent, BlockPropertiesDefinition properties, @Nullable ResourceLocation fullBlockState) {
++        super(TYPE, untypedResourceLocation, parent, properties);
++        this.fullBlockState = fullBlockState;
++    }
++
++    @Override
++    public ArrayList<ResourceLocation> buildReferencedResourceLocations() {
++        var references = super.buildReferencedResourceLocations();
++        if (this.fullBlockState != null) {
++            references.add(fullBlockState);
++        }
++        return references;
++    }
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/BlockPropertiesDefinition.java b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/BlockPropertiesDefinition.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..fc1a4120254bd3919d04202b0b83231ad4758f3c
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/BlockPropertiesDefinition.java
+@@ -0,0 +1,51 @@
++// Fiddle - read packs - blocks - model
++
++package org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.block;
++
++import net.minecraft.world.level.block.state.BlockBehaviour;
++import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
++import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.block.mapcolor.MapColorDefinition;
++import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.blockoritem.BlockOrItemPropertiesDefinition;
++import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.withparent.FiddleContentDefinitionParent;
++import org.jetbrains.annotations.Nullable;
++
++/**
++ * The properties of a {@link BlockDefinition}, that can be used to build a
++ * {@link BlockBehaviour.Properties} instance.
++ * <p>
++ * All values are optional: a default value or the value of the {@link BlockDefinition#parent}
++ * can always be used instead.
++ * </p>
++ */
++public final class BlockPropertiesDefinition
++    extends BlockOrItemPropertiesDefinition {
++
++    public final @Nullable MapColorDefinition mapColor;
++    public final @Nullable Float explosionResistance;
++    public final @Nullable Float destroyTime;
++    public final @Nullable Boolean requiresCorrectToolForDrops;
++    public final @Nullable Float friction;
++    public final @Nullable Boolean ignitedByLava;
++    public final @Nullable NoteBlockInstrument instrument;
++
++    public BlockPropertiesDefinition(
++        @Nullable FiddleContentDefinitionParent parent,
++        @Nullable MapColorDefinition mapColor,
++        @Nullable Float explosionResistance,
++        @Nullable Float destroyTime,
++        @Nullable Boolean requiresCorrectToolForDrops,
++        @Nullable Float friction,
++        @Nullable Boolean ignitedByLava,
++        @Nullable NoteBlockInstrument instrument
++    ) {
++        super(parent);
++        this.mapColor = mapColor;
++        this.explosionResistance = explosionResistance;
++        this.destroyTime = destroyTime;
++        this.requiresCorrectToolForDrops = requiresCorrectToolForDrops;
++        this.friction = friction;
++        this.ignitedByLava = ignitedByLava;
++        this.instrument = instrument;
++    }
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/BlockStateVariants.java b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/BlockStateVariants.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..96ba59ae3401affac99983fa0d62c6f02caa291a
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/BlockStateVariants.java
+@@ -0,0 +1,71 @@
++// Fiddle - read packs - blocks - model - block states condition
++
++package org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.block;
++
++import net.minecraft.world.level.block.state.BlockState;
++import net.minecraft.world.level.block.state.properties.Property;
++
++import java.util.ArrayList;
++import java.util.Arrays;
++import java.util.List;
++import java.util.stream.IntStream;
++
++/**
++ * A definition of {@link BlockState} variants,
++ * consisting of a number of properties that can be checked for to filter the block states.
++ * <p>
++ * Potentially, the number of properties can be 0, in which case this instance matches all block states
++ * (since it has no filters).
++ * </p>
++ */
++public record BlockStateVariants(String[] propertyNames, String[] propertyValues) {
++
++    private static final String propertyDelimiter = ",";
++    private static final String nameValueSeparator = "=";
++
++    public BlockStateVariants {
++        if (propertyNames.length != propertyValues.length) {
++            throw new IllegalArgumentException("Block state property names (" + Arrays.toString(propertyNames) + ") and values (" + Arrays.toString(propertyValues) + ") are not of the same length");
++        }
++    }
++
++    private static <T extends Comparable<T>> String getStatePropertyValueString(BlockState state, Property<T> property) {
++        return property.getName(state.getValue(property));
++    }
++
++    public boolean matches(BlockState state) {
++        for (int i = 0; i < propertyNames.length; i++) {
++            var name = propertyNames[i];
++            var value = propertyValues[i];
++            if (!state.getProperties().stream().filter(property -> property.getName().equals(name)).allMatch(property ->
++                getStatePropertyValueString(state, property).equals(value)
++            )) {
++                return false;
++            }
++        }
++        return true;
++    }
++
++    @Override
++    public String toString() {
++        return String.join(propertyDelimiter, IntStream.of(propertyNames.length).mapToObj(i -> propertyNames[i] + nameValueSeparator + propertyValues[i]).toList());
++    }
++
++    public static BlockStateVariants fromString(String string) throws IllegalArgumentException {
++        String[] properties = string.split(propertyDelimiter);
++        List<String> propertyNames = new ArrayList<>(1);
++        List<String> propertyValues = new ArrayList<>(1);
++        for (var property : properties) {
++            if (!property.isBlank()) {
++                var splitProperty = property.split(nameValueSeparator);
++                if (splitProperty.length != 2 || splitProperty[0].isBlank() || splitProperty[1].isBlank()) {
++                    throw new IllegalArgumentException("Misformatted block state property '" + property + "' in variants '" + string + "'");
++                }
++                propertyNames.add(splitProperty[0].trim());
++                propertyValues.add(splitProperty[1].trim());
++            }
++        }
++        return new BlockStateVariants(propertyNames.toArray(new String[0]), propertyValues.toArray(new String[0]));
++    }
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/mapcolor/ConditionalMapColorDefinition.java b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/mapcolor/ConditionalMapColorDefinition.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..d90ad6e451c6908254714f0e4cd1a880c3fd5103
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/mapcolor/ConditionalMapColorDefinition.java
+@@ -0,0 +1,38 @@
++// Fiddle - read packs - blocks - model - map color
++
++package org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.block.mapcolor;
++
++import net.minecraft.world.level.block.state.BlockState;
++import net.minecraft.world.level.material.MapColor;
++import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.block.BlockStateVariants;
++
++import java.util.function.Function;
++
++/**
++ * A {@link MapColorDefinition} that contains multiple clauses,
++ * each specifying both a condition (block properties and their values)
++ * and the corresponding desired {@link MapColor}.
++ */
++public record ConditionalMapColorDefinition(
++    Clause[] clauses
++) implements MapColorDefinition, Function<BlockState, MapColor> {
++
++    @Override
++    public MapColor apply(BlockState state) {
++        /*
++        Note: the initial value (MapColor.NONE) of this variable will never actually be used,
++        as for any registered block, completeness of this function will be checked beforehand.
++         */
++        var mapColor = MapColor.NONE;
++        for (var clause : clauses) {
++            if (clause.blockStates.matches(state)) {
++                mapColor = clause.mapColor;
++            }
++        }
++        return mapColor;
++    }
++
++    public record Clause(BlockStateVariants blockStates, MapColor mapColor) {
++    }
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/mapcolor/MapColorDefinition.java b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/mapcolor/MapColorDefinition.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..87badfe3a0034c76c3b0d10032fd656087fbb3b6
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/mapcolor/MapColorDefinition.java
+@@ -0,0 +1,13 @@
++// Fiddle - read packs - blocks - model - map color
++
++package org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.block.mapcolor;
++
++import net.minecraft.world.level.block.Block;
++import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.block.BlockPropertiesDefinition;
++
++/**
++ * The definition of the map colors of a {@link Block}, stored in {@link BlockPropertiesDefinition}.
++ */
++public sealed interface MapColorDefinition
++    permits SingleMapColorDefinition, ConditionalMapColorDefinition {
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/mapcolor/SingleMapColorDefinition.java b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/mapcolor/SingleMapColorDefinition.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..37a8d5af764cc2f96e39d1fa79ddf07854ab1535
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/mapcolor/SingleMapColorDefinition.java
+@@ -0,0 +1,12 @@
++// Fiddle - read packs - blocks - model - map color
++
++package org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.block.mapcolor;
++
++import net.minecraft.world.level.material.MapColor;
++
++/**
++ * A {@link MapColorDefinition} that specifies one {@link MapColor}.
++ */
++public record SingleMapColorDefinition(MapColor mapColor)
++    implements MapColorDefinition {
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/parent/BlockDefinitionBase.java b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/parent/BlockDefinitionBase.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..c66e667ebe1cdc9ceb0d81add588246ccad0302e
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/block/parent/BlockDefinitionBase.java
+@@ -0,0 +1,26 @@
++// Fiddle - read packs - blocks - model
++
++package org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.block.parent;
++
++import net.minecraft.resources.ResourceLocation;
++import net.minecraft.world.level.block.Block;
++import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.block.BlockDefinition;
++import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.blockoritem.BlockOrItemDefinitionBase;
++import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.withparent.FiddleContentDefinitionParent;
++
++/**
++ * A parent for blocks that can be used in a {@link BlockDefinition}
++ * instead of a particular block. Most bases correspond to some particular subclass of {@link Block}.
++ */
++public final class BlockDefinitionBase
++    extends BlockOrItemDefinitionBase
++    implements FiddleContentDefinitionParent {
++
++    public static final BlockDefinitionBase BLOCK = new BlockDefinitionBase(new ResourceLocation(ResourceLocation.DEFAULT_NAMESPACE, ""));
++    public static final BlockDefinitionBase STAIRS = new BlockDefinitionBase(new ResourceLocation(ResourceLocation.DEFAULT_NAMESPACE, "stairs"));
++
++    private BlockDefinitionBase(ResourceLocation untypedResourceLocation) {
++        this(untypedResourceLocation);
++    }
++
++}

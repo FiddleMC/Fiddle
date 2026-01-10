@@ -1,0 +1,385 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Mon, 10 Jul 2023 22:05:08 +0200
+Subject: [PATCH] Modifiable Bukkit enums - Remove hard-coded properties -
+ Material - Utilities
+
+* Adds `CachedMaterialProperty` classes that provide a cache for storing a lazily computed value for each `Material`.
+  These are then used in `CraftMagicNumbers` in the "Modifiable Bukkit enums - Remove hard-coded properties - Material - ..." patches in the `fiddle-server` module
+	to provide these values based on a computation efficiently, as otherwise simply replacing hardcoded values by a method may cause performance degradation.
+* Adds the `MaterialDefaultImplementations` class (empty, to be populated in the following "Modifiable Bukkit enums - Remove hard-coded properties - Material - ..." patches),
+  which will contain implementations of the computations mentioned above. The implementations are not put into `Material` directly so that they do not need to be re-implemented
+	when the runtime version of `Material` is replaced in the "Modifiable Bukkit enums - Inject runtime versions - Material" patch in the `fiddle-server` module.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/fiddlemc/fiddle/material/CachedMaterialBooleanProperty.java b/src/main/java/org/fiddlemc/fiddle/material/CachedMaterialBooleanProperty.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..3a6823aa743f8f7ff5455b0cfa1e400d48702e2d
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/material/CachedMaterialBooleanProperty.java
+@@ -0,0 +1,64 @@
++// Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - utilities
++
++package org.fiddlemc.fiddle.material;
++
++import org.bukkit.Material;
++import org.bukkit.UndefinedNullability;
++import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
++
++/**
++ * A sibling of {@link CachedMaterialProperty} that represents a {@code boolean} property.
++ */
++public class CachedMaterialBooleanProperty {
++
++    /**
++     * A function mapping an {@linkplain T Object} to a {@code boolean}.
++     * This class is analogous to {@link java.util.function.IntFunction}.
++     */
++    @FunctionalInterface
++    public interface ToBooleanFunction<T> {
++
++        /**
++         * Applies this function to the given argument.
++         *
++         * @param value the function argument
++         * @return the function result
++         */
++        @SuppressWarnings("deprecation")
++        boolean applyAsBoolean(@UndefinedNullability T value);
++
++    }
++
++    protected final ToBooleanFunction<@NotNull Material> propertyFunction;
++
++    protected boolean @Nullable [] cache;
++    protected boolean areLegacyValuesCached = false;
++
++    public CachedMaterialBooleanProperty(ToBooleanFunction<@NotNull Material> propertyFunction) {
++        this.propertyFunction = propertyFunction;
++    }
++
++    protected void initializeIfNecessary(boolean legacy) {
++        if (this.cache == null) {
++            this.cache = new boolean[CachedMaterialProperty.getCachedMaterialValues().length];
++        } else if (this.areLegacyValuesCached || !legacy) {
++            return;
++        }
++        for (Material otherMaterial : CachedMaterialProperty.getCachedMaterialValues()) {
++            if (legacy || !otherMaterial.isLegacy()) {
++                this.cache[otherMaterial.ordinal()] = this.propertyFunction.applyAsBoolean(otherMaterial);
++            }
++        }
++        if (legacy) {
++            this.areLegacyValuesCached = true;
++        }
++    }
++
++    public boolean get(@NotNull Material material) {
++        this.initializeIfNecessary(material.isLegacy());
++        //noinspection DataFlowIssue
++        return this.cache[material.ordinal()];
++    }
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/material/CachedMaterialFloatProperty.java b/src/main/java/org/fiddlemc/fiddle/material/CachedMaterialFloatProperty.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..9c161daa9c0ec9a4195ca4bdb263d072298b8101
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/material/CachedMaterialFloatProperty.java
+@@ -0,0 +1,64 @@
++// Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - utilities
++
++package org.fiddlemc.fiddle.material;
++
++import org.bukkit.Material;
++import org.bukkit.UndefinedNullability;
++import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
++
++/**
++ * A sibling of {@link CachedMaterialProperty} that represents a {@code float} property.
++ */
++public class CachedMaterialFloatProperty {
++
++    /**
++     * A function mapping an {@linkplain T Object} to a {@code float}.
++     * This class is analogous to {@link java.util.function.IntFunction}.
++     */
++    @FunctionalInterface
++    public interface ToFloatFunction<T> {
++
++        /**
++         * Applies this function to the given argument.
++         *
++         * @param value the function argument
++         * @return the function result
++         */
++        @SuppressWarnings("deprecation")
++        float applyAsFloat(@UndefinedNullability T value);
++
++    }
++
++    protected final ToFloatFunction<@NotNull Material> propertyFunction;
++
++    protected float @Nullable [] cache;
++    protected boolean areLegacyValuesCached = false;
++
++    public CachedMaterialFloatProperty(ToFloatFunction<@NotNull Material> propertyFunction) {
++        this.propertyFunction = propertyFunction;
++    }
++
++    protected void initializeIfNecessary(boolean legacy) {
++        if (this.cache == null) {
++            this.cache = new float[CachedMaterialProperty.getCachedMaterialValues().length];
++        } else if (this.areLegacyValuesCached || !legacy) {
++            return;
++        }
++        for (Material otherMaterial : CachedMaterialProperty.getCachedMaterialValues()) {
++            if (legacy || !otherMaterial.isLegacy()) {
++                this.cache[otherMaterial.ordinal()] = this.propertyFunction.applyAsFloat(otherMaterial);
++            }
++        }
++        if (legacy) {
++            this.areLegacyValuesCached = true;
++        }
++    }
++
++    public float get(@NotNull Material material) {
++        this.initializeIfNecessary(material.isLegacy());
++        //noinspection DataFlowIssue
++        return this.cache[material.ordinal()];
++    }
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/material/CachedMaterialIntProperty.java b/src/main/java/org/fiddlemc/fiddle/material/CachedMaterialIntProperty.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..b7ccdcc745cce5b4884a8ab8f2985a5c252a26f5
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/material/CachedMaterialIntProperty.java
+@@ -0,0 +1,47 @@
++// Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - utilities
++
++package org.fiddlemc.fiddle.material;
++
++import org.bukkit.Material;
++import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
++
++import java.util.function.ToIntFunction;
++
++/**
++ * A sibling of {@link CachedMaterialProperty} that represents an {@code int} property.
++ */
++public class CachedMaterialIntProperty {
++
++    protected final ToIntFunction<@NotNull Material> propertyFunction;
++
++    protected int @Nullable [] cache;
++    protected boolean areLegacyValuesCached = false;
++
++    public CachedMaterialIntProperty(ToIntFunction<@NotNull Material> propertyFunction) {
++        this.propertyFunction = propertyFunction;
++    }
++
++    protected void initializeIfNecessary(boolean legacy) {
++        if (this.cache == null) {
++            this.cache = new int[CachedMaterialProperty.getCachedMaterialValues().length];
++        } else if (this.areLegacyValuesCached || !legacy) {
++            return;
++        }
++        for (Material otherMaterial : CachedMaterialProperty.getCachedMaterialValues()) {
++            if (legacy || !otherMaterial.isLegacy()) {
++                this.cache[otherMaterial.ordinal()] = this.propertyFunction.applyAsInt(otherMaterial);
++            }
++        }
++        if (legacy) {
++            this.areLegacyValuesCached = true;
++        }
++    }
++
++    public int get(@NotNull Material material) {
++        this.initializeIfNecessary(material.isLegacy());
++        //noinspection DataFlowIssue
++        return this.cache[material.ordinal()];
++    }
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/material/CachedMaterialProperty.java b/src/main/java/org/fiddlemc/fiddle/material/CachedMaterialProperty.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..5b837f1ce73f747b768bafe60ab914adbd90ca91
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/material/CachedMaterialProperty.java
+@@ -0,0 +1,70 @@
++// Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - utilities
++
++package org.fiddlemc.fiddle.material;
++
++import org.bukkit.Material;
++import org.bukkit.UndefinedNullability;
++import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
++import org.jetbrains.annotations.UnknownNullability;
++
++import java.util.function.Function;
++import java.util.function.IntFunction;
++
++/**
++ * A cache for a {@link Material} property.
++ * The first time that the value for a {@link Material} is requested, the value is computed and cached for each
++ * {@link Material}.
++ */
++public class CachedMaterialProperty<T> {
++
++    /**
++     * A lazily (when {@link #getCachedMaterialValues()} is first called) computed copy of {@link Material#values()}.
++     */
++    static @NotNull Material @Nullable [] cachedMaterialValues = null;
++
++    /**
++     * @see #cachedMaterialValues
++     */
++    static @NotNull Material @NotNull [] getCachedMaterialValues() {
++        if (cachedMaterialValues == null) {
++            cachedMaterialValues = Material.values();
++        }
++        return cachedMaterialValues;
++    }
++
++    protected final IntFunction<T @NotNull []> arrayConstructor;
++    protected final Function<@NotNull Material, T> propertyFunction;
++
++    protected T @Nullable [] cache;
++    protected boolean areLegacyValuesCached = false;
++
++    public CachedMaterialProperty(IntFunction<T @NotNull []> arrayConstructor, Function<@NotNull Material, @UnknownNullability T> propertyFunction) {
++        this.arrayConstructor = arrayConstructor;
++        this.propertyFunction = propertyFunction;
++    }
++
++    protected void initializeIfNecessary(boolean legacy) {
++        if (this.cache == null) {
++            this.cache = arrayConstructor.apply(getCachedMaterialValues().length);
++        } else if (this.areLegacyValuesCached || !legacy) {
++            return;
++        }
++        for (Material otherMaterial : getCachedMaterialValues()) {
++            if (legacy || !otherMaterial.isLegacy()) {
++                this.cache[otherMaterial.ordinal()] = this.propertyFunction.apply(otherMaterial);
++            }
++        }
++        if (legacy) {
++            this.areLegacyValuesCached = true;
++        }
++    }
++
++    @SuppressWarnings("deprecation")
++    public @UndefinedNullability T get(@NotNull Material material) {
++        this.initializeIfNecessary(material.isLegacy());
++        //noinspection DataFlowIssue
++        return this.cache[material.ordinal()];
++    }
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/material/CachedMaterialShortProperty.java b/src/main/java/org/fiddlemc/fiddle/material/CachedMaterialShortProperty.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..ff1bb95eb930ee4b4e2714ac41c29834d2d72dea
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/material/CachedMaterialShortProperty.java
+@@ -0,0 +1,64 @@
++// Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - utilities
++
++package org.fiddlemc.fiddle.material;
++
++import org.bukkit.Material;
++import org.bukkit.UndefinedNullability;
++import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
++
++/**
++ * A sibling of {@link CachedMaterialProperty} that represents a {@code short} property.
++ */
++public class CachedMaterialShortProperty {
++
++    /**
++     * A function mapping an {@linkplain T Object} to a {@code short}.
++     * This class is analogous to {@link java.util.function.IntFunction}.
++     */
++    @FunctionalInterface
++    public interface ToShortFunction<T> {
++
++        /**
++         * Applies this function to the given argument.
++         *
++         * @param value the function argument
++         * @return the function result
++         */
++        @SuppressWarnings("deprecation")
++        short applyAsShort(@UndefinedNullability T value);
++
++    }
++
++    protected final ToShortFunction<@NotNull Material> propertyFunction;
++
++    protected short @Nullable [] cache;
++    protected boolean areLegacyValuesCached = false;
++
++    public CachedMaterialShortProperty(ToShortFunction<@NotNull Material> propertyFunction) {
++        this.propertyFunction = propertyFunction;
++    }
++
++    protected void initializeIfNecessary(boolean legacy) {
++        if (this.cache == null) {
++            this.cache = new short[CachedMaterialProperty.getCachedMaterialValues().length];
++        } else if (this.areLegacyValuesCached || !legacy) {
++            return;
++        }
++        for (Material otherMaterial : CachedMaterialProperty.getCachedMaterialValues()) {
++            if (legacy || !otherMaterial.isLegacy()) {
++                this.cache[otherMaterial.ordinal()] = this.propertyFunction.applyAsShort(otherMaterial);
++            }
++        }
++        if (legacy) {
++            this.areLegacyValuesCached = true;
++        }
++    }
++
++    public short get(@NotNull Material material) {
++        this.initializeIfNecessary(material.isLegacy());
++        //noinspection DataFlowIssue
++        return this.cache[material.ordinal()];
++    }
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java b/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..179217e5e57ff2c9e0a7528a21b5e4e8efcd4ebe
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/material/MaterialDefaultImplementations.java
+@@ -0,0 +1,24 @@
++// Fiddle start - modifiable Bukkit enums - Material - remove hard-coded properties - utilities
++
++package org.fiddlemc.fiddle.material;
++
++import org.bukkit.Material;
++
++/**
++ * Do not use for any reason.
++ * This class is for internal purposes only.
++ * <p>
++ *     This class provides a number of default implementations for {@link Material} that
++ *     must be available in the API module for unit tests.
++ * </p>
++ *
++ * @apiNote Internal Use Only
++ */
++@org.jetbrains.annotations.ApiStatus.Internal
++public final class MaterialDefaultImplementations {
++
++    private MaterialDefaultImplementations() {
++        throw new RuntimeException();
++    }
++
++}

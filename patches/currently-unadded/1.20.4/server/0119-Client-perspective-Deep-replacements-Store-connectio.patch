@@ -1,0 +1,367 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sun, 23 Jul 2023 15:20:59 +0200
+Subject: [PATCH] Client perspective - Deep replacements - Store connection
+ explicitly in packets that may contain deep replaceables
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/network/protocol/common/ClientboundDisconnectPacket.java b/src/main/java/net/minecraft/network/protocol/common/ClientboundDisconnectPacket.java
+index c75bebb43d8cfe787348b157ca980cbbe690c929..0b15cc94d5ab0b42ae873522ae340dcb1bc4c502 100644
+--- a/src/main/java/net/minecraft/network/protocol/common/ClientboundDisconnectPacket.java
++++ b/src/main/java/net/minecraft/network/protocol/common/ClientboundDisconnectPacket.java
+@@ -4,14 +4,16 @@ import net.minecraft.network.FriendlyByteBuf;
+ import net.minecraft.network.chat.Component;
+ import net.minecraft.network.protocol.Packet;
+ 
+-public class ClientboundDisconnectPacket implements Packet<ClientCommonPacketListener> {
++public class ClientboundDisconnectPacket extends org.fiddlemc.fiddle.packet.PacketWithExplicitTargetClientConnection<ClientCommonPacketListener> { // Fiddle - client perspective - deep replacements - store connection explicitly in packets that may contain deep replaceables
+     private final Component reason;
+ 
+     public ClientboundDisconnectPacket(Component reason) {
++        super(); // Fiddle - client perspective - deep replacements - store connection explicitly in packets that may contain deep replaceables
+         this.reason = reason;
+     }
+ 
+     public ClientboundDisconnectPacket(FriendlyByteBuf buf) {
++        super(); // Fiddle - client perspective - deep replacements - store connection explicitly in packets that may contain deep replaceables
+         this.reason = buf.readComponentTrusted();
+     }
+ 
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundBlockEntityDataPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundBlockEntityDataPacket.java
+index 3944852921335c78a04a9dc301882ab5b152b1ed..f0c68c01b06b9472e56484a7b028d22a19e711b7 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundBlockEntityDataPacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundBlockEntityDataPacket.java
+@@ -10,7 +10,7 @@ import net.minecraft.network.protocol.Packet;
+ import net.minecraft.world.level.block.entity.BlockEntity;
+ import net.minecraft.world.level.block.entity.BlockEntityType;
+ 
+-public class ClientboundBlockEntityDataPacket implements Packet<ClientGamePacketListener> {
++public class ClientboundBlockEntityDataPacket extends org.fiddlemc.fiddle.packet.PacketWithExplicitTargetClientConnection<ClientGamePacketListener> { // Fiddle - client perspective - deep replacements - store connection explicitly in packets that may contain deep replaceables
+     private final BlockPos pos;
+     private final BlockEntityType<?> type;
+     @Nullable
+@@ -25,12 +25,14 @@ public class ClientboundBlockEntityDataPacket implements Packet<ClientGamePacket
+     }
+ 
+     private ClientboundBlockEntityDataPacket(BlockPos pos, BlockEntityType<?> blockEntityType, CompoundTag nbt) {
++        super(); // Fiddle - client perspective - deep replacements - store connection explicitly in packets that may contain deep replaceables
+         this.pos = pos;
+         this.type = blockEntityType;
+         this.tag = nbt.isEmpty() ? null : nbt;
+     }
+ 
+     public ClientboundBlockEntityDataPacket(FriendlyByteBuf buf) {
++        super(); // Fiddle - client perspective - deep replacements - store connection explicitly in packets that may contain deep replaceables
+         this.pos = buf.readBlockPos();
+         this.type = buf.readById(BuiltInRegistries.BLOCK_ENTITY_TYPE);
+         this.tag = buf.readNbt();
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundCommandSuggestionsPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundCommandSuggestionsPacket.java
+index 46520459e6736ebcf88c068a1521f5a3820233df..2067315b4ccf13f5e0ab0c41c99de0957b1c6890 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundCommandSuggestionsPacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundCommandSuggestionsPacket.java
+@@ -9,16 +9,18 @@ import net.minecraft.network.chat.Component;
+ import net.minecraft.network.chat.ComponentUtils;
+ import net.minecraft.network.protocol.Packet;
+ 
+-public class ClientboundCommandSuggestionsPacket implements Packet<ClientGamePacketListener> {
++public class ClientboundCommandSuggestionsPacket extends org.fiddlemc.fiddle.packet.PacketWithExplicitTargetClientConnection<ClientGamePacketListener> { // Fiddle - client perspective - deep replacements - store connection explicitly in packets that may contain deep replaceables
+     private final int id;
+     private final Suggestions suggestions;
+ 
+     public ClientboundCommandSuggestionsPacket(int completionId, Suggestions suggestions) {
++        super(); // Fiddle - client perspective - deep replacements - store connection explicitly in packets that may contain deep replaceables
+         this.id = completionId;
+         this.suggestions = suggestions;
+     }
+ 
+     public ClientboundCommandSuggestionsPacket(FriendlyByteBuf buf) {
++        super(); // Fiddle - client perspective - deep replacements - store connection explicitly in packets that may contain deep replaceables
+         this.id = buf.readVarInt();
+         int i = buf.readVarInt();
+         int j = buf.readVarInt();
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundContainerSetContentPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundContainerSetContentPacket.java
+index dbd8b9b09b82c1b75e8be9dc7416d9f0863c8c87..1f02d9cb98bb0738fd4372e69da8d5766fb2690a 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundContainerSetContentPacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundContainerSetContentPacket.java
+@@ -6,13 +6,14 @@ import net.minecraft.network.FriendlyByteBuf;
+ import net.minecraft.network.protocol.Packet;
+ import net.minecraft.world.item.ItemStack;
+ 
+-public class ClientboundContainerSetContentPacket implements Packet<ClientGamePacketListener> {
++public class ClientboundContainerSetContentPacket extends org.fiddlemc.fiddle.packet.PacketWithExplicitTargetClientConnection<ClientGamePacketListener> { // Fiddle - client perspective - deep replacements - store connection explicitly in packets that may contain deep replaceables
+     private final int containerId;
+     private final int stateId;
+     private final List<ItemStack> items;
+     private final ItemStack carriedItem;
+ 
+     public ClientboundContainerSetContentPacket(int syncId, int revision, NonNullList<ItemStack> contents, ItemStack cursorStack) {
++        super(); // Fiddle - client perspective - deep replacements - store connection explicitly in packets that may contain deep replaceables
+         this.containerId = syncId;
+         this.stateId = revision;
+         this.items = NonNullList.withSize(contents.size(), ItemStack.EMPTY);
+@@ -25,6 +26,7 @@ public class ClientboundContainerSetContentPacket implements Packet<ClientGamePa
+     }
+ 
+     public ClientboundContainerSetContentPacket(FriendlyByteBuf buf) {
++        super(); // Fiddle - client perspective - deep replacements - store connection explicitly in packets that may contain deep replaceables
+         this.containerId = buf.readUnsignedByte();
+         this.stateId = buf.readVarInt();
+         this.items = buf.readCollection(NonNullList::createWithCapacity, FriendlyByteBuf::readItem);
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundContainerSetSlotPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundContainerSetSlotPacket.java
+index 13ee7ad9c9415cd785b5487de7131c932c2198a0..b583818346881345633f21fbcbdb0bfdfa54d14a 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundContainerSetSlotPacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundContainerSetSlotPacket.java
+@@ -4,7 +4,7 @@ import net.minecraft.network.FriendlyByteBuf;
+ import net.minecraft.network.protocol.Packet;
+ import net.minecraft.world.item.ItemStack;
+ 
+-public class ClientboundContainerSetSlotPacket implements Packet<ClientGamePacketListener> {
++public class ClientboundContainerSetSlotPacket extends org.fiddlemc.fiddle.packet.PacketWithExplicitTargetClientConnection<ClientGamePacketListener> { // Fiddle - client perspective - deep replacements - store connection explicitly in packets that may contain deep replaceables
+     public static final int CARRIED_ITEM = -1;
+     public static final int PLAYER_INVENTORY = -2;
+     private final int containerId;
+@@ -13,6 +13,7 @@ public class ClientboundContainerSetSlotPacket implements Packet<ClientGamePacke
+     private final ItemStack itemStack;
+ 
+     public ClientboundContainerSetSlotPacket(int syncId, int revision, int slot, ItemStack stack) {
++        super(); // Fiddle - client perspective - deep replacements - store connection explicitly in packets that may contain deep replaceables
+         this.containerId = syncId;
+         this.stateId = revision;
+         this.slot = slot;
+@@ -20,6 +21,7 @@ public class ClientboundContainerSetSlotPacket implements Packet<ClientGamePacke
+     }
+ 
+     public ClientboundContainerSetSlotPacket(FriendlyByteBuf buf) {
++        super(); // Fiddle - client perspective - deep replacements - store connection explicitly in packets that may contain deep replaceables
+         this.containerId = buf.readByte();
+         this.stateId = buf.readVarInt();
+         this.slot = buf.readShort();
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundMerchantOffersPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundMerchantOffersPacket.java
+index f3b162fc2c859fa82029c35b9b81447a7327a19a..00e290b640b321f109de66ef526f89aa162b977c 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundMerchantOffersPacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundMerchantOffersPacket.java
+@@ -4,7 +4,7 @@ import net.minecraft.network.FriendlyByteBuf;
+ import net.minecraft.network.protocol.Packet;
+ import net.minecraft.world.item.trading.MerchantOffers;
+ 
+-public class ClientboundMerchantOffersPacket implements Packet<ClientGamePacketListener> {
++public class ClientboundMerchantOffersPacket extends org.fiddlemc.fiddle.packet.PacketWithExplicitTargetClientConnection<ClientGamePacketListener> { // Fiddle - client perspective - deep replacements - store connection explicitly in packets that may contain deep replaceables
+     private final int containerId;
+     private final MerchantOffers offers;
+     private final int villagerLevel;
+@@ -13,6 +13,7 @@ public class ClientboundMerchantOffersPacket implements Packet<ClientGamePacketL
+     private final boolean canRestock;
+ 
+     public ClientboundMerchantOffersPacket(int syncId, MerchantOffers offers, int levelProgress, int experience, boolean leveled, boolean refreshable) {
++        super(); // Fiddle - client perspective - deep replacements - store connection explicitly in packets that may contain deep replaceables
+         this.containerId = syncId;
+         this.offers = offers.copy();
+         this.villagerLevel = levelProgress;
+@@ -22,6 +23,7 @@ public class ClientboundMerchantOffersPacket implements Packet<ClientGamePacketL
+     }
+ 
+     public ClientboundMerchantOffersPacket(FriendlyByteBuf buf) {
++        super(); // Fiddle - client perspective - deep replacements - store connection explicitly in packets that may contain deep replaceables
+         this.containerId = buf.readVarInt();
+         this.offers = MerchantOffers.createFromStream(buf);
+         this.villagerLevel = buf.readVarInt();
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundOpenScreenPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundOpenScreenPacket.java
+index d3823dbcf595a7bd755f4e1ef48269830307a7ea..423caa6b7fd235db5aa77e95f17ccac0ae8eb455 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundOpenScreenPacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundOpenScreenPacket.java
+@@ -7,18 +7,20 @@ import net.minecraft.network.chat.Component;
+ import net.minecraft.network.protocol.Packet;
+ import net.minecraft.world.inventory.MenuType;
+ 
+-public class ClientboundOpenScreenPacket implements Packet<ClientGamePacketListener> {
++public class ClientboundOpenScreenPacket extends org.fiddlemc.fiddle.packet.PacketWithExplicitTargetClientConnection<ClientGamePacketListener> { // Fiddle - client perspective - deep replacements - store connection explicitly in packets that may contain deep replaceables
+     private final int containerId;
+     private final MenuType<?> type;
+     private final Component title;
+ 
+     public ClientboundOpenScreenPacket(int syncId, MenuType<?> type, Component name) {
++        super(); // Fiddle - client perspective - deep replacements - store connection explicitly in packets that may contain deep replaceables
+         this.containerId = syncId;
+         this.type = type;
+         this.title = name;
+     }
+ 
+     public ClientboundOpenScreenPacket(FriendlyByteBuf buf) {
++        super(); // Fiddle - client perspective - deep replacements - store connection explicitly in packets that may contain deep replaceables
+         this.containerId = buf.readVarInt();
+         this.type = buf.readById(BuiltInRegistries.MENU);
+         this.title = buf.readComponentTrusted();
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundSetEntityDataPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundSetEntityDataPacket.java
+index 60c866d21aec7e6ddff2b1a55b2f64133529f366..debb34a8f99c5b1356a3f742ae34a002c375f1e8 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundSetEntityDataPacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundSetEntityDataPacket.java
+@@ -6,7 +6,26 @@ import net.minecraft.network.FriendlyByteBuf;
+ import net.minecraft.network.protocol.Packet;
+ import net.minecraft.network.syncher.SynchedEntityData;
+ 
+-public record ClientboundSetEntityDataPacket(int id, List<SynchedEntityData.DataValue<?>> packedItems) implements Packet<ClientGamePacketListener> {
++// Fiddle start - client perspective - deep replacements - store connection explicitly in packets that may contain deep replaceables
++public class ClientboundSetEntityDataPacket extends org.fiddlemc.fiddle.packet.PacketWithExplicitTargetClientConnection<ClientGamePacketListener> {
++    private final int id;
++    private final List<SynchedEntityData.DataValue<?>> packedItems;
++
++    public ClientboundSetEntityDataPacket(int id, List<SynchedEntityData.DataValue<?>> packedItems) {
++        super();
++        this.id = id;
++        this.packedItems = packedItems;
++    }
++
++    public int id() {
++        return this.id;
++    }
++
++    public List<SynchedEntityData.DataValue<?>> packedItems() {
++        return this.packedItems;
++    }
++    // Fiddle end - client perspective - deep replacements - store connection explicitly in packets that may contain deep replaceables
++
+     public static final int EOF_MARKER = 255;
+ 
+     public ClientboundSetEntityDataPacket(FriendlyByteBuf buf) {
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundSetEquipmentPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundSetEquipmentPacket.java
+index 5a8f850b447fc3a4bd0eb0c505bbdfc8be7115e8..e77a13d52756882fb78458f753533f94073a62f9 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundSetEquipmentPacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundSetEquipmentPacket.java
+@@ -8,17 +8,19 @@ import net.minecraft.network.protocol.Packet;
+ import net.minecraft.world.entity.EquipmentSlot;
+ import net.minecraft.world.item.ItemStack;
+ 
+-public class ClientboundSetEquipmentPacket implements Packet<ClientGamePacketListener> {
++public class ClientboundSetEquipmentPacket extends org.fiddlemc.fiddle.packet.PacketWithExplicitTargetClientConnection<ClientGamePacketListener> { // Fiddle - client perspective - deep replacements - store connection explicitly in packets that may contain deep replaceables
+     private static final byte CONTINUE_MASK = -128;
+     private final int entity;
+     private final List<Pair<EquipmentSlot, ItemStack>> slots;
+ 
+     public ClientboundSetEquipmentPacket(int id, List<Pair<EquipmentSlot, ItemStack>> equipmentList) {
++        super(); // Fiddle - client perspective - deep replacements - store connection explicitly in packets that may contain deep replaceables
+         this.entity = id;
+         this.slots = equipmentList;
+     }
+ 
+     public ClientboundSetEquipmentPacket(FriendlyByteBuf buf) {
++        super(); // Fiddle - client perspective - deep replacements - store connection explicitly in packets that may contain deep replaceables
+         this.entity = buf.readVarInt();
+         EquipmentSlot[] equipmentSlots = EquipmentSlot.values();
+         this.slots = Lists.newArrayList();
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundSystemChatPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundSystemChatPacket.java
+index 56349aa5f353bac6aaa7750bb92306c6b41f0b92..a5dbce44e45ec02d7729e3d3678181830d0855f7 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundSystemChatPacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundSystemChatPacket.java
+@@ -5,7 +5,25 @@ import net.minecraft.network.FriendlyByteBuf;
+ import net.minecraft.network.chat.Component;
+ import net.minecraft.network.protocol.Packet;
+ 
+-public record ClientboundSystemChatPacket(Component content, boolean overlay) implements Packet<ClientGamePacketListener> {
++// Spigot start
++// Fiddle start - client perspective - deep replacements - store connection explicitly in packets that may contain deep replaceables
++public class ClientboundSystemChatPacket extends org.fiddlemc.fiddle.packet.PacketWithExplicitTargetClientConnection<ClientGamePacketListener> { // Paper - Adventure
++    private final Component content;
++    private final boolean overlay;
++
++    public Component content() {
++        return this.content;
++    }
++
++    public boolean overlay() {
++        return this.overlay;
++    }
++
++    public ClientboundSystemChatPacket(Component content, boolean overlay) {
++        this.content = content;
++        this.overlay = overlay;
++    }
++    // Fiddle end - client perspective - deep replacements - store connection explicitly in packets that may contain deep replaceables
+ 
+     // Spigot start
+     public ClientboundSystemChatPacket(net.md_5.bungee.api.chat.BaseComponent[] content, boolean overlay) {
+@@ -24,7 +42,7 @@ public record ClientboundSystemChatPacket(Component content, boolean overlay) im
+ 
+     @Override
+     public void write(FriendlyByteBuf buf) {
+-        buf.writeComponent(this.content);
++        buf.writeComponent(this.content, org.fiddlemc.fiddle.packet.deepreplacement.DeepReplacementScope.EVERYTHING); // Fiddle - client perspective - deep replacements - store connection explicitly in packets that may contain deep replaceables
+         buf.writeBoolean(this.overlay);
+     }
+ 
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundTagQueryPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundTagQueryPacket.java
+index e778322664bdd88bc34605f82c90ca7a5994e2f5..c7bccdd7a76de22b8f9f23d448e9a13925216b12 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundTagQueryPacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundTagQueryPacket.java
+@@ -5,17 +5,19 @@ import net.minecraft.nbt.CompoundTag;
+ import net.minecraft.network.FriendlyByteBuf;
+ import net.minecraft.network.protocol.Packet;
+ 
+-public class ClientboundTagQueryPacket implements Packet<ClientGamePacketListener> {
++public class ClientboundTagQueryPacket extends org.fiddlemc.fiddle.packet.PacketWithExplicitTargetClientConnection<ClientGamePacketListener> { // Fiddle - client perspective - deep replacements - store connection explicitly in packets that may contain deep replaceables
+     private final int transactionId;
+     @Nullable
+     private final CompoundTag tag;
+ 
+     public ClientboundTagQueryPacket(int transactionId, @Nullable CompoundTag nbt) {
++        super(); // Fiddle - client perspective - deep replacements - store connection explicitly in packets that may contain deep replaceables
+         this.transactionId = transactionId;
+         this.tag = nbt;
+     }
+ 
+     public ClientboundTagQueryPacket(FriendlyByteBuf buf) {
++        super(); // Fiddle - client perspective - deep replacements - store connection explicitly in packets that may contain deep replaceables
+         this.transactionId = buf.readVarInt();
+         this.tag = buf.readNbt();
+     }
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundUpdateAdvancementsPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundUpdateAdvancementsPacket.java
+index 1d769db105312a60f6a12b670296a16bf575cdec..ac089736645ab6b7a6925409cc1e2313223df802 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundUpdateAdvancementsPacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundUpdateAdvancementsPacket.java
+@@ -11,13 +11,14 @@ import net.minecraft.network.FriendlyByteBuf;
+ import net.minecraft.network.protocol.Packet;
+ import net.minecraft.resources.ResourceLocation;
+ 
+-public class ClientboundUpdateAdvancementsPacket implements Packet<ClientGamePacketListener> {
++public class ClientboundUpdateAdvancementsPacket extends org.fiddlemc.fiddle.packet.PacketWithExplicitTargetClientConnection<ClientGamePacketListener> { // Fiddle - client perspective - deep replacements - store connection explicitly in packets that may contain deep replaceables
+     private final boolean reset;
+     private final List<AdvancementHolder> added;
+     private final Set<ResourceLocation> removed;
+     private final Map<ResourceLocation, AdvancementProgress> progress;
+ 
+     public ClientboundUpdateAdvancementsPacket(boolean clearCurrent, Collection<AdvancementHolder> toEarn, Set<ResourceLocation> toRemove, Map<ResourceLocation, AdvancementProgress> toSetProgress) {
++        super(); // Fiddle - client perspective - deep replacements - store connection explicitly in packets that may contain deep replaceables
+         this.reset = clearCurrent;
+         this.added = List.copyOf(toEarn);
+         this.removed = Set.copyOf(toRemove);
+@@ -25,6 +26,7 @@ public class ClientboundUpdateAdvancementsPacket implements Packet<ClientGamePac
+     }
+ 
+     public ClientboundUpdateAdvancementsPacket(FriendlyByteBuf buf) {
++        super(); // Fiddle - client perspective - deep replacements - store connection explicitly in packets that may contain deep replaceables
+         this.reset = buf.readBoolean();
+         this.added = buf.readList(AdvancementHolder::read);
+         this.removed = buf.readCollection(Sets::newLinkedHashSetWithExpectedSize, FriendlyByteBuf::readResourceLocation);
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundUpdateRecipesPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundUpdateRecipesPacket.java
+index ddb04a1e7d50024ee2f3692bccf471509720f65e..eae0af7d45c35a18a3f37736ed3a0ecc92853277 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundUpdateRecipesPacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundUpdateRecipesPacket.java
+@@ -10,14 +10,16 @@ import net.minecraft.resources.ResourceLocation;
+ import net.minecraft.world.item.crafting.Recipe;
+ import net.minecraft.world.item.crafting.RecipeHolder;
+ 
+-public class ClientboundUpdateRecipesPacket implements Packet<ClientGamePacketListener> {
++public class ClientboundUpdateRecipesPacket extends org.fiddlemc.fiddle.packet.PacketWithExplicitTargetClientConnection<ClientGamePacketListener> { // Fiddle - client perspective - deep replacements - store connection explicitly in packets that may contain deep replaceables
+     private final List<RecipeHolder<?>> recipes;
+ 
+     public ClientboundUpdateRecipesPacket(Collection<RecipeHolder<?>> recipes) {
++        super(); // Fiddle - client perspective - deep replacements - store connection explicitly in packets that may contain deep replaceables
+         this.recipes = Lists.newArrayList(recipes);
+     }
+ 
+     public ClientboundUpdateRecipesPacket(FriendlyByteBuf buf) {
++        super(); // Fiddle - client perspective - deep replacements - store connection explicitly in packets that may contain deep replaceables
+         this.recipes = buf.readList(ClientboundUpdateRecipesPacket::fromNetwork);
+     }
+ 

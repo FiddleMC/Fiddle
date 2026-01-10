@@ -1,0 +1,61 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Wed, 3 Jan 2024 21:02:47 +0100
+Subject: [PATCH] Client perspective - Base ids on perspective - Item - Provide
+
+Provides functionality to base `Item` ids (the ids they are identified by in packets sent to clients) on the target client's perspective.
+For clients that can understand the server-side item ids directly, the id is taken from the regular registry (`BuiltInRegistries.ITEM`), and for those who do not, the ids are taken from the vanilla-only registry (`Item.VANILLA_ONLY_ITEM_REGISTRY`).
+
+Does not add any usages of this functionality, those are added in the "Client perspective - Base ids on perspective - Item - Apply to effect data value" patch.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/ClientPerspective.java b/src/main/java/org/fiddlemc/fiddle/packet/ClientPerspective.java
+index eb26df34a458d48319fe7500322525661e06a0fb..9509fc70120390c17f0f4379ce96b9e6f57b716a 100644
+--- a/src/main/java/org/fiddlemc/fiddle/packet/ClientPerspective.java
++++ b/src/main/java/org/fiddlemc/fiddle/packet/ClientPerspective.java
+@@ -96,6 +96,43 @@ public class ClientPerspective {
+     }
+     // Fiddle end - client perspective - base ids on perspective - provide - block
+ 
++    // Fiddle start - client perspective - base ids on perspective - provide - item
++    /**
++     * The {@link net.minecraft.core.IdMap} that
++     * {@linkplain net.minecraft.core.IdMap#getId provides} the ids for
++     * {@linkplain net.minecraft.world.item.Item items}
++     * that a client with this perspective interprets correctly.
++     */
++    public net.minecraft.core.IdMap<net.minecraft.world.item.Item> getPacketItemIdMap() {
++        return understandsServerSideItemsAndBlocks ? net.minecraft.core.registries.BuiltInRegistries.ITEM : net.minecraft.world.item.Item.VANILLA_ONLY_ITEM_REGISTRY;
++    }
++
++    /**
++     * The id provided by this perspective's {@link #getPacketItemIdMap()},
++     * for the given {@link net.minecraft.world.item.Item}.
++     * A null value will be interpreted as
++     * {@link net.minecraft.world.item.Items#AIR}.
++     * <p>
++     *     This is based on {@link #getPacketItemIdMap()}, but uses the cached id for optimization instead.
++     * </p>
++     */
++    public int getPacketItemId(@org.jetbrains.annotations.Nullable net.minecraft.world.item.Item item) {
++        var itemToQuery = item == null ? net.minecraft.world.item.Items.AIR : item;
++        return understandsServerSideItemsAndBlocks ? itemToQuery.indexInItemRegistry : itemToQuery.indexInVanillaOnlyItemRegistry;
++    }
++
++    /**
++     * @return The single {@link #getPacketItemId} value for the given
++     * {@link net.minecraft.world.item.Item}, if it is the same
++     * for all possible perspectives, or -1 otherwise.
++     */
++    public static int getSinglePacketItemId(@org.jetbrains.annotations.Nullable net.minecraft.world.item.Item item) {
++        var itemToQuery = item == null ? net.minecraft.world.item.Items.AIR : item;
++        int potentialSingleIndex = itemToQuery.indexInItemRegistry;
++        return potentialSingleIndex == itemToQuery.indexInVanillaOnlyItemRegistry ? potentialSingleIndex : -1;
++    }
++    // Fiddle end - client perspective - base ids on perspective - provide - item
++
+     @Override
+     public int hashCode() {
+         return this.category.ordinal();

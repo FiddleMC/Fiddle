@@ -1,0 +1,56 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Thu, 25 Jan 2024 19:41:45 +0100
+Subject: [PATCH] Load packs - Content - Definitions with a parent - Abstract
+ implementation
+
+This provides an abstract implementation for a loader of definitions with a parent (`FiddleContentDefinitionWithParent`).
+
+This is used in the patch "Load packs - Content - Blocks and items - Register - Abstract implementation`.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/load/fiddlecontent/withparent/FiddleContentDefinitionWithParentLoader.java b/src/main/java/org/fiddlemc/fiddle/pack/load/fiddlecontent/withparent/FiddleContentDefinitionWithParentLoader.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..bf3d5f2e49a8de5f5793bc6bfb9b1de2aea654fb
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/load/fiddlecontent/withparent/FiddleContentDefinitionWithParentLoader.java
+@@ -0,0 +1,37 @@
++// Fiddle - load packs - content definitions with parent - load - implementation
++
++package org.fiddlemc.fiddle.pack.load.fiddlecontent.withparent;
++
++import net.minecraft.resources.ResourceLocation;
++import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.withparent.FiddleContentDefinitionBase;
++import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.withparent.FiddleContentDefinitionKeyParent;
++import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.withparent.FiddleContentDefinitionParent;
++
++public abstract class FiddleContentDefinitionWithParentLoader<Resource> {
++
++    protected abstract boolean isKeyParentInvalid(FiddleContentDefinitionKeyParent<Resource> keyParent);
++
++    /**
++     * @return Whether the given parent is invalid.
++     * For example, this may be true if it represents another resource that isn't loaded yet.
++     */
++    protected final boolean isParentInvalid(FiddleContentDefinitionParent parent) {
++        if (parent instanceof FiddleContentDefinitionKeyParent<?> keyParent) {
++            //noinspection unchecked
++            return this.isKeyParentInvalid((FiddleContentDefinitionKeyParent<Resource>) keyParent);
++        } else if (parent instanceof FiddleContentDefinitionBase) {
++            return false;
++        }
++        throw new UnsupportedOperationException("Unknown definition parent type: " + parent.getClass().getName());
++    }
++
++    /**
++     * Looks up an already existing resource by the resource location.
++     * <p>
++     *     This is used to let resources that depend on other resources inspect the latter's actual properties
++     *     and functionality after they have been added.
++     * </p>
++     */
++    protected abstract Resource getResource(ResourceLocation resourceLocation);
++
++}

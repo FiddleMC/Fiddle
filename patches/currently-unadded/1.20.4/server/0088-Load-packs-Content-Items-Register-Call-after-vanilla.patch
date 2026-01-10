@@ -1,0 +1,25 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Thu, 25 Jan 2024 19:29:59 +0100
+Subject: [PATCH] Load packs - Content - Items - Register - Call after vanilla
+ bootstrap
+
+This calls the item registration defined in the patch "Load packs - Content - Items - Register - Implementation"
+with the items passed to the bootstrap in the patch "Load packs - Content - Definitions - Pass read definitions to bootstrap"
+at the appropriate time after the vanilla items have been bootstrapped, but before any plugin bootstrap code is called.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/server/Bootstrap.java b/src/main/java/net/minecraft/server/Bootstrap.java
+index 6610e86ba19f439acd02f2f35af5e5c74461b5ca..61d4e5d7d3b5757283ac770e288c3f0704758751 100644
+--- a/src/main/java/net/minecraft/server/Bootstrap.java
++++ b/src/main/java/net/minecraft/server/Bootstrap.java
+@@ -88,6 +88,7 @@ public class Bootstrap {
+                     DispenseItemBehavior.bootStrap();
+                     CauldronInteraction.bootStrap();
+                     org.fiddlemc.fiddle.pack.load.fiddlecontent.block.BlockByDefinitionLoader.INSTANCE.register(readContentDefinitions.get(org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.block.BlockDefinition.TYPE)); // Fiddle - load packs - blocks - register - call after vanilla bootstrap
++                    org.fiddlemc.fiddle.pack.load.fiddlecontent.item.ItemByDefinitionLoader.INSTANCE.register(readContentDefinitions.get(org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.item.ItemDefinition.TYPE)); // Fiddle - load packs - items - register - call after vanilla bootstrap
+                     // Paper start
+                     BuiltInRegistries.bootStrap(() -> {
+                         io.papermc.paper.world.worldgen.OptionallyFlatBedrockConditionSource.bootstrap(); // Paper - Flat bedrock generator settings

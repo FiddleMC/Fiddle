@@ -1,0 +1,202 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sat, 29 Jul 2023 09:40:56 +0200
+Subject: [PATCH] Client perspective - Deep replacements - Define replacement
+ context
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacementContext.java b/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacementContext.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..41f3ee05efaa9596e7a047f0fa09ad4789e50638
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacementContext.java
+@@ -0,0 +1,187 @@
++// Fiddle - client perspective - deep replacements - context
++
++package org.fiddlemc.fiddle.packet.deepreplacement;
++
++import net.minecraft.network.FriendlyByteBuf;
++import net.minecraft.server.level.ServerPlayer;
++import net.minecraft.server.level.ServerPlayerGameMode;
++import net.minecraft.world.level.GameType;
++import org.fiddlemc.fiddle.packet.ClientPerspective;
++import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
++
++import java.lang.ref.WeakReference;
++
++/**
++ * The context for which a deep replacement invocation was made.
++ * <br>
++ * This includes the client's {@linkplain ClientPerspective perspective}, and additional dynamic settings,
++ * such as a locale, that may influence deep replacements that need to be applied in packets,
++ * such as pre-translating translatables.
++ * <br>
++ * Instances of this interface may be created at times when this information is not available at all, but
++ * at such times, the information is not queried either (i.e. a packet that does not know which client it is being
++ * sent to may pass an instance of this interface to the methods it calls that simply always throws exceptions,
++ * knowing that those methods will not actually call upon the given instance).
++ */
++public interface DeepReplacementContext {
++
++    /**
++     * @return The {@link ClientPerspective} of the client.
++     * This is always non-null.
++     * This may throw an exception when the client perspective can not be queried (for example because no
++     * client has been associated with the current context, such as a {@link FriendlyByteBuf}).
++     */
++    ClientPerspective getPerspective();
++
++    /**
++     * @return The {@link ClientPerspective} of the client.
++     * This is null if and only if the client perspective can not be queried (for example because no
++     * client has been associated with the current context, such as a {@link FriendlyByteBuf}).
++     */
++    @Nullable ClientPerspective getPerspectiveOrNull();
++
++    /**
++     * @return The {@link ServerPlayer#language} set by the client.
++     * This may be null if the client has no known locale.
++     * This may throw an exception when the locale can not be queried (for example because no
++     * client has been associated with the current context, such as a {@link FriendlyByteBuf}).
++     */
++    @Nullable String getLocale();
++
++    /**
++     * @return The {@linkplain ServerPlayerGameMode#getGameModeForPlayer() game mode} of the player that this
++     * client belongs to.
++     * This is always non-null.
++     * This may throw an exception when the game mode can not be queried (for example because no
++     * client has been associated with the current context, such as a {@link FriendlyByteBuf}).
++     */
++    GameType getGameMode();
++
++    /**
++     * @return A {@link DeepReplacementContext} that lazily retrieves its values
++     * from the given {@link FriendlyByteBuf}.
++     */
++    static DeepReplacementContext forFriendlyByteBuf(FriendlyByteBuf friendlyByteBuf) {
++        return new DeepReplacementContextForFriendlyByteBuf(friendlyByteBuf);
++    }
++
++    /**
++     * @return A {@link DeepReplacementContext} that always provides the given values.
++     */
++    static DeepReplacementContext forValues(ClientPerspective targetClientPerspective, @Nullable String targetClientLocale, GameType gameMode) {
++        return new DeepReplacementContextForValues(targetClientPerspective, targetClientLocale, gameMode);
++    }
++
++    /**
++     * A {@link DeepReplacementContext} that always throws an {@link UnsupportedOperationException}
++     * when {@link #getPerspective()} or {@link #getLocale()} is called.
++     */
++    DeepReplacementContext ALWAYS_THROWS_EXCEPTION = new DeepReplacementContext() {
++
++        @Override
++        public ClientPerspective getPerspective() {
++            throw new UnsupportedOperationException("Cannot call #getPerspective() on DeepReplacementContext.ALWAYS_THROWS_EXCEPTION");
++        }
++
++        @Override
++        public @Nullable ClientPerspective getPerspectiveOrNull() {
++            return null;
++        }
++
++        @Override
++        public @Nullable String getLocale() {
++            throw new UnsupportedOperationException("Cannot call #getLocale() on DeepReplacementContext.ALWAYS_THROWS_EXCEPTION");
++        }
++
++        @Override
++        public GameType getGameMode() {
++            throw new UnsupportedOperationException("Cannot call #getGameMode() on DeepReplacementContext.ALWAYS_THROWS_EXCEPTION");
++        }
++
++    };
++
++    class DeepReplacementContextForFriendlyByteBuf implements DeepReplacementContext {
++
++        private final WeakReference<FriendlyByteBuf> friendlyByteBuf;
++        private boolean isNotCached = true;
++        private @Nullable ClientPerspective perspective;
++        private @Nullable String locale;
++        private @Nullable GameType gameMode;
++
++        private DeepReplacementContextForFriendlyByteBuf(FriendlyByteBuf friendlyByteBuf) {
++            this.friendlyByteBuf = new WeakReference<>(friendlyByteBuf);
++        }
++
++        private void cacheIfNecessary() {
++            if (this.isNotCached) {
++                this.isNotCached = false;
++                this.perspective = this.friendlyByteBuf.get().getExplicitTargetClientPerspective();
++                this.locale = this.friendlyByteBuf.get().getExplicitTargetLocale();
++                this.gameMode = this.friendlyByteBuf.get().getExplicitTargetGameMode();
++            }
++        }
++
++        @Override
++        public ClientPerspective getPerspective() {
++            this.cacheIfNecessary();
++            return this.perspective;
++        }
++
++        @Override
++        public @NotNull ClientPerspective getPerspectiveOrNull() {
++            if (this.isNotCached) {
++                return this.friendlyByteBuf.get().getExplicitTargetClientPerspectiveOrNull();
++            }
++            return this.perspective;
++        }
++
++        @Override
++        public @Nullable String getLocale() {
++            this.cacheIfNecessary();
++            return this.locale;
++        }
++
++        @Override
++        public GameType getGameMode() {
++            this.cacheIfNecessary();
++            return this.gameMode;
++        }
++
++    }
++
++    class DeepReplacementContextForValues implements DeepReplacementContext {
++
++        private final ClientPerspective perspective;
++        private final @Nullable String locale;
++        private final GameType gameMode;
++
++        private DeepReplacementContextForValues(ClientPerspective perspective, @Nullable String locale, GameType gameMode) {
++            this.perspective = perspective;
++            this.locale = locale;
++            this.gameMode = gameMode;
++        }
++
++        @Override
++        public ClientPerspective getPerspective() {
++            return this.perspective;
++        }
++
++        @Override
++        public @NotNull ClientPerspective getPerspectiveOrNull() {
++            return this.perspective;
++        }
++
++        @Override
++        public @Nullable String getLocale() {
++            return this.locale;
++        }
++
++        @Override
++        public GameType getGameMode() {
++            return this.gameMode;
++        }
++
++    }
++
++}

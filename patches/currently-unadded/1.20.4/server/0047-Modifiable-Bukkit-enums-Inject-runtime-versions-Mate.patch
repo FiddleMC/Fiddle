@@ -1,0 +1,196 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Mon, 10 Jul 2023 22:05:08 +0200
+Subject: [PATCH] Modifiable Bukkit enums - Inject runtime versions - Material
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/server/Main.java b/src/main/java/net/minecraft/server/Main.java
+index 38045bc523547abc903487c56c760333153eeed0..b041da597f1cb13775d889a1ba94264908925224 100644
+--- a/src/main/java/net/minecraft/server/Main.java
++++ b/src/main/java/net/minecraft/server/Main.java
+@@ -180,6 +180,65 @@ public class Main {
+             var injectRuntimeClassVersionHelper = new InjectRuntimeClassVersionHelper();
+             // Fiddle end - modifiable Bukkit enums - inject runtime versions - common utilities
+ 
++            // Fiddle start - modifiable Bukkit enums - inject runtime versions - Material
++            // Verify that the class was not loaded yet
++            if (injectRuntimeClassVersionHelper.wasClassLoaded("org.bukkit.Material")) {
++                return;
++            }
++            // Load the runtime version
++            var vanillaEnumNames = java.util.Arrays.stream(org.fiddlemc.fiddle.material.OrderedEmptyMaterial.values()).map(org.fiddlemc.fiddle.material.OrderedEmptyMaterial::name).toList();
++            java.util.List<it.unimi.dsi.fastutil.Pair<String, net.minecraft.resources.ResourceLocation>> fiddleEnumNames = com.google.common.collect.Streams.concat(
++                net.minecraft.core.registries.BuiltInRegistries.BLOCK.holders()
++                    .filter(holder -> !holder.value().isVanilla()),
++                net.minecraft.core.registries.BuiltInRegistries.ITEM.holders()
++                    .filter(holder -> !holder.value().isVanilla())
++            ).map(holder -> holder.key().location()).distinct().map(resourceLocation -> {
++                var fiddleEnumName = org.fiddlemc.fiddle.material.FiddleEnumNamePrefix.PREFIX + resourceLocation.getNamespace().toUpperCase(java.util.Locale.ROOT) + "_" + resourceLocation.getPath().toUpperCase(java.util.Locale.ROOT);
++                return it.unimi.dsi.fastutil.Pair.of(fiddleEnumName, resourceLocation);
++            }).toList();
++            LOGGER.info("Adding Fiddle enums: " + fiddleEnumNames);
++            var enumNames = com.google.common.collect.Streams.concat(
++                vanillaEnumNames.stream().filter(java.util.function.Predicate.not(org.fiddlemc.fiddle.material.MaterialLegacyNameChecker::isMaterialNameLegacy)),
++                fiddleEnumNames.stream().map(it.unimi.dsi.fastutil.Pair::left),
++                vanillaEnumNames.stream().filter(org.fiddlemc.fiddle.material.MaterialLegacyNameChecker::isMaterialNameLegacy)
++            ).toList();
++            var materialClassBuilder = new org.fiddlemc.fiddle.bytebuddy.ByteBuddyWithoutValueOf()
++                // Back valueOf(String) by matchMaterial(String)
++                .makeEnumerationWithoutValueOf(enumNames, org.fiddlemc.fiddle.bukkit.material.MatchMaterialTarget.class)
++                .name("org.bukkit.Material");
++            materialClassBuilder
++                // Inherit the default implementations in AbstractMaterial
++                .implement(org.fiddlemc.fiddle.material.AbstractMaterial.class)
++                // Implement the getCraftingRemainingItem() method which returns the casted return value of getAbstractCraftingRemainingItem()
++                .defineMethod("getCraftingRemainingItem", net.bytebuddy.dynamic.TargetType.class, net.bytebuddy.description.modifier.Visibility.PUBLIC).intercept(net.bytebuddy.implementation.MethodDelegation.to(org.fiddlemc.fiddle.bukkit.material.GetCraftingRemainingItemTarget.class))
++                // Implement static getMaterial(...) and matchMaterial(...) methods which return the casted return value of their respective default implementations in AbstractMaterial
++                .defineMethod("getMaterial", net.bytebuddy.dynamic.TargetType.class, net.bytebuddy.description.modifier.Visibility.PUBLIC, net.bytebuddy.description.modifier.Ownership.STATIC).withParameters(String.class).intercept(net.bytebuddy.implementation.MethodDelegation.to(org.fiddlemc.fiddle.bukkit.material.GetMaterialTarget.class))
++                .defineMethod("getMaterial", net.bytebuddy.dynamic.TargetType.class, net.bytebuddy.description.modifier.Visibility.PUBLIC, net.bytebuddy.description.modifier.Ownership.STATIC).withParameters(String.class, Boolean.TYPE).intercept(net.bytebuddy.implementation.MethodDelegation.to(org.fiddlemc.fiddle.bukkit.material.GetMaterialTarget.class))
++                .defineMethod("matchMaterial", net.bytebuddy.dynamic.TargetType.class, net.bytebuddy.description.modifier.Visibility.PUBLIC, net.bytebuddy.description.modifier.Ownership.STATIC).withParameters(String.class).intercept(net.bytebuddy.implementation.MethodDelegation.to(org.fiddlemc.fiddle.bukkit.material.MatchMaterialTarget.class))
++                .defineMethod("matchMaterial", net.bytebuddy.dynamic.TargetType.class, net.bytebuddy.description.modifier.Visibility.PUBLIC, net.bytebuddy.description.modifier.Ownership.STATIC).withParameters(String.class, Boolean.TYPE).intercept(net.bytebuddy.implementation.MethodDelegation.to(org.fiddlemc.fiddle.bukkit.material.MatchMaterialTarget.class))
++                // Implement the data field, which will initially be null, and initialized to its actual non-null value as soon as possible (which is, due to its reliance on CraftMagicNumbers#computeData and thereby Bukkit#createBlockData, as soon as the return value of Bukkit#getServer is no longer null)
++                .defineField("data", net.bytebuddy.description.type.TypeDescription.Generic.Builder.parameterizedType(Class.class, new java.lang.reflect.WildcardType() {
++
++                    private final java.lang.reflect.Type[] upperBounds = {
++                        Object.class
++                    };
++                    private final java.lang.reflect.Type[] lowerBounds = new java.lang.reflect.Type[0];
++
++                    @Override
++                    public java.lang.reflect.Type[] getUpperBounds() {
++                        return this.upperBounds;
++                    }
++
++                    @Override
++                    public java.lang.reflect.Type[] getLowerBounds() {
++                        return this.lowerBounds;
++                    }
++
++                }).build())
++                .make()
++                .load(ClassLoader.getSystemClassLoader(), net.bytebuddy.dynamic.loading.ClassLoadingStrategy.Default.INJECTION);
++            // Fiddle end - modifiable Bukkit enums - inject runtime versions - Material
++
+             dedicatedserversettings.forceSave();
+             // Paper start - load config files early for access below if needed
+             org.bukkit.configuration.file.YamlConfiguration bukkitConfiguration = io.papermc.paper.configuration.PaperConfigurations.loadLegacyConfigFile((File) optionset.valueOf("bukkit-settings"));
+diff --git a/src/main/java/org/fiddlemc/fiddle/bukkit/material/GetCraftingRemainingItemTarget.java b/src/main/java/org/fiddlemc/fiddle/bukkit/material/GetCraftingRemainingItemTarget.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..d8786d8ecd6dae2dbb364dd07811e80db619643a
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/bukkit/material/GetCraftingRemainingItemTarget.java
+@@ -0,0 +1,20 @@
++// Fiddle - modifiable Bukkit enums - inject runtime versions - Material
++
++package org.fiddlemc.fiddle.bukkit.material;
++
++import net.bytebuddy.implementation.bind.annotation.RuntimeType;
++import net.bytebuddy.implementation.bind.annotation.This;
++import org.fiddlemc.fiddle.material.AbstractMaterial;
++import org.jetbrains.annotations.NotNull;
++
++/**
++ * A delegation target for the {@link org.bukkit.Material#getCraftingRemainingItem} method.
++ */
++public class GetCraftingRemainingItemTarget {
++
++    @RuntimeType
++    public static @NotNull Object cast(@This AbstractMaterial thisObject) {
++        return thisObject.getAbstractCraftingRemainingItem();
++    }
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/bukkit/material/GetMaterialTarget.java b/src/main/java/org/fiddlemc/fiddle/bukkit/material/GetMaterialTarget.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..4a6b0ebefc6fd0e345386c54a0f9b65cddc48e2b
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/bukkit/material/GetMaterialTarget.java
+@@ -0,0 +1,25 @@
++// Fiddle - modifiable Bukkit enums - inject runtime versions - Material
++
++package org.fiddlemc.fiddle.bukkit.material;
++
++import net.bytebuddy.implementation.bind.annotation.RuntimeType;
++import org.fiddlemc.fiddle.material.AbstractMaterial;
++import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
++
++/**
++ * A delegation target for the {@link org.bukkit.Material#getMaterial} method.
++ */
++public class GetMaterialTarget {
++
++    @RuntimeType
++    public static @Nullable Object cast(@NotNull String name) {
++        return AbstractMaterial.getAbstractMaterial(name);
++    }
++
++    @RuntimeType
++    public static @Nullable Object cast(@NotNull String name, boolean legacyName) {
++        return AbstractMaterial.getAbstractMaterial(name, legacyName);
++    }
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/bukkit/material/MatchMaterialTarget.java b/src/main/java/org/fiddlemc/fiddle/bukkit/material/MatchMaterialTarget.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..cabeebf1337a087c0d3c49150e391355103dd82b
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/bukkit/material/MatchMaterialTarget.java
+@@ -0,0 +1,25 @@
++// Fiddle - modifiable Bukkit enums - inject runtime versions - Material
++
++package org.fiddlemc.fiddle.bukkit.material;
++
++import net.bytebuddy.implementation.bind.annotation.RuntimeType;
++import org.fiddlemc.fiddle.material.AbstractMaterial;
++import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
++
++/**
++ * A delegation target for the {@link org.bukkit.Material#matchMaterial} method.
++ */
++public class MatchMaterialTarget {
++
++    @RuntimeType
++    public static @Nullable Object cast(@NotNull String name) {
++        return AbstractMaterial.matchAbstractMaterial(name);
++    }
++
++    @RuntimeType
++    public static @Nullable Object cast(@NotNull String name, boolean legacyName) {
++        return AbstractMaterial.matchAbstractMaterial(name, legacyName);
++    }
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/bukkit/material/package-info.java b/src/main/java/org/fiddlemc/fiddle/bukkit/material/package-info.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..5b6c9f858d0530fe175a006717e5545dc7b36c13
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/bukkit/material/package-info.java
+@@ -0,0 +1,9 @@
++@ParametersAreNonnullByDefault
++@MethodsReturnNonnullByDefault
++@FieldsAreNonnullByDefault
++package org.fiddlemc.fiddle.bukkit.material;
++
++import net.minecraft.FieldsAreNonnullByDefault;
++import net.minecraft.MethodsReturnNonnullByDefault;
++
++import javax.annotation.ParametersAreNonnullByDefault;
+diff --git a/src/main/java/org/fiddlemc/fiddle/bukkit/package-info.java b/src/main/java/org/fiddlemc/fiddle/bukkit/package-info.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..e47fe14b6791b659409340785fdb9faad6cddffb
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/bukkit/package-info.java
+@@ -0,0 +1,9 @@
++@ParametersAreNonnullByDefault
++@MethodsReturnNonnullByDefault
++@FieldsAreNonnullByDefault
++package org.fiddlemc.fiddle.bukkit;
++
++import net.minecraft.FieldsAreNonnullByDefault;
++import net.minecraft.MethodsReturnNonnullByDefault;
++
++import javax.annotation.ParametersAreNonnullByDefault;

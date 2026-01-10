@@ -1,0 +1,861 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Mon, 19 Feb 2024 20:28:29 +0100
+Subject: [PATCH] Stash changes
+
+
+diff --git a/src/main/java/net/minecraft/network/protocol/Packet.java b/src/main/java/net/minecraft/network/protocol/Packet.java
+index 881b517d6b012ebb22f39cdf5eb82cf0da6bf823..463ea2b3057085dadaf1bacdb99cc09bc3dbc8eb 100644
+--- a/src/main/java/net/minecraft/network/protocol/Packet.java
++++ b/src/main/java/net/minecraft/network/protocol/Packet.java
+@@ -77,6 +77,34 @@ public interface Packet<T extends PacketListener> {
+     default Packet<T> adaptForClient(net.minecraft.network.Connection connection) {
+         return this;
+     }
++
++    org.fiddlemc.fiddle.packet.ClientPerspective BYPASS_ADAPTATIONS_CLIENT_PERSPECTIVE =
++        org.fiddlemc.fiddle.packet.ClientPerspectiveCategory.NO_FURTHER_ADAPTATIONS.mostLikelyPerspective;
++
++    String BYPASS_ADAPTATIONS_LOCALE =
++        net.minecraft.locale.Language.DEFAULT;
++
++    net.minecraft.world.level.GameType BYPASS_ADAPTATIONS_GAME_MODE =
++        net.minecraft.world.level.GameType.SURVIVAL;
++
++    /**
++     * This method can be called on a {@link Packet} for which no adaptations should be made,
++     * even after {@link #adaptForClient} is called, typically because this packet is sent as part of
++     * visualization and contains data that is already a replacement.
++     * <p>
++     *     After this method has been called on a packet:
++     *     <ul>
++     *         <li>{@link #getExplicitTargetClientPerspective()} throws {@link UnsupportedOperationException}
++     *         or returns {@link #BYPASS_ADAPTATIONS_CLIENT_PERSPECTIVE}</li>
++     *         <li>{@link #getExplicitTargetLocale()} throws {@link UnsupportedOperationException}
++     *         or returns {@link #BYPASS_ADAPTATIONS_LOCALE}</li>
++     *         <li>{@link #getExplicitTargetGameMode()} throws {@link UnsupportedOperationException}
++     *         or returns {@link #BYPASS_ADAPTATIONS_GAME_MODE}</li>
++     *     </ul>
++     * </p>
++     */
++    default void bypassesAdaptations() {
++    }
+     // Fiddle end - client perspective - packets are modifiable
+ 
+     // Fiddle start - client perspective - expose target client properties - packet can provide explicit connection
+diff --git a/src/main/java/net/minecraft/world/entity/Display.java b/src/main/java/net/minecraft/world/entity/Display.java
+index 2ecd3ed5b36475125c6f63af2612011fc8fba8a5..fc4a79da83e32cabd7bab74d1b3c5c5ab8f4fa70 100644
+--- a/src/main/java/net/minecraft/world/entity/Display.java
++++ b/src/main/java/net/minecraft/world/entity/Display.java
+@@ -613,8 +613,10 @@ public abstract class Display extends Entity {
+     public static class ItemDisplay extends Display {
+         private static final String TAG_ITEM = "item";
+         private static final String TAG_ITEM_DISPLAY = "item_display";
+-        private static final EntityDataAccessor<ItemStack> DATA_ITEM_STACK_ID = SynchedEntityData.defineId(Display.ItemDisplay.class, EntityDataSerializers.ITEM_STACK);
+-        private static final EntityDataAccessor<Byte> DATA_ITEM_DISPLAY_ID = SynchedEntityData.defineId(Display.ItemDisplay.class, EntityDataSerializers.BYTE);
++        // Fiddle start - client perspective - fake entities - private -> public
++        public static final EntityDataAccessor<ItemStack> DATA_ITEM_STACK_ID = SynchedEntityData.defineId(Display.ItemDisplay.class, EntityDataSerializers.ITEM_STACK);
++        public static final EntityDataAccessor<Byte> DATA_ITEM_DISPLAY_ID = SynchedEntityData.defineId(Display.ItemDisplay.class, EntityDataSerializers.BYTE);
++        // Fiddle end - client perspective - fake entities - private -> public
+         private final SlotAccess slot = new SlotAccess() {
+             @Override
+             public ItemStack get() {
+diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
+index f6347f9793d4f44cef497cfb1a156da6dca33640..5b301ee8d9bb0a066f6006226572fa437f4683d9 100644
+--- a/src/main/java/net/minecraft/world/entity/Entity.java
++++ b/src/main/java/net/minecraft/world/entity/Entity.java
+@@ -348,21 +348,23 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
+     public int invulnerableTime;
+     protected boolean firstTick;
+     protected final SynchedEntityData entityData;
+-    protected static final EntityDataAccessor<Byte> DATA_SHARED_FLAGS_ID = SynchedEntityData.defineId(Entity.class, EntityDataSerializers.BYTE);
+-    protected static final int FLAG_ONFIRE = 0;
+-    private static final int FLAG_SHIFT_KEY_DOWN = 1;
+-    private static final int FLAG_SPRINTING = 3;
+-    private static final int FLAG_SWIMMING = 4;
+-    private static final int FLAG_INVISIBLE = 5;
+-    protected static final int FLAG_GLOWING = 6;
+-    protected static final int FLAG_FALL_FLYING = 7;
+-    private static final EntityDataAccessor<Integer> DATA_AIR_SUPPLY_ID = SynchedEntityData.defineId(Entity.class, EntityDataSerializers.INT);
+-    private static final EntityDataAccessor<Optional<Component>> DATA_CUSTOM_NAME = SynchedEntityData.defineId(Entity.class, EntityDataSerializers.OPTIONAL_COMPONENT);
+-    private static final EntityDataAccessor<Boolean> DATA_CUSTOM_NAME_VISIBLE = SynchedEntityData.defineId(Entity.class, EntityDataSerializers.BOOLEAN);
+-    private static final EntityDataAccessor<Boolean> DATA_SILENT = SynchedEntityData.defineId(Entity.class, EntityDataSerializers.BOOLEAN);
+-    private static final EntityDataAccessor<Boolean> DATA_NO_GRAVITY = SynchedEntityData.defineId(Entity.class, EntityDataSerializers.BOOLEAN);
+-    protected static final EntityDataAccessor<net.minecraft.world.entity.Pose> DATA_POSE = SynchedEntityData.defineId(Entity.class, EntityDataSerializers.POSE);
+-    private static final EntityDataAccessor<Integer> DATA_TICKS_FROZEN = SynchedEntityData.defineId(Entity.class, EntityDataSerializers.INT);
++    // Fiddle start - client perspective - fake entities - private/protected -> public
++    public static final EntityDataAccessor<Byte> DATA_SHARED_FLAGS_ID = SynchedEntityData.defineId(Entity.class, EntityDataSerializers.BYTE);
++    public static final int FLAG_ONFIRE = 0;
++    public static final int FLAG_SHIFT_KEY_DOWN = 1;
++    public static final int FLAG_SPRINTING = 3;
++    public static final int FLAG_SWIMMING = 4;
++    public static final int FLAG_INVISIBLE = 5;
++    public static final int FLAG_GLOWING = 6;
++    public static final int FLAG_FALL_FLYING = 7;
++    public static final EntityDataAccessor<Integer> DATA_AIR_SUPPLY_ID = SynchedEntityData.defineId(Entity.class, EntityDataSerializers.INT);
++    public static final EntityDataAccessor<Optional<Component>> DATA_CUSTOM_NAME = SynchedEntityData.defineId(Entity.class, EntityDataSerializers.OPTIONAL_COMPONENT);
++    public static final EntityDataAccessor<Boolean> DATA_CUSTOM_NAME_VISIBLE = SynchedEntityData.defineId(Entity.class, EntityDataSerializers.BOOLEAN);
++    public static final EntityDataAccessor<Boolean> DATA_SILENT = SynchedEntityData.defineId(Entity.class, EntityDataSerializers.BOOLEAN);
++    public static final EntityDataAccessor<Boolean> DATA_NO_GRAVITY = SynchedEntityData.defineId(Entity.class, EntityDataSerializers.BOOLEAN);
++    public static final EntityDataAccessor<net.minecraft.world.entity.Pose> DATA_POSE = SynchedEntityData.defineId(Entity.class, EntityDataSerializers.POSE);
++    public static final EntityDataAccessor<Integer> DATA_TICKS_FROZEN = SynchedEntityData.defineId(Entity.class, EntityDataSerializers.INT);
++    // Fiddle end - client perspective - fake entities - private/protected -> public
+     private EntityInLevelCallback levelCallback;
+     private final VecDeltaCodec packetPositionCodec;
+     public boolean noCulling;
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/load/fiddlecontent/block/BlockStateVisualizationLoader.java b/src/main/java/org/fiddlemc/fiddle/pack/load/fiddlecontent/block/BlockStateVisualizationLoader.java
+index ab03a942f6ba12bf81e06ed288c2631e04bf3d7c..1212760df6c17681d222eb3a2c7569a3febbdc57 100644
+--- a/src/main/java/org/fiddlemc/fiddle/pack/load/fiddlecontent/block/BlockStateVisualizationLoader.java
++++ b/src/main/java/org/fiddlemc/fiddle/pack/load/fiddlecontent/block/BlockStateVisualizationLoader.java
+@@ -91,7 +91,7 @@ public final class BlockStateVisualizationLoader {
+                             case JAVA_DEFAULT -> defaultReplacement.withPropertiesOf(state);
+                             case JAVA_WITH_ENABLED_RESOURCE_PACK ->
+                                 withEnabledResourcePackReplacement.withPropertiesOf(state);
+-                            case JAVA_WITH_FIDDLE_CLIENT_MOD -> state;
++                            case JAVA_WITH_FIDDLE_CLIENT_MOD, NO_FURTHER_ADAPTATIONS -> state;
+                         }
+                     );
+                 }
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/ClientPerspectiveCategory.java b/src/main/java/org/fiddlemc/fiddle/packet/ClientPerspectiveCategory.java
+index a6d4aa773fa8eb33318faa8247f2e3c35e48af95..563f35588f03c47894fcd80dd80f8164afdbafc2 100644
+--- a/src/main/java/org/fiddlemc/fiddle/packet/ClientPerspectiveCategory.java
++++ b/src/main/java/org/fiddlemc/fiddle/packet/ClientPerspectiveCategory.java
+@@ -57,7 +57,15 @@ public enum ClientPerspectiveCategory {
+      * This generally results in data being sent as-is, because when joining a Fiddle server, the client receives
+      * the necessary information to from then on interpret the server-side block and item keys directly.
+      */
+-    JAVA_WITH_FIDDLE_CLIENT_MOD;
++    JAVA_WITH_FIDDLE_CLIENT_MOD,
++
++    /**
++     * A hypothetical category for clients for which everything in a packet should be sent as-is.
++     * <p>
++     *     This has only a single instance.
++     * </p>
++     */
++    NO_FURTHER_ADAPTATIONS;
+ 
+     /**
+      * The {@link ClientPerspective} in this category most likely to occur in practice.
+@@ -70,6 +78,7 @@ public enum ClientPerspectiveCategory {
+         JAVA_DEFAULT.mostLikelyPerspective = new ClientPerspective(JAVA_DEFAULT, false, false);
+         JAVA_WITH_ENABLED_RESOURCE_PACK.mostLikelyPerspective = new ClientPerspective(JAVA_WITH_ENABLED_RESOURCE_PACK, false, true);
+         JAVA_WITH_FIDDLE_CLIENT_MOD.mostLikelyPerspective = new ClientPerspective(JAVA_WITH_FIDDLE_CLIENT_MOD, true, true);
++        NO_FURTHER_ADAPTATIONS.mostLikelyPerspective = new ClientPerspective(NO_FURTHER_ADAPTATIONS, true, true);
+     }
+ 
+ }
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/PacketWithExplicitTargetClientConnection.java b/src/main/java/org/fiddlemc/fiddle/packet/PacketWithExplicitTargetClientConnection.java
+index 0df644b758a72357a33b036d1eac4a9f1a7a406c..3263463de6c20e50e5078f1d74001c013ab7918d 100644
+--- a/src/main/java/org/fiddlemc/fiddle/packet/PacketWithExplicitTargetClientConnection.java
++++ b/src/main/java/org/fiddlemc/fiddle/packet/PacketWithExplicitTargetClientConnection.java
+@@ -24,6 +24,11 @@ public abstract class PacketWithExplicitTargetClientConnection<T extends PacketL
+      */
+     private @Nullable WeakReference<Connection> targetClientConnection;
+ 
++    /**
++     * Whether {@link #bypassesAdaptations()} has been called.
++     */
++    private boolean bypassesAdaptations;
++
+     /**
+      * This method is called after setting {@link #targetClientConnection} in {@link #adaptForClient},
+      * and must be overridden instead of {@link #adaptForClient}.
+@@ -38,17 +43,28 @@ public abstract class PacketWithExplicitTargetClientConnection<T extends PacketL
+         return this.postSetConnectionAdaptForClient(connection);
+     }
+ 
++    @Override
++    public void bypassesAdaptations() {
++        this.bypassesAdaptations = true;
++    }
++
+     public Connection getExplicitTargetClientConnection() throws NullPointerException {
+         return Objects.requireNonNull(this.targetClientConnection.get());
+     }
+ 
+     @Override
+     public ClientPerspective getExplicitTargetClientPerspective() throws NullPointerException {
++        if (this.bypassesAdaptations) {
++            return BYPASS_ADAPTATIONS_CLIENT_PERSPECTIVE;
++        }
+         return Objects.requireNonNull(this.targetClientConnection.get().getPlayerClientPerspective());
+     }
+ 
+     @Override
+     public @Nullable ClientPerspective getExplicitTargetClientPerspectiveOrNull() throws NullPointerException {
++        if (this.bypassesAdaptations) {
++            return BYPASS_ADAPTATIONS_CLIENT_PERSPECTIVE;
++        }
+         if (this.targetClientConnection == null) {
+             return null;
+         }
+@@ -62,6 +78,9 @@ public abstract class PacketWithExplicitTargetClientConnection<T extends PacketL
+     // Fiddle start - client perspective - localization - get player locale from connection
+     @Override
+     public @Nullable String getExplicitTargetLocale() throws NullPointerException {
++        if (this.bypassesAdaptations) {
++            return BYPASS_ADAPTATIONS_LOCALE;
++        }
+         return this.targetClientConnection.get().getPlayerLocale();
+     }
+     // Fiddle end - client perspective - localization - get player locale from connection
+@@ -69,6 +88,9 @@ public abstract class PacketWithExplicitTargetClientConnection<T extends PacketL
+     // Fiddle start - client perspective - item replacements - get player game mode from connection
+     @Override
+     public net.minecraft.world.level.GameType getExplicitTargetGameMode() throws NullPointerException {
++        if (this.bypassesAdaptations) {
++            return BYPASS_ADAPTATIONS_GAME_MODE;
++        }
+         return this.targetClientConnection.get().getPlayerGameMode();
+     }
+     // Fiddle end - client perspective - item replacements - get player game mode from connection
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacementContext.java b/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacementContext.java
+index 41f3ee05efaa9596e7a047f0fa09ad4789e50638..a69d754064ce9d454122d6de97a0b2f0db5529e1 100644
+--- a/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacementContext.java
++++ b/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacementContext.java
+@@ -7,6 +7,7 @@ import net.minecraft.server.level.ServerPlayer;
+ import net.minecraft.server.level.ServerPlayerGameMode;
+ import net.minecraft.world.level.GameType;
+ import org.fiddlemc.fiddle.packet.ClientPerspective;
++import org.fiddlemc.fiddle.packet.ClientPerspectiveCategory;
+ import org.jetbrains.annotations.NotNull;
+ import org.jetbrains.annotations.Nullable;
+ 
+@@ -58,6 +59,14 @@ public interface DeepReplacementContext {
+      */
+     GameType getGameMode();
+ 
++    /**
++     * @return Whether this {@link DeepReplacementContext} can lead to any replacements being applied.
++     */
++    default boolean canMakeAnyReplacements() {
++        var perspective = this.getPerspectiveOrNull();
++        return perspective == null || perspective.category != ClientPerspectiveCategory.NO_FURTHER_ADAPTATIONS);
++    }
++
+     /**
+      * @return A {@link DeepReplacementContext} that lazily retrieves its values
+      * from the given {@link FriendlyByteBuf}.
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacementScope.java b/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacementScope.java
+index e6d4f12307c3415b1196bd47ce1a68418c013609..7afdc6c2acbb4ea813d7d8a9a594322dc4c8b1ca 100644
+--- a/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacementScope.java
++++ b/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacementScope.java
+@@ -49,7 +49,7 @@ public final class DeepReplacementScope {
+     }
+ 
+     /**
+-     * Whether this {@link DeepReplacementScope} can lead to any replacements being applied.
++     * @return Whether this {@link DeepReplacementScope} can lead to any replacements being applied.
+      */
+     public boolean canMakeAnyReplacements() {
+         return this.attemptToReplaceItemsAndBlocks || this.attemptToReplaceTranslatables;
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacements.java b/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacements.java
+index 7f01be7a658b8f69f2f2ae067096ec63deac81bf..cc1f18442b5f80a3e9660b39f913056f9aa6c332 100644
+--- a/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacements.java
++++ b/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacements.java
+@@ -65,7 +65,7 @@ public final class DeepReplacements {
+         }
+ 
+         // Skip if we have no replacements to make
+-        if (!scope.canMakeAnyReplacements()) {
++        if (!scope.canMakeAnyReplacements() || !context.canMakeAnyReplacements()) {
+             return value;
+         }
+ 
+@@ -100,7 +100,7 @@ public final class DeepReplacements {
+     public static Component replaceComponent(Component value, DeepReplacementContext context, DeepReplacementScope scope) {
+ 
+         // Skip if we have no replacements to make
+-        if (!scope.canMakeAnyReplacements()) {
++        if (!scope.canMakeAnyReplacements() || !context.canMakeAnyReplacements()) {
+             return value;
+         }
+ 
+@@ -248,7 +248,7 @@ public final class DeepReplacements {
+     public static String replaceSNBT(String value, DeepReplacementContext context, DeepReplacementScope scope) {
+ 
+         // Skip if we have no replacements to make
+-        if (!scope.canMakeAnyReplacements()) {
++        if (!scope.canMakeAnyReplacements() || !context.canMakeAnyReplacements()) {
+             return value;
+         }
+ 
+@@ -286,7 +286,7 @@ public final class DeepReplacements {
+     public static Tag replaceTag(Tag value, DeepReplacementContext context, DeepReplacementScope scope) {
+ 
+         // Skip if we have no replacements to make
+-        if (!scope.canMakeAnyReplacements()) {
++        if (!scope.canMakeAnyReplacements() || !context.canMakeAnyReplacements()) {
+             return value;
+         }
+ 
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/fakeentity/FakeDisplay.java b/src/main/java/org/fiddlemc/fiddle/packet/fakeentity/FakeDisplay.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..48be344aca8113612ef2eb928d529b53c9970ae4
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/packet/fakeentity/FakeDisplay.java
+@@ -0,0 +1,21 @@
++// Fiddle - client perspective - fake entities
++
++package org.fiddlemc.fiddle.packet.fakeentity;
++
++import net.minecraft.server.level.ServerPlayer;
++import net.minecraft.world.entity.Display;
++import net.minecraft.world.phys.Vec3;
++
++/**
++ * A {@link FakeEntity} for {@link Display} entities.
++ */
++public abstract class FakeDisplay extends FakeEntity {
++
++    protected FakeDisplay(ServerPlayer player, int id, boolean packetsBypassAdaptations, double x, double y, double z, byte yaw, byte pitch, Vec3 velocity) {
++        super(player, id, packetsBypassAdaptations, x, y, z, yaw, pitch, 0, velocity, 0);
++    }
++
++    @Override
++    public abstract FakeEntityType<? extends FakeDisplay> getType();
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/fakeentity/FakeEntity.java b/src/main/java/org/fiddlemc/fiddle/packet/fakeentity/FakeEntity.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..bf144c9d383c7f5f38bdb010c2ab13b2fc89c603
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/packet/fakeentity/FakeEntity.java
+@@ -0,0 +1,362 @@
++// Fiddle - client perspective - fake entities
++
++package org.fiddlemc.fiddle.packet.fakeentity;
++
++import net.minecraft.network.protocol.Packet;
++import net.minecraft.network.protocol.game.*;
++import net.minecraft.network.syncher.SynchedEntityData;
++import net.minecraft.server.level.ServerPlayer;
++import net.minecraft.server.network.ServerGamePacketListenerImpl;
++import net.minecraft.util.Mth;
++import net.minecraft.world.entity.Entity;
++import net.minecraft.world.item.ItemStack;
++import net.minecraft.world.phys.Vec3;
++import org.fiddlemc.fiddle.packet.item.ItemStackInPacketContext;
++import org.jetbrains.annotations.Nullable;
++
++import java.lang.ref.WeakReference;
++import java.util.ArrayList;
++import java.util.Collections;
++import java.util.List;
++import java.util.UUID;
++
++/**
++ * The handle for a fake {@link Entity}, for a specific {@link #player}.
++ * <p>
++ *     This handle can be used to modify properties of the fake entity, which are then sent to the player.
++ *     However, only little of the state of the fake entity is remembered by this class.
++ *     If more such state is desired, it must be stored in a class that extends or decorates this class.
++ * </p>
++ */
++public abstract class FakeEntity {
++
++    private boolean isRemoved;
++    final WeakReference<ServerPlayer> player;
++    final int id;
++    final boolean packetsBypassAdaptations;
++    final UUID uuid;
++
++    private double x;
++    private double y;
++    private double z;
++    private byte yaw;
++    private byte pitch;
++    private boolean onGround;
++    private byte sharedEntityFlags;
++
++    /**
++     * Instantiating a {@link FakeEntity} immediately causes it to be sent to the player with a
++     * {@link ClientboundAddEntityPacket}.
++     */
++    protected FakeEntity(ServerPlayer player, int id, boolean packetsBypassAdaptations, double x, double y, double z, byte yaw, byte pitch, int spawnEntityData, Vec3 velocity, double headYaw) {
++        this.player = new WeakReference<>(player);
++        this.id = id;
++        this.packetsBypassAdaptations = packetsBypassAdaptations;
++        this.uuid = Mth.createInsecureUUID(Entity.SHARED_RANDOM);
++        this.x = x;
++        this.y = y;
++        this.z = z;
++        this.yaw = yaw;
++        this.pitch = pitch;
++        this.sendIfNotRemovedAndConnectionIsOpen(new ClientboundAddEntityPacket(this.id, this.uuid, this.x, this.y, this.z, this.pitch, this.yaw, this.getType().minecraftType, spawnEntityData, velocity, headYaw));
++    }
++
++    public abstract FakeEntityType<?> getType();
++
++    /**
++     * The {@link ItemStackInPacketContext} for {@link ItemStack}s in packets sent for this fake entity.
++     */
++    public ItemStackInPacketContext getItemStackInPacketContext() {
++        return ItemStackInPacketContext.DEFAULT;
++    }
++
++    public boolean isRemoved() {
++        return this.isRemoved;
++    }
++
++    public double getX() {
++        return this.x;
++    }
++
++    public double getY() {
++        return this.y;
++    }
++
++    public double getZ() {
++        return this.z;
++    }
++
++    public byte getYaw() {
++        return this.yaw;
++    }
++
++    public byte getPitch() {
++        return this.pitch;
++    }
++
++    public boolean isOnGround() {
++        return this.onGround;
++    }
++
++    public byte getSharedEntityFlags() {
++        return this.sharedEntityFlags;
++    }
++
++    public boolean hasVisualFire() {
++        return (this.sharedEntityFlags & 1 << Entity.FLAG_ONFIRE) != 0;
++    }
++
++    public boolean isInvisible() {
++        return (this.sharedEntityFlags & 1 << Entity.FLAG_INVISIBLE) != 0;
++    }
++
++    public boolean isGlowing() {
++        return (this.sharedEntityFlags & 1 << Entity.FLAG_GLOWING) != 0;
++    }
++
++    private @Nullable ServerGamePacketListenerImpl getPacketListenerIfConnected() {
++        var player = this.player.get();
++        if (player == null) {
++            return null;
++        }
++        var connection = player.connection;
++        if (connection == null || connection.isDisconnected()) {
++            return null;
++        }
++        return connection;
++    }
++
++    void sendIfNotRemovedAndConnectionIsOpen(Packet<?> packet) {
++        if (this.isRemoved) {
++            return;
++        }
++        var connection = this.getPacketListenerIfConnected();
++        if (connection != null) {
++            if (this.packetsBypassAdaptations) {
++                packet.bypassesAdaptations();
++            }
++            connection.send(packet);
++        }
++    }
++
++    /**
++     * Removes this fake entity.
++     *
++     * @see ClientboundRemoveEntitiesPacket
++     */
++    public void remove() {
++        this.sendIfNotRemovedAndConnectionIsOpen(new ClientboundRemoveEntitiesPacket(this.id));
++        this.isRemoved = true;
++    }
++
++    public void setPosition(double x, double y, double z) {
++        this.setPosition(x, y, z, this.onGround);
++    }
++
++    public void setPosition(double x, double y, double z, boolean onGround) {
++        this.setPosition(x, y, z, this.yaw, this.pitch, onGround);
++    }
++
++    public void setPosition(double x, double y, double z, byte yaw, byte pitch) {
++        this.setPosition(x, y, z, yaw, pitch, this.onGround);
++    }
++
++    public void setPosition(double x, double y, double z, byte yaw, byte pitch, boolean onGround) {
++        var dx = x - this.x;
++        var dy = y - this.y;
++        var dz = z - this.z;
++        var dxDiscrete = Math.round(dx * 4096);
++        var dyDiscrete = Math.round(dy * 4096);
++        var dzDiscrete = Math.round(dz * 4096);
++        if (dxDiscrete >= 8 || dxDiscrete < -8 || dyDiscrete >= 8 || dyDiscrete < -8 || dzDiscrete >= 8 || dzDiscrete < -8) {
++            this.teleport(x, y, z, yaw, pitch, onGround);
++            this.yaw = yaw;
++            this.pitch = pitch;
++            this.x = x;
++            this.y = y;
++            this.z = z;
++        } else {
++            var dxShort = (short) dxDiscrete;
++            var dyShort = (short) dyDiscrete;
++            var dzShort = (short) dzDiscrete;
++            if (this.yaw == yaw && this.pitch == pitch) {
++                this.movePos(dxShort, dyShort, dzShort, onGround);
++            } else {
++                this.movePosRot(dxShort, dyShort, dzShort, yaw, pitch, onGround);
++                this.yaw = yaw;
++                this.pitch = pitch;
++            }
++            this.x += dxShort / 4096.0;
++            this.y += dyShort / 4096.0;
++            this.z += dzShort / 4096.0;
++        }
++        this.onGround = onGround;
++    }
++
++    public void setYaw(byte yaw) {
++        this.moveRot(yaw, this.pitch, this.onGround);
++        this.yaw = yaw;
++    }
++
++    public void setPitch(byte pitch) {
++        this.moveRot(this.yaw, pitch, this.onGround);
++        this.pitch = pitch;
++    }
++
++    public void setYawAndPitch(byte yaw, byte pitch) {
++        this.moveRot(yaw, pitch, this.onGround);
++        this.yaw = yaw;
++        this.pitch = pitch;
++    }
++
++    /**
++     * Teleports to the given position.
++     * This is used by {@link #setPosition}.
++     *
++     * @see ClientboundTeleportEntityPacket
++     */
++    private void teleport(double x, double y, double z, byte yaw, byte pitch, boolean onGround) {
++        this.sendIfNotRemovedAndConnectionIsOpen(new ClientboundTeleportEntityPacket(this.id, x, y, z, yaw, pitch, onGround));
++    }
++
++    /**
++     * Moves by the given delta.
++     * This is used by {@link #setPosition}.
++     *
++     * @see ClientboundMoveEntityPacket.Pos
++     */
++    private void movePos(short deltaX, short deltaY, short deltaZ, boolean onGround) {
++        this.sendIfNotRemovedAndConnectionIsOpen(new ClientboundMoveEntityPacket.Pos(this.id, deltaX, deltaY, deltaZ, onGround));
++    }
++
++    /**
++     * Moves by the given delta, and update the yaw and pitch.
++     * This is used by {@link #setPosition}.
++     *
++     * @see ClientboundMoveEntityPacket.PosRot
++     */
++    private void movePosRot(short deltaX, short deltaY, short deltaZ, byte yaw, byte pitch, boolean onGround) {
++        this.sendIfNotRemovedAndConnectionIsOpen(new ClientboundMoveEntityPacket.PosRot(this.id, deltaX, deltaY, deltaZ, yaw, pitch, onGround));
++    }
++
++    /**
++     * Updates the yaw and pitch.
++     * This is used by {@link #setYaw}, {@link #setPitch} and {@link #setYawAndPitch}.
++     *
++     * @see ClientboundMoveEntityPacket.Rot
++     */
++    private void moveRot(byte yaw, byte pitch, boolean onGround) {
++        this.sendIfNotRemovedAndConnectionIsOpen(new ClientboundMoveEntityPacket.Rot(this.id, yaw, pitch, onGround));
++    }
++
++    private void updateNonNullData(List<SynchedEntityData.DataValue<?>> packedItems) {
++        this.sendIfNotRemovedAndConnectionIsOpen(new ClientboundSetEntityDataPacket(this.id, packedItems, this.getItemStackInPacketContext()));
++    }
++
++    public void updateData(List<SynchedEntityData.@Nullable DataValue<?>> packedItems) {
++        int nullCount = 0;
++        for (var packedItem : packedItems) {
++            if (packedItem == null) {
++                nullCount++;
++            }
++        }
++        if (nullCount == 0) {
++            this.updateNonNullData(packedItems);
++            return;
++        }
++        var nonNullPackedItems = new ArrayList<SynchedEntityData.DataValue<?>>(packedItems.size() - nullCount);
++        for (var packedItem : packedItems) {
++            if (packedItem != null) {
++                nonNullPackedItems.add(packedItem);
++            }
++        }
++        this.updateNonNullData(nonNullPackedItems);
++    }
++
++    public void updateData(@Nullable SynchedEntityData.DataValue<?> packedItem) {
++        if (packedItem != null) {
++            this.updateNonNullData(Collections.singletonList(packedItem));
++        }
++    }
++
++    public @Nullable SynchedEntityData.DataValue<Byte> getSharedEntityFlagsDataValue(byte sharedEntityFlags) {
++        if (sharedEntityFlags == this.sharedEntityFlags) {
++            return null;
++        }
++        return SynchedEntityData.DataValue.create(Entity.DATA_SHARED_FLAGS_ID, sharedEntityFlags);
++    }
++
++    public void setSharedEntityFlags(byte sharedEntityFlags) {
++        this.updateData(this.getSharedEntityFlagsDataValue(sharedEntityFlags));
++    }
++
++    public byte getSharedEntityFlags(@Nullable Boolean hasVisualFire, @Nullable Boolean invisible, @Nullable Boolean glowing) {
++        byte newSharedEntityFlags = this.sharedEntityFlags;
++        if (hasVisualFire != null) {
++            if (hasVisualFire) {
++                newSharedEntityFlags |= 1 << Entity.FLAG_ONFIRE;
++            } else {
++                newSharedEntityFlags &= ~(1 << Entity.FLAG_ONFIRE);
++            }
++        }
++        if (invisible != null) {
++            if (invisible) {
++                newSharedEntityFlags |= 1 << Entity.FLAG_INVISIBLE;
++            } else {
++                newSharedEntityFlags &= ~(1 << Entity.FLAG_INVISIBLE);
++            }
++        }
++        if (glowing != null) {
++            if (glowing) {
++                newSharedEntityFlags |= 1 << Entity.FLAG_GLOWING;
++            } else {
++                newSharedEntityFlags &= ~(1 << Entity.FLAG_GLOWING);
++            }
++        }
++        return newSharedEntityFlags;
++    }
++
++    public @Nullable SynchedEntityData.DataValue<Byte> getSharedEntityFlagsDataValue(@Nullable Boolean hasVisualFire, @Nullable Boolean invisible, @Nullable Boolean glowing) {
++        return this.getSharedEntityFlagsDataValue(this.getSharedEntityFlags(hasVisualFire, invisible, glowing));
++    }
++
++    public void setSharedEntityFlags(@Nullable Boolean hasVisualFire, @Nullable Boolean invisible, @Nullable Boolean glowing) {
++        this.updateData(this.getSharedEntityFlagsDataValue(hasVisualFire, invisible, glowing));
++    }
++
++    public void setHasVisualFire(boolean hasVisualFire) {
++        this.setSharedEntityFlags(hasVisualFire, null, null);
++    }
++
++    public void setInvisible(boolean invisible) {
++        this.setSharedEntityFlags(null, invisible, null);
++    }
++
++    public void setGlowing(boolean glowing) {
++        this.setSharedEntityFlags(null, null, glowing);
++    }
++
++    public @Nullable SynchedEntityData.DataValue<Integer> getAirSupplyDataValue(int airSupply) {
++        return SynchedEntityData.DataValue.create(Entity.DATA_AIR_SUPPLY_ID, airSupply);
++    }
++
++    public void setAirSupply(int airSupply) {
++        this.updateData(this.getAirSupplyDataValue(airSupply));
++    }
++
++    public @Nullable SynchedEntityData.DataValue<Boolean> getSilentDataValue(boolean silent) {
++        return SynchedEntityData.DataValue.create(Entity.DATA_SILENT, silent);
++    }
++
++    public void setSilent(boolean silent) {
++        this.updateData(this.getSilentDataValue(silent));
++    }
++    public @Nullable SynchedEntityData.DataValue<Boolean> getNoGravityDataValue(boolean noGravity) {
++        return SynchedEntityData.DataValue.create(Entity.DATA_SILENT, noGravity);
++    }
++
++    public void setNoGravity(boolean noGravity) {
++        this.updateData(this.getNoGravityDataValue(noGravity));
++    }
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/fakeentity/FakeEntityType.java b/src/main/java/org/fiddlemc/fiddle/packet/fakeentity/FakeEntityType.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..5c4eda51b3b1af58147f58da266d9f6fb4244620
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/packet/fakeentity/FakeEntityType.java
+@@ -0,0 +1,21 @@
++// Fiddle - client perspective - fake entities
++
++package org.fiddlemc.fiddle.packet.fakeentity;
++
++import net.minecraft.world.entity.EntityType;
++
++/**
++ * A type of {@link FakeEntity}.
++ */
++public final class FakeEntityType<H extends FakeEntity> {
++
++    public static final FakeEntityType<FakeItemDisplay> ITEM_DISPLAY = new FakeEntityType<>(EntityType.ITEM_DISPLAY);
++    public static final FakeEntityType<FakeItemFrame> ITEM_FRAME = new FakeEntityType<>(EntityType.ITEM_FRAME);
++
++    final EntityType<?> minecraftType;
++
++    private FakeEntityType(EntityType<?> minecraftType) {
++        this.minecraftType = minecraftType;
++    }
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/fakeentity/FakeHangingEntity.java b/src/main/java/org/fiddlemc/fiddle/packet/fakeentity/FakeHangingEntity.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..c18e2ad0b9ef413d5ba268e883c8678b706fb6da
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/packet/fakeentity/FakeHangingEntity.java
+@@ -0,0 +1,21 @@
++// Fiddle - client perspective - fake entities
++
++package org.fiddlemc.fiddle.packet.fakeentity;
++
++import net.minecraft.server.level.ServerPlayer;
++import net.minecraft.world.entity.decoration.HangingEntity;
++import net.minecraft.world.phys.Vec3;
++
++/**
++ * A {@link FakeEntity} for {@link HangingEntity} entities.
++ */
++public abstract class FakeHangingEntity extends FakeEntity {
++
++    protected FakeHangingEntity(ServerPlayer player, int id, boolean packetsBypassAdaptations, double x, double y, double z, byte yaw, byte pitch, int spawnEntityData, Vec3 velocity) {
++        super(player, id, packetsBypassAdaptations, x, y, z, yaw, pitch, spawnEntityData, velocity, 0);
++    }
++
++    @Override
++    public abstract FakeEntityType<? extends FakeHangingEntity> getType();
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/fakeentity/FakeItemDisplay.java b/src/main/java/org/fiddlemc/fiddle/packet/fakeentity/FakeItemDisplay.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..3f75f635a93b1ee6ed21352e2f90827931e123ef
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/packet/fakeentity/FakeItemDisplay.java
+@@ -0,0 +1,43 @@
++// Fiddle - client perspective - fake entities
++
++package org.fiddlemc.fiddle.packet.fakeentity;
++
++import net.minecraft.network.syncher.SynchedEntityData;
++import net.minecraft.server.level.ServerPlayer;
++import net.minecraft.world.entity.Display;
++import net.minecraft.world.item.ItemDisplayContext;
++import net.minecraft.world.item.ItemStack;
++import net.minecraft.world.phys.Vec3;
++import org.jetbrains.annotations.Nullable;
++
++/**
++ * A {@link FakeEntity} for {@link Display.ItemDisplay} entities.
++ */
++public class FakeItemDisplay extends FakeDisplay {
++
++    public FakeItemDisplay(ServerPlayer player, int id, boolean packetsBypassAdaptations, double x, double y, double z, byte yaw, byte pitch, Vec3 velocity) {
++        super(player, id, packetsBypassAdaptations, x, y, z, yaw, pitch, velocity);
++    }
++
++    @Override
++    public FakeEntityType<FakeItemDisplay> getType() {
++        return FakeEntityType.ITEM_DISPLAY;
++    }
++
++    public @Nullable SynchedEntityData.DataValue<ItemStack> getItemStackDataValue(ItemStack itemStack) {
++        return SynchedEntityData.DataValue.create(Display.ItemDisplay.DATA_ITEM_STACK_ID, itemStack);
++    }
++
++    public void setItemStack(ItemStack itemStack) {
++        this.updateData(this.getItemStackDataValue(itemStack));
++    }
++
++    public @Nullable SynchedEntityData.DataValue<Byte> getDisplayContextDataValue(ItemDisplayContext displayContext) {
++        return SynchedEntityData.DataValue.create(Display.ItemDisplay.DATA_ITEM_DISPLAY_ID, displayContext.getId());
++    }
++
++    public void setDisplayContext(ItemDisplayContext displayContext) {
++        this.updateData(this.getDisplayContextDataValue(displayContext));
++    }
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/fakeentity/FakeItemFrame.java b/src/main/java/org/fiddlemc/fiddle/packet/fakeentity/FakeItemFrame.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..f6c920f962addd6b0e796af4cb7677f44701386e
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/packet/fakeentity/FakeItemFrame.java
+@@ -0,0 +1,31 @@
++// Fiddle - client perspective - fake entities
++
++package org.fiddlemc.fiddle.packet.fakeentity;
++
++import net.minecraft.core.Direction;
++import net.minecraft.server.level.ServerPlayer;
++import net.minecraft.world.entity.decoration.ItemFrame;
++import net.minecraft.world.item.ItemStack;
++import net.minecraft.world.phys.Vec3;
++import org.fiddlemc.fiddle.packet.item.ItemStackInPacketContext;
++
++/**
++ * A {@link FakeEntity} for {@link ItemFrame} entities.
++ */
++public class FakeItemFrame extends FakeHangingEntity {
++
++    public FakeItemFrame(ServerPlayer player, int id, boolean packetsBypassAdaptations, double x, double y, double z, Direction direction) {
++        super(player, id, packetsBypassAdaptations, x, y, z, (byte) 0, (byte) 0, direction.get3DDataValue(), Vec3.ZERO);
++    }
++
++    @Override
++    public FakeEntityType<FakeItemFrame> getType() {
++        return FakeEntityType.ITEM_FRAME;
++    }
++
++    @Override
++    public ItemStackInPacketContext getItemStackInPacketContext() {
++        return ItemStackInPacketContext.IN_ITEM_FRAME;
++    }
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/item/ItemStackInPacketReplacer.java b/src/main/java/org/fiddlemc/fiddle/packet/item/ItemStackInPacketReplacer.java
+index 92e7fa3a4c46001a283d4b8b52d6cd306053d140..33a3c843834b1009660c84a98f78ac47aad9578b 100644
+--- a/src/main/java/org/fiddlemc/fiddle/packet/item/ItemStackInPacketReplacer.java
++++ b/src/main/java/org/fiddlemc/fiddle/packet/item/ItemStackInPacketReplacer.java
+@@ -43,7 +43,7 @@ public final class ItemStackInPacketReplacer {
+     public static ItemStack replace(ItemStack original, ItemStackInPacketContext context, DeepReplacementContext replacementContext, DeepReplacementScope replacementScope) {
+ 
+         // Skip if we have no replacements to make
+-        if (!replacementScope.canMakeAnyReplacements()) {
++        if (!replacementScope.canMakeAnyReplacements() || !replacementContext.canMakeAnyReplacements()) {
+             return original;
+         }
+ 
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/item/VanillaItemOverrideItemVisualHandle.java b/src/main/java/org/fiddlemc/fiddle/packet/item/VanillaItemOverrideItemVisualHandle.java
+index 8825f8c78c6fe7156a92d7bf9d4b981579d2612e..b5862c064437a5af43a4d7c5cbb3b5054ff9c09a 100644
+--- a/src/main/java/org/fiddlemc/fiddle/packet/item/VanillaItemOverrideItemVisualHandle.java
++++ b/src/main/java/org/fiddlemc/fiddle/packet/item/VanillaItemOverrideItemVisualHandle.java
+@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
+  * A {@link ItemVisualHandle} with the following replacements:
+  * <ul>
+  *     <li>For perspectives with the {@linkplain ClientPerspectiveCategory#JAVA_WITH_FIDDLE_CLIENT_MOD client mod},
++ *     or for the virtual perspective with category {@link ClientPerspectiveCategory#NO_FURTHER_ADAPTATIONS},
+  *     no replacement is returned.</li>
+  *     <li>For perspectives with the
+  *     {@linkplain ClientPerspectiveCategory#JAVA_WITH_ENABLED_RESOURCE_PACK resource pack}, a
+@@ -39,7 +40,7 @@ public class VanillaItemOverrideItemVisualHandle implements ItemVisualHandle {
+             throw new IllegalArgumentException("Cannot call " + this.getClass().getName() + ".getReplacementItemAndCustomModelData(...) with replacement mapping " + mapping);
+         }
+         return switch (clientPerspective.category) {
+-            case JAVA_WITH_FIDDLE_CLIENT_MOD -> null;
++            case JAVA_WITH_FIDDLE_CLIENT_MOD, NO_FURTHER_ADAPTATIONS -> null;
+             case JAVA_WITH_ENABLED_RESOURCE_PACK -> this.replacementForJavaWithEnabledResourcePackPerspective;
+             case JAVA_DEFAULT -> this.fallbackReplacement;
+         };

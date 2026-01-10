@@ -1,0 +1,41 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sat, 30 Dec 2023 21:26:58 +0100
+Subject: [PATCH] Client perspective - Block state visualization - Apply to
+ chunk packets - Store connection explicitly in chunk packets
+
+Makes all instances of `ClientboundLevelChunkWithLightPacket` bound to a particular explicit target connection.
+This is done by making it a subclass of `PacketWithExplicitTargetClientConnection`.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
+index ff0e55b53062793d6e462870146471ad8884831b..d4d5116b46c63bcc1b2a86c1b75cd0c09d0a71fd 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundLevelChunkWithLightPacket.java
+@@ -8,7 +8,7 @@ import net.minecraft.world.level.ChunkPos;
+ import net.minecraft.world.level.chunk.LevelChunk;
+ import net.minecraft.world.level.lighting.LevelLightEngine;
+ 
+-public class ClientboundLevelChunkWithLightPacket implements Packet<ClientGamePacketListener> {
++public class ClientboundLevelChunkWithLightPacket extends org.fiddlemc.fiddle.packet.PacketWithExplicitTargetClientConnection<ClientGamePacketListener> { // Fiddle - client perspective - block state visualization - apply to chunk packets - store connection explicitly
+     private final int x;
+     private final int z;
+     private final ClientboundLevelChunkPacketData chunkData;
+@@ -29,6 +29,7 @@ public class ClientboundLevelChunkWithLightPacket implements Packet<ClientGamePa
+     // Paper start - Anti-Xray - Add chunk packet info
+     @Deprecated @io.papermc.paper.annotation.DoNotUse public ClientboundLevelChunkWithLightPacket(LevelChunk chunk, LevelLightEngine lightProvider, @Nullable BitSet skyBits, @Nullable BitSet blockBits) { this(chunk, lightProvider, skyBits, blockBits, true); }
+     public ClientboundLevelChunkWithLightPacket(LevelChunk chunk, LevelLightEngine lightProvider, @Nullable BitSet skyBits, @Nullable BitSet blockBits, boolean modifyBlocks) {
++        super(); // Fiddle - client perspective - block state visualization - apply to chunk packets - store connection explicitly
+         ChunkPos chunkPos = chunk.getPos();
+         this.x = chunkPos.x;
+         this.z = chunkPos.z;
+@@ -43,6 +44,7 @@ public class ClientboundLevelChunkWithLightPacket implements Packet<ClientGamePa
+     }
+ 
+     public ClientboundLevelChunkWithLightPacket(FriendlyByteBuf buf) {
++        super(); // Fiddle - client perspective - block state visualization - apply to chunk packets - store connection explicitly
+         this.x = buf.readInt();
+         this.z = buf.readInt();
+         this.chunkData = new ClientboundLevelChunkPacketData(buf, this.x, this.z);

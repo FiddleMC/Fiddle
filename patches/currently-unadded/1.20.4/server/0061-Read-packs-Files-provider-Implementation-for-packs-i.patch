@@ -1,0 +1,248 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Mon, 15 May 2023 21:01:59 +0200
+Subject: [PATCH] Read packs - Files provider - Implementation for packs in
+ directories
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/filesprovider/directory/DirectoryFiddlePackFilesProvider.java b/src/main/java/org/fiddlemc/fiddle/pack/read/filesprovider/directory/DirectoryFiddlePackFilesProvider.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..0c3ca7d2522eb95beedb7ec3c73d4190070c9c7d
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/filesprovider/directory/DirectoryFiddlePackFilesProvider.java
+@@ -0,0 +1,94 @@
++// Fiddle - read packs - pack files - directory packs
++
++package org.fiddlemc.fiddle.pack.read.filesprovider.directory;
++
++import org.fiddlemc.fiddle.pack.read.filesprovider.FiddlePackFilesProvider;
++import org.fiddlemc.fiddle.pack.read.filesprovider.RegularFileInPack;
++import org.jetbrains.annotations.Nullable;
++
++import java.io.File;
++import java.util.ArrayList;
++import java.util.Arrays;
++import java.util.Collections;
++import java.util.List;
++import java.util.stream.Stream;
++
++/**
++ * A {@link FiddlePackFilesProvider} for packs that are defined in a plain file system directory.
++ */
++public class DirectoryFiddlePackFilesProvider implements FiddlePackFilesProvider {
++
++    /**
++     * The directory of this pack.
++     */
++    final File packDirectory;
++
++    /**
++     * The original location of this pack, from which the {@linkplain #packDirectory directory}
++     * was derived. This may, for example, by a RAR archive file, which was extracted to a directory.
++     */
++    final File originalLocation;
++
++    /**
++     * May be empty or incomplete while not fully computed yet (instances are added on the fly when they are created).
++     */
++    private final List<FileInDirectoryPack> files = new ArrayList<>(1);
++
++    /**
++     * Null while it has not been computed yet.
++     */
++    private @Nullable List<FileInDirectoryPack> topLevelFiles;
++
++    public DirectoryFiddlePackFilesProvider(File packDirectory) {
++        this(packDirectory, packDirectory);
++    }
++
++    public DirectoryFiddlePackFilesProvider(File packDirectory, File originalLocation) {
++        this.packDirectory = packDirectory;
++        this.originalLocation = originalLocation;
++    }
++
++    @Override
++    public String getLocation() {
++        return this.originalLocation.getPath();
++    }
++
++    List<FileInDirectoryPack> getTopLevelFilesForDirectoryAndAddToAllFiles(File directory) {
++        File[] directoryFiles = directory.listFiles();
++        if (directoryFiles == null) {
++            return Collections.emptyList();
++        } else {
++            List<FileInDirectoryPack> topLevelFiles = Arrays.stream(directoryFiles)
++                .map(file -> file.isDirectory() ? new DirectoryInDirectoryPack(this, file) : new RegularFileInDirectoryPack(this, file))
++                .filter(file -> !file.isSystemFileOrDirectory())
++                .toList();
++            this.files.addAll(topLevelFiles);
++            return topLevelFiles;
++        }
++    }
++
++    @Override
++    public Stream<FileInDirectoryPack> getTopLevelFilesStream() {
++        return this.getTopLevelFiles().stream();
++    }
++
++    @Override
++    public List<FileInDirectoryPack> getTopLevelFiles() {
++        if (this.topLevelFiles == null) {
++            this.topLevelFiles = this.getTopLevelFilesForDirectoryAndAddToAllFiles(this.packDirectory);
++        }
++        return this.topLevelFiles;
++    }
++
++    @Override
++    public void closeHandlesAndClearCache() {
++        for (FileInDirectoryPack file : this.files) {
++            if (file instanceof RegularFileInPack regularFile) {
++                regularFile.clearCachedBytes();
++            }
++        }
++        this.files.clear();
++        this.topLevelFiles = null;
++    }
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/filesprovider/directory/DirectoryInDirectoryPack.java b/src/main/java/org/fiddlemc/fiddle/pack/read/filesprovider/directory/DirectoryInDirectoryPack.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..fb6fc402e6314146126ea527ccd9da724975887f
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/filesprovider/directory/DirectoryInDirectoryPack.java
+@@ -0,0 +1,50 @@
++// Fiddle - read packs - pack files - directory packs
++
++package org.fiddlemc.fiddle.pack.read.filesprovider.directory;
++
++import org.fiddlemc.fiddle.pack.read.filesprovider.DirectoryInPack;
++import org.jetbrains.annotations.Nullable;
++
++import java.io.File;
++import java.util.List;
++import java.util.stream.Stream;
++
++class DirectoryInDirectoryPack implements DirectoryInPack, FileInDirectoryPack {
++
++    private final DirectoryFiddlePackFilesProvider filesProvider;
++    private final File file;
++
++    /**
++     * Null while it has not been computed yet.
++     */
++    private @Nullable List<FileInDirectoryPack> topLevelFiles;
++
++    DirectoryInDirectoryPack(DirectoryFiddlePackFilesProvider filesProvider, File file) {
++        this.filesProvider = filesProvider;
++        this.file = file;
++    }
++
++    @Override
++    public DirectoryFiddlePackFilesProvider getFilesProvider() {
++        return this.filesProvider;
++    }
++
++    @Override
++    public File getFile() {
++        return this.file;
++    }
++
++    @Override
++    public Stream<FileInDirectoryPack> getTopLevelFilesStream() {
++        return this.getTopLevelFiles().stream();
++    }
++
++    @Override
++    public List<FileInDirectoryPack> getTopLevelFiles() {
++        if (this.topLevelFiles == null) {
++            this.topLevelFiles = this.filesProvider.getTopLevelFilesForDirectoryAndAddToAllFiles(this.file);
++        }
++        return this.topLevelFiles;
++    }
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/filesprovider/directory/FileInDirectoryPack.java b/src/main/java/org/fiddlemc/fiddle/pack/read/filesprovider/directory/FileInDirectoryPack.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..8b7b7133338057de733a0ed98855ce961204cde1
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/filesprovider/directory/FileInDirectoryPack.java
+@@ -0,0 +1,31 @@
++// Fiddle - read packs - pack files - directory packs
++
++package org.fiddlemc.fiddle.pack.read.filesprovider.directory;
++
++import org.fiddlemc.fiddle.pack.read.filesprovider.FiddlePackFilesProvider;
++import org.fiddlemc.fiddle.pack.read.filesprovider.FileInPack;
++import org.fiddlemc.fiddle.pack.exception.PackException;
++
++import java.io.File;
++import java.nio.file.Paths;
++
++interface FileInDirectoryPack extends FileInPack {
++
++    DirectoryFiddlePackFilesProvider getFilesProvider();
++
++    File getFile();
++
++    default String getPathInArchive() throws PackException {
++        try {
++            return Paths.get(this.getFilesProvider().packDirectory.getPath()).relativize(Paths.get(this.getFile().getPath())).toString();
++        } catch (IllegalArgumentException e) {
++            throw new PackException("Failed to get the name of a file in a pack directory ('" + this.getFilesProvider().getLocation() + "'): " + e.getMessage(), e);
++        }
++    }
++
++    @Override
++    default String getName() throws PackException {
++        return FiddlePackFilesProvider.getNameFromPath(this.getPathInArchive());
++    }
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/filesprovider/directory/RegularFileInDirectoryPack.java b/src/main/java/org/fiddlemc/fiddle/pack/read/filesprovider/directory/RegularFileInDirectoryPack.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..6059fdc8a16076ea2e754d9e92bbb5eaa020efaf
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/filesprovider/directory/RegularFileInDirectoryPack.java
+@@ -0,0 +1,40 @@
++// Fiddle - read packs - pack files - directory packs
++
++package org.fiddlemc.fiddle.pack.read.filesprovider.directory;
++
++import org.fiddlemc.fiddle.pack.read.filesprovider.CachingRegularFileInPack;
++import org.fiddlemc.fiddle.pack.exception.PackException;
++
++import java.io.File;
++import java.io.IOException;
++import java.nio.file.Files;
++
++class RegularFileInDirectoryPack extends CachingRegularFileInPack implements FileInDirectoryPack {
++
++    private final DirectoryFiddlePackFilesProvider filesProvider;
++    private final File file;
++
++    RegularFileInDirectoryPack(DirectoryFiddlePackFilesProvider filesProvider, File file) {
++        this.filesProvider = filesProvider;
++        this.file = file;
++    }
++
++    @Override
++    public DirectoryFiddlePackFilesProvider getFilesProvider() {
++        return this.filesProvider;
++    }
++
++    @Override
++    public File getFile() {
++        return this.file;
++    }
++
++    @Override
++    protected byte[] readBytes() throws PackException {
++        try {
++            return Files.readAllBytes(this.file.toPath());
++        } catch (IOException e) {
++            throw new PackException("An exception of type " + e.getClass().getSimpleName() + " occurred while reading a file ('" + this.getPathInArchive() + "') in a pack folder ('" + this.filesProvider.getLocation() + "'): " + e.getMessage(), e);
++        }
++    }
++}

@@ -1,0 +1,158 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sat, 22 Jul 2023 16:12:39 +0200
+Subject: [PATCH] Client perspective - Expose packet target client properties -
+ Base implementations of packet with explicit connection
+
+Adds a number of useful subclasses of `Packet` that implement the abstract functionality defined in the "Client perspective - Expose packet target client properties - Packet can provide explicit connection" patch:
+* `PacketWithExplicitTargetClientConnection`, that stores the connection and returns itself
+* `CloningPacketWithExplicitTargetClientConnection`, that stores the connection in a cloned instance that is returned
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/network/Connection.java b/src/main/java/net/minecraft/network/Connection.java
+index b6f0615ced64d371f09734ff978d0de154217dae..07cc28cbef8f594b06d77c17c6707ad6a126d0f2 100644
+--- a/src/main/java/net/minecraft/network/Connection.java
++++ b/src/main/java/net/minecraft/network/Connection.java
+@@ -150,6 +150,8 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+     }
+     // Paper end - packet limiter
+ 
++    private @Nullable java.lang.ref.WeakReference<Connection> weakReference; // Fiddle - client perspective - packets are modifiable - expose target client properties - packet can provide explicit connection - base implementations
++
+     public Connection(PacketFlow side) {
+         this.receiving = side;
+     }
+@@ -988,4 +990,16 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+     }
+     // Fiddle end - client perspective - player - get from connection
+ 
++    // Fiddle start - client perspective - expose target client properties - packet can provide explicit connection - base implementations
++    /**
++     * @return A {@link java.lang.ref.WeakReference} to this {@link Connection} instance.
++     */
++    public final java.lang.ref.WeakReference<Connection> getWeakReference() {
++        if (this.weakReference == null) {
++            this.weakReference = new java.lang.ref.WeakReference<>(this);
++        }
++        return this.weakReference;
++    }
++    // Fiddle end - client perspective - expose target client properties - packet can provide explicit connection - base implementations
++
+ }
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/CloningPacketWithExplicitTargetClientConnection.java b/src/main/java/org/fiddlemc/fiddle/packet/CloningPacketWithExplicitTargetClientConnection.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..79d4998c99184810a06863c037cc77aaa10e9e9d
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/packet/CloningPacketWithExplicitTargetClientConnection.java
+@@ -0,0 +1,41 @@
++// Fiddle - client perspective - expose target client properties - packet can provide explicit connection - base implementations
++
++package org.fiddlemc.fiddle.packet;
++
++import net.minecraft.network.Connection;
++import net.minecraft.network.PacketListener;
++import net.minecraft.network.protocol.Packet;
++
++/**
++ * A modified version of {@link PacketWithExplicitTargetClientConnection},
++ * that stores the {@link Connection} in a cloned copy of itself and returns that clone,
++ * leaving the original instance itself unmodified.
++ */
++public abstract class CloningPacketWithExplicitTargetClientConnection<T extends PacketListener> extends PacketWithExplicitTargetClientConnection<T> {
++
++    protected abstract CloningPacketWithExplicitTargetClientConnection<T> makeClone();
++
++    /**
++     * This method is meant to be overridden when useful.
++     * <br>
++     * When it returns true, {@link #adaptForClient} will not do anything at all,
++     * and return this instance itself instead.
++     */
++    protected boolean canSkipCloning() {
++        return false;
++    }
++
++    private Packet<T>  superAdaptForClient(Connection connection) {
++        return super.adaptForClient(connection);
++    }
++
++    @Override
++    public final Packet<T> adaptForClient(Connection connection) {
++        if (this.canSkipCloning()) {
++            return this;
++        }
++        var clone = this.makeClone();
++        return clone.superAdaptForClient(connection);
++    }
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/PacketWithExplicitTargetClientConnection.java b/src/main/java/org/fiddlemc/fiddle/packet/PacketWithExplicitTargetClientConnection.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..5cc3e028fbf993da1681e06cb760b939015c9538
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/packet/PacketWithExplicitTargetClientConnection.java
+@@ -0,0 +1,62 @@
++// Fiddle - client perspective - expose target client properties - packet can provide explicit connection - base implementations
++
++package org.fiddlemc.fiddle.packet;
++
++import net.minecraft.network.Connection;
++import net.minecraft.network.PacketListener;
++import net.minecraft.network.protocol.Packet;
++import org.jetbrains.annotations.Nullable;
++
++import java.lang.ref.WeakReference;
++import java.util.Objects;
++
++/**
++ * An abstract base for {@link Packet}s that stores the {@link Connection} of its target client
++ * (after it is provided through {@link #adaptForClient}) and then use it to implement
++ * {@link #getExplicitTargetClientPerspective()} and {@link #getExplicitTargetLocale()}.
++ */
++public abstract class PacketWithExplicitTargetClientConnection<T extends PacketListener> implements Packet<T> {
++
++    /**
++     * The {@linkplain Connection#getPlayerClientPerspective perspective} of the client of the {@link Connection}
++     * passed to the last {@link #adaptForClient} call on this {@link Packet} instance.
++     * This will be null if and only if {@link #adaptForClient} was not called yet.
++     */
++    private @Nullable WeakReference<Connection> targetClientConnection;
++
++    /**
++     * This method is called after setting {@link #targetClientConnection} in {@link #adaptForClient},
++     * and must be overridden instead of {@link #adaptForClient}.
++     */
++    protected Packet<T> postSetConnectionAdaptForClient(Connection connection) {
++        return this;
++    }
++
++    @Override
++    public Packet<T> adaptForClient(Connection connection) {
++        this.targetClientConnection = connection.getWeakReference();
++        return this.postSetConnectionAdaptForClient(connection);
++    }
++
++    public Connection getExplicitTargetClientConnection() throws NullPointerException {
++        return Objects.requireNonNull(this.targetClientConnection.get());
++    }
++
++    @Override
++    public ClientPerspective getExplicitTargetClientPerspective() throws NullPointerException {
++        return Objects.requireNonNull(this.targetClientConnection.get().getPlayerClientPerspective());
++    }
++
++    @Override
++    public @Nullable ClientPerspective getExplicitTargetClientPerspectiveOrNull() throws NullPointerException {
++        if (this.targetClientConnection == null) {
++            return null;
++        }
++        var actualTargetClientConnection = this.targetClientConnection.get();
++        if (actualTargetClientConnection == null) {
++            return null;
++        }
++        return actualTargetClientConnection.getPlayerClientPerspective();
++    }
++
++}

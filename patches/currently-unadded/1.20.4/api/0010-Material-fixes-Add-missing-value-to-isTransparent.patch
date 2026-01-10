@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Mon, 10 Jul 2023 22:05:08 +0200
+Subject: [PATCH] Material fixes - Add missing value to isTransparent
+
+Adds the missing legacy value `LEGACY_BARRIER` to `Material.isTransparent`.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/bukkit/Material.java b/src/main/java/org/bukkit/Material.java
+index 4bbe343223f3ebf90dd6b41a707e573d02e1f48b..e718d84401c732328854104fa37441ee0838a91b 100644
+--- a/src/main/java/org/bukkit/Material.java
++++ b/src/main/java/org/bukkit/Material.java
+@@ -7469,6 +7469,7 @@ public enum Material implements Keyed, Translatable, net.kyori.adventure.transla
+             case LEGACY_REDSTONE_COMPARATOR_OFF:
+             case LEGACY_REDSTONE_COMPARATOR_ON:
+             case LEGACY_ACTIVATOR_RAIL:
++            case LEGACY_BARRIER: // Fiddle - add missing Material values that are transparent
+             case LEGACY_CARPET:
+             case LEGACY_DOUBLE_PLANT:
+             case LEGACY_END_ROD:

@@ -1,0 +1,244 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sat, 27 Jan 2024 14:23:47 +0100
+Subject: [PATCH] Load packs - Content - Items - Register - Implementation
+
+This provides the implementation, in `ItemByDefinitionLoader`, to register `ItemDefinition` instances as `Item`s in the item registry.
+It relies on the more generic implementation, in `BlockOrItemByDefinitionLoader`, provided by the patch "Load packs - Content - Blocks and items - Register - Abstract implementation".
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/world/item/Item.java b/src/main/java/net/minecraft/world/item/Item.java
+index f2cdd4c79bf8a415bfdb0e3533c7912cc9782585..965144138d2764c4026cc7e90c87e8becd385f73 100644
+--- a/src/main/java/net/minecraft/world/item/Item.java
++++ b/src/main/java/net/minecraft/world/item/Item.java
+@@ -60,17 +60,22 @@ public class Item implements FeatureElement, ItemLike {
+     public static final int MAX_BAR_WIDTH = 13;
+     private final Holder.Reference<Item> builtInRegistryHolder = BuiltInRegistries.ITEM.createIntrusiveHolder(this);
+     public static final net.minecraft.core.IdMapper<Item> VANILLA_ONLY_ITEM_REGISTRY = new org.fiddlemc.fiddle.registry.VanillaOnlyItemRegistry(); // Fiddle - modded registries - vanilla-only registries - create - item
+-    public final Rarity rarity;
+-    private final int maxStackSize;
+-    private final int maxDamage;
+-    private final boolean isFireResistant;
++    // Fiddle start - load packs - items - register - implementation - copy properties
++    public Rarity rarity;
++    private int maxStackSize;
++    private int maxDamage;
++    private boolean isFireResistant;
+     @Nullable
+-    private final Item craftingRemainingItem;
++    private Item craftingRemainingItem;
++    // Fiddle end - load packs - items - register - implementation - copy properties
+     @Nullable
+     private String descriptionId;
+     @Nullable
+-    private final FoodProperties foodProperties;
+-    private final FeatureFlagSet requiredFeatures;
++    // Fiddle start - load packs - items - register - implementation - copy properties
++    private FoodProperties foodProperties;
++    private FeatureFlagSet requiredFeatures;
++    public Item.Properties properties;
++    // Fiddle end - load packs - items - register - implementation - copy properties
+ 
+     // Fiddle start - flags for vanilla content - item
+     /**
+@@ -135,6 +140,13 @@ public class Item implements FeatureElement, ItemLike {
+     }
+ 
+     public Item(Item.Properties settings) {
++        // Fiddle start - load packs - items - register - implementation - copy properties
++        this.setProperties(settings);
++        this.checkClassName();
++    }
++
++    public void setProperties(Item.Properties settings) {
++        // Fiddle end - load packs - items - register - implementation - copy properties
+         this.rarity = settings.rarity;
+         this.craftingRemainingItem = settings.craftingRemainingItem;
+         this.maxDamage = settings.maxDamage;
+@@ -142,6 +154,12 @@ public class Item implements FeatureElement, ItemLike {
+         this.foodProperties = settings.foodProperties;
+         this.isFireResistant = settings.isFireResistant;
+         this.requiredFeatures = settings.requiredFeatures;
++        this.properties = settings;
++        // Fiddle start - load packs - items - register - implementation - copy properties
++    }
++
++    private void checkClassName() {
++        // Fiddle end - load packs - items - register - implementation - copy properties
+         if (SharedConstants.IS_RUNNING_IN_IDE) {
+             String string = this.getClass().getSimpleName();
+             if (!string.endsWith("Item")) {
+@@ -423,15 +441,17 @@ public class Item implements FeatureElement, ItemLike {
+     }
+ 
+     public static class Properties {
+-        int maxStackSize = 64;
+-        int maxDamage;
++        // Fiddle start - load packs - items - register - implementation - copy properties - package-private -> public
++        public int maxStackSize = 64;
++        public int maxDamage;
+         @Nullable
+-        Item craftingRemainingItem;
+-        Rarity rarity = Rarity.COMMON;
++        public Item craftingRemainingItem;
++        public Rarity rarity = Rarity.COMMON;
+         @Nullable
+-        FoodProperties foodProperties;
+-        boolean isFireResistant;
+-        FeatureFlagSet requiredFeatures = FeatureFlags.VANILLA_SET;
++        public FoodProperties foodProperties;
++        public boolean isFireResistant;
++        public FeatureFlagSet requiredFeatures = FeatureFlags.VANILLA_SET;
++        // Fiddle end - load packs - items - register - implementation - copy properties - package-private -> public
+ 
+         public Item.Properties food(FoodProperties foodComponent) {
+             this.foodProperties = foodComponent;
+@@ -468,7 +488,13 @@ public class Item implements FeatureElement, ItemLike {
+         }
+ 
+         public Item.Properties fireResistant() {
+-            this.isFireResistant = true;
++            // Fiddle start - load packs - items - register - implementation - copy properties
++            return this.fireResistant(true);
++        }
++
++        public Item.Properties fireResistant(boolean isFireResistant) {
++            this.isFireResistant = isFireResistant;
++            // Fiddle end - load packs - items - register - implementation - copy properties
+             return this;
+         }
+ 
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/load/fiddlecontent/item/ItemByDefinitionLoader.java b/src/main/java/org/fiddlemc/fiddle/pack/load/fiddlecontent/item/ItemByDefinitionLoader.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..cba53dbd37c307a9e978b26d9bf07a423a03c0fd
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/pack/load/fiddlecontent/item/ItemByDefinitionLoader.java
+@@ -0,0 +1,96 @@
++// Fiddle - load packs - items - register - implementation
++
++package org.fiddlemc.fiddle.pack.load.fiddlecontent.item;
++
++import net.minecraft.core.registries.BuiltInRegistries;
++import net.minecraft.resources.ResourceLocation;
++import net.minecraft.world.item.BlockItem;
++import net.minecraft.world.item.Item;
++import org.fiddlemc.fiddle.pack.load.fiddlecontent.blockoritem.BlockOrItemByDefinitionLoader;
++import org.fiddlemc.fiddle.pack.exception.PackException;
++import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.item.ItemDefinition;
++import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.item.ItemDefinitionParser;
++import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.item.ItemPropertiesDefinition;
++import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.item.parent.ItemDefinitionBase;
++import org.jetbrains.annotations.Nullable;
++
++/**
++ * A class to {@linkplain BuiltInRegistries#ITEM register} {@link ItemDefinition}s as {@link Item}s.
++ */
++public final class ItemByDefinitionLoader
++    extends BlockOrItemByDefinitionLoader<Item, Item.Properties, ItemPropertiesDefinition, ItemDefinition> {
++
++    public static final ItemByDefinitionLoader INSTANCE = new ItemByDefinitionLoader();
++
++    private ItemByDefinitionLoader() {
++        super(BuiltInRegistries.ITEM, ItemDefinition.TYPE);
++    }
++
++    @Override
++    public Item.Properties createDefaultProperties() {
++        return new Item.Properties();
++    }
++
++    @Override
++    protected Item.Properties copyPropertiesFromResource(Item item) {
++        var properties = new Item.Properties();
++        properties.maxStackSize = item.properties.maxStackSize;
++        properties.maxDamage = item.properties.maxDamage;
++        properties.craftingRemainingItem = item.properties.craftingRemainingItem;
++        properties.rarity = item.properties.rarity;
++        properties.foodProperties = item.properties.foodProperties;
++        properties.isFireResistant = item.properties.isFireResistant;
++        properties.requiredFeatures = item.properties.requiredFeatures;
++        return properties;
++    }
++
++    @Override
++    protected Item.Properties buildProperties(ItemDefinition definition) throws PackException {
++        // Start with the pre-initialized properties
++        var properties = super.buildProperties(definition);
++
++        // Copy some more values
++        var maxStackSize = definition.propertiesDefinition.maxStackSize;
++        if (maxStackSize != null) {
++            properties = properties.stacksTo(maxStackSize); // TODO set max stack size BEFORE durability to prevent exception being thrown here
++        }
++        var isFireResistant = definition.propertiesDefinition.isFireResistant;
++        if (isFireResistant != null) {
++            properties = properties.fireResistant(isFireResistant);
++        }
++
++        // Return the properties
++        return properties;
++    }
++
++    @Override
++    protected Item buildResourceFromProperties(ItemDefinition definition, @Nullable Item parentItem, Item.Properties properties) throws PackException {
++        // Build the item
++        Item item;
++        if (definition.parent == ItemDefinitionBase.BLOCK || parentItem instanceof BlockItem) {
++            ResourceLocation blockResourceLocation = definition.block != null ? definition.block : definition.untypedResourceLocation;
++            if (!BuiltInRegistries.BLOCK.containsKey(blockResourceLocation)) {
++                if (definition.block == null) {
++                    throw new PackException("Block " + this.uncapitalizedDefinitionName(definition) +
++                        " is missing a " + ItemDefinitionParser.blockJsonKey + ", or a block with the same namespaced key" +
++                        " doesn't exist");
++                } else {
++                    throw new PackException(this.capitalizedDefinitionName(definition) +
++                        " has a block that doesn't exist: " + definition.block);
++                }
++            }
++            item = new BlockItem(BuiltInRegistries.BLOCK.get(blockResourceLocation), properties) {};
++        } else {
++            item = new Item(properties);
++        }
++
++        // Return the result
++        return item;
++    }
++
++    @Override
++    protected void copyProperties(Item from, Item to) {
++        to.setProperties(from.properties);
++    }
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/item/parent/ItemDefinitionBase.java b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/item/parent/ItemDefinitionBase.java
+index f350d6858642891f2fd9016ba826d78bd7b7d074..eb69ac9f03a7ffce9cb6c2ff320794b29e3d6c68 100644
+--- a/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/item/parent/ItemDefinitionBase.java
++++ b/src/main/java/org/fiddlemc/fiddle/pack/read/fiddlecontent/definition/item/parent/ItemDefinitionBase.java
+@@ -13,14 +13,23 @@ import org.fiddlemc.fiddle.pack.read.fiddlecontent.definition.withparent.FiddleC
+  * instead of a particular block. Most bases correspond to some particular subclass of {@link Item}.
+  */
+ public final class ItemDefinitionBase
+-    extends BlockOrItemDefinitionBase
++    extends BlockOrItemDefinitionBase<Item.Properties> // Fiddle - load packs - items - register - implementation
+     implements FiddleContentDefinitionParent {
+ 
+     public static final ItemDefinitionBase ITEM = new ItemDefinitionBase(new ResourceLocation(ResourceLocation.DEFAULT_NAMESPACE, ""));
+     public static final ItemDefinitionBase BLOCK = new ItemDefinitionBase(new ResourceLocation(ResourceLocation.DEFAULT_NAMESPACE, "block"));
+ 
++    // Fiddle start - load packs - items - register - implementation
++    private ItemDefinitionBase(
++        ResourceLocation untypedResourceLocation,
++        java.util.function.Function<Item.Properties, Item.Properties> propertiesCreator
++    ) {
++        super(ItemDefinition.TYPE, untypedResourceLocation, propertiesCreator);
++    }
++    // Fiddle end - load packs - items - register - implementation
++
+     private ItemDefinitionBase(ResourceLocation untypedResourceLocation) {
+-        this(untypedResourceLocation);
++        this(untypedResourceLocation, java.util.function.Function.identity()); // Fiddle - load packs - items - register - implementation
+     }
+ 
+ }

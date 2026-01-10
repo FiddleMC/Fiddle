@@ -1,0 +1,85 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sun, 11 Feb 2024 18:01:34 +0100
+Subject: [PATCH] Client perspective - Item replacements - Convenience methods
+ to get player game mode from connection
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/network/Connection.java b/src/main/java/net/minecraft/network/Connection.java
+index cd86e23958d12551d487a5084f674c2f866e76da..47965e0af14f0449c2f7c53c88e371cdaf671e7f 100644
+--- a/src/main/java/net/minecraft/network/Connection.java
++++ b/src/main/java/net/minecraft/network/Connection.java
+@@ -1018,4 +1018,25 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+     }
+     // Fiddle end - client perspective - localization - get player locale from connection
+ 
++    // Fiddle start - client perspective - item replacements - get player game mode from connection
++    /**
++     * @return The {@linkplain net.minecraft.server.level.ServerPlayerGameMode#getGameModeForPlayer() game mode}
++     * of this connection's {@linkplain #getPlayer() player}.
++     * This is null if the player is null or if their {@link net.minecraft.server.level.ServerPlayer#gameMode} is null.
++     *
++     * @see net.minecraft.server.level.ServerPlayerGameMode#getGameModeForPlayer()
++     */
++    public final @Nullable net.minecraft.world.level.GameType getPlayerGameMode() {
++        var player = this.getPlayer();
++        if (player == null) {
++            return null;
++        }
++        var gameMode = player.gameMode;
++        if (gameMode == null) {
++            return null;
++        }
++        return gameMode.getGameModeForPlayer();
++    }
++    // Fiddle end - client perspective - item replacements - get player game mode from connection
++
+ }
+diff --git a/src/main/java/net/minecraft/network/protocol/Packet.java b/src/main/java/net/minecraft/network/protocol/Packet.java
+index 5ab0cc0dada53d176adb5f099fbc1cb97d68068f..881b517d6b012ebb22f39cdf5eb82cf0da6bf823 100644
+--- a/src/main/java/net/minecraft/network/protocol/Packet.java
++++ b/src/main/java/net/minecraft/network/protocol/Packet.java
+@@ -128,4 +128,25 @@ public interface Packet<T extends PacketListener> {
+     }
+     // Fiddle end - client perspective - localization - get player locale from connection
+ 
++    // Fiddle start - client perspective - item replacements - get player game mode from connection
++    /**
++     * @return The {@linkplain net.minecraft.server.level.ServerPlayerGameMode#getGameModeForPlayer() game mode}
++     * of the receiving player of this packet, if explicitly known.
++     * This must be implemented for some instances of {@link Packet}
++     * for which the {@link org.fiddlemc.fiddle.packet.ClientPerspective} is needed
++     * at the time of {@linkplain #write(FriendlyByteBuf) writing the packet to a byte buffer}.
++     * @throws UnsupportedOperationException If there is no implementation for this method.
++     * The default implementation of this method in {@link Packet} always throws this exception.
++     * An exception being thrown from this method should never actually happen (because it is slow):
++     * this method must not be called when there is any chance of an exception
++     * (including a {@link NullPointerException} if an attempt is made to return a non-null value) being thrown.
++     * No exception from this method should be caught, because if one occurs,
++     * it indicates that there is code that needs this value,
++     * but it is not available early enough for the value to be available.
++     */
++    default net.minecraft.world.level.GameType getExplicitTargetGameMode() throws UnsupportedOperationException {
++        throw new UnsupportedOperationException("Tried to call getExplicitTargetGameMode() on a " + Packet.class.getSimpleName() + " instance of type " + this.getClass().getName() + ", but no overriding implementation is available");
++    }
++    // Fiddle end - client perspective - item replacements - get player game mode from connection
++
+ }
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/PacketWithExplicitTargetClientConnection.java b/src/main/java/org/fiddlemc/fiddle/packet/PacketWithExplicitTargetClientConnection.java
+index 6298f4fef7b8cc07db8e69c4d14f3558ea24f57d..0df644b758a72357a33b036d1eac4a9f1a7a406c 100644
+--- a/src/main/java/org/fiddlemc/fiddle/packet/PacketWithExplicitTargetClientConnection.java
++++ b/src/main/java/org/fiddlemc/fiddle/packet/PacketWithExplicitTargetClientConnection.java
+@@ -66,4 +66,11 @@ public abstract class PacketWithExplicitTargetClientConnection<T extends PacketL
+     }
+     // Fiddle end - client perspective - localization - get player locale from connection
+ 
++    // Fiddle start - client perspective - item replacements - get player game mode from connection
++    @Override
++    public net.minecraft.world.level.GameType getExplicitTargetGameMode() throws NullPointerException {
++        return this.targetClientConnection.get().getPlayerGameMode();
++    }
++    // Fiddle end - client perspective - item replacements - get player game mode from connection
++
+ }

@@ -1,0 +1,151 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sat, 22 Jul 2023 19:51:11 +0200
+Subject: [PATCH] Client perspective - Item replacements - Define visual
+ handles
+
+Defines visual handles for items with the `ItemVisualHandle` class,
+and a provider for such visual handles with the `ItemVisualHandleProvider` class.
+
+Additionally, a basic implementation of a visual handle is also included: `VanillaItemOverrideItemVisualHandle`.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/item/ItemVisualHandle.java b/src/main/java/org/fiddlemc/fiddle/packet/item/ItemVisualHandle.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..b5ac338ffd4226176e6a225e8c1ba39313cd062c
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/packet/item/ItemVisualHandle.java
+@@ -0,0 +1,45 @@
++// Fiddle - client perspective - item replacements - visual handle
++
++package org.fiddlemc.fiddle.packet.item;
++
++import it.unimi.dsi.fastutil.Pair;
++import net.minecraft.world.item.Item;
++import net.minecraft.world.item.ItemStack;
++import org.fiddlemc.fiddle.packet.ClientPerspective;
++import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
++
++/**
++ * A class that represents a desired texture and rough usage behavior of an item on the client.
++ * The usage behavior includes the behavior of mouse clicks (such as being able to block with a shield-like item,
++ * start pulling a bow-like item, or start consuming an item).
++ * <br>
++ * Importantly, this also includes some behavior of block items when they are placed.
++ * When a block item is attempted to be placed by the client, the client may use the item type to determine whether
++ * the candidate block placement is possible at all, and if not,
++ * simply not send the block placement packet to the server.
++ * Additionally, when a block placement is assumed to be successful, the client (when sending the block placement
++ * packet to the server) already places the block state it expects in the position, which gives the player visual
++ * feedback as well as makes the client assume the placed block state's collision box in movement calculations.
++ * This means that block item types sent to the client must be chosen in such a way that the visual look of the
++ * block states when the item is attempted to be placed are a good temporary representation, and that the
++ * collision box of the block state that the client assumes is the same as the collision box of the block state
++ * that the server would place (for example, to allow the player to tower up while placing solid blocks,
++ * or keep moving through newly placed blocks without a collision box, even under laggy conditions).
++ * <br>
++ * {@link ItemVisualHandle} instances must only be constructed during server start, and then cached in a way that allows
++ * the {@link ItemVisualHandleProvider} that may provide them to return them. The constructed {@link ItemVisualHandle}
++ * instances should exactly be all of (and no more than) the desired item look and behavior combinations that could
++ * be necessary to be sent to a client.
++ */
++public interface ItemVisualHandle {
++
++    /**
++     * @return A pair of the {@link Item} and custom model data to set on an {@link ItemStack}, that will achieve
++     * the desired effects of this {@link ItemVisualHandle} for the given
++     * {@linkplain ClientPerspective client perspective} of the target of the packet containing that {@link ItemStack}.
++     * This can be null to indicate no item type or custom model data replacements need to be performed.
++     */
++    @Nullable Pair<@NotNull Item, @NotNull Integer> getReplacementItemAndCustomModelData(ClientPerspective clientPerspective, ItemAndCustomModelDataReplacementMapping mapping);
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/item/ItemVisualHandleProvider.java b/src/main/java/org/fiddlemc/fiddle/packet/item/ItemVisualHandleProvider.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..3e3e2869e4eee85fecd51f15bd29d365ea0c8e4d
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/packet/item/ItemVisualHandleProvider.java
+@@ -0,0 +1,26 @@
++// Fiddle - client perspective - item replacements - visual handle
++
++package org.fiddlemc.fiddle.packet.item;
++
++import net.minecraft.world.item.Item;
++import net.minecraft.world.item.ItemStack;
++import org.jetbrains.annotations.Nullable;
++
++/**
++ * An abstract provider of the desired {@link ItemVisualHandle} of a given {@link ItemStack}.
++ * <br>
++ * This can be used to give different {@link ItemStack}s with the same {@link Item} a different {@link ItemVisualHandle}.
++ * For example, similar to how an elytra has multiple textures (one regular texture, and one for when its durability
++ * has run out), the decision for which texture is shown in the client could be based on {@link ItemStack} properties
++ * such as durability, enchantments, or other meta contents (for example the contents of a shulker box,
++ * direction of a custom compass, degree to which a custom bow is pulled back).
++ */
++public interface ItemVisualHandleProvider {
++
++    /**
++     * @return The desired {@link ItemVisualHandle} for the given {@link ItemStack}, or null if the
++     * {@link ItemStack} can be sent unmodified to all possible clients.
++     */
++    @Nullable ItemVisualHandle getDesiredVisualHandle(ItemStack itemStack);
++
++}
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/item/VanillaItemOverrideItemVisualHandle.java b/src/main/java/org/fiddlemc/fiddle/packet/item/VanillaItemOverrideItemVisualHandle.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..8825f8c78c6fe7156a92d7bf9d4b981579d2612e
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/packet/item/VanillaItemOverrideItemVisualHandle.java
+@@ -0,0 +1,48 @@
++// Fiddle - client perspective - item replacements - visual handle
++
++package org.fiddlemc.fiddle.packet.item;
++
++import it.unimi.dsi.fastutil.Pair;
++import net.minecraft.world.item.Item;
++import org.fiddlemc.fiddle.packet.ClientPerspective;
++import org.fiddlemc.fiddle.packet.ClientPerspectiveCategory;
++import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
++
++/**
++ * A {@link ItemVisualHandle} with the following replacements:
++ * <ul>
++ *     <li>For perspectives with the {@linkplain ClientPerspectiveCategory#JAVA_WITH_FIDDLE_CLIENT_MOD client mod},
++ *     no replacement is returned.</li>
++ *     <li>For perspectives with the
++ *     {@linkplain ClientPerspectiveCategory#JAVA_WITH_ENABLED_RESOURCE_PACK resource pack}, a
++ *     vanilla item type with a specific custom model data, that has an override
++ *     with the desired texture in the resource pack, is returned.</li>
++ *     <li>For other perspectives, the same vanilla item type as above is returned as a fallback.</li>
++ * </ul>
++ * This handle can only be sent to the client for the {@link ItemAndCustomModelDataReplacementMapping#DEFAULT} mapping.
++ * For any other mapping, {@link #getReplacementItemAndCustomModelData} throws an exception.
++ */
++public class VanillaItemOverrideItemVisualHandle implements ItemVisualHandle {
++
++    public final Pair<@NotNull Item, @NotNull Integer> replacementForJavaWithEnabledResourcePackPerspective;
++    public final Pair<@NotNull Item, @NotNull Integer> fallbackReplacement;
++
++    public VanillaItemOverrideItemVisualHandle(Item vanillaItem, int resourcePackTextureCustomModelData) {
++        this.replacementForJavaWithEnabledResourcePackPerspective = Pair.of(vanillaItem, resourcePackTextureCustomModelData);
++        this.fallbackReplacement = Pair.of(vanillaItem, 0);
++    }
++
++    @Override
++    public @Nullable Pair<@NotNull Item, @NotNull Integer> getReplacementItemAndCustomModelData(ClientPerspective clientPerspective, ItemAndCustomModelDataReplacementMapping mapping) {
++        if (mapping != ItemAndCustomModelDataReplacementMapping.DEFAULT) {
++            throw new IllegalArgumentException("Cannot call " + this.getClass().getName() + ".getReplacementItemAndCustomModelData(...) with replacement mapping " + mapping);
++        }
++        return switch (clientPerspective.category) {
++            case JAVA_WITH_FIDDLE_CLIENT_MOD -> null;
++            case JAVA_WITH_ENABLED_RESOURCE_PACK -> this.replacementForJavaWithEnabledResourcePackPerspective;
++            case JAVA_DEFAULT -> this.fallbackReplacement;
++        };
++    }
++
++}

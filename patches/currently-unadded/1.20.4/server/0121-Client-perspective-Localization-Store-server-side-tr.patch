@@ -1,0 +1,225 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sun, 23 Jul 2023 17:09:27 +0200
+Subject: [PATCH] Client perspective - Localization - Store server-side
+ translations
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacements.java b/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacements.java
+index ce36e17aab17d4cfcc06ecf3d97370f656191755..50e09dd10bbcc47b46898b18686f1ee2e045c643 100644
+--- a/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacements.java
++++ b/src/main/java/org/fiddlemc/fiddle/packet/deepreplacement/DeepReplacements.java
+@@ -431,8 +431,7 @@ public final class DeepReplacements {
+     }
+ 
+     private static ComponentContents replaceTranslatableContents(TranslatableContents value, @Nullable String locale) {
+-        // TODO call implementation
+-        return value;
++        return org.fiddlemc.fiddle.packet.locale.ServerSideTranslations.replace(value, locale); // Fiddle - client perspective - localization - store server-side translations
+     }
+ 
+ }
+diff --git a/src/main/java/org/fiddlemc/fiddle/packet/locale/ServerSideTranslations.java b/src/main/java/org/fiddlemc/fiddle/packet/locale/ServerSideTranslations.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..0531bde1d5d5f24452e50a70fd71a2c5bd5f137d
+--- /dev/null
++++ b/src/main/java/org/fiddlemc/fiddle/packet/locale/ServerSideTranslations.java
+@@ -0,0 +1,196 @@
++// Fiddle - client perspective - localization - store server-side translations
++
++package org.fiddlemc.fiddle.packet.locale;
++
++import net.minecraft.locale.Language;
++import net.minecraft.network.chat.ComponentContents;
++import net.minecraft.network.chat.contents.PlainTextContents;
++import net.minecraft.network.chat.contents.TranslatableContents;
++import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
++
++import java.util.HashMap;
++import java.util.Map;
++
++/**
++ * An index of the changes that were made to localized strings by the loaded packs.
++ * This includes two types of changes:
++ * <ul>
++ *     <li>{@linkplain #vanillaKeyTranslations New values assigned to translation keys that exist in vanilla}.</li>
++ *     <li>{@linkplain #addedKeyTranslations Values assigned to translation keys that do not exist in vanilla}.</li>
++ * </ul>
++ */
++public final class ServerSideTranslations {
++
++    private ServerSideTranslations() {
++        throw new RuntimeException();
++    }
++
++    public final static String defaultLocaleLanguage = getLocaleLanguage(Language.DEFAULT);
++    public final static String defaultLocaleRegion = getLocaleRegion(Language.DEFAULT);
++
++    /**
++     * The desired translation strings for keys that exist in vanilla.
++     * <br>
++     * This is a nested mapping of, in order of keys to look up, with the last being the value obtained:
++     * <ul>
++     *     <li>The {@linkplain TranslatableContents#getKey() translation key} -></li>
++     *     <li>In-game locale language (the part before the underscore or the entire string if not present:
++     *     <code>"en"</code> for in-game locale <code>"en_us"</code>,
++     *     <code>"lzh"</code> for in-game locale <code>"lzh"</code>) -></li>
++     *     <li>In-game locale region (the part after the underscore or an empty string if not present:
++     *     <code>"us"</code> for in-game locale <code>"en_us"</code>,
++     *     <code>""</code> for in-game locale <code>"lzh"</code>) -></li>
++     *     <li>The desired translated value as a string.</li>
++     * </ul>
++     */
++    private static final Map<@NotNull String, @NotNull Map<@NotNull String, @NotNull Map<@NotNull String, @NotNull String>>> vanillaKeyTranslations = new HashMap<>(1);
++
++    /**
++     * The desired translation strings for keys that do not exist in vanilla.
++     * <br>
++     * The structure is analogous to {@link #vanillaKeyTranslations}.
++     */
++    private static final Map<@NotNull String, @NotNull Map<@NotNull String, @NotNull Map<@NotNull String, @NotNull String>>> addedKeyTranslations = new HashMap<>(1);
++
++    private static void registerTranslation(Map<@NotNull String, @NotNull Map<@NotNull String, @NotNull Map<@NotNull String, @NotNull String>>> map, String locale, String key, String translation) {
++        String localeLanguage = getLocaleLanguage(locale);
++        String localeRegion = getLocaleRegion(locale);
++        map.computeIfAbsent(key, $ -> new HashMap<>(1)).computeIfAbsent(localeLanguage, $ -> new HashMap<>(1)).put(localeRegion, translation);
++    }
++
++    public static void registerVanillaTranslationReplacement(String locale, String key, String translation) {
++        registerTranslation(vanillaKeyTranslations, locale, key, translation);
++    }
++
++    public static void registerAddedTranslation(String locale, String key, String translation) {
++        registerTranslation(addedKeyTranslations, locale, key, translation);
++    }
++
++    /**
++     * Looks up a key in either {@link #vanillaKeyTranslations} or {@link #addedKeyTranslations},
++     * in the order as defined by {@link #replace}.
++     *
++     * @return The value found, or null if no value was found.
++     */
++    private static @Nullable String getKeyTranslation(Map<@NotNull String, @NotNull Map<@NotNull String, @NotNull Map<@NotNull String, @NotNull String>>> map, String translationKey, String localeLanguage, String localeRegion, boolean goFurtherThanGivenLocale) {
++        var translationsForKey = map.get(translationKey);
++        if (translationsForKey == null) {
++            return null;
++        }
++        var translationsForLanguage = translationsForKey.get(localeLanguage);
++        if (translationsForLanguage != null) {
++            var translationForRegion = translationsForLanguage.get(localeRegion);
++            if (translationForRegion != null) {
++                return translationForRegion;
++            }
++            translationForRegion = translationsForLanguage.get(defaultLocaleRegion);
++            if (translationForRegion != null) {
++                return translationForRegion;
++            }
++            if (!translationsForLanguage.isEmpty()) {
++                return translationsForLanguage.values().iterator().next();
++            }
++        }
++        if (!goFurtherThanGivenLocale) {
++            return null;
++        }
++        translationsForLanguage = translationsForKey.get(defaultLocaleLanguage);
++        if (translationsForLanguage != null) {
++            var translationForRegion = translationsForLanguage.get(defaultLocaleRegion);
++            if (translationForRegion != null) {
++                return translationForRegion;
++            }
++            if (!translationsForLanguage.isEmpty()) {
++                return translationsForLanguage.values().iterator().next();
++            }
++        }
++        for (var translationsForSomeLanguage : translationsForKey.values()) {
++            if (!translationsForSomeLanguage.isEmpty()) {
++                return translationsForSomeLanguage.values().iterator().next();
++            }
++        }
++        return null;
++    }
++
++    private static String getLocaleLanguage(@Nullable String locale) {
++        if (locale == null) {
++            return "";
++        }
++        int underscoreIndexInLocale = locale.indexOf('_');
++        return underscoreIndexInLocale == -1 ? locale : underscoreIndexInLocale == 0 ? "" : locale.substring(0, underscoreIndexInLocale);
++    }
++
++    private static String getLocaleRegion(@Nullable String locale) {
++        if (locale == null) {
++            return "";
++        }
++        int underscoreIndexInLocale = locale.indexOf('_');
++        return underscoreIndexInLocale == -1 || underscoreIndexInLocale == locale.length() - 1 ? "" : locale.substring(underscoreIndexInLocale + 1);
++    }
++
++    /**
++     * @return Replacement {@link ComponentContents} for the given translatable contents.
++     * This is either:
++     * <ul>
++     *     <li>A {@link TranslatableContents} with a
++     *     {@linkplain TranslatableContents#getFallback()} fallback set, or</li>
++     *     <li>A {@link PlainTextContents} with an appropriate replacement string as
++     *     {@linkplain PlainTextContents.LiteralContents#text() plain text}, or</li>
++     *     <li>The given {@code translatableContents},
++     *     if no replacement could be determined at all, or if no better replacement could be found.</li>
++     * </ul>
++     * For both translation keys that exist and do not exist in vanilla, the following translations are searched for
++     * in order, and the first translation value found is used:
++     * <ul>
++     *     <li>A translation with the exact locale language and region</li>
++     *     <li>Any translation with the same language (giving preference to the {@link #defaultLocaleRegion})</li>
++     * </ul>
++     * For only translation keys that do not exist in vanilla, the following additional searches are performed in order:
++     * <ul>
++     *     <li>A translation for the {@link Language#DEFAULT} locale</li>
++     *     <li>Any translation with the {@link #defaultLocaleLanguage}</li>
++     *     <li>Any translation</li>
++     * </ul>
++     */
++    public static ComponentContents replace(TranslatableContents translatableContents, @Nullable String locale) {
++
++        String translationKey = translatableContents.getKey();
++        if (translationKey == null) {
++            return translatableContents;
++        }
++        String localeLanguage = getLocaleLanguage(locale);
++        String localeRegion = getLocaleRegion(locale);
++
++        // Try to find the corresponding vanilla key replacement
++        @Nullable String replacementString = getKeyTranslation(vanillaKeyTranslations, translationKey, localeLanguage, localeRegion, false);
++
++        // Otherwise, try to find the corresponding added key replacement
++        if (replacementString == null) {
++            replacementString = getKeyTranslation(addedKeyTranslations, translationKey, localeLanguage, localeRegion, true);
++        }
++
++        if (replacementString == null) {
++            return translatableContents;
++        }
++        // If there are arguments, we cannot replace the entire string, so we set our own replacement as fallback
++        if (translatableContents.getArgs().length > 0) {
++            return new TranslatableContents(translatableContents.getKey(), replacementString, translatableContents.getArgs());
++        }
++        return PlainTextContents.create(replacementString);
++
++    }
++
++    /**
++     * @return Whether there is a replacement that would be applied for the given translation key and locale.
++     */
++    public static boolean hasTranslatableReplacement(String translationKey, @Nullable String locale) {
++
++        String localeLanguage = getLocaleLanguage(locale);
++        String localeRegion = getLocaleRegion(locale);
++
++        return getKeyTranslation(vanillaKeyTranslations, translationKey, localeLanguage, localeRegion, false) != null || getKeyTranslation(addedKeyTranslations, translationKey, localeLanguage, localeRegion, true) != null;
++
++    }
++
++}

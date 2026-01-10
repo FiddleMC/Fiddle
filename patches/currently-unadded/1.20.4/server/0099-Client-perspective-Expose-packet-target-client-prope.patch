@@ -1,0 +1,50 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Martijn Muijsers <martijnmuijsers@live.nl>
+Date: Sat, 22 Jul 2023 15:06:25 +0200
+Subject: [PATCH] Client perspective - Expose packet target client properties -
+ Packet can provide explicit connection
+
+Adds abstract methods in `Packet` that allow it to, based on some implementation,
+provide an explicit perspective and locale of the client it is poised to be sent to.
+
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+Fiddle - https://fiddlemc.org
+
+diff --git a/src/main/java/net/minecraft/network/protocol/Packet.java b/src/main/java/net/minecraft/network/protocol/Packet.java
+index fbc6180cab00cc8733e7e9489be44c31fe618cfe..d99a276e877e128014d27c41577ad7c4f94454fb 100644
+--- a/src/main/java/net/minecraft/network/protocol/Packet.java
++++ b/src/main/java/net/minecraft/network/protocol/Packet.java
+@@ -79,4 +79,33 @@ public interface Packet<T extends PacketListener> {
+     }
+     // Fiddle end - client perspective - packets are modifiable
+ 
++    // Fiddle start - client perspective - expose target client properties - packet can provide explicit connection
++    /**
++     * @return The {@link org.fiddlemc.fiddle.packet.ClientPerspective} of the receiving client of this packet,
++     * if explicitly known.
++     * This must be implemented for some instances of {@link Packet}
++     * for which the {@link org.fiddlemc.fiddle.packet.ClientPerspective} is needed
++     * at the time of {@linkplain #write(FriendlyByteBuf) writing the packet to a byte buffer}.
++     * @throws UnsupportedOperationException If there is no implementation for this method.
++     * The default implementation of this method in {@link Packet} always throws this exception.
++     * An exception being thrown from this method should never actually happen (because it is slow):
++     * this method must not be called when there is any chance of an exception
++     * (including a {@link NullPointerException} if an attempt is made to return a non-null value) being thrown.
++     * No exception from this method should be caught, because if one occurs,
++     * it indicates that there is code that needs this value,
++     * but it is not available early enough for the value to be available.
++     */
++    default org.fiddlemc.fiddle.packet.ClientPerspective getExplicitTargetClientPerspective() throws UnsupportedOperationException {
++        throw new UnsupportedOperationException("Tried to call getExplicitTargetClientPerspective() on a " + Packet.class.getSimpleName() + " instance of type " + this.getClass().getName() + ", but no overriding implementation is available");
++    }
++
++    /**
++     * @return The same value as {@link #getExplicitTargetClientPerspective()}, except that it returns null
++     * where {@link #getExplicitTargetClientPerspective()} would otherwise throw an exception.
++     */
++    default @org.jetbrains.annotations.Nullable org.fiddlemc.fiddle.packet.ClientPerspective getExplicitTargetClientPerspectiveOrNull() {
++        return null;
++    }
++    // Fiddle end - client perspective - expose target client properties - packet can provide explicit connection
++
+ }
