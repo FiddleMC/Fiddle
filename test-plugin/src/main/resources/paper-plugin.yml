@@ -1,0 +1,12 @@
+name: Fiddle-Test-Plugin
+version: ${version}
+main: org.fiddlemc.testplugin.TestPlugin
+description: Fiddle Test Plugin
+author: FiddleMC
+api-version: ${apiversion}
+load: STARTUP
+bootstrapper: org.fiddlemc.testplugin.TestPluginBootstrap
+loader: org.fiddlemc.testplugin.TestPluginLoader
+defaultPerm: FALSE
+permissions:
+dependencies:
