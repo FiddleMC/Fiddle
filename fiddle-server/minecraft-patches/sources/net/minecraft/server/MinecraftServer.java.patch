@@ -1,5 +1,14 @@
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
+@@ -302,7 +_,7 @@
+     public volatile boolean hasFullyShutdown; // Paper - Improved watchdog support
+     public volatile boolean abnormalExit; // Paper - Improved watchdog support
+     public volatile Thread shutdownThread; // Paper - Improved watchdog support
+-    public final io.papermc.paper.configuration.PaperConfigurations paperConfigurations; // Paper - add paper configuration files
++    public final io.papermc.paper.configuration.PaperConfigurations.OriginalPaperConfigurations paperConfigurations; // Paper - add paper configuration files // Fiddle - Configuration - Use PaperConfigurations as basis - Re-add original concrete class
+     public boolean isIteratingOverLevels = false; // Paper - Throw exception on world create while being ticked
+     private final Set<String> pluginsBlockingSleep = new java.util.HashSet<>(); // Paper - API to allow/disallow tick sleeping
+     public static final long SERVER_INIT = System.nanoTime(); // Paper - Lag compensation
 @@ -1280,13 +_,15 @@
              // Paper end
              org.spigotmc.WatchdogThread.hasStarted = true; // Paper

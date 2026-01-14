@@ -5,7 +5,19 @@
  
      @SuppressWarnings("unchecked")
 -    private static InnerClassFieldDiscoverer create(final Map<Class<?>, Object> overrides, final List<Definition<?, ?, ? extends FieldProcessor.Factory<?, ?>>> fieldProcessors) {
-+    public static InnerClassFieldDiscoverer create(final Map<Class<?>, Object> overrides, final List<Definition<?, ?, ? extends FieldProcessor.Factory<?, ?>>> fieldProcessors) { // Fiddle - Configuration - Make public
++    public static InnerClassFieldDiscoverer create(final Map<Class<?>, Object> overrides, final List<Definition<?, ?, ? extends FieldProcessor.Factory<?, ?>>> fieldProcessors) { // Fiddle - Configuration - Use PaperConfigurations as basis - Make public
          final Map<Class<? extends Annotation>, List<Definition<?, ?, ? extends FieldProcessor.Factory<?, ?>>>> processors = new LinkedHashMap<>();
          for (final Definition<?, ?, ? extends FieldProcessor.Factory<?, ?>> definition : fieldProcessors) {
              processors.computeIfAbsent(definition.annotation(), k -> new ArrayList<>()).add(definition);
+@@ -90,9 +_,9 @@
+         return new InnerClassFieldDiscoverer(instanceSupplier, (FieldDiscoverer<Map<Field, Object>>) FieldDiscoverer.object(instanceSupplier), processors);
+     }
+ 
+-    public static FieldDiscoverer<?> worldConfig(final WorldConfiguration worldConfiguration, final List<Definition<?, ?, ? extends FieldProcessor.Factory<?, ?>>> fieldProcessors) {
++    public static <W> FieldDiscoverer<?> worldConfig(final Class<W> worldConfigurationClass, final W worldConfiguration, final List<Definition<?, ?, ? extends FieldProcessor.Factory<?, ?>>> fieldProcessors) { // Fiddle - Configuration - Use PaperConfigurations as basis - Make PaperConfigurations abstract
+         final Map<Class<?>, Object> overrides = Map.of(
+-            WorldConfiguration.class, worldConfiguration
++            worldConfigurationClass, worldConfiguration // Fiddle - Configuration - Use PaperConfigurations as basis - Make PaperConfigurations abstract
+         );
+         return create(overrides, fieldProcessors);
+     }
