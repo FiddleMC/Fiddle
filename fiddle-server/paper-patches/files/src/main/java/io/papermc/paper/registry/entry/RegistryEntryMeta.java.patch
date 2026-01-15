@@ -1,0 +1,14 @@
+--- a/src/main/java/io/papermc/paper/registry/entry/RegistryEntryMeta.java
++++ b/src/main/java/io/papermc/paper/registry/entry/RegistryEntryMeta.java
+@@ -113,6 +_,11 @@
+         @Override
+         public org.bukkit.Registry<A> createApiRegistry(final Registry<M> nmsRegistry) {
+             if (this.modificationApiSupport.canAdd()) {
++                // Fiddle start - Mode data-driven - Paper API - Make block and item registries key-aware
++                if (nmsRegistry instanceof org.fiddlemc.fiddle.minecraft.registries.BlockRegistry || nmsRegistry instanceof org.fiddlemc.fiddle.minecraft.registries.ItemRegistry) {
++                    return (org.bukkit.Registry<A>) new org.fiddlemc.fiddle.paper.registry.KeyAwareWritableCraftRegistry((MappedRegistry<M>) nmsRegistry, this);
++                }
++                // Fiddle end - Mode data-driven - Paper API - Make block and item registries key-aware
+                 return new WritableCraftRegistry<>((MappedRegistry<M>) nmsRegistry, this);
+             } else {
+                 return ServerSide.super.createApiRegistry(nmsRegistry);

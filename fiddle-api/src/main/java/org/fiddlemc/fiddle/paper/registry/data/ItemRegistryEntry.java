@@ -3,6 +3,7 @@ package org.fiddlemc.fiddle.paper.registry.data;
 import io.papermc.paper.registry.RegistryBuilder;
 import org.bukkit.inventory.ItemType;
 import org.jetbrains.annotations.ApiStatus;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A data-centric version-specific registry entry for the {@link ItemType} type.
