@@ -1,0 +1,21 @@
+--- a/src/test/java/io/papermc/paper/registry/RegistryBuilderTest.java
++++ b/src/test/java/io/papermc/paper/registry/RegistryBuilderTest.java
+@@ -23,6 +_,18 @@
+         return PaperRegistries.REGISTRY_ENTRIES.stream()
+             .map(RegistryEntry::meta)
+             .filter(RegistryEntryMeta.Buildable.class::isInstance)
++            // Fiddle start - More data-driven - API
++            .filter(entry -> {
++                var identifier = entry.mcKey().identifier();
++                if (identifier.equals(net.minecraft.core.registries.Registries.BLOCK.identifier())) {
++                    return false;
++                }
++                if (identifier.equals(net.minecraft.core.registries.Registries.ITEM.identifier())) {
++                    return false;
++                }
++                return true;
++            })
++            // Fiddle end - More data-driven - API
+             .map(Arguments::arguments);
+     }
+ 
