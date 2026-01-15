@@ -72,12 +72,10 @@ public abstract class FiddleItemRegistryEntry implements ItemRegistryEntry, KeyA
 
         @Override
         public Item build() {
-            if (this.nmsFactory != null) {
-                Item.Properties properties = this.nmsProperties != null ? this.nmsProperties : new Item.Properties();
-                properties.setId(ResourceKey.create(Registries.ITEM, this.key));
-                return nmsFactory.apply(properties);
-            }
-            throw new UnsupportedOperationException();
+            Function<Item.Properties, Item> factory = this.nmsFactory != null ? this.nmsFactory : Item::new;
+            Item.Properties properties = this.nmsProperties != null ? this.nmsProperties : new Item.Properties();
+            properties.setId(ResourceKey.create(Registries.ITEM, this.key));
+            return factory.apply(properties);
         }
 
     }

@@ -5,8 +5,6 @@ import io.papermc.paper.registry.data.util.Conversions;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import org.bukkit.block.BlockType;
@@ -31,7 +29,7 @@ public abstract class FiddleBlockRegistryEntry implements BlockRegistryEntry, Ke
     }
 
     @Override
-    public Identifier getKey()  {
+    public Identifier getKey() {
         return this.key;
     }
 
@@ -75,12 +73,10 @@ public abstract class FiddleBlockRegistryEntry implements BlockRegistryEntry, Ke
 
         @Override
         public Block build() {
-            if (this.nmsFactory != null) {
-                BlockBehaviour.Properties properties = this.nmsProperties != null ? this.nmsProperties : BlockBehaviour.Properties.of();
-                properties.setId(ResourceKey.create(Registries.BLOCK, this.key));
-                return nmsFactory.apply(properties);
-            }
-            throw new UnsupportedOperationException();
+            Function<BlockBehaviour.Properties, Block> factory = this.nmsFactory != null ? this.nmsFactory : Block::new;
+            BlockBehaviour.Properties properties = this.nmsProperties != null ? this.nmsProperties : BlockBehaviour.Properties.of();
+            properties.setId(ResourceKey.create(Registries.BLOCK, this.key));
+            return factory.apply(properties);
         }
 
     }
