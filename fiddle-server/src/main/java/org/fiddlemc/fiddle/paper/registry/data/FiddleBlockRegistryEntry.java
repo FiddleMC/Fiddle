@@ -2,17 +2,24 @@ package org.fiddlemc.fiddle.paper.registry.data;
 
 import io.papermc.paper.registry.PaperRegistryBuilder;
 import io.papermc.paper.registry.data.util.Conversions;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import org.bukkit.block.BlockType;
 import org.jspecify.annotations.Nullable;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * The implementation of {@link BlockRegistryEntry}.
  */
-public class FiddleBlockRegistryEntry implements BlockRegistryEntry, KeyAwareRegistryEntry {
+public abstract class FiddleBlockRegistryEntry implements BlockRegistryEntry, KeyAwareRegistryEntry {
 
-    private @Nullable Identifier key;
+    protected @Nullable Identifier key;
 
     public FiddleBlockRegistryEntry(
         final Conversions conversions,
@@ -28,20 +35,52 @@ public class FiddleBlockRegistryEntry implements BlockRegistryEntry, KeyAwareReg
         return this.key;
     }
 
-    @Override
-    public void setKey(Identifier key) {
-        this.key = key;
-    }
-
     public static final class FiddleBuilder extends FiddleBlockRegistryEntry implements Builder, PaperRegistryBuilder<Block, BlockType> {
+
+        private @Nullable Function<Block.Properties, Block> nmsFactory;
+        private BlockBehaviour.@Nullable Properties nmsProperties;
 
         public FiddleBuilder(final Conversions conversions, final @Nullable Block internal) {
             super(conversions, internal);
         }
 
         @Override
+        public void setKey(Identifier key) {
+            this.key = key;
+        }
+
+        /**
+         * Sets the factory to use, and marks this builder as using NMS.
+         */
+        public void nmsFactory(Function<BlockBehaviour.Properties, Block> factory) {
+            this.nmsFactory = factory;
+        }
+
+        /**
+         * Replaces the NMS properties for the block.
+         */
+        public void nmsProperties(BlockBehaviour.Properties properties) {
+            this.nmsProperties = properties;
+        }
+
+        /**
+         * Modifies the NMS properties for the block.
+         */
+        public void nmsProperties(Consumer<BlockBehaviour.Properties> properties) {
+            if (this.nmsProperties == null) {
+                this.nmsProperties = BlockBehaviour.Properties.of();
+            }
+            properties.accept(this.nmsProperties);
+        }
+
+        @Override
         public Block build() {
-            return new Block(null); // TODO
+            if (this.nmsFactory != null) {
+                BlockBehaviour.Properties properties = this.nmsProperties != null ? this.nmsProperties : BlockBehaviour.Properties.of();
+                properties.setId(ResourceKey.create(Registries.BLOCK, this.key));
+                return nmsFactory.apply(properties);
+            }
+            throw new UnsupportedOperationException();
         }
 
     }

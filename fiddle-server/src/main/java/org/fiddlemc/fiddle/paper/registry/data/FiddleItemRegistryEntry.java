@@ -2,17 +2,21 @@ package org.fiddlemc.fiddle.paper.registry.data;
 
 import io.papermc.paper.registry.PaperRegistryBuilder;
 import io.papermc.paper.registry.data.util.Conversions;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 import org.bukkit.inventory.ItemType;
 import org.jspecify.annotations.Nullable;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * The implementation of {@link ItemRegistryEntry}.
  */
-public class FiddleItemRegistryEntry  implements ItemRegistryEntry, KeyAwareRegistryEntry {
+public abstract class FiddleItemRegistryEntry implements ItemRegistryEntry, KeyAwareRegistryEntry {
 
-    private @Nullable Identifier key;
+    protected @Nullable Identifier key;
 
     public FiddleItemRegistryEntry(
         final Conversions conversions,
@@ -24,24 +28,56 @@ public class FiddleItemRegistryEntry  implements ItemRegistryEntry, KeyAwareRegi
     }
 
     @Override
-    public Identifier getKey()  {
+    public Identifier getKey() {
         return this.key;
     }
 
-    @Override
-    public void setKey(Identifier key) {
-        this.key = key;
-    }
-
     public static final class FiddleBuilder extends FiddleItemRegistryEntry implements Builder, PaperRegistryBuilder<Item, ItemType> {
+
+        private @Nullable Function<Item.Properties, Item> nmsFactory;
+        private Item.@Nullable Properties nmsProperties;
 
         public FiddleBuilder(final Conversions conversions, final @Nullable Item internal) {
             super(conversions, internal);
         }
 
         @Override
+        public void setKey(Identifier key) {
+            this.key = key;
+        }
+
+        /**
+         * Sets the factory to use, and marks this builder as using NMS.
+         */
+        public void nmsFactory(Function<Item.Properties, Item> factory) {
+            this.nmsFactory = factory;
+        }
+
+        /**
+         * Replaces the NMS properties for the item.
+         */
+        public void nmsProperties(Item.Properties properties) {
+            this.nmsProperties = properties;
+        }
+
+        /**
+         * Modifies the NMS properties for the item.
+         */
+        public void nmsProperties(Consumer<Item.Properties> properties) {
+            if (this.nmsProperties == null) {
+                this.nmsProperties = new Item.Properties();
+            }
+            properties.accept(this.nmsProperties);
+        }
+
+        @Override
         public Item build() {
-            return new Item(null); // TODO
+            if (this.nmsFactory != null) {
+                Item.Properties properties = this.nmsProperties != null ? this.nmsProperties : new Item.Properties();
+                properties.setId(ResourceKey.create(Registries.ITEM, this.key));
+                return nmsFactory.apply(properties);
+            }
+            throw new UnsupportedOperationException();
         }
 
     }

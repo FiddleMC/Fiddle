@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# Refreshes the dev bundle dependency of the test plugin (in IntelliJ, right-click -> Run 'refreshTestPluginDevBundle')
+
+cd ..
+./gradlew :test-plugin:cleanAllPaperweightUserdevCaches
+./gradlew :test-plugin:paperweightUserdevSetup
+cd gradle-bin
