@@ -3,5 +3,6 @@
 # Applies all patches (in IntelliJ, right-click -> Run 'apply')
 
 cd ..
+find . -name '.DS_Store' -type f -delete
 ./gradlew applyAllPatches
 cd gradle-bin
