@@ -1,7 +1,0 @@
-#!/bin/sh
-
-# Publishes the dev bundle to Maven local (in IntelliJ, right-click -> Run 'publishDevBundlePublicationToMavenLocal')
-
-cd ..
-./gradlew -PpublishDevBundle publishDevBundlePublicationToMavenLocal
-cd gradle-bin

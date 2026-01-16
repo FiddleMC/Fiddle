@@ -1,11 +1,13 @@
 package org.fiddlemc.testplugin;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
 import org.bukkit.inventory.ShapelessRecipe;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.fiddlemc.testplugin.data.PluginItemTypes;
+import java.util.Arrays;
 import java.util.logging.Logger;
 
 @SuppressWarnings("unused")
@@ -30,6 +32,12 @@ public final class TestPlugin extends JavaPlugin {
         Registry.ITEM.stream()
             .filter(type -> !type.getKey().namespace().equals(NamespacedKey.MINECRAFT_NAMESPACE))
             .forEach(type -> logger.info("* " + type.getKey()));
+
+        // Print non-vanilla Material instances
+        logger.info("All non-vanilla Material instances:");
+        Arrays.stream(Material.values())
+            .filter(type -> !type.getKey().namespace().equals(NamespacedKey.MINECRAFT_NAMESPACE))
+            .forEach(type -> logger.info("* " + type.name() + " = " + type.getKey()));
 
         // Register crafting recipes
         this.registerCraftingRecipes();

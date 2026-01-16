@@ -5,9 +5,13 @@ import io.papermc.paper.registry.data.util.Conversions;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
 import org.bukkit.inventory.ItemType;
+import org.fiddlemc.fiddle.minecraft.registries.BlockRegistry;
 import org.jspecify.annotations.Nullable;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -51,6 +55,42 @@ public abstract class FiddleItemRegistryEntry implements ItemRegistryEntry, KeyA
          */
         public void nmsFactory(Function<Item.Properties, Item> factory) {
             this.nmsFactory = factory;
+        }
+
+        /**
+         * Sets the factory to use for an item for a block with the {@linkplain #getKey same} {@link Identifier},
+         * and marks this builder as using NMS.
+         */
+        public void nmsFactoryForBlock() {
+            this.nmsFactoryForBlock(BlockItem::new);
+        }
+
+        /**
+         * Sets the factory to use for an item for a block with the given {@link Identifier},
+         * and marks this builder as using NMS.
+         *
+         * @param blockIdentifier The identifier of the block.
+         */
+        public void nmsFactoryForBlock(Identifier blockIdentifier) {
+            this.nmsFactoryForBlock(blockIdentifier);
+        }
+
+        /**
+         * Sets the factory to use for an item for a block with the {@linkplain #getKey same} {@link Identifier},
+         * and marks this builder as using NMS.
+         */
+        public void nmsFactoryForBlock(BiFunction<Block, Item.Properties, BlockItem> factory) {
+            this.nmsFactoryForBlock(this.key, factory);
+        }
+
+        /**
+         * Sets the factory to use for an item for a block with the given {@link Identifier},
+         * and marks this builder as using NMS.
+         *
+         * @param blockIdentifier The identifier of the block.
+         */
+        public void nmsFactoryForBlock(Identifier blockIdentifier, BiFunction<Block, Item.Properties, BlockItem> factory) {
+            this.nmsFactory = properties -> factory.apply(BlockRegistry.get().get(blockIdentifier).get().value(), properties);
         }
 
         /**
