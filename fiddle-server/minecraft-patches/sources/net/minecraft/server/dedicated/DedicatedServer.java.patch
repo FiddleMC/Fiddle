@@ -8,3 +8,24 @@
          this.server.spark.enableEarlyIfRequested(); // Paper - spark
          // Paper start - fix converting txt to json file; convert old users earlier after PlayerList creation but before file load/save
          if (this.convertOldUsers()) {
+@@ -315,6 +_,20 @@
+             if (true) throw new IllegalStateException("Failed to bind to port", var11); // Paper - Propagate failed to bind to port error
+             return false;
+         }
++
++        // Fiddle start - Synchronize Bukkit enums - Run on server start
++        try {
++            @Nullable String errorMessage = org.fiddlemc.fiddle.bukkit.enums.MaterialEnumSynchronizer.run();
++            if (errorMessage != null) {
++                // Don't start the server with an incomplete Material enum
++                LOGGER.warn("Failed to extend Bukkit Material enum: {}", errorMessage);
++                return false;
++            }
++        } catch (Exception e) {
++            // Don't start the server with an incomplete Material enum
++            throw new IllegalStateException("Failed to extend Bukkit Material enum", e);
++        }
++        // Fiddle end - Synchronize Bukkit enums - Run on server start
+ 
+         // CraftBukkit start
+         this.server.loadPlugins();

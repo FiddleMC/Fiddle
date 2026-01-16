@@ -6,6 +6,7 @@ import org.bukkit.NamespacedKey;
  * Holds the {@link #FIDDLE} namespace.
  */
 public final class FiddleNamespace {
+
     private FiddleNamespace() {
         throw new UnsupportedOperationException();
     }
@@ -18,4 +19,5 @@ public final class FiddleNamespace {
      * </p>
       */
     public static final String FIDDLE = "fiddle";
+
 }

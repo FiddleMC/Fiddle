@@ -22,22 +22,22 @@ public final class TestPlugin extends JavaPlugin {
         this.logger = this.getLogger();
 
         // Print non-vanilla block types
-        logger.info("All non-vanilla block types:");
+        this.logger.info("All non-vanilla block types:");
         Registry.BLOCK.stream()
             .filter(type -> !type.getKey().namespace().equals(NamespacedKey.MINECRAFT_NAMESPACE))
-            .forEach(type -> logger.info("* " + type.getKey()));
+            .forEach(type -> this.logger.info("* " + type.getKey()));
 
         // Print non-vanilla item types
-        logger.info("All non-vanilla item types:");
+        this.logger.info("All non-vanilla item types:");
         Registry.ITEM.stream()
             .filter(type -> !type.getKey().namespace().equals(NamespacedKey.MINECRAFT_NAMESPACE))
-            .forEach(type -> logger.info("* " + type.getKey()));
+            .forEach(type -> this.logger.info("* " + type.getKey()));
 
         // Print non-vanilla Material instances
-        logger.info("All non-vanilla Material instances:");
+        this.logger.info("All non-vanilla Material instances:");
         Arrays.stream(Material.values())
-            .filter(type -> !type.getKey().namespace().equals(NamespacedKey.MINECRAFT_NAMESPACE))
-            .forEach(type -> logger.info("* " + type.name() + " = " + type.getKey()));
+            .filter(type -> !type.isLegacy() && !type.getKey().namespace().equals(NamespacedKey.MINECRAFT_NAMESPACE))
+            .forEach(type -> this.logger.info("* " + type.name() + " = " + type.getKey()));
 
         // Register crafting recipes
         this.registerCraftingRecipes();

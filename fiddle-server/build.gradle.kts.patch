@@ -98,7 +98,7 @@
      testImplementation("org.ow2.asm:asm-tree:9.8")
      testImplementation("org.junit-pioneer:junit-pioneer:2.2.0") // CartesianTest
  
-@@ -191,21 +_,22 @@
+@@ -191,21 +_,23 @@
          val git = Git(rootProject.layout.projectDirectory.path)
          val mcVersion = rootProject.providers.gradleProperty("mcVersion").get()
          val build = System.getenv("BUILD_NUMBER") ?: null
@@ -111,6 +111,7 @@
          attributes(
              "Main-Class" to "org.bukkit.craftbukkit.Main",
 -            "Implementation-Title" to "Paper",
++            "Add-Opens" to "java.base/java.lang", // Fiddle - Synchronize Bukkit enums - Add module opens to server JAR
 +            "Implementation-Title" to "Fiddle", // Fiddle - Branding changes - Rename server brand
              "Implementation-Version" to implementationVersion,
 -            "Implementation-Vendor" to date,
@@ -138,6 +139,14 @@
  idea {
      module {
          generatedSourceDirs.add(generatedDir.toFile())
+@@ -293,6 +_,7 @@
+         vendor.set(JvmVendorSpec.JETBRAINS)
+     })
+     jvmArgs("-XX:+AllowEnhancedClassRedefinition")
++    jvmArgs("--add-opens", "java.base/java.lang=ALL-UNNAMED") // Fiddle - Synchronize Bukkit enums - Add module opens to server JAR
+ 
+     if (rootProject.childProjects["test-plugin"] != null) {
+         val testPluginJar = rootProject.project(":test-plugin").tasks.jar.flatMap { it.archiveFile }
 @@ -356,6 +_,21 @@
      mainClass.set(null as String?)
  }
@@ -160,19 +169,19 @@
  fill {
      project("paper")
      versionFamily(paperweight.minecraftVersion.map { it.split(".", "-").takeWhile { part -> part.toIntOrNull() != null }.take(2).joinToString(".") })
-@@ -372,3 +_,67 @@
+@@ -372,3 +_,69 @@
          }
      }
  }
 +*/
 +// Fiddle end - Project setup - Remove Fill
 +
-+// Fiddle - Modifiable Bukkit enums - Inject runtime versions - Add module opens to server JAR
-+val extendedManifestElements: List<Pair<String, String>> = listOf(
++// Fiddle start - Synchronize Bukkit enums - Add module opens to server JAR
++val extendedManifestLines: List<String> = listOf(
 +    "Add-Opens" to "java.base/java.lang"
-+)
++).map { "${it.first}: ${it.second}" }
 +
-+if (extendedManifestElements.isNotEmpty()) {
++if (extendedManifestLines.isNotEmpty()) {
 +    for (jar in listOf(
 +        "server" to null,
 +        "bundler" to "mojmap",
@@ -208,16 +217,18 @@
 +                    unzip(jarFile, tempUnpackDir)
 +
 +                    val manifestFile = tempUnpackDir.resolve("META-INF/MANIFEST.MF")
-+                    manifestFile.writeLines(ArrayList(manifestFile.readLines()).also { lines ->
-+                        lines.addAll(
-+                            lines.indexOfFirst { line -> line.startsWith("Main-Class:") } + 1,
-+                            extendedManifestElements.map { "${it.first}: ${it.second}" }
-+                        )
-+                    })
++                    val lines = ArrayList(manifestFile.readLines())
++                    val extendedManifestLinesToAdd = extendedManifestLines.filter { it -> it !in lines }
++                    if (extendedManifestLinesToAdd.isNotEmpty()) {
++                        val mainClassLineIndex = lines.indexOfFirst { line -> line.startsWith("Main-Class:") }
++                        if (mainClassLineIndex != -1) {
++                            lines.addAll(mainClassLineIndex + 1, extendedManifestLinesToAdd)
++                            manifestFile.writeLines(lines)
 +
-+                    ensureDeleted(jarFile)
-+
-+                    zip(tempUnpackDir, jarFile)
++                            ensureDeleted(jarFile)
++                            zip(tempUnpackDir, jarFile)
++                        }
++                    }
 +                } finally {
 +                    @OptIn(kotlin.io.path.ExperimentalPathApi::class)
 +                    tempUnpackDir.deleteRecursively()
@@ -227,4 +238,4 @@
 +        }
 +    }
 +}
-+// Fiddle end - Modifiable Bukkit enums - Inject runtime versions - Add module opens to server JAR
++// Fiddle end - Synchronize Bukkit enums - Add module opens to server JAR
