@@ -239,7 +239,7 @@
      }
  
 -    private static List<Definition<? extends Annotation, ?, ? extends FieldProcessor.Factory<?, ?>>> defaultFieldProcessors() {
-+    public static List<Definition<? extends Annotation, ?, ? extends FieldProcessor.Factory<?, ?>>> defaultFieldProcessors() { // Fiddle - Configuration - Use PaperConfigurations as basis - Make public
++    public static List<Definition<?, ?, ? extends FieldProcessor.Factory<?, ?>>> defaultFieldProcessors() { // Fiddle - Configuration - Use PaperConfigurations as basis - Make public and more generic
          return List.of(
              MergeMap.DEFINITION
          );

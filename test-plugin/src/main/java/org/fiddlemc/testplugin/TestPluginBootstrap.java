@@ -6,12 +6,16 @@ import io.papermc.paper.registry.RegistryKey;
 import io.papermc.paper.registry.TypedKey;
 import io.papermc.paper.registry.event.RegistryEvents;
 import net.kyori.adventure.key.Key;
-import net.minecraft.resources.Identifier;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
-import org.fiddlemc.fiddle.minecraft.registries.ItemRegistry;
+import org.fiddlemc.fiddle.client.ClientProfile;
+import org.fiddlemc.fiddle.minecraft.packet.mapping.item.ItemMappingPipeline;
 import org.fiddlemc.fiddle.paper.registry.data.FiddleBlockRegistryEntry;
 import org.fiddlemc.fiddle.paper.registry.data.FiddleItemRegistryEntry;
+import org.fiddlemc.testplugin.data.PluginItems;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("unused")
@@ -22,6 +26,7 @@ public class TestPluginBootstrap implements PluginBootstrap {
 
         // Register custom blocks
         context.getLifecycleManager().registerEventHandler(RegistryEvents.BLOCK.compose(), event -> {
+            context.getLogger().info("Registering custom blocks...");
             // Register an ash block
             event.registry().register(TypedKey.create(RegistryKey.BLOCK, Key.key("example:ash_block")), builder -> {
                 FiddleBlockRegistryEntry.FiddleBuilder internalBuilder = (FiddleBlockRegistryEntry.FiddleBuilder) builder;
@@ -38,6 +43,7 @@ public class TestPluginBootstrap implements PluginBootstrap {
 
         // Register custom items
         context.getLifecycleManager().registerEventHandler(RegistryEvents.ITEM.compose(), event -> {
+            context.getLogger().info("Registering custom items...");
             // Register ash
             event.registry().register(TypedKey.create(RegistryKey.ITEM, Key.key("example:ash")), builder -> {
                 FiddleItemRegistryEntry.FiddleBuilder internalBuilder = (FiddleItemRegistryEntry.FiddleBuilder) builder;
@@ -55,8 +61,29 @@ public class TestPluginBootstrap implements PluginBootstrap {
                 internalBuilder.nmsFactoryForBlock();
                 internalBuilder.nmsProperties(properties -> {
                     // It leaves ash when used in a crafting recipe
-                    properties.craftRemainder(ItemRegistry.get().get(Identifier.parse("example:ash")).get().value());
+                    properties.craftRemainder(PluginItems.ASH.get());
                 });
+            });
+        });
+
+        // Register item mappings
+        context.getLifecycleManager().registerEventHandler(ItemMappingPipeline.compose(), event -> {
+            context.getLogger().info("Registering item mappings...");
+            // Map ash to gunpowder
+            event.getRegistrar().register(ClientProfile.AwarenessLevel.JAVA_DEFAULT, PluginItems.ASH.get(), (itemStack, original, clientProfile) -> {
+                // Change the type
+                itemStack.setItem(Items.GUNPOWDER);
+                // Set the desired item name
+                itemStack.set(DataComponents.ITEM_NAME, Component.literal("Ash"));
+                return itemStack;
+            });
+            // Map ash blocks to light gray concrete powder
+            event.getRegistrar().register(ClientProfile.AwarenessLevel.JAVA_DEFAULT, PluginItems.ASH_BLOCK.get(), (itemStack, original, clientProfile) -> {
+                // Change the type
+                itemStack.setItem(Items.LIGHT_GRAY_CONCRETE_POWDER);
+                // Set the desired item name
+                itemStack.set(DataComponents.ITEM_NAME, Component.literal("Ash block"));
+                return itemStack;
             });
         });
 

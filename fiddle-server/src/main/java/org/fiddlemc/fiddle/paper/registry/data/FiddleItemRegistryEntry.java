@@ -90,7 +90,7 @@ public abstract class FiddleItemRegistryEntry implements ItemRegistryEntry, KeyA
          * @param blockIdentifier The identifier of the block.
          */
         public void nmsFactoryForBlock(Identifier blockIdentifier, BiFunction<Block, Item.Properties, BlockItem> factory) {
-            this.nmsFactory = properties -> factory.apply(BlockRegistry.get().get(blockIdentifier).get().value(), properties);
+            this.nmsFactory = properties -> factory.apply(BlockRegistry.get().getValue(blockIdentifier), properties);
         }
 
         /**

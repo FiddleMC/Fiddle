@@ -46,9 +46,9 @@ public final class TestPlugin extends JavaPlugin {
 
     private void registerCraftingRecipes() {
         // 9 x Ash -> Ash block
-        Bukkit.addRecipe(new ShapelessRecipe(NamespacedKey.fromString("example:ash_block"), PluginItemTypes.ASH_BLOCK.createItemStack()).addIngredient(9, PluginItemTypes.ASH.createItemStack()));
+        Bukkit.addRecipe(new ShapelessRecipe(NamespacedKey.fromString("example:ash_block"), PluginItemTypes.ASH_BLOCK.get().createItemStack()).addIngredient(9, PluginItemTypes.ASH.get().createItemStack()));
         // Ash block -> 9x Ash
-        Bukkit.addRecipe(new ShapelessRecipe(NamespacedKey.fromString("example:ash_from_block"), PluginItemTypes.ASH.createItemStack(9)).addIngredient(PluginItemTypes.ASH_BLOCK.createItemStack()));
+        Bukkit.addRecipe(new ShapelessRecipe(NamespacedKey.fromString("example:ash_from_block"), PluginItemTypes.ASH.get().createItemStack(9)).addIngredient(PluginItemTypes.ASH_BLOCK.get().createItemStack()));
     }
 
 }
