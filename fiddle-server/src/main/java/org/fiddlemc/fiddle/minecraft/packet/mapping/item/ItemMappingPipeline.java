@@ -217,18 +217,19 @@ public class ItemMappingPipeline implements ItemMappingRegistrar {
      * This method may modify the given {@code itemStack}.
      * </p>
      *
+     * @param context The context of this mapping, where the {@link ItemMapping.Context#getOriginal} is null.
      * @return The resulting {@link ItemStack}, which may or may not be the given {@code itemStack}.
      */
-    public ItemStack apply(ItemStack itemStack, ClientProfile clientProfile) {
-        Map<Item, List<ItemMapping>> mapForAwarenessLevel = this.getForAwarenessLevel(clientProfile.getAwarenessLevel());
+    public ItemStack apply(ItemStack itemStack, ItemMappingContextImpl context) {
+        Map<Item, List<ItemMapping>> mapForAwarenessLevel = this.getForAwarenessLevel(context.getClientProfile().getAwarenessLevel());
         @Nullable List<ItemMapping> mappings = mapForAwarenessLevel.get(itemStack.getItem());
         if (mappings == null) {
             return itemStack;
         }
         ItemStack current = itemStack;
-        ItemStack original = itemStack.copy();
+        ItemMappingContextImpl contextWithOriginal = new ItemMappingContextImpl(itemStack.copy(), context.getClientProfile(), context.isItemStackInItemFrame(), context.isStonecutterRecipeResult());
         for (ItemMapping mapping : mappings) {
-            @Nullable ItemStack result = mapping.apply(current, original, clientProfile);
+            @Nullable ItemStack result = mapping.apply(current, contextWithOriginal);
             if (result != null) {
                 current = result;
             }

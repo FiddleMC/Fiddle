@@ -70,7 +70,7 @@ public class TestPluginBootstrap implements PluginBootstrap {
         context.getLifecycleManager().registerEventHandler(ItemMappingPipeline.compose(), event -> {
             context.getLogger().info("Registering item mappings...");
             // Map ash to gunpowder
-            event.getRegistrar().register(ClientProfile.AwarenessLevel.JAVA_DEFAULT, PluginItems.ASH.get(), (itemStack, original, clientProfile) -> {
+            event.getRegistrar().register(ClientProfile.AwarenessLevel.JAVA_DEFAULT, PluginItems.ASH.get(), (itemStack, mappingContext) -> {
                 // Change the type
                 itemStack.setItem(Items.GUNPOWDER);
                 // Set the desired item name
@@ -78,7 +78,7 @@ public class TestPluginBootstrap implements PluginBootstrap {
                 return itemStack;
             });
             // Map ash blocks to light gray concrete powder
-            event.getRegistrar().register(ClientProfile.AwarenessLevel.JAVA_DEFAULT, PluginItems.ASH_BLOCK.get(), (itemStack, original, clientProfile) -> {
+            event.getRegistrar().register(ClientProfile.AwarenessLevel.JAVA_DEFAULT, PluginItems.ASH_BLOCK.get(), (itemStack, mappingContext) -> {
                 // Change the type
                 itemStack.setItem(Items.LIGHT_GRAY_CONCRETE_POWDER);
                 // Set the desired item name
