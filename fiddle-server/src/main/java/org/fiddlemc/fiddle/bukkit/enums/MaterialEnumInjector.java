@@ -26,7 +26,6 @@ public class MaterialEnumInjector extends EnumInjector<Material> {
     private final Field keyField;
     private final Field idField;
     private final Field legacyField;
-    private final Field maxStackField;
     private final Field ctorField;
     private final Field dataField;
     private final Field itemTypeField;
@@ -37,7 +36,6 @@ public class MaterialEnumInjector extends EnumInjector<Material> {
         this.keyField = ReflectionUtil.getDeclaredField(Material.class, "key");
         this.idField = ReflectionUtil.getDeclaredField(Material.class, "id");
         this.legacyField = ReflectionUtil.getDeclaredField(Material.class, "legacy");
-        this.maxStackField = ReflectionUtil.getDeclaredField(Material.class, "maxStack");
         this.ctorField = ReflectionUtil.getDeclaredField(Material.class, "ctor");
         this.dataField = ReflectionUtil.getDeclaredField(Material.class, "data");
         this.itemTypeField = ReflectionUtil.getDeclaredField(Material.class, "itemType");
@@ -55,8 +53,6 @@ public class MaterialEnumInjector extends EnumInjector<Material> {
             this.idField.set(material, -1);
             // Set its isLegacy()
             this.legacyField.set(material, false);
-            // Set its getMaxStackSize()
-            this.maxStackField.set(material, itemType == null ? 64 : itemType.getMaxStackSize());
             // Set its MaterialData constructor
             this.ctorField.set(material, MaterialData.class.getConstructor(Material.class, byte.class));
             // Set its public data field
