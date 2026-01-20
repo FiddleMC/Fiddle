@@ -6,8 +6,8 @@
              @Override
 -            public void encode(RegistryFriendlyByteBuf buffer, ItemStack value) {
 -                if (value.isEmpty() || value.getItem() == null) { // CraftBukkit - NPE fix itemstack.getItem()
-+            public void encode(RegistryFriendlyByteBuf buffer, ItemStack unmappedValue) { // Fiddle - Packet mapping - Apply at ItemStack encoding
-+                if (unmappedValue.isEmpty() || unmappedValue.getItem() == null) { // CraftBukkit - NPE fix itemstack.getItem() // Fiddle - Packet mapping - Apply at ItemStack encoding
++            public void encode(RegistryFriendlyByteBuf buffer, ItemStack unmappedValue) { // Fiddle - Packet mapping - Item - Apply at ItemStack encoding
++                if (unmappedValue.isEmpty() || unmappedValue.getItem() == null) { // CraftBukkit - NPE fix itemstack.getItem() // Fiddle - Packet mapping - Item - Apply at ItemStack encoding
                      buffer.writeVarInt(0);
                  } else {
 +                    // Fiddle start - Packet mapping - Apply at ItemStack encoding
