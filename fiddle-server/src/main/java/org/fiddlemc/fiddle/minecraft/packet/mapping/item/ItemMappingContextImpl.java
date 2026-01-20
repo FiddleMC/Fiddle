@@ -1,7 +1,7 @@
 package org.fiddlemc.fiddle.minecraft.packet.mapping.item;
 
 import net.minecraft.world.item.ItemStack;
-import org.fiddlemc.fiddle.client.ClientProfile;
+import org.fiddlemc.fiddle.client.ClientView;
 
 /**
  * A simple implementation of {@link ItemMapping.Context}.
@@ -9,13 +9,13 @@ import org.fiddlemc.fiddle.client.ClientProfile;
 public class ItemMappingContextImpl implements ItemMapping.Context {
 
     private final ItemStack original;
-    private final ClientProfile clientProfile;
+    private final ClientView clientView;
     private final boolean isItemStackInItemFrame;
     private final boolean isStonecutterRecipeResult;
 
-    public ItemMappingContextImpl(ItemStack original, ClientProfile clientProfile, boolean isItemStackInItemFrame, boolean isStonecutterRecipeResult) {
+    public ItemMappingContextImpl(ItemStack original, ClientView clientView, boolean isItemStackInItemFrame, boolean isStonecutterRecipeResult) {
         this.original = original;
-        this.clientProfile = clientProfile;
+        this.clientView = clientView;
         this.isItemStackInItemFrame = isItemStackInItemFrame;
         this.isStonecutterRecipeResult = isStonecutterRecipeResult;
     }
@@ -26,8 +26,8 @@ public class ItemMappingContextImpl implements ItemMapping.Context {
     }
 
     @Override
-    public ClientProfile getClientProfile() {
-        return this.clientProfile;
+    public ClientView getClientView() {
+        return this.clientView;
     }
 
     @Override

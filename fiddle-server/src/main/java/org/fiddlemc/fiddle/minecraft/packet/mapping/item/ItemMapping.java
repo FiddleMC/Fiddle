@@ -1,7 +1,7 @@
 package org.fiddlemc.fiddle.minecraft.packet.mapping.item;
 
 import net.minecraft.world.item.ItemStack;
-import org.fiddlemc.fiddle.client.ClientProfile;
+import org.fiddlemc.fiddle.client.ClientView;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -18,9 +18,9 @@ public interface ItemMapping {
         ItemStack getOriginal();
 
         /**
-         * @return The {@link ClientProfile} of the client that this mapping is being done for.
+         * @return The {@link ClientView} of the client that this mapping is being done for.
          */
-        ClientProfile getClientProfile();
+        ClientView getClientView();
 
         /**
          * @return Whether the item stack on which this mapping is being applied

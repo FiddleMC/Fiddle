@@ -1,0 +1,11 @@
+--- a/net/minecraft/world/entity/player/Player.java
++++ b/net/minecraft/world/entity/player/Player.java
+@@ -122,7 +_,7 @@
+ import net.minecraft.world.scores.Team;
+ import org.jspecify.annotations.Nullable;
+ 
+-public abstract class Player extends Avatar implements ContainerUser {
++public abstract class Player extends Avatar implements ContainerUser, org.fiddlemc.fiddle.client.ClientViewProvider { // Fiddle - Client view - Provide from Player
+     public static final int MAX_HEALTH = 20;
+     public static final int SLEEP_DURATION = 100;
+     public static final int WAKE_UP_DURATION = 10;

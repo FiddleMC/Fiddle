@@ -8,14 +8,15 @@
          this.server.spark.enableEarlyIfRequested(); // Paper - spark
          // Paper start - fix converting txt to json file; convert old users earlier after PlayerList creation but before file load/save
          if (this.convertOldUsers()) {
-@@ -275,6 +_,11 @@
+@@ -275,6 +_,12 @@
          com.destroystokyo.paper.Metrics.PaperMetrics.startMetrics(); // Paper - start metrics
          com.destroystokyo.paper.VersionHistoryManager.INSTANCE.getClass(); // Paper - load version history now
  
-+        // Fiddle start - Packet transformation - Register replacements
-+        io.papermc.paper.plugin.lifecycle.event.LifecycleEventRunner.INSTANCE.callEvent(org.fiddlemc.fiddle.minecraft.packet.mapping.item.ItemMappingPipeline.compose(), new org.fiddlemc.fiddle.minecraft.packet.mapping.item.ItemMappingPipeline.ComposeEvent());
-+        org.fiddlemc.fiddle.minecraft.packet.mapping.item.ItemMappingPipeline.get().minimizeListDuplication();
-+        // Fiddle end - Packet transformation - Register replacements
++        // Fiddle start - Packet mapping - Register replacements
++        org.fiddlemc.fiddle.minecraft.packet.mapping.item.ItemMappingPipeline.ComposeEvent itemMappingPipelienComposeEvent = new org.fiddlemc.fiddle.minecraft.packet.mapping.item.ItemMappingPipeline.ComposeEvent();
++        io.papermc.paper.plugin.lifecycle.event.LifecycleEventRunner.INSTANCE.callEvent(org.fiddlemc.fiddle.minecraft.packet.mapping.item.ItemMappingPipeline.compose(), itemMappingPipelienComposeEvent);
++        itemMappingPipelienComposeEvent.bake();
++        // Fiddle end - Packet mapping - Register replacements
 +
          // this.worldData.setGameType(properties.gameMode.get()); // CraftBukkit - moved to world loading
          LOGGER.info("Default game type: {}", properties.gameMode.get());

@@ -11,7 +11,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
-import org.fiddlemc.fiddle.client.ClientProfile;
+import org.fiddlemc.fiddle.client.ClientView;
 import org.fiddlemc.fiddle.minecraft.packet.mapping.item.ItemMappingPipeline;
 import org.fiddlemc.fiddle.paper.registry.data.FiddleBlockRegistryEntry;
 import org.fiddlemc.fiddle.paper.registry.data.FiddleItemRegistryEntry;
@@ -70,7 +70,7 @@ public class TestPluginBootstrap implements PluginBootstrap {
         context.getLifecycleManager().registerEventHandler(ItemMappingPipeline.compose(), event -> {
             context.getLogger().info("Registering item mappings...");
             // Map ash to gunpowder
-            event.getRegistrar().register(ClientProfile.AwarenessLevel.JAVA_DEFAULT, PluginItems.ASH.get(), (itemStack, mappingContext) -> {
+            event.getRegistrar().register(ClientView.AwarenessLevel.JAVA_DEFAULT, PluginItems.ASH.get(), (itemStack, mappingContext) -> {
                 // Change the type
                 itemStack.setItem(Items.GUNPOWDER);
                 // Set the desired item name
@@ -78,7 +78,7 @@ public class TestPluginBootstrap implements PluginBootstrap {
                 return itemStack;
             });
             // Map ash blocks to light gray concrete powder
-            event.getRegistrar().register(ClientProfile.AwarenessLevel.JAVA_DEFAULT, PluginItems.ASH_BLOCK.get(), (itemStack, mappingContext) -> {
+            event.getRegistrar().register(ClientView.AwarenessLevel.JAVA_DEFAULT, PluginItems.ASH_BLOCK.get(), (itemStack, mappingContext) -> {
                 // Change the type
                 itemStack.setItem(Items.LIGHT_GRAY_CONCRETE_POWDER);
                 // Set the desired item name

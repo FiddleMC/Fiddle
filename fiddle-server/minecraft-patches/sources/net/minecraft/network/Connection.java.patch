@@ -1,0 +1,34 @@
+--- a/net/minecraft/network/Connection.java
++++ b/net/minecraft/network/Connection.java
+@@ -29,7 +_,6 @@
+ import java.util.Queue;
+ import java.util.concurrent.RejectedExecutionException;
+ import java.util.function.Consumer;
+-import javax.crypto.Cipher;
+ import net.minecraft.SharedConstants;
+ import net.minecraft.network.chat.Component;
+ import net.minecraft.network.protocol.BundlerInfo;
+@@ -55,7 +_,14 @@
+ import org.slf4j.Marker;
+ import org.slf4j.MarkerFactory;
+ 
+-public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
++public class Connection extends SimpleChannelInboundHandler<Packet<?>> implements org.fiddlemc.fiddle.client.ClientViewProvider { // Fiddle - Client view - Provide from Connection
++    // Fiddle start - Client view - Provide from Connection
++    private org.fiddlemc.fiddle.client.@Nullable ClientView clientView = new org.fiddlemc.fiddle.client.JavaDefaultClientViewImpl(); // TODO actually determine the view
++    @Override
++    public org.fiddlemc.fiddle.client.@Nullable ClientView getClientView() {
++        return this.clientView;
++    }
++    // Fiddle end - Client view - Provide from Connection
+     private static final float AVERAGE_PACKETS_SMOOTHING = 0.75F;
+     private static final Logger LOGGER = LogUtils.getLogger();
+     public static final Marker ROOT_MARKER = MarkerFactory.getMarker("NETWORK");
+@@ -136,6 +_,7 @@
+     public void channelActive(ChannelHandlerContext ctx) throws Exception {
+         super.channelActive(ctx);
+         this.channel = ctx.channel();
++        this.channel.attr(org.fiddlemc.fiddle.client.NettyClientViewProviderAttribute.ATTRIBUTE_KEY).set(new java.lang.ref.WeakReference<>(this)); // Fiddle - Client view - Store provider in channel
+         this.address = this.channel.remoteAddress();
+         this.preparing = false; // Spigot
+         if (this.delayedDisconnect != null) {

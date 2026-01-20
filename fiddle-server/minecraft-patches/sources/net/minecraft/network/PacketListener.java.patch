@@ -1,0 +1,11 @@
+--- a/net/minecraft/network/PacketListener.java
++++ b/net/minecraft/network/PacketListener.java
+@@ -8,7 +_,7 @@
+ import net.minecraft.network.protocol.PacketFlow;
+ import net.minecraft.network.protocol.PacketUtils;
+ 
+-public interface PacketListener {
++public interface PacketListener extends org.fiddlemc.fiddle.client.ClientViewProvider { // Fiddle - Client view - Provide from PacketListener
+     PacketFlow flow();
+ 
+     ConnectionProtocol protocol();

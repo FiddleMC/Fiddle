@@ -1,0 +1,10 @@
+--- a/net/minecraft/network/PacketEncoder.java
++++ b/net/minecraft/network/PacketEncoder.java
+@@ -24,6 +_,7 @@
+ 
+         try {
+             ADVENTURE_LOCALE.set(channelHandlerContext.channel().attr(io.papermc.paper.adventure.PaperAdventure.LOCALE_ATTRIBUTE).get()); // Paper - adventure; set player's locale
++            org.fiddlemc.fiddle.client.ClientViewProviderThreadLocal.THREAD_LOCAL.set(channelHandlerContext.channel().attr(org.fiddlemc.fiddle.client.NettyClientViewProviderAttribute.ATTRIBUTE_KEY).get()); // Fiddle - Client view - Store provider in thread
+             this.protocolInfo.codec().encode(byteBuf, packet);
+             int i = byteBuf.readableBytes();
+             if (LOGGER.isDebugEnabled()) {

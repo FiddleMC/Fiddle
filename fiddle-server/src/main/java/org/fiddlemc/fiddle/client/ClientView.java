@@ -11,20 +11,21 @@ package org.fiddlemc.fiddle.client;
  * loaded (so the moment after accepting, downloading and successful loading) or not loaded (so the moment it is either
  * confirmed that the player declined the resource pack, that the download failed or that another type of error
  * occurred after which we can be sure the resource pack will not be successfully loaded anymore), that player is not
- * assigned their {@link ClientProfile} yet. This also implies that we must make sure not to send any relevant
+ * assigned their {@link ClientView} yet. This also implies that we must make sure not to send any relevant
  * data (such as chunks, entities and potentially even the player's inventory - although that can be sent
- * according to a fallback profile and updated as necessary) to the player before their profile
+ * according to a fallback view and updated as necessary) to the player before their view
  * is determined.
  * <br>
  * Apart from the interval before having definitely loaded or not loaded the resource pack, a player's session
- * (and as such their {@link ClientProfile} value) lasts from joining the server until disconnecting.
+ * (and as such their {@link ClientView} value) lasts from joining the server until disconnecting.
  * </p>
  * <p>
- * This class may be extended to support additional values relevant to certain profiles
+ * This class may be extended to support additional values relevant to certain views
  * (such as the protocol version of the client).
  * </p>
  */
-public interface ClientProfile {
+public interface ClientView {
+
     AwarenessLevel getAwarenessLevel();
 
     /**
@@ -52,7 +53,7 @@ public interface ClientProfile {
          * Additional rendering can be done through the use of entities.
          * </p>
          */
-        JAVA_WITH_RESOURCE_PACK,
+        JAVA_WITH_RESOURCE_PACK, // TODO implement
 
         /**
          * For Java clients that are have the client mod, i.e. they have the mod installed and are able to use
@@ -62,6 +63,14 @@ public interface ClientProfile {
          * the necessary information to interpret the server-side block and item keys directly from then on.
          * </p>
          */
-        JAVA_WITH_CLIENT_MOD
+        JAVA_WITH_CLIENT_MOD // TODO implement
     }
+
+    /**
+     * @return A default {@link ClientView} that is used for mappings when no view is known.
+     */
+    static ClientView createDefault() {
+        return new JavaDefaultClientViewImpl();
+    }
+
 }
