@@ -100,7 +100,7 @@ public final class ItemMappingPipeline {
      * @param context The context of this mapping, where the {@link ItemMapping.Context#getOriginal} is null.
      * @return The resulting {@link ItemStack}, which may or may not be the given {@code itemStack}.
      */
-    public ItemStack apply(ItemStack itemStack, ItemMappingContextImpl context) { // TODO call
+    public ItemStack apply(ItemStack itemStack, ItemMappingContextImpl context) {
         Map<Item, ItemMapping[]> mapForAwarenessLevel = this.mappings[context.getClientView().getAwarenessLevel().ordinal()];
         ItemMapping @Nullable [] mappings = mapForAwarenessLevel.get(itemStack.getItem());
         if (mappings == null) {

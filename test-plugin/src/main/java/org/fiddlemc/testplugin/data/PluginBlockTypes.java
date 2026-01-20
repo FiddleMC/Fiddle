@@ -7,7 +7,7 @@ import org.bukkit.block.BlockType;
 import java.util.function.Supplier;
 
 /**
- * Don't call a method of this class before its block type has been registered.
+ * Don't call {@link Supplier#get} on a field of this class before its block type has been registered.
  */
 public final class PluginBlockTypes {
     public static Supplier<BlockType> ASH_BLOCK = blockType("example:ash_block");

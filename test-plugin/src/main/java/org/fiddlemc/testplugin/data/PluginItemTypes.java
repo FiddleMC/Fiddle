@@ -7,7 +7,7 @@ import org.bukkit.inventory.ItemType;
 import java.util.function.Supplier;
 
 /**
- * Don't call a method of this class before its item type has been registered.
+ * Don't call {@link Supplier#get} on a field of this class before its item type has been registered.
  */
 public final class PluginItemTypes {
     public static Supplier<ItemType> ASH = itemType("example:ash");

@@ -29,6 +29,33 @@ public interface ClientView {
     AwarenessLevel getAwarenessLevel();
 
     /**
+     * @return True only if this client understands all server-side translatables
+     * (such as in the case of a client that has loaded the resource pack containing them),
+     * false if it can not be guaranteed.
+     */
+    default boolean understandsAllServerSideTranslatables() {
+        return false;
+    }
+
+    /**
+     * @return True only if this client understands all server-side items
+     * (such as in the case of a client mod that has added them to its client-side registry),
+     * false if it can not be guaranteed.
+     */
+    default boolean understandsAllServerSideItems() {
+        return false;
+    }
+
+    /**
+     * @return True only if this client understands all server-side blocks
+     * (such as in the case of a client mod that has added them to its client-side registry),
+     * false if it can not be guaranteed.
+     */
+    default boolean understandsAllServerSideBlocks() {
+        return false;
+    }
+
+    /**
      * This enum represents the major categorization of the client's capability
      * to interpret data sent by the server.
      */

@@ -1,6 +1,6 @@
 --- a/net/minecraft/network/FriendlyByteBuf.java
 +++ b/net/minecraft/network/FriendlyByteBuf.java
-@@ -68,9 +_,17 @@
+@@ -68,9 +_,19 @@
  import org.joml.Vector3fc;
  import org.jspecify.annotations.Nullable;
  
@@ -16,6 +16,8 @@
 +        return clientViewProvider == null ? null : clientViewProvider.getClientView();
 +    }
 +    // Fiddle - Client view - Store provider in FriendlyByteBuf - Easy access via ClientViewProvider interface
++    public boolean isEncodingStonecutterRecipeResult; // Fiddle - Packet mapping - Item - Stonecutter recipe result - Store in FriendlyByteBuf
++    public boolean isEncodingItemFrameItem; // Fiddle - Packet mapping - Item - Item frame item - Store in FriendlyByteBuf
      public static final short MAX_STRING_LENGTH = 32767;
      public static final int MAX_COMPONENT_STRING_LENGTH = 262144;
      private static final int PUBLIC_KEY_SIZE = 256;

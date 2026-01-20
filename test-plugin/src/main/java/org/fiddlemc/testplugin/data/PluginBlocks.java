@@ -7,7 +7,7 @@ import net.minecraft.world.level.block.Block;
 import java.util.function.Supplier;
 
 /**
- * Don't call a method of this class before its block has been registered.
+ * Don't call {@link Supplier#get} on a field of this class before its block has been registered.
  */
 public final class PluginBlocks {
     public static Supplier<Block> ASH_BLOCK = block("example:ash_block");
