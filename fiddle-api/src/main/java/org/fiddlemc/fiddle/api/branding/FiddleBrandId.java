@@ -1,4 +1,4 @@
-package org.fiddlemc.fiddle.api;
+package org.fiddlemc.fiddle.api.branding;
 
 import net.kyori.adventure.key.Key;
 

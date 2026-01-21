@@ -12,6 +12,6 @@
  * </p>
  */
 @NullMarked
-package org.fiddlemc.fiddle.api.configuration;
+package org.fiddlemc.fiddle.impl.configuration.api;
 
 import org.jspecify.annotations.NullMarked;

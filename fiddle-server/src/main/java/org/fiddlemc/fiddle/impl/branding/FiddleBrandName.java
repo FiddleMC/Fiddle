@@ -1,4 +1,4 @@
-package org.fiddlemc.fiddle.impl;
+package org.fiddlemc.fiddle.impl.branding;
 
 /**
  * Holder for {@link #BRAND_FIDDLE_NAME}.
