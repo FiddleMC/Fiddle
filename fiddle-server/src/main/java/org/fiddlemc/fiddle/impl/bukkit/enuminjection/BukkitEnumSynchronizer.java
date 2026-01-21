@@ -41,10 +41,34 @@ public abstract class BukkitEnumSynchronizer<E extends Enum<E>, T, I extends Enu
     protected abstract String getEnumName(T sourceValue) throws EnumNameMappingException;
 
     /**
+     * @param enumName A string being considered for an enum value's {@link Enum#name()}.
+     * @throws EnumNameMappingException If the given string is not an acceptable enum name.
+     */
+    protected void checkAcceptableEnumName(String enumName) throws EnumNameMappingException {
+        boolean hasNonUnderscore = false;
+        for (char c : enumName.toCharArray()) {
+            if (c == '_') {
+                // Underscores are allowed
+                continue;
+            }
+            hasNonUnderscore = true;
+            if ((c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9')) {
+                // Uppercase alphanumeric characters are allowed
+                continue;
+            }
+            throw new EnumNameMappingException("An enum name (" + enumName + ") contains a " + c + " character, which is not allowed by Fiddle");
+        }
+        if (!hasNonUnderscore) {
+            throw new EnumNameMappingException("An enum name (" + enumName + ") contains only underscores, which is not allowed by Java");
+        }
+        // The enum name is acceptable
+    }
+
+    /**
      * Adds the new values into the enum.
      *
      * @throws EnumNameMappingException If a source value cannot be mapped to an acceptable enum name.
-     * @throws Exception If something goes wrong.
+     * @throws Exception                If something goes wrong.
      */
     public void run() throws EnumNameMappingException, Exception {
 
@@ -60,6 +84,8 @@ public abstract class BukkitEnumSynchronizer<E extends Enum<E>, T, I extends Enu
         for (T sourceValue : sourceValues) {
             // Determine the enum name
             String enumName = this.getEnumName(sourceValue);
+            // Verify sure the resulting enum name is valid
+            this.checkAcceptableEnumName(enumName);
             // Stage the new value
             this.stage(enumName, sourceValue);
         }

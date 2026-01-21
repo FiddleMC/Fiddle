@@ -45,19 +45,24 @@ public abstract class KeyedSourceBukkitEnumSynchronizer<E extends Enum<E>, T, I 
      *                                  the given {@code key} to an acceptable enum name.
      */
     protected void checkAcceptableNamespacedKeyPart(NamespacedKey key, String part) throws EnumNameMappingException {
+        boolean hasNonUnderscore = false;
         for (char c : part.toCharArray()) {
-            if ((c >= 'a' && c <= 'z') || (c >= '0' && c <= '9')) {
-                // Alphanumeric characters are allowed
-                continue;
-            }
             if (c == '_') {
                 // Underscores are allowed
+                continue;
+            }
+            hasNonUnderscore = true;
+            if ((c >= 'a' && c <= 'z') || (c >= '0' && c <= '9')) {
+                // Lowercase alphanumeric characters are allowed
                 continue;
             }
             if (c == '.' || c == '-' || c == '/') {
                 throw new EnumNameMappingException("A block or item key (" + key + ") contains a " + c + " character, which is technically allowed by Minecraft, but not by Fiddle");
             }
             throw new EnumNameMappingException("A block or item key (" + key + ") contains a " + c + " character, which is not allowed by Fiddle");
+        }
+        if (!hasNonUnderscore) {
+            throw new EnumNameMappingException("A block or item key part (" + key + ") contains only underscores, which is technically allowed by Minecraft, but not by Fiddle");
         }
         // The part is acceptable
     }
