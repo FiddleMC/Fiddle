@@ -6,7 +6,7 @@ import io.papermc.paper.plugin.lifecycle.event.types.PrioritizableLifecycleEvent
 import it.unimi.dsi.fastutil.ints.IntObjectPair;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import org.fiddlemc.fiddle.api.client.ClientView;
+import org.fiddlemc.fiddle.api.client.view.ClientView;
 import org.fiddlemc.fiddle.api.minecraft.packet.mapping.item.ItemMappingPipeline;
 import org.fiddlemc.fiddle.api.minecraft.packet.mapping.item.ItemMappingRegistrar;
 import org.jspecify.annotations.Nullable;

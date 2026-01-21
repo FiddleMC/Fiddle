@@ -1,7 +1,7 @@
 package org.fiddlemc.fiddle.impl.minecraft.packet.mapping.item;
 
 import net.minecraft.world.item.ItemStack;
-import org.fiddlemc.fiddle.api.client.ClientView;
+import org.fiddlemc.fiddle.api.client.view.ClientView;
 
 /**
  * A simple implementation of {@link ItemMapping.Context}.

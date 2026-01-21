@@ -3,7 +3,7 @@ package org.fiddlemc.fiddle.impl.minecraft.packet.mapping.item.hoverevent;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.world.item.ItemStack;
-import org.fiddlemc.fiddle.impl.client.ClientViewProviderThreadLocal;
+import org.fiddlemc.fiddle.impl.client.view.ClientViewProviderThreadLocal;
 import org.fiddlemc.fiddle.impl.minecraft.packet.mapping.item.ItemMappingContextImpl;
 import org.fiddlemc.fiddle.impl.minecraft.packet.mapping.item.ItemMappingPipelineImpl;
 

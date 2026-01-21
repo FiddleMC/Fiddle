@@ -1,6 +1,6 @@
-package org.fiddlemc.fiddle.impl.client;
+package org.fiddlemc.fiddle.impl.client.view;
 
-import org.fiddlemc.fiddle.api.client.ClientView;
+import org.fiddlemc.fiddle.api.client.view.ClientView;
 
 /**
  * Holder for {@link #createDefault()}.

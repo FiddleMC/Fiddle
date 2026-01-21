@@ -1,4 +1,4 @@
-package org.fiddlemc.fiddle.api.client;
+package org.fiddlemc.fiddle.api.client.view;
 
 /**
  * This class represents the static circumstances under which a client (typically a player) observes the data sent.

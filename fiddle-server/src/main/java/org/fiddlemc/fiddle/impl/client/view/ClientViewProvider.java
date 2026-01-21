@@ -1,9 +1,9 @@
-package org.fiddlemc.fiddle.impl.client;
+package org.fiddlemc.fiddle.impl.client.view;
 
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerCommonPacketListenerImpl;
 import net.minecraft.server.network.ServerLoginPacketListenerImpl;
-import org.fiddlemc.fiddle.api.client.ClientView;
+import org.fiddlemc.fiddle.api.client.view.ClientView;
 import org.jspecify.annotations.Nullable;
 
 /**

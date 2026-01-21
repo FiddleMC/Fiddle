@@ -11,7 +11,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
-import org.fiddlemc.fiddle.api.client.ClientView;
+import org.fiddlemc.fiddle.api.client.view.ClientView;
 import org.fiddlemc.fiddle.api.paper.registry.data.NMSBlockRegistryEntryBuilder;
 import org.fiddlemc.fiddle.api.paper.registry.data.NMSItemRegistryEntryBuilder;
 import org.fiddlemc.fiddle.api.minecraft.packet.mapping.item.ItemMappingPipeline;

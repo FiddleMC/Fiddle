@@ -1,7 +1,7 @@
 package org.fiddlemc.fiddle.impl.minecraft.packet.mapping.item;
 
 import net.minecraft.world.item.Item;
-import org.fiddlemc.fiddle.api.client.ClientView;
+import org.fiddlemc.fiddle.api.client.view.ClientView;
 import org.fiddlemc.fiddle.api.minecraft.packet.mapping.item.NMSItemMappingRegistrar;
 import org.fiddlemc.fiddle.impl.minecraft.registries.ItemRegistry;
 import org.jspecify.annotations.Nullable;

@@ -1,4 +1,4 @@
-package org.fiddlemc.fiddle.impl.client;
+package org.fiddlemc.fiddle.impl.client.view;
 
 import io.netty.channel.Channel;
 import io.netty.util.AttributeKey;

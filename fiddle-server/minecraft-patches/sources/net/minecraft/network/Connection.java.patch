@@ -5,11 +5,11 @@
  import org.slf4j.MarkerFactory;
  
 -public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
-+public class Connection extends SimpleChannelInboundHandler<Packet<?>> implements org.fiddlemc.fiddle.impl.client.ClientViewProvider { // Fiddle - Client view - Provide from Connection
++public class Connection extends SimpleChannelInboundHandler<Packet<?>> implements org.fiddlemc.fiddle.impl.client.view.ClientViewProvider { // Fiddle - Client view - Provide from Connection
 +    // Fiddle start - Client view - Provide from Connection
-+    private org.fiddlemc.fiddle.api.client.@Nullable ClientView clientView = new org.fiddlemc.fiddle.impl.client.JavaDefaultClientViewImpl(); // TODO actually determine the view
++    private org.fiddlemc.fiddle.api.client.view.@Nullable ClientView clientView = new org.fiddlemc.fiddle.impl.client.view.JavaDefaultClientViewImpl(); // TODO actually determine the view
 +    @Override
-+    public org.fiddlemc.fiddle.api.client.@Nullable ClientView getClientView() {
++    public org.fiddlemc.fiddle.api.client.view.@Nullable ClientView getClientView() {
 +        return this.clientView;
 +    }
 +    // Fiddle end - Client view - Provide from Connection
@@ -20,7 +20,7 @@
      public void channelActive(ChannelHandlerContext ctx) throws Exception {
          super.channelActive(ctx);
          this.channel = ctx.channel();
-+        this.channel.attr(org.fiddlemc.fiddle.impl.client.NettyClientViewProviderAttribute.ATTRIBUTE_KEY).set(new java.lang.ref.WeakReference<>(this)); // Fiddle - Client view - Store provider in channel
++        this.channel.attr(org.fiddlemc.fiddle.impl.client.view.NettyClientViewProviderAttribute.ATTRIBUTE_KEY).set(new java.lang.ref.WeakReference<>(this)); // Fiddle - Client view - Store provider in channel
          this.address = this.channel.remoteAddress();
          this.preparing = false; // Spigot
          if (this.delayedDisconnect != null) {

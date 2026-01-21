@@ -2,8 +2,8 @@ package org.fiddlemc.fiddle.impl.minecraft.packet.mapping.item.recipe;
 
 import net.minecraft.network.protocol.game.ClientboundRecipeBookAddPacket;
 import net.minecraft.world.item.crafting.Ingredient;
-import org.fiddlemc.fiddle.api.client.ClientView;
-import org.fiddlemc.fiddle.impl.client.ClientViewProviderThreadLocal;
+import org.fiddlemc.fiddle.api.client.view.ClientView;
+import org.fiddlemc.fiddle.impl.client.view.ClientViewProviderThreadLocal;
 import org.jspecify.annotations.Nullable;
 import java.util.List;
 
