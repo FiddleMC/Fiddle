@@ -3,11 +3,19 @@ package org.fiddlemc.fiddle.impl.configuration;
 import com.mojang.logging.LogUtils;
 import io.papermc.paper.configuration.Configuration;
 import io.papermc.paper.configuration.ConfigurationPart;
+import io.papermc.paper.configuration.WorldConfiguration;
 import net.minecraft.resources.Identifier;
 import org.slf4j.Logger;
 import org.spigotmc.SpigotWorldConfig;
 import org.spongepowered.configurate.objectmapping.meta.Setting;
 
+/**
+ * The world configuration for Fiddle.
+ *
+ * <p>
+ * Analogous to the Paper {@link WorldConfiguration}.
+ * </p>
+ */
 @SuppressWarnings({"FieldCanBeLocal", "FieldMayBeFinal", "NotNullFieldNotInitialized", "InnerClassMayBeStatic"})
 public class FiddleWorldConfiguration extends ConfigurationPart {
     private static final Logger LOGGER = LogUtils.getLogger();

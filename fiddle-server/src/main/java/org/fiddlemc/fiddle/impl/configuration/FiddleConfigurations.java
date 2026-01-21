@@ -27,6 +27,10 @@ import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
 /**
  * The configurations for Fiddle. The instance can be set up before bootstrap,
  * so that the global configuration can be loaded before bootstrap.
+ *
+ * <p>
+ * Analogous to the Paper {@link PaperConfigurations.OriginalPaperConfigurations}.
+ * </p>
  */
 @SuppressWarnings("Convert2Diamond")
 public final class FiddleConfigurations extends PaperConfigurations<FiddleGlobalConfiguration, FiddleWorldConfiguration> {
@@ -131,7 +135,8 @@ public final class FiddleConfigurations extends PaperConfigurations<FiddleGlobal
             .header(FIDDLE_GLOBAL_HEADER)
             .serializers(builder -> builder
                 .register(new ServerboundPacketClassSerializer())
-                .register(new RegistryValueSerializer<>(new TypeToken<DataComponentType<?>>() {}, registryAccess, Registries.DATA_COMPONENT_TYPE, false))
+                .register(new RegistryValueSerializer<>(new TypeToken<DataComponentType<?>>() {
+                }, registryAccess, Registries.DATA_COMPONENT_TYPE, false))
             );
     }
 
