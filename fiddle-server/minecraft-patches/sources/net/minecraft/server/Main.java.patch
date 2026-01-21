@@ -10,12 +10,12 @@
 +            // Fiddle end - Create EULA before bootstrap
 +
 +            // Fiddle start - Configuration - Load global configuration before bootstrap
-+            var fiddleConfigurations = org.fiddlemc.fiddle.configuration.FiddleConfigurations.get(optionSet);
++            var fiddleConfigurations = org.fiddlemc.fiddle.impl.configuration.FiddleConfigurations.get(optionSet);
 +            fiddleConfigurations.initializeGlobalConfiguration(null);
 +            // Fiddle end - Configuration - Load global configuration before bootstrap
 +
 +            // Fiddle start - Confirm permanence
-+            if (!org.fiddlemc.fiddle.configuration.FiddleGlobalConfiguration.get()._enabled) {
++            if (!org.fiddlemc.fiddle.impl.configuration.FiddleGlobalConfiguration.get()._enabled) {
 +                LOGGER.warn("");
 +                LOGGER.warn("********************************************************************************");
 +                LOGGER.warn("You must confirm that you wish to run Fiddle in this folder.");

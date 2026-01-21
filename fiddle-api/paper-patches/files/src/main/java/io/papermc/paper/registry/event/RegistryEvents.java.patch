@@ -5,8 +5,8 @@
      public static final RegistryEventProvider<Dialog, DialogRegistryEntry.Builder> DIALOG = create(RegistryKey.DIALOG);
      // End generate - RegistryEvents
 +    // Fiddle start - More data-driven - Paper API
-+    public static final RegistryEventProvider<org.bukkit.inventory.ItemType, org.fiddlemc.fiddle.paper.registry.data.ItemRegistryEntry.Builder> ITEM = create(RegistryKey.ITEM);
-+    public static final RegistryEventProvider<org.bukkit.block.BlockType, org.fiddlemc.fiddle.paper.registry.data.BlockRegistryEntry.Builder> BLOCK = create(RegistryKey.BLOCK);
++    public static final RegistryEventProvider<org.bukkit.inventory.ItemType, org.fiddlemc.fiddle.api.paper.registry.data.ItemRegistryEntry.Builder> ITEM = create(RegistryKey.ITEM);
++    public static final RegistryEventProvider<org.bukkit.block.BlockType, org.fiddlemc.fiddle.api.paper.registry.data.BlockRegistryEntry.Builder> BLOCK = create(RegistryKey.BLOCK);
 +    // Fiddle end - More data-driven - Paper API
  
      private RegistryEvents() {

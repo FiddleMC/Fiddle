@@ -10,17 +10,17 @@
 +     * {@link Block#BLOCK_STATE_REGISTRY}.
 +     * <p>
 +     * This will be -1 until initialized in
-+     * {@link org.fiddlemc.fiddle.minecraft.registries.BlockStateRegistry#add}.
++     * {@link BlockStateRegistry#add}.
 +     * </p>
 +     */
 +    public int indexInBlockStateRegistry = -1;
 +
 +    /**
 +     * The {@linkplain net.minecraft.core.Registry#getId index} at which this block state is registered in
-+     * {@link org.fiddlemc.fiddle.minecraft.registries.VanillaOnlyBlockStateRegistry}.
++     * {@link VanillaOnlyBlockStateRegistry}.
 +     * <p>
 +     * This will be -1 until initialized in
-+     * {@link org.fiddlemc.fiddle.minecraft.registries.VanillaOnlyBlockStateRegistry#add}.
++     * {@link VanillaOnlyBlockStateRegistry#add}.
 +     * </p>
 +     */
 +    public int indexInVanillaOnlyBlockStateRegistry = -1;

@@ -5,7 +5,7 @@
      public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundRecipeBookAddPacket> STREAM_CODEC = StreamCodec.composite(
          ClientboundRecipeBookAddPacket.Entry.STREAM_CODEC.apply(ByteBufCodecs.list()),
 -        ClientboundRecipeBookAddPacket::entries,
-+        org.fiddlemc.fiddle.minecraft.packet.mapping.item.recipe.RecipeBookAddPacketEntriesFilterForClientView::getEntriesFilteredForClientView, // Fiddle - Packet mapping - Recipes - Remove recipes that client can't accept
++        org.fiddlemc.fiddle.impl.minecraft.packet.mapping.item.recipe.RecipeBookAddPacketEntriesFilterForClientView::getEntriesFilteredForClientView, // Fiddle - Packet mapping - Recipes - Remove recipes that client can't accept
          ByteBufCodecs.BOOL,
          ClientboundRecipeBookAddPacket::replace,
          ClientboundRecipeBookAddPacket::new

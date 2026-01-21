@@ -10,7 +10,7 @@
 +     * {@link BuiltInRegistries#ITEM}.
 +     * <p>
 +     * This will be null until initialized in
-+     * {@link org.fiddlemc.fiddle.minecraft.registries.ItemRegistry#register}.
++     * {@link org.fiddlemc.fiddle.impl.minecraft.registries.ItemRegistry#register}.
 +     * </p>
 +     */
 +    public net.minecraft.resources.Identifier keyInItemRegistry = null;
@@ -20,17 +20,17 @@
 +     * {@link BuiltInRegistries#ITEM}.
 +     * <p>
 +     * This will be -1 until initialized in
-+     * {@link org.fiddlemc.fiddle.minecraft.registries.ItemRegistry#register}.
++     * {@link org.fiddlemc.fiddle.impl.minecraft.registries.ItemRegistry#register}.
 +     * </p>
 +     */
 +    public int indexInItemRegistry = -1;
 +
 +    /**
 +     * The {@linkplain net.minecraft.core.Registry#getId index} at which this item is registered in
-+     * {@link org.fiddlemc.fiddle.minecraft.registries.VanillaOnlyItemRegistry}.
++     * {@link org.fiddlemc.fiddle.impl.minecraft.registries.VanillaOnlyItemRegistry}.
 +     * <p>
 +     * This will be -1 until initialized in
-+     * {@link org.fiddlemc.fiddle.minecraft.registries.VanillaOnlyItemRegistry#add}.
++     * {@link org.fiddlemc.fiddle.impl.minecraft.registries.VanillaOnlyItemRegistry#add}.
 +     * </p>
 +     */
 +    public int indexInVanillaOnlyItemRegistry = -1;

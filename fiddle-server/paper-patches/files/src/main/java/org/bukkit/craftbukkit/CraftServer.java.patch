@@ -1,10 +1,18 @@
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
+@@ -253,6 +_,7 @@
+ import org.bukkit.scoreboard.Criteria;
+ import org.bukkit.structure.StructureManager;
+ import org.bukkit.util.permissions.DefaultPermissions;
++import org.fiddlemc.fiddle.impl.configuration.FiddleConfigurations;
+ import org.jetbrains.annotations.NotNull;
+ import org.jetbrains.annotations.Nullable;
+ import org.yaml.snakeyaml.LoaderOptions;
 @@ -992,6 +_,7 @@
  
          org.spigotmc.SpigotConfig.init((File) this.console.options.valueOf("spigot-settings")); // Spigot
          this.console.paperConfigurations.reloadConfigs(this.console);
-+        org.fiddlemc.fiddle.configuration.FiddleConfigurations.get(null).reloadConfigs(this.console); // Fiddle - Configuration - Reload on Bukkit reload
++        FiddleConfigurations.get(null).reloadConfigs(this.console); // Fiddle - Configuration - Reload on Bukkit reload
          for (ServerLevel world : this.console.getAllLevels()) {
              // world.serverLevelData.setDifficulty(config.difficulty); // Paper - per level difficulty
              world.setSpawnSettings(world.isSpawningMonsters()); // Paper - per level difficulty (from MinecraftServer#setDifficulty(ServerLevel, Difficulty, boolean))
@@ -17,7 +25,7 @@
 +        @Override
 +        public YamlConfiguration getFiddleConfig()
 +        {
-+            return org.fiddlemc.fiddle.configuration.FiddleConfigurations.get(null).createLegacyObject(CraftServer.this.console);
++            return FiddleConfigurations.get(null).createLegacyObject(CraftServer.this.console);
 +        }
 +        // Fiddle end - Configuration - API
  

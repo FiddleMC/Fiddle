@@ -18,7 +18,7 @@
                  Ingredient.CONTENTS_STREAM_CODEC,
                  SingleItemRecipe::input,
 -                ItemStack.STREAM_CODEC,
-+                isStonecutter ? org.fiddlemc.fiddle.minecraft.packet.mapping.item.StonecutterRecipeResultStreamCodec.STREAM_CODEC : ItemStack.STREAM_CODEC, // Fiddle - Packet mapping - Item - Stonecutter recipe result - Apply codec
++                isStonecutter ? org.fiddlemc.fiddle.impl.minecraft.packet.mapping.item.recipe.stonecutter.StonecutterRecipeResultStreamCodec.STREAM_CODEC : ItemStack.STREAM_CODEC, // Fiddle - Packet mapping - Item - Stonecutter recipe result - Apply codec
                  SingleItemRecipe::result,
                  factory::create
              );

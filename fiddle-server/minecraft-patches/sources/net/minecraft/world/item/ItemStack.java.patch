@@ -11,8 +11,8 @@
                      buffer.writeVarInt(0);
                  } else {
 +                    // Fiddle start - Packet mapping - Apply at ItemStack encoding
-+                    org.fiddlemc.fiddle.minecraft.packet.mapping.item.ItemMappingContextImpl itemMappingContext = new org.fiddlemc.fiddle.minecraft.packet.mapping.item.ItemMappingContextImpl(unmappedValue, buffer.getClientViewOrDefault(), buffer.isEncodingItemFrameItem, buffer.isEncodingStonecutterRecipeResult);
-+                    ItemStack value = org.fiddlemc.fiddle.minecraft.packet.mapping.item.ItemMappingPipeline.get().apply(unmappedValue, itemMappingContext);
++                    org.fiddlemc.fiddle.impl.minecraft.packet.mapping.item.ItemMappingContextImpl itemMappingContext = new org.fiddlemc.fiddle.impl.minecraft.packet.mapping.item.ItemMappingContextImpl(unmappedValue, buffer.getClientViewOrDefault(), buffer.isEncodingItemFrameItem, buffer.isEncodingStonecutterRecipeResult);
++                    ItemStack value = org.fiddlemc.fiddle.impl.minecraft.packet.mapping.item.ItemMappingPipelineImpl.get().apply(unmappedValue, itemMappingContext);
 +                    // Fiddle end - Packet mapping - Apply at ItemStack encoding
                      buffer.writeVarInt(io.papermc.paper.util.sanitizer.ItemComponentSanitizer.sanitizeCount(io.papermc.paper.util.sanitizer.ItemObfuscationSession.currentSession(), value, value.getCount())); // Paper - potentially sanitize count
                      Item.STREAM_CODEC.encode(buffer, value.getItemHolder());

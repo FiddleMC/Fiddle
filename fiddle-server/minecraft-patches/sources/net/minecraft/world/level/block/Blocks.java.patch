@@ -23,6 +23,6 @@
                  blockState.initCache();
              }
          }
-+        org.fiddlemc.fiddle.minecraft.registries.BlockRegistry.get().canInitializeBlockStateCaches = true; // Fiddle - Custom registries for blocks and items - Initialize block state caches for non-vanilla blocks in BlockRegistry#register
++        org.fiddlemc.fiddle.impl.minecraft.registries.BlockRegistry.get().canInitializeBlockStateCaches = true; // Fiddle - Custom registries for blocks and items - Initialize block state caches for non-vanilla blocks in BlockRegistry#register
      }
  }

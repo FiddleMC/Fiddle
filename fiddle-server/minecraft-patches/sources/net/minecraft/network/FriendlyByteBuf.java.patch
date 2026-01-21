@@ -5,14 +5,14 @@
  import org.jspecify.annotations.Nullable;
  
 -public class FriendlyByteBuf extends ByteBuf {
-+public class FriendlyByteBuf extends ByteBuf implements org.fiddlemc.fiddle.client.ClientViewProvider { // Fiddle - Client view - Store provider in FriendlyByteBuf - Easy access via ClientViewProvider interface
++public class FriendlyByteBuf extends ByteBuf implements org.fiddlemc.fiddle.impl.client.ClientViewProvider { // Fiddle - Client view - Store provider in FriendlyByteBuf - Easy access via ClientViewProvider interface
      private final ByteBuf source;
      public final java.util.@Nullable Locale adventure$locale; // Paper - track player's locale for server-side translations
-+    public final java.lang.ref.@Nullable WeakReference<org.fiddlemc.fiddle.client.ClientViewProvider> clientViewProvider; // Fiddle - Client view - Store provider in FriendlyByteBuf
++    public final java.lang.ref.@Nullable WeakReference<org.fiddlemc.fiddle.impl.client.ClientViewProvider> clientViewProvider; // Fiddle - Client view - Store provider in FriendlyByteBuf
 +    // Fiddle start - Client view - Store provider in FriendlyByteBuf - Easy access via ClientViewProvider interface
 +    @Override
-+    public org.fiddlemc.fiddle.client.@Nullable ClientView getClientView() {
-+        org.fiddlemc.fiddle.client.@Nullable ClientViewProvider clientViewProvider = this.clientViewProvider == null ? null : this.clientViewProvider.get();
++    public org.fiddlemc.fiddle.api.client.@Nullable ClientView getClientView() {
++        org.fiddlemc.fiddle.impl.client.@Nullable ClientViewProvider clientViewProvider = this.clientViewProvider == null ? null : this.clientViewProvider.get();
 +        return clientViewProvider == null ? null : clientViewProvider.getClientView();
 +    }
 +    // Fiddle - Client view - Store provider in FriendlyByteBuf - Easy access via ClientViewProvider interface
@@ -25,7 +25,7 @@
  
      public FriendlyByteBuf(ByteBuf source) {
          this.adventure$locale = PacketEncoder.ADVENTURE_LOCALE.get(); // Paper - track player's locale for server-side translations
-+        this.clientViewProvider = org.fiddlemc.fiddle.client.ClientViewProviderThreadLocal.THREAD_LOCAL.get(); // Fiddle - Client view - Store provider in FriendlyByteBuf
++        this.clientViewProvider = org.fiddlemc.fiddle.impl.client.ClientViewProviderThreadLocal.THREAD_LOCAL.get(); // Fiddle - Client view - Store provider in FriendlyByteBuf
          this.source = source;
      }
  

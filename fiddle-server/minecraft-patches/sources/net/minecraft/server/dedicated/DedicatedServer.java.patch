@@ -4,7 +4,7 @@
          this.paperConfigurations.initializeGlobalConfiguration(this.registryAccess());
          this.paperConfigurations.initializeWorldDefaultsConfiguration(this.registryAccess());
          // Paper end - initialize global and world-defaults configuration
-+        org.fiddlemc.fiddle.configuration.FiddleConfigurations.get(this.options).initializeWorldDefaultsConfiguration(this.registryAccess()); // Fiddle - Configuration - Initialize world-defaults configuration
++        org.fiddlemc.fiddle.impl.configuration.FiddleConfigurations.get(this.options).initializeWorldDefaultsConfiguration(this.registryAccess()); // Fiddle - Configuration - Initialize world-defaults configuration
          this.server.spark.enableEarlyIfRequested(); // Paper - spark
          // Paper start - fix converting txt to json file; convert old users earlier after PlayerList creation but before file load/save
          if (this.convertOldUsers()) {
@@ -13,8 +13,8 @@
          com.destroystokyo.paper.VersionHistoryManager.INSTANCE.getClass(); // Paper - load version history now
  
 +        // Fiddle start - Packet mapping - Register replacements
-+        org.fiddlemc.fiddle.minecraft.packet.mapping.item.ItemMappingPipeline.ComposeEvent itemMappingPipelienComposeEvent = new org.fiddlemc.fiddle.minecraft.packet.mapping.item.ItemMappingPipeline.ComposeEvent();
-+        io.papermc.paper.plugin.lifecycle.event.LifecycleEventRunner.INSTANCE.callEvent(org.fiddlemc.fiddle.minecraft.packet.mapping.item.ItemMappingPipeline.compose(), itemMappingPipelienComposeEvent);
++        org.fiddlemc.fiddle.impl.minecraft.packet.mapping.item.ItemMappingPipelineImpl.ComposeEventImpl itemMappingPipelienComposeEvent = new org.fiddlemc.fiddle.impl.minecraft.packet.mapping.item.ItemMappingPipelineImpl.ComposeEventImpl();
++        io.papermc.paper.plugin.lifecycle.event.LifecycleEventRunner.INSTANCE.callEvent(org.fiddlemc.fiddle.impl.minecraft.packet.mapping.item.ItemMappingPipelineImpl.get().compose(), itemMappingPipelienComposeEvent);
 +        itemMappingPipelienComposeEvent.bake();
 +        // Fiddle end - Packet mapping - Register replacements
 +
@@ -28,7 +28,7 @@
 +
 +        // Fiddle start - Synchronize Bukkit enums - Run on server start
 +        try {
-+            @Nullable String errorMessage = org.fiddlemc.fiddle.bukkit.enums.MaterialEnumSynchronizer.run();
++            @Nullable String errorMessage = org.fiddlemc.fiddle.impl.bukkit.enums.MaterialEnumSynchronizer.run();
 +            if (errorMessage != null) {
 +                // Don't start the server with an incomplete Material enum
 +                LOGGER.warn("Failed to extend Bukkit Material enum: {}", errorMessage);
