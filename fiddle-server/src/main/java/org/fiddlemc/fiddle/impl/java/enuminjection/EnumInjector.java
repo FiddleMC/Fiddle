@@ -1,8 +1,8 @@
-package org.fiddlemc.fiddle.impl.java.enums;
+package org.fiddlemc.fiddle.impl.java.enuminjection;
 
-import org.fiddlemc.fiddle.impl.util.function.ConsumerThrowsException;
-import org.fiddlemc.fiddle.impl.util.reflection.ReflectionUtil;
-import org.fiddlemc.fiddle.impl.util.reflection.UnsafeUtil;
+import org.fiddlemc.fiddle.impl.java.util.function.ConsumerThrowsException;
+import org.fiddlemc.fiddle.impl.java.util.reflect.ReflectionUtil;
+import org.fiddlemc.fiddle.impl.java.util.unsafe.UnsafeUtil;
 import org.jspecify.annotations.Nullable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -10,9 +10,13 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Provides functionality for the runtime injection of values into an enum.
+ * An abstract base for an injector that can inject additional values into an enum during runtime.
+ * <p>
+ * First, call {@link #stage} once to prepare each desired value,
+ * then call {@link #commit} to apply the changes.
+ * </p>
  */
-public class EnumInjector<T extends Enum<T>> {
+public abstract class EnumInjector<E extends Enum<E>> {
 
     private final Field ordinalField;
     private final Field nameField;
@@ -20,11 +24,11 @@ public class EnumInjector<T extends Enum<T>> {
     private final Field enumConstantsField;
     private final Field enumConstantDirectoryField;
 
-    protected final Class<T> clazz;
+    protected final Class<E> clazz;
 
-    private final List<StagedInjection<T>> stagedInjections = new ArrayList<>();
+    private final List<StagedInjection<E>> stagedInjections = new ArrayList<>();
 
-    public EnumInjector(Class<T> clazz) throws Exception {
+    public EnumInjector(Class<E> clazz) throws Exception {
         this.ordinalField = ReflectionUtil.getDeclaredField(Enum.class, "ordinal");
         this.nameField = ReflectionUtil.getDeclaredField(Enum.class, "name");
         this.valuesField = ReflectionUtil.getDeclaredField(clazz, "$VALUES");
@@ -46,7 +50,7 @@ public class EnumInjector<T extends Enum<T>> {
      * @param enumName   The {@linkplain Enum#name() name} of the instance.
      * @param onAllocate Extra processing to apply after allocating the instance.
      */
-    protected void stage(String enumName, @Nullable ConsumerThrowsException<T, Exception> onAllocate) {
+    protected void stage(String enumName, @Nullable ConsumerThrowsException<E, Exception> onAllocate) {
         this.stagedInjections.add(new StagedInjection<>(enumName, onAllocate));
     }
 
@@ -56,13 +60,13 @@ public class EnumInjector<T extends Enum<T>> {
     protected void processStagedInjections() throws Exception {
 
         // Get the original values and prepare the new values array
-        T[] originalValues = this.clazz.getEnumConstants();
-        T[] newValues = Arrays.copyOf(originalValues, originalValues.length + this.stagedInjections.size());
+        E[] originalValues = this.clazz.getEnumConstants();
+        E[] newValues = Arrays.copyOf(originalValues, originalValues.length + this.stagedInjections.size());
 
         for (int i = 0; i < this.stagedInjections.size(); i++) {
-            StagedInjection<T> stagedInjection = this.stagedInjections.get(i);
+            StagedInjection<E> stagedInjection = this.stagedInjections.get(i);
             // Allocate a value
-            T value = UnsafeUtil.allocateInstance(this.clazz);
+            E value = UnsafeUtil.allocateInstance(this.clazz);
             // Determine the ordinal
             int ordinal = originalValues.length + i;
             // Set its ordinal()
@@ -99,7 +103,8 @@ public class EnumInjector<T extends Enum<T>> {
         this.stagedInjections.clear();
     }
 
-    private record StagedInjection<T extends Enum<T>>(String enumName, @Nullable ConsumerThrowsException<T, Exception> onAllocate) {
+    private record StagedInjection<T extends Enum<T>>(String enumName,
+                                                      @Nullable ConsumerThrowsException<T, Exception> onAllocate) {
     }
 
 }

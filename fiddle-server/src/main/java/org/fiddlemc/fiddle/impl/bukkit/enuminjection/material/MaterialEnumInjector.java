@@ -1,4 +1,4 @@
-package org.fiddlemc.fiddle.impl.bukkit.enums;
+package org.fiddlemc.fiddle.impl.bukkit.enuminjection.material;
 
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -10,14 +10,15 @@ import org.bukkit.craftbukkit.inventory.CraftItemType;
 import org.bukkit.craftbukkit.util.CraftMagicNumbers;
 import org.bukkit.inventory.ItemType;
 import org.bukkit.material.MaterialData;
-import org.fiddlemc.fiddle.impl.java.enums.EnumInjector;
-import org.fiddlemc.fiddle.impl.util.reflection.ReflectionUtil;
+import org.fiddlemc.fiddle.impl.java.enuminjection.EnumInjector;
+import org.fiddlemc.fiddle.impl.java.util.function.ConsumerThrowsException;
+import org.fiddlemc.fiddle.impl.java.util.reflect.ReflectionUtil;
 import org.jspecify.annotations.Nullable;
 import java.lang.reflect.Field;
 import java.util.function.Supplier;
 
 /**
- * Provides functionality for the runtime injection of values into the {@link Material} enum.
+ * An {@link EnumInjector} for {@link Material}.
  */
 public class MaterialEnumInjector extends EnumInjector<Material> {
 
@@ -40,10 +41,15 @@ public class MaterialEnumInjector extends EnumInjector<Material> {
         this.blockTypeField = ReflectionUtil.getDeclaredField(Material.class, "blockType");
     }
 
+    @Override
+    protected void stage(final String enumName, @Nullable final ConsumerThrowsException<Material, Exception> onAllocate) {
+        throw new UnsupportedOperationException();
+    }
+
     /**
      * @see EnumInjector#stage 
      */
-    public void stage(NamespacedKey key, String enumName, @Nullable BlockType blockType, @Nullable ItemType itemType) {
+    public void stage(String enumName, NamespacedKey key, @Nullable BlockType blockType, @Nullable ItemType itemType) {
         super.stage(enumName, material -> {
             // Set its getKey()
             keyField.set(material, key);

@@ -1,4 +1,4 @@
-package org.fiddlemc.fiddle.impl.util.function;
+package org.fiddlemc.fiddle.impl.java.util.function;
 
 import java.util.function.Consumer;
 
@@ -8,6 +8,9 @@ import java.util.function.Consumer;
 @FunctionalInterface
 public interface ConsumerThrowsException<T, E extends Throwable> {
 
+    /**
+     * @see Consumer#accept
+     */
     void accept(T t) throws E;
 
 }

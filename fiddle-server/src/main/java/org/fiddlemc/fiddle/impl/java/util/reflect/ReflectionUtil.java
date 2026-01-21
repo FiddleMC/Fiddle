@@ -1,4 +1,4 @@
-package org.fiddlemc.fiddle.impl.util.reflection;
+package org.fiddlemc.fiddle.impl.java.util.reflect;
 
 import org.jspecify.annotations.Nullable;
 import java.lang.reflect.Field;
