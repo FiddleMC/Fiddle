@@ -11,6 +11,7 @@ public interface KeyAwareRegistryEntry {
     /**
      * The key with which this entry is being registered,
      * or null if not set yet.
+     *
      * <p>
      * Plugins can assume it will always be set.
      * </p>

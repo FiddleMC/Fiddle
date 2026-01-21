@@ -13,6 +13,7 @@ public final class FiddleNamespace {
 
     /**
       * The namespace for Fiddle {@link NamespacedKey}s.
+     *
      * <p>
       * This is for {@link NamespacedKey}s that are defined by and belong to Fiddle itself,
       * not those of packs that are loaded by Fiddle (content in those packs uses its own namespaces).

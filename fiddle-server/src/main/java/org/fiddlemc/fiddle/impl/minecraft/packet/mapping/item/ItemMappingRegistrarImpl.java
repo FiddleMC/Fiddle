@@ -15,6 +15,7 @@ public final class ItemMappingRegistrarImpl implements NMSItemMappingRegistrar {
 
     /**
      * The registered item mappings.
+     *
      * <p>
      * The mappings are organized in an array where {@link ClientView.AwarenessLevel#ordinal()}
      * is the index, and then in a map where {@link Item} is the key.

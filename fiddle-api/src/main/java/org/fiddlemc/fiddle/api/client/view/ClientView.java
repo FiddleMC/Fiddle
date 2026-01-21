@@ -2,9 +2,13 @@ package org.fiddlemc.fiddle.api.client.view;
 
 /**
  * This class represents the static circumstances under which a client (typically a player) observes the data sent.
+ *
  * <p>
  * An instance of this class represents a set of values that are static within a client's session with the server:
  * i.e. they stay the same for a client during the entire session.
+ * </p>
+ *
+ * <p>
  * Note that for the purposes of this class, the session of the client only starts when it is able to have any
  * view of relevant data sent to it. For example, when a player joins, we first present them with the option
  * to accept or decline the resource pack. Until it has been confirmed that the resource pack has been definitively
@@ -15,10 +19,13 @@ package org.fiddlemc.fiddle.api.client.view;
  * data (such as chunks, entities and potentially even the player's inventory - although that can be sent
  * according to a fallback view and updated as necessary) to the player before their view
  * is determined.
- * <br>
+ * </p>
+ *
+ * <p>
  * Apart from the interval before having definitely loaded or not loaded the resource pack, a player's session
  * (and as such their {@link ClientView} value) lasts from joining the server until disconnecting.
  * </p>
+ *
  * <p>
  * This class may be extended to support additional values relevant to certain views
  * (such as the protocol version of the client).
@@ -63,6 +70,7 @@ public interface ClientView {
         /**
          * For Java clients that have not accepted the server resource pack,
          * and also do not have the client mod.
+         *
          * <p>
          * This generally results in data being replaced by the closest or most acceptable vanilla equivalent,
          * with additional rendering potentially being done through the use of vanilla entities.
@@ -73,6 +81,7 @@ public interface ClientView {
         /**
          * For Java clients that have accepted the server resource pack,
          * but do not have the client mod.
+         *
          * <p>
          * This generally results in data being replaced by hosts that are overridden in the resource pack
          * (such as block states) or having additional data attached that links to the resource pack
@@ -85,6 +94,7 @@ public interface ClientView {
         /**
          * For Java clients that are have the client mod, i.e. they have the mod installed and are able to use
          * a sufficiently up-to-date version of it.
+         *
          * <p>
          * This generally results in data being sent as-is, because when joining the server, the client receives
          * the necessary information to interpret the server-side block and item keys directly from then on.

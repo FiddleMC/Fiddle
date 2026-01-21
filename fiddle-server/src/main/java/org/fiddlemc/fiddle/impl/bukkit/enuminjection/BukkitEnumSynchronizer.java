@@ -6,6 +6,7 @@ import java.util.List;
 /**
  * An abstract base for a synchronizer that injects new values into a Bukkit enum {@link E}
  * that correspond to values from another source (of type {@link T}).
+ *
  * <p>
  * To apply the synchronization, call {@link #run}.
  * </p>

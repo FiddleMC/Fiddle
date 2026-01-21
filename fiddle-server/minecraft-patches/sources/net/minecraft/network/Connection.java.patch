@@ -5,14 +5,14 @@
  import org.slf4j.MarkerFactory;
  
 -public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
-+public class Connection extends SimpleChannelInboundHandler<Packet<?>> implements org.fiddlemc.fiddle.impl.client.view.ClientViewProvider { // Fiddle - Client view - Provide from Connection
-+    // Fiddle start - Client view - Provide from Connection
-+    private org.fiddlemc.fiddle.api.client.view.@Nullable ClientView clientView = new org.fiddlemc.fiddle.impl.client.view.JavaDefaultClientViewImpl(); // TODO actually determine the view
++public class Connection extends SimpleChannelInboundHandler<Packet<?>> implements org.fiddlemc.fiddle.impl.client.view.lookup.ClientViewLookup { // Fiddle - Client view lookup - Implement for Connection
++    private org.fiddlemc.fiddle.api.client.view.@Nullable ClientView clientView = org.fiddlemc.fiddle.impl.client.view.DefaultClientView.createDefault()/* TODO actually determine the view */; // Fiddle - Client view set - Field
++    // Fiddle start - Client view lookup - Implement for Connection - Getter
 +    @Override
 +    public org.fiddlemc.fiddle.api.client.view.@Nullable ClientView getClientView() {
 +        return this.clientView;
 +    }
-+    // Fiddle end - Client view - Provide from Connection
++    // Fiddle end - Client view set - Implement for Connection - Getter
      private static final float AVERAGE_PACKETS_SMOOTHING = 0.75F;
      private static final Logger LOGGER = LogUtils.getLogger();
      public static final Marker ROOT_MARKER = MarkerFactory.getMarker("NETWORK");
@@ -20,7 +20,7 @@
      public void channelActive(ChannelHandlerContext ctx) throws Exception {
          super.channelActive(ctx);
          this.channel = ctx.channel();
-+        this.channel.attr(org.fiddlemc.fiddle.impl.client.view.NettyClientViewProviderAttribute.ATTRIBUTE_KEY).set(new java.lang.ref.WeakReference<>(this)); // Fiddle - Client view - Store provider in channel
++        this.channel.attr(org.fiddlemc.fiddle.impl.client.view.lookup.packethandling.NettyClientViewLookupAttribute.ATTRIBUTE_KEY).set(new java.lang.ref.WeakReference<>(this)); // Fiddle - Client view lookup during packet handling - Copy the connection (acting as the lookup) to the channel
          this.address = this.channel.remoteAddress();
          this.preparing = false; // Spigot
          if (this.delayedDisconnect != null) {

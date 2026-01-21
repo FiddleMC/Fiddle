@@ -14,7 +14,7 @@ public final class DefaultClientView {
     /**
      * @return A default {@link ClientView} that is used for mappings when no view is known.
      */
-    static ClientView createDefault() {
+    public static ClientView createDefault() {
         return new JavaDefaultClientViewImpl();
     }
 

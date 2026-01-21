@@ -11,6 +11,7 @@ import java.util.List;
 
 /**
  * An abstract base for an injector that can inject additional values into an enum during runtime.
+ *
  * <p>
  * First, call {@link #stage} once to prepare each desired value,
  * then call {@link #commit} to apply the changes.
@@ -39,9 +40,11 @@ public abstract class EnumInjector<E extends Enum<E>> {
 
     /**
      * Stages a new instance to be added to the enum.
+     *
      * <p>
      * This does not mutate the enum yet.
      * </p>
+     *
      * <p>
      * {@link #commit} must be called on this injector instance afterward to actually add the instance,
      * i.e. after all desired instances have been staged by calling this method multiple times.

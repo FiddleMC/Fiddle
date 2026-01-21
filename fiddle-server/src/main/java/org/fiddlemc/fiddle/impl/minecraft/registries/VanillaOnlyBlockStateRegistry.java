@@ -9,6 +9,7 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * An implementation of {@link IdMapper} to hold all vanilla items registered to {@link Block#BLOCK_STATE_REGISTRY}.
+ *
  * <p>
  * A single instance of this class shall exist: {@link #INSTANCE}.
  * </p>

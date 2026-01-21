@@ -5,15 +5,15 @@
  import org.jspecify.annotations.Nullable;
  
 -public class FriendlyByteBuf extends ByteBuf {
-+public class FriendlyByteBuf extends ByteBuf implements org.fiddlemc.fiddle.impl.client.view.ClientViewProvider { // Fiddle - Client view - Store provider in FriendlyByteBuf - Easy access via ClientViewProvider interface
++public class FriendlyByteBuf extends ByteBuf implements org.fiddlemc.fiddle.impl.client.view.lookup.ClientViewLookup { // Fiddle - Client view - Store provider in FriendlyByteBuf - Easy access via ClientViewProvider interface
      private final ByteBuf source;
      public final java.util.@Nullable Locale adventure$locale; // Paper - track player's locale for server-side translations
-+    public final java.lang.ref.@Nullable WeakReference<org.fiddlemc.fiddle.impl.client.view.ClientViewProvider> clientViewProvider; // Fiddle - Client view - Store provider in FriendlyByteBuf
++    public final java.lang.ref.@Nullable WeakReference<org.fiddlemc.fiddle.impl.client.view.lookup.ClientViewLookup> clientViewProvider; // Fiddle - Client view - Store provider in FriendlyByteBuf
 +    // Fiddle start - Client view - Store provider in FriendlyByteBuf - Easy access via ClientViewProvider interface
 +    @Override
 +    public org.fiddlemc.fiddle.api.client.view.@Nullable ClientView getClientView() {
-+        org.fiddlemc.fiddle.impl.client.view.@Nullable ClientViewProvider clientViewProvider = this.clientViewProvider == null ? null : this.clientViewProvider.get();
-+        return clientViewProvider == null ? null : clientViewProvider.getClientView();
++        org.fiddlemc.fiddle.impl.client.view.lookup.@Nullable ClientViewLookup clientViewLookup = this.clientViewProvider == null ? null : this.clientViewProvider.get();
++        return clientViewLookup == null ? null : clientViewLookup.getClientView();
 +    }
 +    // Fiddle - Client view - Store provider in FriendlyByteBuf - Easy access via ClientViewProvider interface
 +    public boolean isEncodingStonecutterRecipeResult; // Fiddle - Packet mapping - Item - Stonecutter recipe result - Store in FriendlyByteBuf
@@ -25,7 +25,7 @@
  
      public FriendlyByteBuf(ByteBuf source) {
          this.adventure$locale = PacketEncoder.ADVENTURE_LOCALE.get(); // Paper - track player's locale for server-side translations
-+        this.clientViewProvider = org.fiddlemc.fiddle.impl.client.view.ClientViewProviderThreadLocal.THREAD_LOCAL.get(); // Fiddle - Client view - Store provider in FriendlyByteBuf
++        this.clientViewProvider = org.fiddlemc.fiddle.impl.client.view.lookup.packethandling.ClientViewLookupThreadLocal.THREAD_LOCAL.get();// Fiddle - Client view lookup during packet handling - Copy lookup from the thread-local variable to the write buffer
          this.source = source;
      }
  

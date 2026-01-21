@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/block/state/BlockState.java
 +++ b/net/minecraft/world/level/block/state/BlockState.java
-@@ -25,6 +_,56 @@
+@@ -25,6 +_,60 @@
          super(owner, values, propertiesCodec);
      }
  
@@ -8,19 +8,21 @@
 +    /**
 +     * The {@linkplain net.minecraft.core.Registry#getId index} at which this block state is registered in
 +     * {@link Block#BLOCK_STATE_REGISTRY}.
++     *
 +     * <p>
 +     * This will be -1 until initialized in
-+     * {@link BlockStateRegistry#add}.
++     * {@link org.fiddlemc.fiddle.impl.minecraft.registries.BlockStateRegistry#add}.
 +     * </p>
 +     */
 +    public int indexInBlockStateRegistry = -1;
 +
 +    /**
 +     * The {@linkplain net.minecraft.core.Registry#getId index} at which this block state is registered in
-+     * {@link VanillaOnlyBlockStateRegistry}.
++     * {@link org.fiddlemc.fiddle.impl.minecraft.registries.VanillaOnlyBlockStateRegistry}.
++     *
 +     * <p>
 +     * This will be -1 until initialized in
-+     * {@link VanillaOnlyBlockStateRegistry#add}.
++     * {@link org.fiddlemc.fiddle.impl.minecraft.registries.VanillaOnlyBlockStateRegistry#add}.
 +     * </p>
 +     */
 +    public int indexInVanillaOnlyBlockStateRegistry = -1;
@@ -31,6 +33,7 @@
 +
 +    /**
 +     * Returns whether this block state is present in vanilla.
++     *
 +     * <p>
 +     * This does not take into account whether any details of this block state, such as its collision box,
 +     * are different (were modified) from vanilla.
@@ -44,6 +47,7 @@
 +
 +    /**
 +     * Sets {@link #isVanilla} to true.
++     *
 +     * <p>
 +     * This must only be called at most once,
 +     * before the block state is registered to {@link Block#BLOCK_STATE_REGISTRY}.

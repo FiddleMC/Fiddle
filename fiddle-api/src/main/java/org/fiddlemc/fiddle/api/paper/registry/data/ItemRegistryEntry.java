@@ -13,6 +13,7 @@ public interface ItemRegistryEntry {
 
     /**
      * A mutable builder for the {@link ItemRegistryEntry} plugins may change in applicable registry events.
+     *
      * <p>
      * Currently, this must be cast to {@code NMSItemRegistryEntryBuilder} to be used.
      * </p>

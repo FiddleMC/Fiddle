@@ -18,6 +18,7 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * An implementation of {@link Registry} specially for {@link BuiltInRegistries#BLOCK}.
+ *
  * <p>
  * A single instance of this class shall exist: {@link #INSTANCE}.
  * </p>
@@ -35,6 +36,7 @@ public final class BlockRegistry extends DefaultedMappedRegistry<Block> {
 
     /**
      * Whether {@link BlockState#initCache} can be called.
+     *
      * <p>
      * Because calling {@link BlockState#initCache} may reference some {@link Item}
      * instances defined in {@link Items},

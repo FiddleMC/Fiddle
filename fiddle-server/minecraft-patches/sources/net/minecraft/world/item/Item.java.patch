@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/item/Item.java
 +++ b/net/minecraft/world/item/Item.java
-@@ -120,6 +_,66 @@
+@@ -120,6 +_,71 @@
          return item == null ? 0 : BuiltInRegistries.ITEM.getId(item);
      }
  
@@ -8,6 +8,7 @@
 +    /**
 +     * The {@link net.minecraft.resources.Identifier} with which this item is registered in
 +     * {@link BuiltInRegistries#ITEM}.
++     *
 +     * <p>
 +     * This will be null until initialized in
 +     * {@link org.fiddlemc.fiddle.impl.minecraft.registries.ItemRegistry#register}.
@@ -18,6 +19,7 @@
 +    /**
 +     * The {@linkplain net.minecraft.core.Registry#getId index} at which this item is registered in
 +     * {@link BuiltInRegistries#ITEM}.
++     *
 +     * <p>
 +     * This will be -1 until initialized in
 +     * {@link org.fiddlemc.fiddle.impl.minecraft.registries.ItemRegistry#register}.
@@ -28,6 +30,7 @@
 +    /**
 +     * The {@linkplain net.minecraft.core.Registry#getId index} at which this item is registered in
 +     * {@link org.fiddlemc.fiddle.impl.minecraft.registries.VanillaOnlyItemRegistry}.
++     *
 +     * <p>
 +     * This will be -1 until initialized in
 +     * {@link org.fiddlemc.fiddle.impl.minecraft.registries.VanillaOnlyItemRegistry#add}.
@@ -41,6 +44,7 @@
 +
 +    /**
 +     * Returns whether this item is present in vanilla.
++     *
 +     * <p>
 +     * This does not take into account whether any details of this item, such as its max stack size,
 +     * are different (were modified) from vanilla.
@@ -54,6 +58,7 @@
 +
 +    /**
 +     * Sets {@link #isVanilla} to true.
++     *
 +     * <p>
 +     * This must only be called at most once,
 +     * before the item is registered to {@link BuiltInRegistries#ITEM}.

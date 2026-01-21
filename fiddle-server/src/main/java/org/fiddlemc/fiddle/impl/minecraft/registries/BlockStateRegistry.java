@@ -7,6 +7,7 @@ import javax.annotation.Nullable;
 
 /**
  * An implementation of {@link IdMapper} specially for {@link Block#BLOCK_STATE_REGISTRY}.
+ *
  * <p>
  * A single instance of this class shall exist: {@link #INSTANCE}.
  * </p>

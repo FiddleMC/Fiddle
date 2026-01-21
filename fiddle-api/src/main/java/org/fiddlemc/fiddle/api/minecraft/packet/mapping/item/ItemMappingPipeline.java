@@ -25,6 +25,7 @@ public interface ItemMappingPipeline {
 
     /**
      * A {@link LifecycleEvent} that fires when this pipeline is composed.
+     *
      * <p>
      * Item mappings can be registered in handlers of this event.
      * </p>

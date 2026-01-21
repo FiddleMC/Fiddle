@@ -58,6 +58,7 @@ public interface NMSItemMappingRegistrar extends ItemMappingRegistrar {
 
     /**
      * Registers a mapping that applies to all {@link Item}s.
+     *
      * <p>
      * This negatively affects performance: try to use
      * {@link #register(ClientView.AwarenessLevel, Item[], ItemMapping)} instead.
@@ -70,6 +71,7 @@ public interface NMSItemMappingRegistrar extends ItemMappingRegistrar {
 
     /**
      * Registers a mapping that applies to all {@link Item}s.
+     *
      * <p>
      * This negatively affects performance: try to use
      * {@link #register(ClientView.AwarenessLevel[], Item[], ItemMapping)} instead.
@@ -83,6 +85,7 @@ public interface NMSItemMappingRegistrar extends ItemMappingRegistrar {
 
     /**
      * Changes the list of registered mappings for the given awareness level and item.
+     *
      * <p>
      * This list is freely mutable.
      * This can be used to remove existing mappings or insert a mapping at the desired index.

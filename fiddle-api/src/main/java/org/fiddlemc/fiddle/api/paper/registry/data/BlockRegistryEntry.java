@@ -13,6 +13,7 @@ public interface BlockRegistryEntry {
 
     /**
      * A mutable builder for the {@link BlockRegistryEntry} plugins may change in applicable registry events.
+     *
      * <p>
      * Currently, this must be cast to {@code NMSBlockRegistryEntryBuilder} to be used.
      * </p>

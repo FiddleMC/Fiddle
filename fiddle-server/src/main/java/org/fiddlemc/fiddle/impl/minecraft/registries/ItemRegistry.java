@@ -15,6 +15,7 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * An implementation of {@link Registry} specially for {@link BuiltInRegistries#ITEM}.
+ *
  * <p>
  * A single instance of this class shall exist: {@link #INSTANCE}.
  * </p>

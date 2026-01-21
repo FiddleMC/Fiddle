@@ -1,15 +1,16 @@
-package org.fiddlemc.fiddle.impl.client.view;
+package org.fiddlemc.fiddle.impl.client.view.lookup;
 
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerCommonPacketListenerImpl;
 import net.minecraft.server.network.ServerLoginPacketListenerImpl;
 import org.fiddlemc.fiddle.api.client.view.ClientView;
+import org.fiddlemc.fiddle.impl.client.view.DefaultClientView;
 import org.jspecify.annotations.Nullable;
 
 /**
  * An interface for classes that can provide a {@link ClientView} for a client that they represent.
  */
-public interface ClientViewProvider {
+public interface ClientViewLookup {
 
     /**
      * @return The {@link ClientView} of the client, or null if none is determined.
@@ -26,6 +27,8 @@ public interface ClientViewProvider {
     }
 
     /**
+     * Convenience method to get the {@link ClientView} of the client, or a default.
+     *
      * @return The same as {@link ClientView},
      * except null will be replaced by {@link DefaultClientView#createDefault}.
      */

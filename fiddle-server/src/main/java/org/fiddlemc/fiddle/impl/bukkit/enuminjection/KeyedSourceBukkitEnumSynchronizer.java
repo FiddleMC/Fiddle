@@ -64,6 +64,7 @@ public abstract class KeyedSourceBukkitEnumSynchronizer<E extends Enum<E>, T, I 
 
     /**
      * Maps a {@link NamespacedKey} namespaced or path to a fitting enum name part.
+     *
      * <p>
      * This method assumes that the part is {@linkplain #checkAcceptableNamespacedKeyPart acceptable}.
      * </p>

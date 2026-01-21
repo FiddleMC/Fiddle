@@ -78,6 +78,7 @@ public final class ItemMappingPipelineImpl implements ItemMappingPipeline {
 
     /**
      * The registered item mappings.
+     *
      * <p>
      * The mappings are organized in an array where {@link ClientView.AwarenessLevel#ordinal()}
      * is the index, and then in a map where {@link Item} is the key.
@@ -96,6 +97,7 @@ public final class ItemMappingPipelineImpl implements ItemMappingPipeline {
 
     /**
      * {@linkplain ItemMapping#apply Applies} all applicable mappings to the item stack.
+     *
      * <p>
      * This method will not modify the given {@code itemStack}.
      * </p>

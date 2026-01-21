@@ -9,7 +9,7 @@
      private static final LoadingCache<VoxelShape, Boolean> SHAPE_FULL_BLOCK_CACHE = CacheBuilder.newBuilder()
          .maximumSize(512L)
          .weakKeys()
-@@ -144,6 +_,66 @@
+@@ -144,6 +_,71 @@
      protected MapCodec<? extends Block> codec() {
          return CODEC;
      }
@@ -18,6 +18,7 @@
 +    /**
 +     * The {@link net.minecraft.resources.Identifier} with which this block is registered in the
 +     * {@link BuiltInRegistries#BLOCK}.
++     *
 +     * <p>
 +     * This will be null until initialized in
 +     * {@link org.fiddlemc.fiddle.impl.minecraft.registries.BlockRegistry#register}.
@@ -28,6 +29,7 @@
 +    /**
 +     * The {@linkplain net.minecraft.core.Registry#getId index} at which this block is registered in
 +     * {@link BuiltInRegistries#BLOCK}.
++     *
 +     * <p>
 +     * This will be -1 until initialized in
 +     * {@link org.fiddlemc.fiddle.impl.minecraft.registries.BlockRegistry#register}.
@@ -38,6 +40,7 @@
 +    /**
 +     * The {@linkplain net.minecraft.core.Registry#getId index} at which this block is registered in
 +     * {@link org.fiddlemc.fiddle.impl.minecraft.registries.VanillaOnlyBlockRegistry}.
++     *
 +     * <p>
 +     * This will be -1 until initialized in
 +     * {@link org.fiddlemc.fiddle.impl.minecraft.registries.VanillaOnlyBlockRegistry#add}.
@@ -51,6 +54,7 @@
 +
 +    /**
 +     * Returns whether this block is present in vanilla.
++     *
 +     * <p>
 +     * This does not take into account whether any details of this block, such as its hardness,
 +     * are different (were modified) from vanilla.
@@ -64,6 +68,7 @@
 +
 +    /**
 +     * Sets {@link #isVanilla} to true.
++     *
 +     * <p>
 +     * This must only be called at most once,
 +     * before the block is registered to {@link BuiltInRegistries#BLOCK}.
