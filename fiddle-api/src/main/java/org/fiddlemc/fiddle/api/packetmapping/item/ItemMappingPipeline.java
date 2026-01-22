@@ -12,16 +12,21 @@ import java.util.ServiceLoader;
 public interface ItemMappingPipeline {
 
     /**
+     * The backing field for {@link #get()}.
+     */
+    ItemMappingPipeline INSTANCE = ServiceLoader.load(ItemMappingPipeline.class, ItemMappingPipeline.class.getClassLoader()).findFirst().get();
+
+    /**
      * @return The pipeline instance.
      */
     static ItemMappingPipeline get() {
-        return ServiceLoader.load(ItemMappingPipeline.class).findFirst().get();
+        return INSTANCE;
     }
 
     /**
      * @return The {@link LifecycleEventType} for the {@link ComposeEvent}.
      */
-    LifecycleEventType<BootstrapContext, ComposeEvent, PrioritizedLifecycleEventHandlerConfiguration<BootstrapContext>> compose();
+    LifecycleEventType<BootstrapContext, ComposeEvent, PrioritizedLifecycleEventHandlerConfiguration<BootstrapContext>> composeEventType();
 
     /**
      * A {@link LifecycleEvent} that fires when this pipeline is composed.

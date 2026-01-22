@@ -1,32 +1,37 @@
 package org.fiddlemc.fiddle.impl.bukkit.enuminjection.material;
 
-import com.mojang.logging.LogUtils;
 import it.unimi.dsi.fastutil.Pair;
-import net.minecraft.server.dedicated.DedicatedServer;
 import org.apache.commons.lang3.tuple.Triple;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
 import org.bukkit.block.BlockType;
 import org.bukkit.inventory.ItemType;
-import org.fiddlemc.fiddle.impl.bukkit.enuminjection.BukkitEnumSynchronizer;
+import org.fiddlemc.fiddle.api.bukkit.enuminjection.material.MaterialEnumSynchronizer;
 import org.fiddlemc.fiddle.impl.bukkit.enuminjection.KeyedSourceBukkitEnumSynchronizerImpl;
 import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * A {@link BukkitEnumSynchronizer} for {@link Material}.
+ * The implementation of {@link MaterialEnumSynchronizer}.
  */
-public final class MaterialEnumSynchronizerImpl extends KeyedSourceBukkitEnumSynchronizerImpl<Material, Triple<NamespacedKey, @Nullable BlockType, @Nullable ItemType>, MaterialEnumInjector> {
+public final class MaterialEnumSynchronizerImpl extends KeyedSourceBukkitEnumSynchronizerImpl<Material, Triple<NamespacedKey, @Nullable BlockType, @Nullable ItemType>, MaterialEnumInjector> implements MaterialEnumSynchronizer {
 
-    private static final Logger LOGGER = LogUtils.getLogger();
+    private static MaterialEnumSynchronizerImpl INSTANCE;
 
-    public MaterialEnumSynchronizerImpl() throws Exception {
-        super(new MaterialEnumInjector());
+    public static MaterialEnumSynchronizerImpl get() {
+        if (INSTANCE == null) {
+            INSTANCE = (MaterialEnumSynchronizerImpl) MaterialEnumSynchronizer.get();
+        }
+        return INSTANCE;
+    }
+
+    @Override
+    protected MaterialEnumInjector createInjector() throws Exception {
+        return new MaterialEnumInjector();
     }
 
     @Override
@@ -67,37 +72,18 @@ public final class MaterialEnumSynchronizerImpl extends KeyedSourceBukkitEnumSyn
     }
 
     @Override
-    protected void stage(String enumName, Triple<NamespacedKey, @Nullable BlockType, @Nullable ItemType> sourceValue) {
-        this.injector.stage(enumName, sourceValue.getLeft(), sourceValue.getMiddle(), sourceValue.getRight());
+    protected void stage(String enumName, Triple<NamespacedKey, @Nullable BlockType, @Nullable ItemType> sourceValue) throws Exception {
+        this.getInjector().stage(enumName, sourceValue.getLeft(), sourceValue.getMiddle(), sourceValue.getRight());
     }
 
-    /**
-     * @return The {@link NamespacedKey} for the given source value.
-     */
     @Override
     protected NamespacedKey getKey(Triple<NamespacedKey, @Nullable BlockType, @Nullable ItemType> sourceValue) {
         return sourceValue.getLeft();
     }
 
-    /**
-     * A convenience method to {@link #run} this synchronizer from {@link DedicatedServer#initServer}.
-     *
-     * @return True if {@link #run} was successful, false otherwise.
-     * @throws IllegalStateException If running was unsuccessful for an unexpected reason.
-     */
-    public static boolean runFromDedicatedServerInit() throws IllegalStateException {
-        try {
-            new MaterialEnumSynchronizerImpl().run();
-            // Success
-            return true;
-        } catch (EnumNameMappingException e) {
-            LOGGER.warn("Failed to extend Bukkit Material enum: {}", e.getMessage());
-            // Don't start the server with an incomplete Material enum
-            return false;
-        } catch (Exception e) {
-            // Don't start the server with an incomplete Material enum
-            throw new IllegalStateException("Failed to extend Bukkit Material enum", e);
-        }
+    @Override
+    protected String getEventTypeNamePrefix() {
+        return "fiddle_material_enum_synchronizer";
     }
 
 }

@@ -70,7 +70,7 @@ public final class ItemMappingPipelineImpl implements ItemMappingPipeline {
     private static ComposeEventType COMPOSE_EVENT_TYPE;
 
     @Override
-    public ComposeEventType compose() {
+    public ComposeEventType composeEventType() {
         if (COMPOSE_EVENT_TYPE == null) {
             COMPOSE_EVENT_TYPE = new ComposeEventType();
         }

@@ -1,18 +1,20 @@
 package org.fiddlemc.fiddle.impl.bukkit.enuminjection;
 
 import java.util.Locale;
+import io.papermc.paper.plugin.bootstrap.BootstrapContext;
+import io.papermc.paper.plugin.lifecycle.event.LifecycleEventRunner;
+import io.papermc.paper.plugin.lifecycle.event.PaperLifecycleEvent;
+import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEventType;
+import io.papermc.paper.plugin.lifecycle.event.types.PrioritizableLifecycleEventType;
 import org.bukkit.NamespacedKey;
+import org.fiddlemc.fiddle.api.bukkit.enuminjection.KeyedSourceBukkitEnumSynchronizer;
 import org.fiddlemc.fiddle.impl.java.enuminjection.EnumInjector;
+import org.jspecify.annotations.Nullable;
 
 /**
- * A {@link BukkitEnumSynchronizer} for which the source value has a {@link NamespacedKey},
- * and which bases the enum name on that key.
+ * The implementation of {@link KeyedSourceBukkitEnumSynchronizer}.
  */
-public abstract class KeyedSourceBukkitEnumSynchronizerImpl<E extends Enum<E>, T, I extends EnumInjector<E>> extends BukkitEnumSynchronizer<E, T, I> {
-
-    public KeyedSourceBukkitEnumSynchronizerImpl(I injector) {
-        super(injector);
-    }
+public abstract class KeyedSourceBukkitEnumSynchronizerImpl<E extends Enum<E>, T, I extends EnumInjector<E>> extends BukkitEnumSynchronizerImpl<E, T, I> implements KeyedSourceBukkitEnumSynchronizer<E, T> {
 
     /**
      * @return The {@link NamespacedKey} for the given source value.
@@ -20,13 +22,18 @@ public abstract class KeyedSourceBukkitEnumSynchronizerImpl<E extends Enum<E>, T
     protected abstract NamespacedKey getKey(T sourceValue);
 
     @Override
-    protected String getEnumName(T sourceValue) throws EnumNameMappingException {
+    protected String determineEnumName(T sourceValue) throws EnumNameMappingException {
         // Get the key
         NamespacedKey key = this.getKey(sourceValue);
         // Check if the key is acceptable
         this.checkAcceptableNamespacedKey(key);
         // Map the key to the enum name
-        return "FIDDLE_" + this.mapNamespacedKeyPartToEnumPart(key.namespace()) + "_" + this.mapNamespacedKeyPartToEnumPart(key.getKey());
+        String originalEnumName = "FIDDLE_" + this.mapNamespacedKeyPartToEnumPart(key.namespace()) + "_" + this.mapNamespacedKeyPartToEnumPart(key.getKey());
+        // Fire the event
+        DetermineEnumNameEventImpl<T> event = new DetermineEnumNameEventImpl<>(sourceValue, originalEnumName);
+        LifecycleEventRunner.INSTANCE.callEvent(this.determineEnumNameEventType(), event);
+        // Return the final enum name
+        return event.enumName;
     }
 
     /**
@@ -79,5 +86,67 @@ public abstract class KeyedSourceBukkitEnumSynchronizerImpl<E extends Enum<E>, T
     protected String mapNamespacedKeyPartToEnumPart(String part) {
         return part.toUpperCase(Locale.ROOT);
     }
+
+    public static final class DetermineEnumNameEventImpl<T> implements DetermineEnumNameEvent<T>, PaperLifecycleEvent {
+
+        public final T sourceValue;
+        public final String originalEnumName;
+        private String enumName;
+
+        public DetermineEnumNameEventImpl(T sourceValue, String originalEnumName) {
+            this.sourceValue = sourceValue;
+            this.originalEnumName = originalEnumName;
+            this.enumName = originalEnumName;
+        }
+
+        @Override
+        public T getSourceValue() {
+            return this.sourceValue;
+        }
+
+        @Override
+        public String getOriginallyDeterminedEnumName() {
+            return this.originalEnumName;
+        }
+
+        @Override
+        public String getDeterminedEnumName() {
+            return this.enumName;
+        }
+
+        @Override
+        public void setDeterminedEnumName(String enumName) {
+            this.enumName = enumName;
+        }
+
+    }
+
+    /**
+     * The prefix for the {@link LifecycleEventType#name()} of events for this synchronizer.
+     */
+    protected abstract String getEventTypeNamePrefix();
+
+    public final class DetermineEnumNameEventType extends PrioritizableLifecycleEventType.Simple<BootstrapContext, DetermineEnumNameEvent<T>> {
+
+        private DetermineEnumNameEventType() {
+            super(KeyedSourceBukkitEnumSynchronizerImpl.this.getEventTypeNamePrefix() + "/determine_enum_name", BootstrapContext.class);
+        }
+
+    }
+
+    /**
+     * The cached return value of {@link #determineEnumNameEventType()},
+     * or null if not cached yet.
+     */
+    private @Nullable DetermineEnumNameEventType determineEnumNameEventType;
+
+    @Override
+    public DetermineEnumNameEventType determineEnumNameEventType() {
+        if (this.determineEnumNameEventType == null) {
+            this.determineEnumNameEventType = new DetermineEnumNameEventType();
+        }
+        return this.determineEnumNameEventType;
+    }
+
 
 }

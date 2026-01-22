@@ -1,22 +1,47 @@
 package org.fiddlemc.fiddle.impl.bukkit.enuminjection;
 
+import com.mojang.logging.LogUtils;
+import net.minecraft.server.dedicated.DedicatedServer;
+import org.fiddlemc.fiddle.api.bukkit.enuminjection.BukkitEnumSynchronizer;
 import org.fiddlemc.fiddle.impl.java.enuminjection.EnumInjector;
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
 import java.util.List;
 
 /**
- * An abstract base for a synchronizer that injects new values into a Bukkit enum {@link E}
- * that correspond to values from another source (of type {@link T}).
+ * The implementation of {@link BukkitEnumSynchronizer}.
  *
  * <p>
  * To apply the synchronization, call {@link #run}.
  * </p>
  */
-public abstract class BukkitEnumSynchronizer<E extends Enum<E>, T, I extends EnumInjector<E>> {
+public abstract class BukkitEnumSynchronizerImpl<E extends Enum<E>, T, I extends EnumInjector<E>> implements BukkitEnumSynchronizer<E, T> {
 
-    protected final I injector;
+    private static final Logger LOGGER = LogUtils.getLogger();
 
-    public BukkitEnumSynchronizer(I injector) {
-        this.injector = injector;
+    /**
+     * The {@link EnumInjector} used by this synchronizer,
+     * or null if not initialized yet.
+     */
+    private @Nullable I injector;
+
+    /**
+     * Acquires the injector used by this synchronizer.
+     *
+     * @return The desired return value of {@link #getInjector()}.
+     * @throws Exception                If something unexpected goes wrong.
+     */
+    protected abstract I createInjector() throws Exception;
+
+    /**
+     * @return The {@link EnumInjector} used by this synchronizer.
+     * @throws Exception                If something unexpected goes wrong.
+     */
+    protected I getInjector() throws Exception {
+        if (this.injector == null) {
+            this.injector = createInjector();
+        }
+        return this.injector;
     }
 
     /**
@@ -29,8 +54,9 @@ public abstract class BukkitEnumSynchronizer<E extends Enum<E>, T, I extends Enu
      *
      * @param enumName    The {@link Enum#name()} for the new value.
      * @param sourceValue The source value for which this new value is being injected.
+     * @throws Exception                If something unexpected goes wrong.
      */
-    protected abstract void stage(String enumName, T sourceValue);
+    protected abstract void stage(String enumName, T sourceValue) throws Exception;
 
     /**
      * @param sourceValue A source value.
@@ -38,7 +64,7 @@ public abstract class BukkitEnumSynchronizer<E extends Enum<E>, T, I extends Enu
      * While not generally enforced, this should only consist of uppercase letters, digits and underscores.
      * @throws EnumNameMappingException When the source value cannot be mapped to an acceptable enum name.
      */
-    protected abstract String getEnumName(T sourceValue) throws EnumNameMappingException;
+    protected abstract String determineEnumName(T sourceValue) throws EnumNameMappingException;
 
     /**
      * @param enumName A string being considered for an enum value's {@link Enum#name()}.
@@ -68,7 +94,7 @@ public abstract class BukkitEnumSynchronizer<E extends Enum<E>, T, I extends Enu
      * Adds the new values into the enum.
      *
      * @throws EnumNameMappingException If a source value cannot be mapped to an acceptable enum name.
-     * @throws Exception                If something goes wrong.
+     * @throws Exception                If something unexpected goes wrong.
      */
     public void run() throws EnumNameMappingException, Exception {
 
@@ -83,7 +109,7 @@ public abstract class BukkitEnumSynchronizer<E extends Enum<E>, T, I extends Enu
         // Stage the new values
         for (T sourceValue : sourceValues) {
             // Determine the enum name
-            String enumName = this.getEnumName(sourceValue);
+            String enumName = this.determineEnumName(sourceValue);
             // Verify sure the resulting enum name is valid
             this.checkAcceptableEnumName(enumName);
             // Stage the new value
@@ -93,6 +119,27 @@ public abstract class BukkitEnumSynchronizer<E extends Enum<E>, T, I extends Enu
         // Commit the new values
         this.injector.commit();
 
+    }
+
+    /**
+     * A convenience method to {@link #run} this synchronizer from {@link DedicatedServer#initServer}.
+     *
+     * @return True if {@link #run} was successful, false otherwise.
+     * @throws IllegalStateException If running was unsuccessful for an unexpected reason.
+     */
+    public boolean runFromDedicatedServerInit() throws IllegalStateException {
+        try {
+            this.run();
+            // Success
+            return true;
+        } catch (EnumNameMappingException e) {
+            LOGGER.warn("Failed to extend Bukkit Material enum: {}", e.getMessage());
+            // Don't start the server with an incomplete Material enum
+            return false;
+        } catch (Exception e) {
+            // Don't start the server with an incomplete Material enum
+            throw new IllegalStateException("Failed to extend Bukkit Material enum", e);
+        }
     }
 
     /**

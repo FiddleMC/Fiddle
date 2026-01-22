@@ -10,6 +10,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
+import org.bukkit.NamespacedKey;
+import org.fiddlemc.fiddle.api.bukkit.enuminjection.material.MaterialEnumSynchronizer;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
 import org.fiddlemc.fiddle.api.moredatadriven.paper.BlockRegistryEventProvider;
 import org.fiddlemc.fiddle.api.moredatadriven.paper.ItemRegistryEventProvider;
@@ -68,8 +70,17 @@ public class TestPluginBootstrap implements PluginBootstrap {
             });
         });
 
+        // Use a custom enum name, just to show that we can
+        context.getLifecycleManager().registerEventHandler(MaterialEnumSynchronizer.get().determineEnumNameEventType(), event -> {
+            NamespacedKey key = event.getSourceValue().getLeft();
+            if (key.equals(NamespacedKey.fromString("example:ash"))) {
+                event.setDeterminedEnumName("ASHES_TO_DUST");
+                context.getLogger().info("Changed enum name for " + key + " to " + event.getDeterminedEnumName());
+            }
+        });
+
         // Register item mappings
-        context.getLifecycleManager().registerEventHandler(ItemMappingPipeline.get().compose(), event -> {
+        context.getLifecycleManager().registerEventHandler(ItemMappingPipeline.get().composeEventType(), event -> {
             context.getLogger().info("Registering item mappings...");
             NMSItemMappingRegistrar registrar = (NMSItemMappingRegistrar) event.getRegistrar();
             // Map ash to gunpowder
