@@ -6,7 +6,7 @@
  * This means that Bukkit enum injections are typically based on such other values,
  * and for such purpose, this package provides
  * {@link org.fiddlemc.fiddle.impl.bukkit.enuminjection.BukkitEnumSynchronizer} and its subclass
- * {@link org.fiddlemc.fiddle.impl.bukkit.enuminjection.KeyedSourceBukkitEnumSynchronizer}
+ * {@link org.fiddlemc.fiddle.impl.bukkit.enuminjection.KeyedSourceBukkitEnumSynchronizerImpl}
  * for the easy injection of Bukkit enum values based on some source values.
  * </p>
  */

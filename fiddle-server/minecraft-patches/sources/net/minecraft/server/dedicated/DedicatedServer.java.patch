@@ -26,7 +26,7 @@
              return false;
          }
 +
-+        org.fiddlemc.fiddle.impl.bukkit.enuminjection.material.MaterialEnumSynchronizer.runFromDedicatedServerInit(); // Fiddle - Material injection - Run on server start, before Bukkit plugins are loaded
++        org.fiddlemc.fiddle.impl.bukkit.enuminjection.material.MaterialEnumSynchronizerImpl.runFromDedicatedServerInit(); // Fiddle - Material injection - Run on server start, before Bukkit plugins are loaded
  
          // CraftBukkit start
          this.server.loadPlugins();

@@ -8,9 +8,9 @@ import org.fiddlemc.fiddle.impl.java.enuminjection.EnumInjector;
  * A {@link BukkitEnumSynchronizer} for which the source value has a {@link NamespacedKey},
  * and which bases the enum name on that key.
  */
-public abstract class KeyedSourceBukkitEnumSynchronizer<E extends Enum<E>, T, I extends EnumInjector<E>> extends BukkitEnumSynchronizer<E, T, I> {
+public abstract class KeyedSourceBukkitEnumSynchronizerImpl<E extends Enum<E>, T, I extends EnumInjector<E>> extends BukkitEnumSynchronizer<E, T, I> {
 
-    public KeyedSourceBukkitEnumSynchronizer(I injector) {
+    public KeyedSourceBukkitEnumSynchronizerImpl(I injector) {
         super(injector);
     }
 
