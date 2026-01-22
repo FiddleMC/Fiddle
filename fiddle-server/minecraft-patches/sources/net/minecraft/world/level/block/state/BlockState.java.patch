@@ -4,31 +4,31 @@
          super(owner, values, propertiesCodec);
      }
  
-+    // Fiddle start - Cache block and item values
++    // Fiddle start - More data-driven - Minecraft registries - Cache block and item values
 +    /**
 +     * The {@linkplain net.minecraft.core.Registry#getId index} at which this block state is registered in
 +     * {@link Block#BLOCK_STATE_REGISTRY}.
 +     *
 +     * <p>
 +     * This will be -1 until initialized in
-+     * {@link org.fiddlemc.fiddle.impl.minecraft.registries.BlockStateRegistry#add}.
++     * {@link org.fiddlemc.fiddle.impl.moredatadriven.minecraft.BlockStateRegistry#add}.
 +     * </p>
 +     */
 +    public int indexInBlockStateRegistry = -1;
 +
 +    /**
 +     * The {@linkplain net.minecraft.core.Registry#getId index} at which this block state is registered in
-+     * {@link org.fiddlemc.fiddle.impl.minecraft.registries.VanillaOnlyBlockStateRegistry}.
++     * {@link org.fiddlemc.fiddle.impl.moredatadriven.minecraft.VanillaOnlyBlockStateRegistry}.
 +     *
 +     * <p>
 +     * This will be -1 until initialized in
-+     * {@link org.fiddlemc.fiddle.impl.minecraft.registries.VanillaOnlyBlockStateRegistry#add}.
++     * {@link org.fiddlemc.fiddle.impl.moredatadriven.minecraft.VanillaOnlyBlockStateRegistry#add}.
 +     * </p>
 +     */
 +    public int indexInVanillaOnlyBlockStateRegistry = -1;
-+    // Fiddle end - Cache block and item values
++    // Fiddle end - More data-driven - Minecraft registries - Cache block and item values
 +
-+    // Fiddle start - Vanilla flag
++    // Fiddle start - More data-driven - Vanilla flag
 +    private boolean isVanilla;
 +
 +    /**
@@ -56,7 +56,7 @@
 +    public void markAsVanilla() {
 +        this.isVanilla = true;
 +    }
-+    // Fiddle end - Vanilla flag
++    // Fiddle end - More data-driven - Vanilla flag
 +
      @Override
      protected BlockState asState() {

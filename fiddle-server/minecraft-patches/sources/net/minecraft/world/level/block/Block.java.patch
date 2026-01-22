@@ -5,7 +5,7 @@
      private static final Logger LOGGER = LogUtils.getLogger();
      private final Holder.Reference<Block> builtInRegistryHolder = BuiltInRegistries.BLOCK.createIntrusiveHolder(this);
 -    public static final IdMapper<BlockState> BLOCK_STATE_REGISTRY = new IdMapper<>();
-+    public static final org.fiddlemc.fiddle.impl.minecraft.registries.BlockStateRegistry BLOCK_STATE_REGISTRY = org.fiddlemc.fiddle.impl.minecraft.registries.BlockStateRegistry.get(); // Fiddle - Custom registries for blocks and items
++    public static final org.fiddlemc.fiddle.impl.moredatadriven.minecraft.BlockStateRegistry BLOCK_STATE_REGISTRY = org.fiddlemc.fiddle.impl.moredatadriven.minecraft.BlockStateRegistry.get(); // Fiddle - More data-driven - Minecraft registries - Custom registries for blocks and items
      private static final LoadingCache<VoxelShape, Boolean> SHAPE_FULL_BLOCK_CACHE = CacheBuilder.newBuilder()
          .maximumSize(512L)
          .weakKeys()
@@ -14,14 +14,14 @@
          return CODEC;
      }
 +
-+    // Fiddle start - Cache block and item values
++    // Fiddle start - More data-driven - Minecraft registries - Cache block and item values
 +    /**
 +     * The {@link net.minecraft.resources.Identifier} with which this block is registered in the
 +     * {@link BuiltInRegistries#BLOCK}.
 +     *
 +     * <p>
 +     * This will be null until initialized in
-+     * {@link org.fiddlemc.fiddle.impl.minecraft.registries.BlockRegistry#register}.
++     * {@link org.fiddlemc.fiddle.impl.moredatadriven.minecraft.BlockRegistry#register}.
 +     * </p>
 +     */
 +    public net.minecraft.resources.Identifier keyInBlockRegistry = null;
@@ -32,24 +32,24 @@
 +     *
 +     * <p>
 +     * This will be -1 until initialized in
-+     * {@link org.fiddlemc.fiddle.impl.minecraft.registries.BlockRegistry#register}.
++     * {@link org.fiddlemc.fiddle.impl.moredatadriven.minecraft.BlockRegistry#register}.
 +     * </p>
 +     */
 +    public int indexInBlockRegistry = -1;
 +
 +    /**
 +     * The {@linkplain net.minecraft.core.Registry#getId index} at which this block is registered in
-+     * {@link org.fiddlemc.fiddle.impl.minecraft.registries.VanillaOnlyBlockRegistry}.
++     * {@link org.fiddlemc.fiddle.impl.moredatadriven.minecraft.VanillaOnlyBlockRegistry}.
 +     *
 +     * <p>
 +     * This will be -1 until initialized in
-+     * {@link org.fiddlemc.fiddle.impl.minecraft.registries.VanillaOnlyBlockRegistry#add}.
++     * {@link org.fiddlemc.fiddle.impl.moredatadriven.minecraft.VanillaOnlyBlockRegistry#add}.
 +     * </p>
 +     */
 +    public int indexInVanillaOnlyBlockRegistry = -1;
-+    // Fiddle end - Cache block and item values
++    // Fiddle end - More data-driven - Minecraft registries - Cache block and item values
 +
-+    // Fiddle start - Vanilla flag
++    // Fiddle start - More data-driven - Vanilla flag
 +    private boolean isVanilla;
 +
 +    /**
@@ -77,7 +77,7 @@
 +    public void markAsVanilla() {
 +        this.isVanilla = true;
 +    }
-+    // Fiddle end - Vanilla flag
++    // Fiddle end - More data-driven - Vanilla flag
  
      public static int getId(@Nullable BlockState state) {
          if (state == null) {

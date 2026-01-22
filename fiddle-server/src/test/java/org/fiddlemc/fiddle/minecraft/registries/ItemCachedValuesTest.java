@@ -3,8 +3,8 @@ package org.fiddlemc.fiddle.minecraft.registries;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import org.bukkit.support.environment.VanillaFeature;
-import org.fiddlemc.fiddle.impl.minecraft.registries.ItemRegistry;
-import org.fiddlemc.fiddle.impl.minecraft.registries.VanillaOnlyItemRegistry;
+import org.fiddlemc.fiddle.impl.moredatadriven.minecraft.ItemRegistry;
+import org.fiddlemc.fiddle.impl.moredatadriven.minecraft.VanillaOnlyItemRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

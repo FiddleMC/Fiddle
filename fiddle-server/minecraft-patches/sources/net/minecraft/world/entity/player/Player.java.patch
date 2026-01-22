@@ -5,7 +5,7 @@
  import org.jspecify.annotations.Nullable;
  
 -public abstract class Player extends Avatar implements ContainerUser {
-+public abstract class Player extends Avatar implements ContainerUser, org.fiddlemc.fiddle.impl.client.view.lookup.ClientViewLookup { // Fiddle - Client view - Provide from Player
++public abstract class Player extends Avatar implements ContainerUser, org.fiddlemc.fiddle.impl.clientview.lookup.ClientViewLookup { // Fiddle - Client view - Lookup - Provide from Player
      public static final int MAX_HEALTH = 20;
      public static final int SLEEP_DURATION = 100;
      public static final int WAKE_UP_DURATION = 10;

@@ -4,11 +4,11 @@
          @Override
          public org.bukkit.Registry<A> createApiRegistry(final Registry<M> nmsRegistry) {
              if (this.modificationApiSupport.canAdd()) {
-+                // Fiddle start - Mode data-driven - Paper API - Make block and item registries key-aware
-+                if (nmsRegistry instanceof org.fiddlemc.fiddle.impl.minecraft.registries.BlockRegistry || nmsRegistry instanceof org.fiddlemc.fiddle.impl.minecraft.registries.ItemRegistry) {
-+                    return (org.bukkit.Registry<A>) new org.fiddlemc.fiddle.impl.paper.registry.KeyAwareWritableCraftRegistry((MappedRegistry<M>) nmsRegistry, this);
++                // Fiddle start - More data-driven - Registry API - Implementation - Make block and item registries key-aware
++                if (nmsRegistry instanceof org.fiddlemc.fiddle.impl.moredatadriven.minecraft.BlockRegistry || nmsRegistry instanceof org.fiddlemc.fiddle.impl.moredatadriven.minecraft.ItemRegistry) {
++                    return (org.bukkit.Registry<A>) new org.fiddlemc.fiddle.impl.moredatadriven.paper.KeyAwareWritableCraftRegistry((MappedRegistry<M>) nmsRegistry, this);
 +                }
-+                // Fiddle end - Mode data-driven - Paper API - Make block and item registries key-aware
++                // Fiddle end - More data-driven - Registry API - Implementation - Make block and item registries key-aware
                  return new WritableCraftRegistry<>((MappedRegistry<M>) nmsRegistry, this);
              } else {
                  return ServerSide.super.createApiRegistry(nmsRegistry);

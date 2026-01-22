@@ -1,7 +1,9 @@
 /**
  * <h1>Module: Java functional utilities</h1>
  *
+ * <p>
  * Provides utilities related to functional programming and the {@link java.util.function} package.
+ * </p>
  *
  * <p>
  * Currently provides {@link org.fiddlemc.fiddle.impl.java.util.function.ConsumerThrowsException}.

@@ -5,7 +5,7 @@
  
  public class ItemFrame extends HangingEntity {
 -    public static final EntityDataAccessor<ItemStack> DATA_ITEM = SynchedEntityData.defineId(ItemFrame.class, EntityDataSerializers.ITEM_STACK);
-+    public static final EntityDataAccessor<ItemStack> DATA_ITEM = SynchedEntityData.defineId(ItemFrame.class, org.fiddlemc.fiddle.impl.minecraft.packet.mapping.item.itemframe.ItemFrameItemStackSerializer.SERIALIZER); // Fiddle - Packet mapping - Item - Item frame item - Use custom serializer
++    public static final EntityDataAccessor<ItemStack> DATA_ITEM = SynchedEntityData.defineId(ItemFrame.class, org.fiddlemc.fiddle.impl.packetmapping.item.detectitemframe.ItemFrameItemStackSerializer.SERIALIZER); // Fiddle - Item mapping - Detect item frame - Use custom serializer
      public static final EntityDataAccessor<Integer> DATA_ROTATION = SynchedEntityData.defineId(ItemFrame.class, EntityDataSerializers.INT);
      public static final int NUM_ROTATIONS = 8;
      private static final float DEPTH = 0.0625F;

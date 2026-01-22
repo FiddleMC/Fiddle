@@ -4,14 +4,14 @@
          return item == null ? 0 : BuiltInRegistries.ITEM.getId(item);
      }
  
-+    // Fiddle start - Cache block and item values
++    // Fiddle start - More data-driven - Minecraft registries - Cache block and item values
 +    /**
 +     * The {@link net.minecraft.resources.Identifier} with which this item is registered in
 +     * {@link BuiltInRegistries#ITEM}.
 +     *
 +     * <p>
 +     * This will be null until initialized in
-+     * {@link org.fiddlemc.fiddle.impl.minecraft.registries.ItemRegistry#register}.
++     * {@link org.fiddlemc.fiddle.impl.moredatadriven.minecraft.ItemRegistry#register}.
 +     * </p>
 +     */
 +    public net.minecraft.resources.Identifier keyInItemRegistry = null;
@@ -22,24 +22,24 @@
 +     *
 +     * <p>
 +     * This will be -1 until initialized in
-+     * {@link org.fiddlemc.fiddle.impl.minecraft.registries.ItemRegistry#register}.
++     * {@link org.fiddlemc.fiddle.impl.moredatadriven.minecraft.ItemRegistry#register}.
 +     * </p>
 +     */
 +    public int indexInItemRegistry = -1;
 +
 +    /**
 +     * The {@linkplain net.minecraft.core.Registry#getId index} at which this item is registered in
-+     * {@link org.fiddlemc.fiddle.impl.minecraft.registries.VanillaOnlyItemRegistry}.
++     * {@link org.fiddlemc.fiddle.impl.moredatadriven.minecraft.VanillaOnlyItemRegistry}.
 +     *
 +     * <p>
 +     * This will be -1 until initialized in
-+     * {@link org.fiddlemc.fiddle.impl.minecraft.registries.VanillaOnlyItemRegistry#add}.
++     * {@link org.fiddlemc.fiddle.impl.moredatadriven.minecraft.VanillaOnlyItemRegistry#add}.
 +     * </p>
 +     */
 +    public int indexInVanillaOnlyItemRegistry = -1;
-+    // Fiddle end - Cache block and item values
++    // Fiddle end - More data-driven - Minecraft registries - Cache block and item values
 +
-+    // Fiddle start - Vanilla flag
++    // Fiddle start - More data-driven - Vanilla flag
 +    private boolean isVanilla;
 +
 +    /**
@@ -67,7 +67,7 @@
 +    public void markAsVanilla() {
 +        this.isVanilla = true;
 +    }
-+    // Fiddle end - Vanilla flag
++    // Fiddle end - More data-driven - Vanilla flag
 +
      public static Item byId(int id) {
          return BuiltInRegistries.ITEM.byId(id);

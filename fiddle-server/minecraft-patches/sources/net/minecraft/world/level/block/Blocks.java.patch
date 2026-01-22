@@ -4,13 +4,13 @@
  
      private static Block register(ResourceKey<Block> resourceKey, Function<BlockBehaviour.Properties, Block> factory, BlockBehaviour.Properties properties) {
          Block block = factory.apply(properties.setId(resourceKey));
-+        // Fiddle start - Vanilla flag
++        // Fiddle start - More data-driven - Vanilla flag
 +        block.markAsVanilla();
 +        // Currently, there is no way to modify block states of vanilla blocks, so we assume all block states of vanilla blocks are vanilla too
 +        for (BlockState blockState : block.getStateDefinition().getPossibleStates()) {
 +            blockState.markAsVanilla();
 +        }
-+        // Fiddle end - Vanilla flag
++        // Fiddle end - More data-driven - Vanilla flag
          return Registry.register(BuiltInRegistries.BLOCK, resourceKey, block);
      }
  
@@ -19,10 +19,10 @@
          for (Block block : BuiltInRegistries.BLOCK) {
              for (BlockState blockState : block.getStateDefinition().getPossibleStates()) {
 -                Block.BLOCK_STATE_REGISTRY.add(blockState);
-+                // Block.BLOCK_STATE_REGISTRY.add(blockState); // Fiddle - Custom registries for blocks and items - Register block states in BlockRegistry#register
++                // Block.BLOCK_STATE_REGISTRY.add(blockState); // Fiddle - More data-driven - Minecraft registries - Register block states in BlockRegistry#register
                  blockState.initCache();
              }
          }
-+        org.fiddlemc.fiddle.impl.minecraft.registries.BlockRegistry.get().canInitializeBlockStateCaches = true; // Fiddle - Custom registries for blocks and items - Initialize block state caches for non-vanilla blocks in BlockRegistry#register
++        org.fiddlemc.fiddle.impl.moredatadriven.minecraft.BlockRegistry.get().canInitializeBlockStateCaches = true; // Fiddle - More data-driven - Minecraft registries - Initialize block state caches for non-vanilla blocks in BlockRegistry#register
      }
  }

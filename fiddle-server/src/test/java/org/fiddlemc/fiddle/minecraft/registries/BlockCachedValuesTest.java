@@ -4,10 +4,10 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.support.environment.VanillaFeature;
-import org.fiddlemc.fiddle.impl.minecraft.registries.BlockRegistry;
-import org.fiddlemc.fiddle.impl.minecraft.registries.BlockStateRegistry;
-import org.fiddlemc.fiddle.impl.minecraft.registries.VanillaOnlyBlockRegistry;
-import org.fiddlemc.fiddle.impl.minecraft.registries.VanillaOnlyBlockStateRegistry;
+import org.fiddlemc.fiddle.impl.moredatadriven.minecraft.BlockRegistry;
+import org.fiddlemc.fiddle.impl.moredatadriven.minecraft.BlockStateRegistry;
+import org.fiddlemc.fiddle.impl.moredatadriven.minecraft.VanillaOnlyBlockRegistry;
+import org.fiddlemc.fiddle.impl.moredatadriven.minecraft.VanillaOnlyBlockStateRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

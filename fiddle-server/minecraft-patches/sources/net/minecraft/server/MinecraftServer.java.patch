@@ -20,7 +20,7 @@
 -                LOGGER.info("View this and more helpful information here: https://docs.papermc.io/paper/next-steps");
 -                LOGGER.info("*************************************************************************************");
 -            }
-+            // Fiddle start - Disable onboarding message
++            // Fiddle start - Branding (server) - Disable onboarding message (server owners who download Fiddle are expected to be more advanced users anyway)
 +            // if (io.papermc.paper.configuration.GlobalConfiguration.isFirstStart) {
 +            //     LOGGER.info("*************************************************************************************");
 +            //     LOGGER.info("This is the first time you're starting this server.");
@@ -28,7 +28,7 @@
 +            //     LOGGER.info("View this and more helpful information here: https://docs.papermc.io/paper/next-steps");
 +            //     LOGGER.info("*************************************************************************************");
 +            // }
-+            // Fiddle end - Disable onboarding message
++            // Fiddle end - Branding (server) - Disable onboarding message (server owners who download Fiddle are expected to be more advanced users anyway)
              // Paper end - Add onboarding message for initial server start
              // Paper start - Improve outdated version checking
              if (System.getProperty("paper.disableStartupVersionCheck") == null && io.papermc.paper.configuration.GlobalConfiguration.get().updateChecker.enabled) {

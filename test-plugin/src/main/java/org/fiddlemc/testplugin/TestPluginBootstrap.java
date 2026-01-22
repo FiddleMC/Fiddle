@@ -4,18 +4,19 @@ import io.papermc.paper.plugin.bootstrap.BootstrapContext;
 import io.papermc.paper.plugin.bootstrap.PluginBootstrap;
 import io.papermc.paper.registry.RegistryKey;
 import io.papermc.paper.registry.TypedKey;
-import io.papermc.paper.registry.event.RegistryEvents;
 import net.kyori.adventure.key.Key;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
-import org.fiddlemc.fiddle.api.client.view.ClientView;
-import org.fiddlemc.fiddle.api.paper.registry.data.NMSBlockRegistryEntryBuilder;
-import org.fiddlemc.fiddle.api.paper.registry.data.NMSItemRegistryEntryBuilder;
-import org.fiddlemc.fiddle.api.minecraft.packet.mapping.item.ItemMappingPipeline;
-import org.fiddlemc.fiddle.api.minecraft.packet.mapping.item.NMSItemMappingRegistrar;
+import org.fiddlemc.fiddle.api.clientview.ClientView;
+import org.fiddlemc.fiddle.api.moredatadriven.paper.BlockRegistryEventProvider;
+import org.fiddlemc.fiddle.api.moredatadriven.paper.ItemRegistryEventProvider;
+import org.fiddlemc.fiddle.api.moredatadriven.paper.nms.NMSBlockRegistryEntryBuilder;
+import org.fiddlemc.fiddle.api.moredatadriven.paper.nms.NMSItemRegistryEntryBuilder;
+import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingPipeline;
+import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMappingRegistrar;
 import org.fiddlemc.testplugin.data.PluginItems;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,7 +27,7 @@ public class TestPluginBootstrap implements PluginBootstrap {
     public void bootstrap(@NotNull BootstrapContext context) {
 
         // Register custom blocks
-        context.getLifecycleManager().registerEventHandler(RegistryEvents.BLOCK.compose(), event -> {
+        context.getLifecycleManager().registerEventHandler(BlockRegistryEventProvider.BLOCK.compose(), event -> {
             context.getLogger().info("Registering custom blocks...");
             // Register an ash block
             event.registry().register(TypedKey.create(RegistryKey.BLOCK, Key.key("example:ash_block")), builder -> {
@@ -43,7 +44,7 @@ public class TestPluginBootstrap implements PluginBootstrap {
         });
 
         // Register custom items
-        context.getLifecycleManager().registerEventHandler(RegistryEvents.ITEM.compose(), event -> {
+        context.getLifecycleManager().registerEventHandler(ItemRegistryEventProvider.ITEM.compose(), event -> {
             context.getLogger().info("Registering custom items...");
             // Register ash
             event.registry().register(TypedKey.create(RegistryKey.ITEM, Key.key("example:ash")), builder -> {

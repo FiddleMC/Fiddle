@@ -1,0 +1,14 @@
+--- a/src/main/java/io/papermc/paper/registry/event/RegistryEventProviderImpl.java
++++ b/src/main/java/io/papermc/paper/registry/event/RegistryEventProviderImpl.java
+@@ -8,9 +_,9 @@
+ import org.jetbrains.annotations.ApiStatus;
+ 
+ @ApiStatus.Internal
+-record RegistryEventProviderImpl<T, B extends RegistryBuilder<T>>(RegistryKey<T> registryKey) implements RegistryEventProvider<T, B> {
++public record RegistryEventProviderImpl<T, B extends RegistryBuilder<T>>(RegistryKey<T> registryKey) implements RegistryEventProvider<T, B> { // Fiddle - More data-driven - Registry API - Internals - Make public
+ 
+-    static <T, B extends RegistryBuilder<T>> RegistryEventProvider<T, B> create(final RegistryKey<T> registryKey) {
++    public static <T, B extends RegistryBuilder<T>> RegistryEventProvider<T, B> create(final RegistryKey<T> registryKey) { // Fiddle - More data-driven - Registry API - Internals - Make public
+         return new RegistryEventProviderImpl<>(registryKey);
+     }
+ 

@@ -12,11 +12,11 @@
          com.destroystokyo.paper.Metrics.PaperMetrics.startMetrics(); // Paper - start metrics
          com.destroystokyo.paper.VersionHistoryManager.INSTANCE.getClass(); // Paper - load version history now
  
-+        // Fiddle start - Packet mapping - Register replacements
-+        org.fiddlemc.fiddle.impl.minecraft.packet.mapping.item.ItemMappingPipelineImpl.ComposeEventImpl itemMappingPipelienComposeEvent = new org.fiddlemc.fiddle.impl.minecraft.packet.mapping.item.ItemMappingPipelineImpl.ComposeEventImpl();
-+        io.papermc.paper.plugin.lifecycle.event.LifecycleEventRunner.INSTANCE.callEvent(org.fiddlemc.fiddle.impl.minecraft.packet.mapping.item.ItemMappingPipelineImpl.get().compose(), itemMappingPipelienComposeEvent);
++        // Fiddle start - Item mapping - Implementation - Register replacements
++        org.fiddlemc.fiddle.impl.packetmapping.item.ItemMappingPipelineImpl.ComposeEventImpl itemMappingPipelienComposeEvent = new org.fiddlemc.fiddle.impl.packetmapping.item.ItemMappingPipelineImpl.ComposeEventImpl();
++        io.papermc.paper.plugin.lifecycle.event.LifecycleEventRunner.INSTANCE.callEvent(org.fiddlemc.fiddle.impl.packetmapping.item.ItemMappingPipelineImpl.get().compose(), itemMappingPipelienComposeEvent);
 +        itemMappingPipelienComposeEvent.bake();
-+        // Fiddle end - Packet mapping - Register replacements
++        // Fiddle end - Item mapping - Implementation - Register replacements
 +
          // this.worldData.setGameType(properties.gameMode.get()); // CraftBukkit - moved to world loading
          LOGGER.info("Default game type: {}", properties.gameMode.get());
