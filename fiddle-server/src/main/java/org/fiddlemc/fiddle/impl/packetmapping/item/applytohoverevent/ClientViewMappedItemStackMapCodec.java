@@ -19,7 +19,7 @@ public final class ClientViewMappedItemStackMapCodec {
 
     /**
      * A modified version of {@link ItemStack#MAP_CODEC}, which maps the item according to the
-     * {@link ClientViewLookupThreadLocal#getThreadLocalClientViewOrDefault}.
+     * {@link ClientViewLookupThreadLocal#getThreadLocalClientViewOrFallback}.
      *
      * <p>
      * The usage of this instance in {@link HoverEvent.ShowItem} makes it so that

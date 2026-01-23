@@ -1,0 +1,31 @@
+package org.fiddlemc.fiddle.impl.clientview;
+
+import net.minecraft.network.Connection;
+import org.fiddlemc.fiddle.api.clientview.ClientView;
+import org.fiddlemc.fiddle.api.clientview.nms.NMSClientView;
+import org.jspecify.annotations.Nullable;
+
+/**
+ * A fallback {@link ClientView} that is used for mappings when no view is known.
+ */
+public final class FallbackClientViewImpl implements NMSClientView {
+
+    /**
+     * A usable instance of {@link FallbackClientViewImpl}.
+     */
+    public static final FallbackClientViewImpl INSTANCE = new FallbackClientViewImpl();
+
+    private FallbackClientViewImpl() {
+    }
+
+    @Override
+    public AwarenessLevel getAwarenessLevel() {
+        return AwarenessLevel.JAVA_DEFAULT;
+    }
+
+    @Override
+    public @Nullable Connection getConnection() {
+        return null;
+    }
+
+}

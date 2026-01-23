@@ -1,5 +1,8 @@
 package org.fiddlemc.fiddle.api.clientview;
 
+import org.bukkit.entity.Player;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This class represents the static circumstances under which a client (typically a player) observes the data sent.
  *
@@ -34,6 +37,12 @@ package org.fiddlemc.fiddle.api.clientview;
 public interface ClientView {
 
     AwarenessLevel getAwarenessLevel();
+
+    /**
+     * @return The player of this client,
+     * or null if not available (for example when the client is still in the configuration phase).
+     */
+    @Nullable Player getPlayer();
 
     /**
      * @return True only if this client understands all server-side translatables

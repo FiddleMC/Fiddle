@@ -4,7 +4,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerCommonPacketListenerImpl;
 import net.minecraft.server.network.ServerLoginPacketListenerImpl;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
-import org.fiddlemc.fiddle.impl.clientview.DefaultClientView;
+import org.fiddlemc.fiddle.impl.clientview.FallbackClientViewImpl;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -27,14 +27,14 @@ public interface ClientViewLookup {
     }
 
     /**
-     * Convenience method to get the {@link ClientView} of the client, or a default.
+     * Convenience method to get the {@link ClientView} of the client, or a fallback.
      *
      * @return The same as {@link ClientView},
-     * except null will be replaced by {@link DefaultClientView#createDefault}.
+     * except null will be replaced by {@link FallbackClientViewImpl#INSTANCE}.
      */
-    default ClientView getClientViewOrDefault() {
+    default ClientView getClientViewOrFallback() {
         @Nullable ClientView clientView = this.getClientView();
-        return clientView != null ? clientView : DefaultClientView.createDefault();
+        return clientView != null ? clientView : FallbackClientViewImpl.INSTANCE;
     }
 
 }

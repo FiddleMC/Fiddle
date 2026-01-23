@@ -1,7 +1,7 @@
 package org.fiddlemc.fiddle.impl.clientview.lookup.packethandling;
 
 import org.fiddlemc.fiddle.api.clientview.ClientView;
-import org.fiddlemc.fiddle.impl.clientview.DefaultClientView;
+import org.fiddlemc.fiddle.impl.clientview.FallbackClientViewImpl;
 import org.fiddlemc.fiddle.impl.clientview.lookup.ClientViewLookup;
 import org.jspecify.annotations.Nullable;
 import java.lang.ref.WeakReference;
@@ -33,11 +33,11 @@ public final class ClientViewLookupThreadLocal {
 
     /**
      * Utility function, the same as {@link #getThreadLocalClientView}, but will return
-     * {@link DefaultClientView#createDefault} instead of null.
+     * {@link FallbackClientViewImpl#INSTANCE} instead of null.
      */
-    public static ClientView getThreadLocalClientViewOrDefault() {
+    public static ClientView getThreadLocalClientViewOrFallback() {
         @Nullable ClientView clientView = getThreadLocalClientView();
-        return clientView != null ? clientView : DefaultClientView.createDefault();
+        return clientView != null ? clientView : FallbackClientViewImpl.INSTANCE;
     }
 
 }

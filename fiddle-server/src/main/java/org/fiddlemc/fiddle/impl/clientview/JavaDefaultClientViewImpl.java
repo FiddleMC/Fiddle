@@ -1,12 +1,17 @@
 package org.fiddlemc.fiddle.impl.clientview;
 
+import net.minecraft.network.Connection;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
 
 /**
  * A simple implementation of {@link ClientView}
  * for {@link ClientView.AwarenessLevel#JAVA_DEFAULT} clients.
  */
-public class JavaDefaultClientViewImpl implements ClientView { // TODO use
+public class JavaDefaultClientViewImpl extends ConnectionClientViewImpl {
+
+    public JavaDefaultClientViewImpl(Connection connection) {
+        super(connection);
+    }
 
     @Override
     public AwarenessLevel getAwarenessLevel() {

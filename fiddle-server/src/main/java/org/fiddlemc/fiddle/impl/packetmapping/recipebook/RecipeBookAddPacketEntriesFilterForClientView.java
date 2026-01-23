@@ -18,7 +18,7 @@ public final class RecipeBookAddPacketEntriesFilterForClientView {
 
     public static List<ClientboundRecipeBookAddPacket.Entry> getEntriesFilteredForClientView(ClientboundRecipeBookAddPacket packet) {
         List<ClientboundRecipeBookAddPacket.Entry> entries = packet.entries();
-        ClientView clientView = ClientViewLookupThreadLocal.getThreadLocalClientViewOrDefault();
+        ClientView clientView = ClientViewLookupThreadLocal.getThreadLocalClientViewOrFallback();
         if (clientView.understandsAllServerSideItems()) {
             return entries;
         }

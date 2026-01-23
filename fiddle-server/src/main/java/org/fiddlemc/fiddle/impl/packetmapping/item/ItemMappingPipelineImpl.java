@@ -129,7 +129,7 @@ public final class ItemMappingPipelineImpl implements ItemMappingPipeline {
      * It will create an {@link ItemMappingContextImpl} based on {@link ClientViewLookupThreadLocal}.
      */
     public ItemStack applyGenerically(ItemStack itemStack) {
-        return this.apply(itemStack, new ItemMappingContextImpl(null, ClientViewLookupThreadLocal.getThreadLocalClientViewOrDefault(), false, false));
+        return this.apply(itemStack, new ItemMappingContextImpl(null, ClientViewLookupThreadLocal.getThreadLocalClientViewOrFallback(), false, false));
     }
 
 }

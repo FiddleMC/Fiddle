@@ -70,7 +70,7 @@ public class TestPluginBootstrap implements PluginBootstrap {
             });
         });
 
-        // Use a custom enum name, just to show that we can
+        // Use a custom enum name, just to show that we can (but please don't do this yourself unless you really know what you are doing)
         context.getLifecycleManager().registerEventHandler(MaterialEnumSynchronizer.get().determineEnumNameEventType(), event -> {
             NamespacedKey key = event.getSourceValue().getLeft();
             if (key.equals(NamespacedKey.fromString("example:ash"))) {

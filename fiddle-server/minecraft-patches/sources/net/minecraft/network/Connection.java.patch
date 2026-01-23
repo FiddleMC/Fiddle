@@ -6,7 +6,7 @@
  
 -public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
 +public class Connection extends SimpleChannelInboundHandler<Packet<?>> implements org.fiddlemc.fiddle.impl.clientview.lookup.ClientViewLookup { // Fiddle - Client view - Lookup - Implement for Connection
-+    private org.fiddlemc.fiddle.api.clientview.@Nullable ClientView clientView = org.fiddlemc.fiddle.impl.clientview.DefaultClientView.createDefault()/* TODO actually determine the view */; // Fiddle - Client view - Set - Field
++    private org.fiddlemc.fiddle.api.clientview.@Nullable ClientView clientView; // Fiddle - Client view - Set - Field
 +    // Fiddle start - Client view - Lookup - Implement for Connection - Getter
 +    @Override
 +    public org.fiddlemc.fiddle.api.clientview.@Nullable ClientView getClientView() {
@@ -16,7 +16,14 @@
      private static final float AVERAGE_PACKETS_SMOOTHING = 0.75F;
      private static final Logger LOGGER = LogUtils.getLogger();
      public static final Marker ROOT_MARKER = MarkerFactory.getMarker("NETWORK");
-@@ -136,6 +_,7 @@
+@@ -130,12 +_,14 @@
+ 
+     public Connection(PacketFlow receiving) {
+         this.receiving = receiving;
++        this.clientView = new org.fiddlemc.fiddle.impl.clientview.JavaDefaultClientViewImpl(this)/* TODO determine actual view */; // Fiddle - Client view - Set - Field
+     }
+ 
+     @Override
      public void channelActive(ChannelHandlerContext ctx) throws Exception {
          super.channelActive(ctx);
          this.channel = ctx.channel();
