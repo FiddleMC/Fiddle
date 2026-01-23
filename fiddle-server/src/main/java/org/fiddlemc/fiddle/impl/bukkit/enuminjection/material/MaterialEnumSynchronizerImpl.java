@@ -9,6 +9,7 @@ import org.bukkit.block.BlockType;
 import org.bukkit.inventory.ItemType;
 import org.fiddlemc.fiddle.api.bukkit.enuminjection.material.MaterialEnumSynchronizer;
 import org.fiddlemc.fiddle.impl.bukkit.enuminjection.KeyedSourceBukkitEnumSynchronizerImpl;
+import org.fiddlemc.fiddle.impl.java.util.serviceloader.NoArgsConstructorServiceProviderImpl;
 import org.jspecify.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -20,13 +21,19 @@ import java.util.Map;
  */
 public final class MaterialEnumSynchronizerImpl extends KeyedSourceBukkitEnumSynchronizerImpl<Material, Triple<NamespacedKey, @Nullable BlockType, @Nullable ItemType>, MaterialEnumInjector> implements MaterialEnumSynchronizer {
 
-    private static MaterialEnumSynchronizerImpl INSTANCE;
+    public static final class ServiceProviderImpl extends NoArgsConstructorServiceProviderImpl<MaterialEnumSynchronizer, MaterialEnumSynchronizerImpl> implements ServiceProvider {
+
+        public ServiceProviderImpl() {
+            super(MaterialEnumSynchronizerImpl.class);
+        }
+
+    }
 
     public static MaterialEnumSynchronizerImpl get() {
-        if (INSTANCE == null) {
-            INSTANCE = (MaterialEnumSynchronizerImpl) MaterialEnumSynchronizer.get();
-        }
-        return INSTANCE;
+        return (MaterialEnumSynchronizerImpl) MaterialEnumSynchronizer.get();
+    }
+
+    private MaterialEnumSynchronizerImpl() {
     }
 
     @Override

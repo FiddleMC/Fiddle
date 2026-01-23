@@ -1,0 +1,20 @@
+--- a/src/main/java/org/bukkit/Material.java
++++ b/src/main/java/org/bukkit/Material.java
+@@ -3078,16 +_,7 @@
+     @Nullable
+     public static Material matchMaterial(@NotNull final String name, boolean legacyName) {
+         Preconditions.checkArgument(name != null, "Name cannot be null");
+-
+-        String filtered = name;
+-        if (filtered.startsWith(NamespacedKey.MINECRAFT + ":")) {
+-            filtered = filtered.substring((NamespacedKey.MINECRAFT + ":").length());
+-        }
+-
+-        filtered = filtered.toUpperCase(Locale.ROOT);
+-
+-        filtered = filtered.replaceAll("\\s+", "_").replaceAll("\\W", "");
+-        return getMaterial(filtered, legacyName);
++        return org.fiddlemc.fiddle.api.bukkit.enuminjection.material.MaterialByKeyLookup.get().lookup(name, legacyName); // Fiddle - Material injection - API - Replace matchMaterial
+     }
+ 
+     static {

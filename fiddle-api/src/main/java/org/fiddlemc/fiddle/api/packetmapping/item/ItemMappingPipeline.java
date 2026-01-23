@@ -4,6 +4,7 @@ import io.papermc.paper.plugin.bootstrap.BootstrapContext;
 import io.papermc.paper.plugin.lifecycle.event.LifecycleEvent;
 import io.papermc.paper.plugin.lifecycle.event.handler.configuration.PrioritizedLifecycleEventHandlerConfiguration;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEventType;
+import org.fiddlemc.fiddle.impl.java.util.serviceloader.GenericServiceProvider;
 import java.util.ServiceLoader;
 
 /**
@@ -12,15 +13,16 @@ import java.util.ServiceLoader;
 public interface ItemMappingPipeline {
 
     /**
-     * The backing field for {@link #get()}.
+     * An internal interface to get the {@link ItemMappingPipeline} instance.
      */
-    ItemMappingPipeline INSTANCE = ServiceLoader.load(ItemMappingPipeline.class, ItemMappingPipeline.class.getClassLoader()).findFirst().get();
+    interface ServiceProvider extends GenericServiceProvider<ItemMappingPipeline> {
+    }
 
     /**
-     * @return The pipeline instance.
+     * @return The {@link ItemMappingPipeline} instance.
      */
     static ItemMappingPipeline get() {
-        return INSTANCE;
+        return ServiceLoader.load(ItemMappingPipeline.ServiceProvider.class, ItemMappingPipeline.ServiceProvider.class.getClassLoader()).findFirst().get().get();
     }
 
     /**

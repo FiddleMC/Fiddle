@@ -5,6 +5,18 @@
  * Provides API for hooking into the injection of values into {@link org.bukkit.Material},
  * in particular for changing the determination of enum names.
  * </p>
+ *
+ * <p>
+ * Also, modifies {@link org.bukkit.Material#matchMaterial}
+ * to be more flexible towards plugins that make outdated assumptions.
+ * </p>
+ *
+ * <p>
+ * <h3>Paper changes</h3>
+ * <ul>
+ *     <li>{@link org.bukkit.Material} - To replace the {@code matchMaterial} implementation.</li>
+ * </ul>
+ * </p>
  */
 @NullMarked
 package org.fiddlemc.fiddle.api.bukkit.enuminjection.material;

@@ -10,6 +10,7 @@ import org.fiddlemc.fiddle.api.clientview.ClientView;
 import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingPipeline;
 import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingRegistrar;
 import org.fiddlemc.fiddle.impl.clientview.lookup.packethandling.ClientViewLookupThreadLocal;
+import org.fiddlemc.fiddle.impl.java.util.serviceloader.NoArgsConstructorServiceProviderImpl;
 import org.jspecify.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,13 +22,16 @@ import java.util.Map;
  */
 public final class ItemMappingPipelineImpl implements ItemMappingPipeline {
 
-    private static ItemMappingPipelineImpl INSTANCE;
+    public static final class ServiceProviderImpl extends NoArgsConstructorServiceProviderImpl<ItemMappingPipeline, ItemMappingPipelineImpl> implements ServiceProvider {
+
+        public ServiceProviderImpl() {
+            super(ItemMappingPipelineImpl.class);
+        }
+
+    }
 
     public static ItemMappingPipelineImpl get() {
-        if (INSTANCE == null) {
-            INSTANCE = (ItemMappingPipelineImpl) ItemMappingPipeline.get();
-        }
-        return INSTANCE;
+        return (ItemMappingPipelineImpl) ItemMappingPipeline.get();
     }
 
     public static final class ComposeEventImpl implements ComposeEvent, PaperLifecycleEvent {
@@ -89,7 +93,7 @@ public final class ItemMappingPipelineImpl implements ItemMappingPipeline {
      */
     private final Map<Item, ItemMapping[]>[] mappings;
 
-    public ItemMappingPipelineImpl() {
+    private ItemMappingPipelineImpl() {
         this.mappings = new Map[ClientView.AwarenessLevel.values().length];
         for (int i = 0; i < this.mappings.length; i++) {
             this.mappings[i] = new HashMap<>(16, 0.5f);

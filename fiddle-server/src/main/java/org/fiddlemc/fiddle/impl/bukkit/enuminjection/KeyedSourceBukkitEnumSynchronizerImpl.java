@@ -16,6 +16,8 @@ import org.jspecify.annotations.Nullable;
  */
 public abstract class KeyedSourceBukkitEnumSynchronizerImpl<E extends Enum<E>, T, I extends EnumInjector<E>> extends BukkitEnumSynchronizerImpl<E, T, I> implements KeyedSourceBukkitEnumSynchronizer<E, T> {
 
+    public static final String DEFAULT_ENUM_PREFIX = "FIDDLE_";
+
     /**
      * @return The {@link NamespacedKey} for the given source value.
      */
@@ -28,7 +30,7 @@ public abstract class KeyedSourceBukkitEnumSynchronizerImpl<E extends Enum<E>, T
         // Check if the key is acceptable
         this.checkAcceptableNamespacedKey(key);
         // Map the key to the enum name
-        String originalEnumName = "FIDDLE_" + this.mapNamespacedKeyPartToEnumPart(key.namespace()) + "_" + this.mapNamespacedKeyPartToEnumPart(key.getKey());
+        String originalEnumName = DEFAULT_ENUM_PREFIX + this.mapNamespacedKeyPartToEnumPart(key.namespace()) + "_" + this.mapNamespacedKeyPartToEnumPart(key.getKey());
         // Fire the event
         DetermineEnumNameEventImpl<T> event = new DetermineEnumNameEventImpl<>(sourceValue, originalEnumName);
         LifecycleEventRunner.INSTANCE.callEvent(this.determineEnumNameEventType(), event);
@@ -52,6 +54,9 @@ public abstract class KeyedSourceBukkitEnumSynchronizerImpl<E extends Enum<E>, T
      *                                  the given {@code key} to an acceptable enum name.
      */
     protected void checkAcceptableNamespacedKeyPart(NamespacedKey key, String part) throws EnumNameMappingException {
+        if (part.isEmpty()) {
+            throw new EnumNameMappingException("A key (" + key + ") contains an empty part, which is not allowed by Minecraft");
+        }
         boolean hasNonUnderscore = false;
         for (char c : part.toCharArray()) {
             if (c == '_') {
@@ -64,12 +69,12 @@ public abstract class KeyedSourceBukkitEnumSynchronizerImpl<E extends Enum<E>, T
                 continue;
             }
             if (c == '.' || c == '-' || c == '/') {
-                throw new EnumNameMappingException("A block or item key (" + key + ") contains a " + c + " character, which is technically allowed by Minecraft, but not by Fiddle");
+                throw new EnumNameMappingException("A key (" + key + ") contains a " + c + " character, which is technically allowed by Minecraft, but not by Fiddle");
             }
-            throw new EnumNameMappingException("A block or item key (" + key + ") contains a " + c + " character, which is not allowed by Fiddle");
+            throw new EnumNameMappingException("A key (" + key + ") contains a " + c + " character, which is not allowed by Minecraft");
         }
         if (!hasNonUnderscore) {
-            throw new EnumNameMappingException("A block or item key part (" + key + ") contains only underscores, which is technically allowed by Minecraft, but not by Fiddle");
+            throw new EnumNameMappingException("A key (" + key + ") contains a part with only underscores, which is technically allowed by Minecraft, but not by Fiddle");
         }
         // The part is acceptable
     }

@@ -7,6 +7,7 @@ import org.bukkit.block.BlockType;
 import org.bukkit.inventory.ItemType;
 import org.fiddlemc.fiddle.api.bukkit.enuminjection.BukkitEnumSynchronizer;
 import org.fiddlemc.fiddle.api.bukkit.enuminjection.KeyedSourceBukkitEnumSynchronizer;
+import org.fiddlemc.fiddle.impl.java.util.serviceloader.GenericServiceProvider;
 import org.jspecify.annotations.Nullable;
 import java.util.ServiceLoader;
 
@@ -16,15 +17,16 @@ import java.util.ServiceLoader;
 public interface MaterialEnumSynchronizer extends KeyedSourceBukkitEnumSynchronizer<Material, Triple<NamespacedKey, @Nullable BlockType, @Nullable ItemType>> {
 
     /**
-     * The backing field for {@link #get()}.
+     * An internal interface to get the {@link MaterialEnumSynchronizer} instance.
      */
-    MaterialEnumSynchronizer INSTANCE = ServiceLoader.load(MaterialEnumSynchronizer.class, MaterialEnumSynchronizer.class.getClassLoader()).findFirst().get();
+    interface ServiceProvider extends GenericServiceProvider<MaterialEnumSynchronizer> {
+    }
 
     /**
-     * @return The synchronizer instance.
+     * @return The {@link MaterialEnumSynchronizer} instance.
      */
     static MaterialEnumSynchronizer get() {
-        return INSTANCE;
+        return ServiceLoader.load(MaterialEnumSynchronizer.ServiceProvider.class, MaterialEnumSynchronizer.ServiceProvider.class.getClassLoader()).findFirst().get().get();
     }
 
 }

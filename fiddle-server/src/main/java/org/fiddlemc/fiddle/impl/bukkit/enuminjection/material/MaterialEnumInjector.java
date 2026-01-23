@@ -15,6 +15,7 @@ import org.fiddlemc.fiddle.impl.java.util.function.ConsumerThrowsException;
 import org.fiddlemc.fiddle.impl.java.util.reflect.ReflectionUtil;
 import org.jspecify.annotations.Nullable;
 import java.lang.reflect.Field;
+import java.util.Map;
 import java.util.function.Supplier;
 
 /**
@@ -29,6 +30,7 @@ public class MaterialEnumInjector extends EnumInjector<Material> {
     private final Field dataField;
     private final Field itemTypeField;
     private final Field blockTypeField;
+    private final Field byNameField;
 
     public MaterialEnumInjector() throws Exception {
         super(Material.class);
@@ -39,6 +41,7 @@ public class MaterialEnumInjector extends EnumInjector<Material> {
         this.dataField = ReflectionUtil.getDeclaredField(Material.class, "data");
         this.itemTypeField = ReflectionUtil.getDeclaredField(Material.class, "itemType");
         this.blockTypeField = ReflectionUtil.getDeclaredField(Material.class, "blockType");
+        this.byNameField = ReflectionUtil.getDeclaredField(Material.class, "BY_NAME");
     }
 
     @Override
@@ -65,6 +68,8 @@ public class MaterialEnumInjector extends EnumInjector<Material> {
             this.itemTypeField.set(material, (Supplier<ItemType>) () -> itemType);
             // Set its asBlockType()
             this.blockTypeField.set(material, (Supplier<BlockType>) () -> blockType);
+            // Support it in getMaterial(..)
+            ((Map<String, Material>) this.byNameField.get(null)).put(enumName, material);
             // Add to CraftMagicNumbers conversions
             if (itemType != null) {
                 Item item = ((CraftItemType<?>) itemType).getHandle();

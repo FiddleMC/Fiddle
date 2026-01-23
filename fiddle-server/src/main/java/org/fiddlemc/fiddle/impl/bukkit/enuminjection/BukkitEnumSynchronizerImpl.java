@@ -71,6 +71,9 @@ public abstract class BukkitEnumSynchronizerImpl<E extends Enum<E>, T, I extends
      * @throws EnumNameMappingException If the given string is not an acceptable enum name.
      */
     protected void checkAcceptableEnumName(String enumName) throws EnumNameMappingException {
+        if (enumName.isEmpty()) {
+            throw new EnumNameMappingException("An enum name is empty, which is not allowed by Java");
+        }
         boolean hasNonUnderscore = false;
         for (char c : enumName.toCharArray()) {
             if (c == '_') {
