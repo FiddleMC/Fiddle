@@ -3,9 +3,8 @@
 # Rebuilds all patches (in IntelliJ, right-click -> Run 'rebuild')
 
 cd ..
-./gradlew rebuildPaperPatches
+./gradlew rebuildPaperApiFeaturePatches # includes rebuildPaperApiFilePatches
 ./gradlew rebuildPaperSingleFilePatches
-./gradlew :fiddle-server:rebuildMinecraftPatches
-./gradlew :fiddle-server:rebuildAllServerPatches
-./gradlew :fiddle-server:rebuildServerPatches
+./gradlew :fiddle-server:rebuildMinecraftFeaturePatches # includes :fiddle-server:rebuildMinecraftFilePatches, which includes :fiddle-server:rebuildMinecraftResourcePatches and :fiddle-server:rebuildMinecraftSourcePatches
+./gradlew :fiddle-server:rebuildPaperServerFeaturePatches # includes :fiddle-server:rebuildPaperServerFilePatches
 cd gradle-bin
