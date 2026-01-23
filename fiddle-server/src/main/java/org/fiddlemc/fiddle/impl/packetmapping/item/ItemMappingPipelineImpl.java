@@ -6,11 +6,11 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
 import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingContext;
+import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingHandle;
 import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingPipeline;
 import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMapping;
 import org.fiddlemc.fiddle.impl.clientview.lookup.packethandling.ClientViewLookupThreadLocal;
 import org.fiddlemc.fiddle.impl.java.util.serviceloader.NoArgsConstructorServiceProviderImpl;
-import org.fiddlemc.fiddle.impl.packetmapping.MutablePacketDataMappingHandleImpl;
 import org.fiddlemc.fiddle.impl.packetmapping.PacketDataMappingPipelineImpl;
 import org.jspecify.annotations.Nullable;
 import java.util.ArrayList;
@@ -21,9 +21,9 @@ import java.util.Map;
 /**
  * A pipeline of {@link NMSItemMapping}s.
  */
-public final class ItemMappingPipelineImpl extends PacketDataMappingPipelineImpl<ItemStack, MutablePacketDataMappingHandleImpl<ItemStack>, ItemMappingContext, NMSItemMapping, ItemMappingRegistrarImpl> implements ItemMappingPipeline<ItemStack, MutablePacketDataMappingHandleImpl<ItemStack>, ItemMappingContext, NMSItemMapping, ItemMappingRegistrarImpl> {
+public final class ItemMappingPipelineImpl extends PacketDataMappingPipelineImpl<ItemStack, ItemMappingHandle<ItemStack>, ItemMappingContext, NMSItemMapping, ItemMappingRegistrarImpl> implements ItemMappingPipeline<ItemStack, ItemMappingHandle<ItemStack>, ItemMappingContext, NMSItemMapping, ItemMappingRegistrarImpl> {
 
-    public static final class ServiceProviderImpl extends NoArgsConstructorServiceProviderImpl<ItemMappingPipeline<ItemStack, MutablePacketDataMappingHandleImpl<ItemStack>, ItemMappingContext, NMSItemMapping, ItemMappingRegistrarImpl>, ItemMappingPipelineImpl> implements ServiceProvider<ItemStack, MutablePacketDataMappingHandleImpl<ItemStack>, ItemMappingContext, NMSItemMapping, ItemMappingRegistrarImpl> {
+    public static final class ServiceProviderImpl extends NoArgsConstructorServiceProviderImpl<ItemMappingPipeline<ItemStack, ItemMappingHandle<ItemStack>, ItemMappingContext, NMSItemMapping, ItemMappingRegistrarImpl>, ItemMappingPipelineImpl> implements ServiceProvider<ItemStack, ItemMappingHandle<ItemStack>, ItemMappingContext, NMSItemMapping, ItemMappingRegistrarImpl> {
 
         public ServiceProviderImpl() {
             super(ItemMappingPipelineImpl.class);
@@ -40,7 +40,7 @@ public final class ItemMappingPipelineImpl extends PacketDataMappingPipelineImpl
         return "fiddle_item_mapping";
     }
 
-    private final class ComposeEventImpl extends PacketDataMappingPipelineImpl<ItemStack, MutablePacketDataMappingHandleImpl<ItemStack>, ItemMappingContext, NMSItemMapping, ItemMappingRegistrarImpl>.ComposeEventImpl {
+    private final class ComposeEventImpl extends PacketDataMappingPipelineImpl<ItemStack, ItemMappingHandle<ItemStack>, ItemMappingContext, NMSItemMapping, ItemMappingRegistrarImpl>.ComposeEventImpl {
 
         public ComposeEventImpl(ItemMappingRegistrarImpl registrar) {
             super(registrar);
