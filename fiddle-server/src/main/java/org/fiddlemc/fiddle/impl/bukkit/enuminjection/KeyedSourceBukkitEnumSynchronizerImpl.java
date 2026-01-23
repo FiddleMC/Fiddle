@@ -153,5 +153,4 @@ public abstract class KeyedSourceBukkitEnumSynchronizerImpl<E extends Enum<E>, T
         return this.determineEnumNameEventType;
     }
 
-
 }

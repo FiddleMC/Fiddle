@@ -11,7 +11,7 @@
                      buffer.writeVarInt(0);
                  } else {
 +                    // Fiddle start - Item mapping - Implementation - Apply at ItemStack encoding
-+                    org.fiddlemc.fiddle.impl.packetmapping.item.ItemMappingContextImpl itemMappingContext = new org.fiddlemc.fiddle.impl.packetmapping.item.ItemMappingContextImpl(unmappedValue, buffer.getClientViewOrFallback(), buffer.isEncodingItemFrameItem, buffer.isEncodingStonecutterRecipeResult);
++                    org.fiddlemc.fiddle.impl.packetmapping.item.ItemMappingContextImpl itemMappingContext = new org.fiddlemc.fiddle.impl.packetmapping.item.ItemMappingContextImpl(buffer.getClientViewOrFallback(), buffer.isEncodingItemFrameItem, buffer.isEncodingStonecutterRecipeResult);
 +                    ItemStack value = org.fiddlemc.fiddle.impl.packetmapping.item.ItemMappingPipelineImpl.get().apply(unmappedValue, itemMappingContext);
 +                    // Fiddle end - Item mapping - Implementation - Apply at ItemStack encoding
                      buffer.writeVarInt(io.papermc.paper.util.sanitizer.ItemComponentSanitizer.sanitizeCount(io.papermc.paper.util.sanitizer.ItemObfuscationSession.currentSession(), value, value.getCount())); // Paper - potentially sanitize count

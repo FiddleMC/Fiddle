@@ -1,49 +1,28 @@
 package org.fiddlemc.fiddle.api.packetmapping.item;
 
-import io.papermc.paper.plugin.bootstrap.BootstrapContext;
-import io.papermc.paper.plugin.lifecycle.event.LifecycleEvent;
-import io.papermc.paper.plugin.lifecycle.event.handler.configuration.PrioritizedLifecycleEventHandlerConfiguration;
-import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEventType;
+import org.fiddlemc.fiddle.api.packetmapping.MutablePacketDataMappingHandle;
+import org.fiddlemc.fiddle.api.packetmapping.PacketDataMapping;
+import org.fiddlemc.fiddle.api.packetmapping.PacketDataMappingPipeline;
+import org.fiddlemc.fiddle.api.packetmapping.PacketDataMappingRegistrar;
 import org.fiddlemc.fiddle.impl.java.util.serviceloader.GenericServiceProvider;
 import java.util.ServiceLoader;
 
 /**
  * A pipeline of item mappings.
  */
-public interface ItemMappingPipeline {
+public interface ItemMappingPipeline<T, H extends MutablePacketDataMappingHandle<T>, C extends ItemMappingContext, M extends PacketDataMapping<T, H, C>, R extends PacketDataMappingRegistrar<? extends T>> extends PacketDataMappingPipeline<T, H, C, M, R> {
 
     /**
      * An internal interface to get the {@link ItemMappingPipeline} instance.
      */
-    interface ServiceProvider extends GenericServiceProvider<ItemMappingPipeline> {
+    interface ServiceProvider<T, H extends MutablePacketDataMappingHandle<T>, C extends ItemMappingContext, M extends PacketDataMapping<T, H, C>, R extends PacketDataMappingRegistrar<? extends T>> extends GenericServiceProvider<ItemMappingPipeline<T, H, C, M, R>> {
     }
 
     /**
      * @return The {@link ItemMappingPipeline} instance.
      */
-    static ItemMappingPipeline get() {
-        return ServiceLoader.load(ItemMappingPipeline.ServiceProvider.class, ItemMappingPipeline.ServiceProvider.class.getClassLoader()).findFirst().get().get();
-    }
-
-    /**
-     * @return The {@link LifecycleEventType} for the {@link ComposeEvent}.
-     */
-    LifecycleEventType<BootstrapContext, ComposeEvent, PrioritizedLifecycleEventHandlerConfiguration<BootstrapContext>> composeEventType();
-
-    /**
-     * A {@link LifecycleEvent} that fires when this pipeline is composed.
-     *
-     * <p>
-     * Item mappings can be registered in handlers of this event.
-     * </p>
-     */
-    interface ComposeEvent extends LifecycleEvent {
-
-        /**
-         * The registrar to register mappings with.
-         */
-        ItemMappingRegistrar getRegistrar();
-
+    static ItemMappingPipeline<?, ?, ?, ?, ?> get() {
+        return (ItemMappingPipeline<?, ?, ?, ?, ?>) ServiceLoader.load(ItemMappingPipeline.ServiceProvider.class, ItemMappingPipeline.ServiceProvider.class.getClassLoader()).findFirst().get().get();
     }
 
 }

@@ -1,33 +1,21 @@
 package org.fiddlemc.fiddle.impl.packetmapping.item;
 
-import net.minecraft.world.item.ItemStack;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
+import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingContext;
+import org.fiddlemc.fiddle.impl.packetmapping.PacketDataMappingContextImpl;
 
 /**
- * A simple implementation of {@link ItemMapping.Context}.
+ * The implementation of {@link ItemMappingContext}.
  */
-public class ItemMappingContextImpl implements ItemMapping.Context {
+public class ItemMappingContextImpl extends PacketDataMappingContextImpl implements ItemMappingContext {
 
-    private final ItemStack original;
-    private final ClientView clientView;
     private final boolean isItemStackInItemFrame;
     private final boolean isStonecutterRecipeResult;
 
-    public ItemMappingContextImpl(ItemStack original, ClientView clientView, boolean isItemStackInItemFrame, boolean isStonecutterRecipeResult) {
-        this.original = original;
-        this.clientView = clientView;
+    public ItemMappingContextImpl(ClientView clientView, boolean isItemStackInItemFrame, boolean isStonecutterRecipeResult) {
+        super(clientView);
         this.isItemStackInItemFrame = isItemStackInItemFrame;
         this.isStonecutterRecipeResult = isStonecutterRecipeResult;
-    }
-
-    @Override
-    public ItemStack getOriginal() {
-        return this.original;
-    }
-
-    @Override
-    public ClientView getClientView() {
-        return this.clientView;
     }
 
     @Override

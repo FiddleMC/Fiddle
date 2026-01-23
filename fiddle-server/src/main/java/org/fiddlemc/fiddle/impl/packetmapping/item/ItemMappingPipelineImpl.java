@@ -1,16 +1,17 @@
 package org.fiddlemc.fiddle.impl.packetmapping.item;
 
-import io.papermc.paper.plugin.bootstrap.BootstrapContext;
-import io.papermc.paper.plugin.lifecycle.event.PaperLifecycleEvent;
-import io.papermc.paper.plugin.lifecycle.event.types.PrioritizableLifecycleEventType;
+import io.papermc.paper.plugin.lifecycle.event.LifecycleEventRunner;
 import it.unimi.dsi.fastutil.ints.IntObjectPair;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
+import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingContext;
 import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingPipeline;
-import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingRegistrar;
+import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMapping;
 import org.fiddlemc.fiddle.impl.clientview.lookup.packethandling.ClientViewLookupThreadLocal;
 import org.fiddlemc.fiddle.impl.java.util.serviceloader.NoArgsConstructorServiceProviderImpl;
+import org.fiddlemc.fiddle.impl.packetmapping.MutablePacketDataMappingHandleImpl;
+import org.fiddlemc.fiddle.impl.packetmapping.PacketDataMappingPipelineImpl;
 import org.jspecify.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,11 +19,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * A pipeline of {@link ItemMapping}s.
+ * A pipeline of {@link NMSItemMapping}s.
  */
-public final class ItemMappingPipelineImpl implements ItemMappingPipeline {
+public final class ItemMappingPipelineImpl extends PacketDataMappingPipelineImpl<ItemStack, MutablePacketDataMappingHandleImpl<ItemStack>, ItemMappingContext, NMSItemMapping, ItemMappingRegistrarImpl> implements ItemMappingPipeline<ItemStack, MutablePacketDataMappingHandleImpl<ItemStack>, ItemMappingContext, NMSItemMapping, ItemMappingRegistrarImpl> {
 
-    public static final class ServiceProviderImpl extends NoArgsConstructorServiceProviderImpl<ItemMappingPipeline, ItemMappingPipelineImpl> implements ServiceProvider {
+    public static final class ServiceProviderImpl extends NoArgsConstructorServiceProviderImpl<ItemMappingPipeline<ItemStack, MutablePacketDataMappingHandleImpl<ItemStack>, ItemMappingContext, NMSItemMapping, ItemMappingRegistrarImpl>, ItemMappingPipelineImpl> implements ServiceProvider<ItemStack, MutablePacketDataMappingHandleImpl<ItemStack>, ItemMappingContext, NMSItemMapping, ItemMappingRegistrarImpl> {
 
         public ServiceProviderImpl() {
             super(ItemMappingPipelineImpl.class);
@@ -34,55 +35,42 @@ public final class ItemMappingPipelineImpl implements ItemMappingPipeline {
         return (ItemMappingPipelineImpl) ItemMappingPipeline.get();
     }
 
-    public static final class ComposeEventImpl implements ComposeEvent, PaperLifecycleEvent {
+    @Override
+    protected String getEventTypeNamePrefix() {
+        return "fiddle_item_mapping";
+    }
 
-        /**
-         * Will be made null after baking.
-         */
-        private @Nullable ItemMappingRegistrarImpl registrar = new ItemMappingRegistrarImpl();
+    private final class ComposeEventImpl extends PacketDataMappingPipelineImpl<ItemStack, MutablePacketDataMappingHandleImpl<ItemStack>, ItemMappingContext, NMSItemMapping, ItemMappingRegistrarImpl>.ComposeEventImpl {
 
-        public ItemMappingRegistrar getRegistrar() {
-            return this.registrar;
+        public ComposeEventImpl(ItemMappingRegistrarImpl registrar) {
+            super(registrar);
         }
 
-        public void bake() {
-            Map<List<ItemMapping>, List<IntObjectPair<Item>>> transposed = new HashMap<>();
+        @Override
+        public void invalidate() {
+
+            // Bake the mappings
+            Map<List<NMSItemMapping>, List<IntObjectPair<Item>>> transposed = new HashMap<>();
             for (int awarenessLevelI = 0; awarenessLevelI < this.registrar.mappings.length; awarenessLevelI++) {
-                for (Map.Entry<Item, List<ItemMapping>> entry : this.registrar.mappings[awarenessLevelI].entrySet()) {
+                for (Map.Entry<Item, List<NMSItemMapping>> entry : this.registrar.mappings[awarenessLevelI].entrySet()) {
                     transposed.computeIfAbsent(entry.getValue(), $ -> new ArrayList<>()).add(IntObjectPair.of(awarenessLevelI, entry.getKey()));
                 }
             }
-            ItemMappingPipelineImpl pipeline = ItemMappingPipelineImpl.get();
-            for (Map.Entry<List<ItemMapping>, List<IntObjectPair<Item>>> entry : transposed.entrySet()) {
+            for (Map.Entry<List<NMSItemMapping>, List<IntObjectPair<Item>>> entry : transposed.entrySet()) {
                 for (IntObjectPair<Item> target : entry.getValue()) {
-                    pipeline.mappings[target.firstInt()].put(target.second(), entry.getKey().toArray(ItemMapping[]::new));
+                    ItemMappingPipelineImpl.this.mappings[target.firstInt()].put(target.second(), entry.getKey().toArray(NMSItemMapping[]::new));
                 }
             }
-            this.registrar = null;
+
+            // Continue with invalidation
+            super.invalidate();
+
         }
 
-    }
-
-    public static final class ComposeEventType extends PrioritizableLifecycleEventType.Simple<BootstrapContext, ComposeEvent> {
-
-        private ComposeEventType() {
-            super("fiddle_item_mapping/compose", BootstrapContext.class);
-        }
-
-    }
-
-    private static ComposeEventType COMPOSE_EVENT_TYPE;
-
-    @Override
-    public ComposeEventType composeEventType() {
-        if (COMPOSE_EVENT_TYPE == null) {
-            COMPOSE_EVENT_TYPE = new ComposeEventType();
-        }
-        return COMPOSE_EVENT_TYPE;
     }
 
     /**
-     * The registered item mappings.
+     * The registered mappings.
      *
      * <p>
      * The mappings are organized in an array where {@link ClientView.AwarenessLevel#ordinal()}
@@ -91,7 +79,7 @@ public final class ItemMappingPipelineImpl implements ItemMappingPipeline {
      * The maps do not contain empty arrays.
      * </p>
      */
-    private final Map<Item, ItemMapping[]>[] mappings;
+    private final Map<Item, NMSItemMapping[]>[] mappings;
 
     private ItemMappingPipelineImpl() {
         this.mappings = new Map[ClientView.AwarenessLevel.values().length];
@@ -100,40 +88,28 @@ public final class ItemMappingPipelineImpl implements ItemMappingPipeline {
         }
     }
 
-    /**
-     * {@linkplain ItemMapping#apply Applies} all applicable mappings to the item stack.
-     *
-     * <p>
-     * This method will not modify the given {@code itemStack}.
-     * </p>
-     *
-     * @param context The context of this mapping, where the {@link ItemMapping.Context#getOriginal} is null.
-     * @return The resulting {@link ItemStack}, which may or may not be the given {@code itemStack}.
-     */
-    public ItemStack apply(ItemStack itemStack, ItemMappingContextImpl context) {
-        Map<Item, ItemMapping[]> mapForAwarenessLevel = this.mappings[context.getClientView().getAwarenessLevel().ordinal()];
-        ItemMapping @Nullable [] mappings = mapForAwarenessLevel.get(itemStack.getItem());
-        if (mappings == null) {
-            return itemStack;
-        }
-        ItemStack current = itemStack.copy();
-        ItemMappingContextImpl contextWithOriginal = new ItemMappingContextImpl(itemStack, context.getClientView(), context.isItemStackInItemFrame(), context.isStonecutterRecipeResult());
-        for (ItemMapping mapping : mappings) {
-            @Nullable ItemStack result = mapping.apply(current, contextWithOriginal);
-            if (result != null) {
-                current = result;
-            }
-        }
-        return current;
+    @Override
+    public NMSItemMapping @Nullable [] getMappingsThatMayApplyTo(ItemStack data, ItemMappingContext context) {
+        Map<Item, NMSItemMapping[]> mapForAwarenessLevel = this.mappings[context.getClientView().getAwarenessLevel().ordinal()];
+        return mapForAwarenessLevel.get(data.getItem());
+    }
+
+    @Override
+    public ItemMappingHandleImpl createHandle(final ItemStack data) {
+        return new ItemMappingHandleImpl(data);
     }
 
     /**
-     * Convenience method for {@link #apply(ItemStack, ItemMappingContextImpl)},
-     * which is assumed to be called during generic packet handling.
+     * Convenience method for {@link #apply},
+     * which can be called during generic packet handling.
      * It will create an {@link ItemMappingContextImpl} based on {@link ClientViewLookupThreadLocal}.
      */
     public ItemStack applyGenerically(ItemStack itemStack) {
-        return this.apply(itemStack, new ItemMappingContextImpl(null, ClientViewLookupThreadLocal.getThreadLocalClientViewOrFallback(), false, false));
+        return this.apply(itemStack, new ItemMappingContextImpl(ClientViewLookupThreadLocal.getThreadLocalClientViewOrFallback(), false, false));
+    }
+
+    public void fireComposeEvent() {
+        LifecycleEventRunner.INSTANCE.callEvent(composeEventType(), new ComposeEventImpl(new ItemMappingRegistrarImpl()));
     }
 
 }

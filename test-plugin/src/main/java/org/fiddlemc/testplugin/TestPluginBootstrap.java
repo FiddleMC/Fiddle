@@ -7,6 +7,7 @@ import io.papermc.paper.registry.TypedKey;
 import net.kyori.adventure.key.Key;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
@@ -18,6 +19,7 @@ import org.fiddlemc.fiddle.api.moredatadriven.paper.ItemRegistryEventProvider;
 import org.fiddlemc.fiddle.api.moredatadriven.paper.nms.NMSBlockRegistryEntryBuilder;
 import org.fiddlemc.fiddle.api.moredatadriven.paper.nms.NMSItemRegistryEntryBuilder;
 import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingPipeline;
+import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMapping;
 import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMappingRegistrar;
 import org.fiddlemc.testplugin.data.PluginItems;
 import org.jetbrains.annotations.NotNull;
@@ -84,20 +86,20 @@ public class TestPluginBootstrap implements PluginBootstrap {
             context.getLogger().info("Registering item mappings...");
             NMSItemMappingRegistrar registrar = (NMSItemMappingRegistrar) event.getRegistrar();
             // Map ash to gunpowder
-            registrar.register(ClientView.AwarenessLevel.JAVA_DEFAULT, PluginItems.ASH.get(), (itemStack, mappingContext) -> {
+            registrar.register(ClientView.AwarenessLevel.JAVA_DEFAULT, PluginItems.ASH.get(), (handle, mappingContext) -> {
+                ItemStack itemStack = handle.getMutable();
                 // Change the type
                 itemStack.setItem(Items.GUNPOWDER);
                 // Set the desired item name
                 itemStack.set(DataComponents.ITEM_NAME, Component.literal("Ash"));
-                return itemStack;
             });
             // Map ash blocks to light gray concrete powder
-            registrar.register(ClientView.AwarenessLevel.JAVA_DEFAULT, PluginItems.ASH_BLOCK.get(), (itemStack, mappingContext) -> {
+            registrar.register(ClientView.AwarenessLevel.JAVA_DEFAULT, PluginItems.ASH_BLOCK.get(), (handle, mappingContext) -> {
+                ItemStack itemStack = handle.getMutable();
                 // Change the type
                 itemStack.setItem(Items.LIGHT_GRAY_CONCRETE_POWDER);
                 // Set the desired item name
                 itemStack.set(DataComponents.ITEM_NAME, Component.literal("Ash block"));
-                return itemStack;
             });
         });
 
