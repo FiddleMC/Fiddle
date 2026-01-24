@@ -10,12 +10,12 @@ import java.util.ServiceLoader;
 /**
  * A pipeline of item mappings.
  */
-public interface ItemMappingPipeline<T, H extends MutablePacketDataMappingHandle<T>, C extends ItemMappingContext, M extends PacketDataMapping<T, H, C>, R extends PacketDataMappingRegistrar<? extends T>> extends PacketDataMappingPipeline<T, H, C, M, R> {
+public interface ItemMappingPipeline<T, H extends MutablePacketDataMappingHandle<T, T>, C extends ItemMappingContext, M extends PacketDataMapping<T, H, C>, R extends PacketDataMappingRegistrar<? extends T>> extends PacketDataMappingPipeline<T, H, C, M, R> {
 
     /**
      * An internal interface to get the {@link ItemMappingPipeline} instance.
      */
-    interface ServiceProvider<T, H extends MutablePacketDataMappingHandle<T>, C extends ItemMappingContext, M extends PacketDataMapping<T, H, C>, R extends PacketDataMappingRegistrar<? extends T>> extends GenericServiceProvider<ItemMappingPipeline<T, H, C, M, R>> {
+    interface ServiceProvider<T, H extends MutablePacketDataMappingHandle<T, T>, C extends ItemMappingContext, M extends PacketDataMapping<T, H, C>, R extends PacketDataMappingRegistrar<? extends T>> extends GenericServiceProvider<ItemMappingPipeline<T, H, C, M, R>> {
     }
 
     /**

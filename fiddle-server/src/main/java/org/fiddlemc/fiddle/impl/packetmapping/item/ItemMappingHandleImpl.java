@@ -9,14 +9,14 @@ import org.fiddlemc.fiddle.impl.packetmapping.MutablePacketDataMappingHandleImpl
 /**
  * The {@link PacketDataMappingHandle} implementation for {@link NMSItemMapping}s.
  */
-public class ItemMappingHandleImpl extends MutablePacketDataMappingHandleImpl<ItemStack> implements ItemMappingHandle<ItemStack> {
+public class ItemMappingHandleImpl extends MutablePacketDataMappingHandleImpl<ItemStack, ItemStack> implements ItemMappingHandle<ItemStack> {
 
     public ItemMappingHandleImpl(ItemStack original) {
         super(original);
     }
 
     @Override
-    protected ItemStack clone(ItemStack data) {
+    protected ItemStack cloneMutable(ItemStack data) {
         return data.copy();
     }
 

@@ -1,19 +1,17 @@
 --- a/net/minecraft/world/item/ItemStack.java
 +++ b/net/minecraft/world/item/ItemStack.java
-@@ -201,10 +_,14 @@
-             }
+@@ -202,6 +_,14 @@
  
              @Override
--            public void encode(RegistryFriendlyByteBuf buffer, ItemStack value) {
--                if (value.isEmpty() || value.getItem() == null) { // CraftBukkit - NPE fix itemstack.getItem()
-+            public void encode(RegistryFriendlyByteBuf buffer, ItemStack unmappedValue) { // Fiddle - Item mapping - Implementation - Apply at ItemStack encoding
-+                if (unmappedValue.isEmpty() || unmappedValue.getItem() == null) { // CraftBukkit - NPE fix itemstack.getItem() // Fiddle - Item mapping - Implementation - Apply at ItemStack encoding
+             public void encode(RegistryFriendlyByteBuf buffer, ItemStack value) {
++                // Fiddle start - Item mapping - Implementation - Apply at ItemStack encoding
++                org.fiddlemc.fiddle.impl.packetmapping.item.ItemMappingContextImpl itemMappingContext = new org.fiddlemc.fiddle.impl.packetmapping.item.ItemMappingContextImpl(buffer.getClientViewOrFallback(), buffer.isEncodingItemFrameItem, buffer.isEncodingStonecutterRecipeResult);
++                ItemStack mappedValue = org.fiddlemc.fiddle.impl.packetmapping.item.ItemMappingPipelineImpl.get().apply(value, itemMappingContext);
++                this.encodeUnmapped(buffer, mappedValue);
++            }
++
++            private void encodeUnmapped(RegistryFriendlyByteBuf buffer, ItemStack value) {
++                // Fiddle end - Item mapping - Implementation - Apply at ItemStack encoding
+                 if (value.isEmpty() || value.getItem() == null) { // CraftBukkit - NPE fix itemstack.getItem()
                      buffer.writeVarInt(0);
                  } else {
-+                    // Fiddle start - Item mapping - Implementation - Apply at ItemStack encoding
-+                    org.fiddlemc.fiddle.impl.packetmapping.item.ItemMappingContextImpl itemMappingContext = new org.fiddlemc.fiddle.impl.packetmapping.item.ItemMappingContextImpl(buffer.getClientViewOrFallback(), buffer.isEncodingItemFrameItem, buffer.isEncodingStonecutterRecipeResult);
-+                    ItemStack value = org.fiddlemc.fiddle.impl.packetmapping.item.ItemMappingPipelineImpl.get().apply(unmappedValue, itemMappingContext);
-+                    // Fiddle end - Item mapping - Implementation - Apply at ItemStack encoding
-                     buffer.writeVarInt(io.papermc.paper.util.sanitizer.ItemComponentSanitizer.sanitizeCount(io.papermc.paper.util.sanitizer.ItemObfuscationSession.currentSession(), value, value.getCount())); // Paper - potentially sanitize count
-                     Item.STREAM_CODEC.encode(buffer, value.getItemHolder());
-                     // Paper start - adventure; conditionally render translatable components

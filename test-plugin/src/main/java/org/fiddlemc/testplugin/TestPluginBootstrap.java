@@ -1,5 +1,6 @@
 package org.fiddlemc.testplugin;
 
+import io.papermc.paper.adventure.AdventureComponent;
 import io.papermc.paper.plugin.bootstrap.BootstrapContext;
 import io.papermc.paper.plugin.bootstrap.PluginBootstrap;
 import io.papermc.paper.registry.RegistryKey;
@@ -7,6 +8,9 @@ import io.papermc.paper.registry.TypedKey;
 import net.kyori.adventure.key.Key;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentContents;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.material.MapColor;
@@ -18,8 +22,9 @@ import org.fiddlemc.fiddle.api.moredatadriven.paper.BlockRegistryEventProvider;
 import org.fiddlemc.fiddle.api.moredatadriven.paper.ItemRegistryEventProvider;
 import org.fiddlemc.fiddle.api.moredatadriven.paper.nms.NMSBlockRegistryEntryBuilder;
 import org.fiddlemc.fiddle.api.moredatadriven.paper.nms.NMSItemRegistryEntryBuilder;
+import org.fiddlemc.fiddle.api.packetmapping.component.ComponentMappingPipeline;
+import org.fiddlemc.fiddle.api.packetmapping.component.nms.NMSComponentMappingRegistrar;
 import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingPipeline;
-import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMapping;
 import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMappingRegistrar;
 import org.fiddlemc.testplugin.data.PluginItems;
 import org.jetbrains.annotations.NotNull;
@@ -91,7 +96,7 @@ public class TestPluginBootstrap implements PluginBootstrap {
                 // Change the type
                 itemStack.setItem(Items.GUNPOWDER);
                 // Set the desired item name
-                itemStack.set(DataComponents.ITEM_NAME, Component.literal("Ash"));
+                itemStack.set(DataComponents.ITEM_NAME, Component.translatable("item.example.ash"));
             });
             // Map ash blocks to light gray concrete powder
             registrar.register(ClientView.AwarenessLevel.JAVA_DEFAULT, PluginItems.ASH_BLOCK.get(), (handle, mappingContext) -> {
@@ -99,7 +104,25 @@ public class TestPluginBootstrap implements PluginBootstrap {
                 // Change the type
                 itemStack.setItem(Items.LIGHT_GRAY_CONCRETE_POWDER);
                 // Set the desired item name
-                itemStack.set(DataComponents.ITEM_NAME, Component.literal("Ash block"));
+                itemStack.set(DataComponents.ITEM_NAME, Component.translatable("item.example.ash_block"));
+            });
+        });
+
+        // Register component mappings
+        context.getLifecycleManager().registerEventHandler(ComponentMappingPipeline.get().composeEventType(), event -> {
+            context.getLogger().info("Registering component mappings...");
+            NMSComponentMappingRegistrar registrar = (NMSComponentMappingRegistrar) event.getRegistrar();
+            // Map the translatables
+            registrar.register(ClientView.AwarenessLevel.JAVA_DEFAULT, (handle, mappingContext) -> {
+                ComponentContents contents = handle.getImmutable().getContents();
+                if (contents instanceof TranslatableContents translatableContents) {
+                    String key = translatableContents.getKey();
+                    if (key.equals("item.example.ash")) {
+                        handle.set(Component.translatableWithFallback(key, "Ash"));
+                    } else if (key.equals("item.example.ash_block")) {
+                        handle.set(Component.translatableWithFallback(key, "Ash block"));
+                    }
+                }
             });
         });
 

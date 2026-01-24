@@ -12,6 +12,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
+/**
+ * The implementation of {@link NMSItemMappingRegistrar}.
+ */
 public final class ItemMappingRegistrarImpl implements NMSItemMappingRegistrar {
 
     /**

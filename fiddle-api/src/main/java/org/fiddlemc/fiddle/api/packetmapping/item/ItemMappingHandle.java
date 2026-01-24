@@ -6,5 +6,5 @@ import org.fiddlemc.fiddle.api.packetmapping.PacketDataMappingHandle;
 /**
  * A {@link PacketDataMappingHandle} for the {@link ItemMappingPipeline}.
  */
-public interface ItemMappingHandle<T> extends MutablePacketDataMappingHandle<T> {
+public interface ItemMappingHandle<T> extends MutablePacketDataMappingHandle<T, T> {
 }

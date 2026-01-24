@@ -8,10 +8,11 @@
          this.server.spark.enableEarlyIfRequested(); // Paper - spark
          // Paper start - fix converting txt to json file; convert old users earlier after PlayerList creation but before file load/save
          if (this.convertOldUsers()) {
-@@ -275,6 +_,8 @@
+@@ -275,6 +_,9 @@
          com.destroystokyo.paper.Metrics.PaperMetrics.startMetrics(); // Paper - start metrics
          com.destroystokyo.paper.VersionHistoryManager.INSTANCE.getClass(); // Paper - load version history now
  
++        org.fiddlemc.fiddle.impl.packetmapping.component.ComponentMappingPipelineImpl.get().fireComposeEvent(); // Fiddle - Component mapping - Implementation - Register replacements
 +        org.fiddlemc.fiddle.impl.packetmapping.item.ItemMappingPipelineImpl.get().fireComposeEvent(); // Fiddle - Item mapping - Implementation - Register replacements
 +
          // this.worldData.setGameType(properties.gameMode.get()); // CraftBukkit - moved to world loading

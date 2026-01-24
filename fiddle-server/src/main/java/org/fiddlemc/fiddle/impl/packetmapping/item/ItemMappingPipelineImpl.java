@@ -1,6 +1,6 @@
 package org.fiddlemc.fiddle.impl.packetmapping.item;
 
-import io.papermc.paper.plugin.lifecycle.event.LifecycleEventRunner;
+import io.papermc.paper.plugin.lifecycle.event.PaperLifecycleEvent;
 import it.unimi.dsi.fastutil.ints.IntObjectPair;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -9,7 +9,6 @@ import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingContext;
 import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingHandle;
 import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingPipeline;
 import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMapping;
-import org.fiddlemc.fiddle.impl.clientview.lookup.packethandling.ClientViewLookupThreadLocal;
 import org.fiddlemc.fiddle.impl.java.util.serviceloader.NoArgsConstructorServiceProviderImpl;
 import org.fiddlemc.fiddle.impl.packetmapping.PacketDataMappingPipelineImpl;
 import org.jspecify.annotations.Nullable;
@@ -95,21 +94,32 @@ public final class ItemMappingPipelineImpl extends PacketDataMappingPipelineImpl
     }
 
     @Override
-    public ItemMappingHandleImpl createHandle(final ItemStack data) {
+    public ItemMappingHandleImpl createHandle(ItemStack data) {
         return new ItemMappingHandleImpl(data);
     }
 
-    /**
-     * Convenience method for {@link #apply},
-     * which can be called during generic packet handling.
-     * It will create an {@link ItemMappingContextImpl} based on {@link ClientViewLookupThreadLocal}.
-     */
-    public ItemStack applyGenerically(ItemStack itemStack) {
-        return this.apply(itemStack, new ItemMappingContextImpl(ClientViewLookupThreadLocal.getThreadLocalClientViewOrFallback(), false, false));
+    @Override
+    public ItemStack apply(ItemStack data, ItemMappingContext context) {
+        if (data.isEmpty() || data.getItem() == null) {
+            // Skip the mapping for empty item stacks
+            return data;
+        }
+        return super.apply(data, context);
     }
 
-    public void fireComposeEvent() {
-        LifecycleEventRunner.INSTANCE.callEvent(composeEventType(), new ComposeEventImpl(new ItemMappingRegistrarImpl()));
+    @Override
+    protected ItemMappingContextImpl createGenericContext(ClientView clientView) {
+        return new ItemMappingContextImpl(clientView, false, false);
+    }
+
+    @Override
+    protected ItemMappingRegistrarImpl createRegistrar() {
+        return new ItemMappingRegistrarImpl();
+    }
+
+    @Override
+    protected <CE extends ComposeEvent<ItemStack, ItemMappingRegistrarImpl> & PaperLifecycleEvent> CE createComposeEvent() {
+        return (CE) new ComposeEventImpl(this.createRegistrar());
     }
 
 }
