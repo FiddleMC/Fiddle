@@ -99,7 +99,8 @@ public class TestPluginBootstrap implements PluginBootstrap {
                 itemStack.set(DataComponents.ITEM_NAME, Component.translatable("item.example.ash"));
             });
             // Map ash blocks to light gray concrete powder
-            registrar.register(ClientView.AwarenessLevel.JAVA_DEFAULT, PluginItems.ASH_BLOCK.get(), (handle, mappingContext) -> {
+            registrar.register(ClientView.AwarenessLevel.getThatDoNotAlwaysUnderstandsAllServerSideItems(), PluginItems.ASH_BLOCK.get(), (handle, mappingContext) -> {
+                if (mappingContext.getClientView().understandsAllServerSideItems()) return;
                 ItemStack itemStack = handle.getMutable();
                 // Change the type
                 itemStack.setItem(Items.LIGHT_GRAY_CONCRETE_POWDER);
@@ -113,7 +114,8 @@ public class TestPluginBootstrap implements PluginBootstrap {
             context.getLogger().info("Registering component mappings...");
             NMSComponentMappingRegistrar registrar = (NMSComponentMappingRegistrar) event.getRegistrar();
             // Map the translatables
-            registrar.register(ClientView.AwarenessLevel.JAVA_DEFAULT, (handle, mappingContext) -> {
+            registrar.register(ClientView.AwarenessLevel.getThatDoNotAlwaysUnderstandsAllServerSideTranslatables(), (handle, mappingContext) -> {
+                if (mappingContext.getClientView().understandsAllServerSideTranslatables()) return;
                 ComponentContents contents = handle.getImmutable().getContents();
                 if (contents instanceof TranslatableContents translatableContents) {
                     String key = translatableContents.getKey();

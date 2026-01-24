@@ -2,6 +2,7 @@ package org.fiddlemc.fiddle.api.clientview;
 
 import org.bukkit.entity.Player;
 import org.jspecify.annotations.Nullable;
+import java.util.Arrays;
 
 /**
  * This class represents the static circumstances under which a client (typically a player) observes the data sent.
@@ -50,7 +51,7 @@ public interface ClientView {
      * false if it can not be guaranteed.
      */
     default boolean understandsAllServerSideTranslatables() {
-        return false;
+        return this.getAwarenessLevel().alwaysUnderstandsAllServerSideTranslatables;
     }
 
     /**
@@ -59,7 +60,7 @@ public interface ClientView {
      * false if it can not be guaranteed.
      */
     default boolean understandsAllServerSideItems() {
-        return false;
+        return this.getAwarenessLevel().alwaysUnderstandsAllServerSideItems;
     }
 
     /**
@@ -68,7 +69,7 @@ public interface ClientView {
      * false if it can not be guaranteed.
      */
     default boolean understandsAllServerSideBlocks() {
-        return false;
+        return this.getAwarenessLevel().alwaysUnderstandsAllServerSideBlocks;
     }
 
     /**
@@ -76,6 +77,7 @@ public interface ClientView {
      * to interpret data sent by the server.
      */
     enum AwarenessLevel {
+
         /**
          * For Java clients that have not accepted the server resource pack,
          * and also do not have the client mod.
@@ -85,7 +87,7 @@ public interface ClientView {
          * with additional rendering potentially being done through the use of vanilla entities.
          * </p>
          */
-        JAVA_DEFAULT,
+        JAVA_DEFAULT(false, false, false),
 
         /**
          * For Java clients that have accepted the server resource pack,
@@ -98,7 +100,7 @@ public interface ClientView {
          * Additional rendering can be done through the use of entities.
          * </p>
          */
-        JAVA_WITH_RESOURCE_PACK, // TODO implement
+        JAVA_WITH_RESOURCE_PACK(true, false, false), // TODO implement
 
         /**
          * For Java clients that are have the client mod, i.e. they have the mod installed and are able to use
@@ -109,7 +111,84 @@ public interface ClientView {
          * the necessary information to interpret the server-side block and item keys directly from then on.
          * </p>
          */
-        JAVA_WITH_CLIENT_MOD // TODO implement
+        JAVA_WITH_CLIENT_MOD(true, true, true); // TODO implement
+
+        private final boolean alwaysUnderstandsAllServerSideTranslatables;
+        private final boolean alwaysUnderstandsAllServerSideItems;
+        private final boolean alwaysUnderstandsAllServerSideBlocks;
+
+        AwarenessLevel(
+            boolean alwaysUnderstandsAllServerSideTranslatables,
+            boolean alwaysUnderstandsAllServerSideItems,
+            boolean alwaysUnderstandsAllServerSideBlocks
+        ) {
+            this.alwaysUnderstandsAllServerSideTranslatables = alwaysUnderstandsAllServerSideTranslatables;
+            this.alwaysUnderstandsAllServerSideItems = alwaysUnderstandsAllServerSideItems;
+            this.alwaysUnderstandsAllServerSideBlocks = alwaysUnderstandsAllServerSideBlocks;
+        }
+
+        /**
+         * @return True if every {@link ClientView} with this {@link AwarenessLevel}
+         * will have {@link ClientView#understandsAllServerSideTranslatables} returning true.
+         */
+        public boolean alwaysUnderstandsAllServerSideTranslatables() {
+            return this.alwaysUnderstandsAllServerSideTranslatables;
+        }
+
+        /**
+         * @return True if every {@link ClientView} with this {@link AwarenessLevel}
+         * will have {@link ClientView#understandsAllServerSideItems} returning true.
+         */
+        public boolean alwaysUnderstandsAllServerSideItems() {
+            return this.alwaysUnderstandsAllServerSideItems;
+        }
+
+        /**
+         * @return True if every {@link ClientView} with this {@link AwarenessLevel}
+         * will have {@link ClientView#understandsAllServerSideBlocks} returning true.
+         */
+        public boolean alwaysUnderstandsAllServerSideBlocks() {
+            return this.alwaysUnderstandsAllServerSideBlocks;
+        }
+
+        /**
+         * Return value for {@link #getThatDoNotAlwaysUnderstandsAllServerSideTranslatables()},
+         * or null if not initialized yet.
+         */
+        private static AwarenessLevel @Nullable [] thatDoNotAlwaysUnderstandsAllServerSideTranslatables;
+
+        /**
+         * Convenience function that returns all {@link AwarenessLevel}s
+         * that have {@link #alwaysUnderstandsAllServerSideTranslatables()} returning false.
+         *
+         * @return An array of {@link AwarenessLevel}s.
+         */
+        public static AwarenessLevel[] getThatDoNotAlwaysUnderstandsAllServerSideTranslatables() {
+            if (thatDoNotAlwaysUnderstandsAllServerSideTranslatables == null) {
+                thatDoNotAlwaysUnderstandsAllServerSideTranslatables = Arrays.stream(AwarenessLevel.values()).filter(level -> !level.alwaysUnderstandsAllServerSideTranslatables).toArray(AwarenessLevel[]::new);
+            }
+            return thatDoNotAlwaysUnderstandsAllServerSideTranslatables;
+        }
+
+        /**
+         * Return value for {@link #getThatDoNotAlwaysUnderstandsAllServerSideItems()},
+         * or null if not initialized yet.
+         */
+        private static AwarenessLevel @Nullable [] thatDoNotAlwaysUnderstandsAllServerSideItems;
+
+        /**
+         * Convenience function that returns all {@link AwarenessLevel}s
+         * that have {@link #alwaysUnderstandsAllServerSideItems()} returning false.
+         *
+         * @return An array of {@link AwarenessLevel}s.
+         */
+        public static AwarenessLevel[] getThatDoNotAlwaysUnderstandsAllServerSideItems() {
+            if (thatDoNotAlwaysUnderstandsAllServerSideItems == null) {
+                thatDoNotAlwaysUnderstandsAllServerSideItems = Arrays.stream(AwarenessLevel.values()).filter(level -> !level.alwaysUnderstandsAllServerSideItems).toArray(AwarenessLevel[]::new);
+            }
+            return thatDoNotAlwaysUnderstandsAllServerSideItems;
+        }
+
     }
 
 }
