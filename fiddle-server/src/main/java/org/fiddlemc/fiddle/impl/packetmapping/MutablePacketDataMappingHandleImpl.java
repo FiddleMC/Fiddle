@@ -19,10 +19,7 @@ public abstract class MutablePacketDataMappingHandleImpl<T, MT extends T> extend
         super.set(data);
     }
 
-    /**
-     * The same as {@link #set}, but with the explicit guarantee that the given instance
-     * is allowed to be mutated by this or other mappings.
-     */
+    @Override
     public void setMutable(MT data) {
         this.isCurrentMutable = true;
         super.set(data);

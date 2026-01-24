@@ -20,6 +20,7 @@ public interface PacketDataMappingHandle<T> {
 
     /**
      * Replaces the data with the given one.
+     * The given instance will not be modified.
      *
      * @param data The data that results from this mapping.
      */

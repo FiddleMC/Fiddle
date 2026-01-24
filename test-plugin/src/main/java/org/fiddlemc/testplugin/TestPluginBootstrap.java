@@ -1,6 +1,5 @@
 package org.fiddlemc.testplugin;
 
-import io.papermc.paper.adventure.AdventureComponent;
 import io.papermc.paper.plugin.bootstrap.BootstrapContext;
 import io.papermc.paper.plugin.bootstrap.PluginBootstrap;
 import io.papermc.paper.registry.RegistryKey;
@@ -9,7 +8,6 @@ import net.kyori.adventure.key.Key;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentContents;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -120,9 +118,9 @@ public class TestPluginBootstrap implements PluginBootstrap {
                 if (contents instanceof TranslatableContents translatableContents) {
                     String key = translatableContents.getKey();
                     if (key.equals("item.example.ash")) {
-                        handle.set(Component.translatableWithFallback(key, "Ash"));
+                        handle.setMutable(Component.translatableWithFallback(key, "Ash"));
                     } else if (key.equals("item.example.ash_block")) {
-                        handle.set(Component.translatableWithFallback(key, "Ash block"));
+                        handle.setMutable(Component.translatableWithFallback(key, "Ash block"));
                     }
                 }
             });
