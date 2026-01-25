@@ -11,6 +11,7 @@ import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingPipeline;
 import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMapping;
 import org.fiddlemc.fiddle.impl.java.util.serviceloader.NoArgsConstructorServiceProviderImpl;
 import org.fiddlemc.fiddle.impl.packetmapping.PacketDataMappingPipelineImpl;
+import org.fiddlemc.fiddle.impl.packetmapping.item.encloseserverside.EncloseServerSideItemStack;
 import org.jspecify.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -100,11 +101,23 @@ public final class ItemMappingPipelineImpl extends PacketDataMappingPipelineImpl
 
     @Override
     public ItemStack apply(ItemStack data, ItemMappingContext context) {
+
+        // Skip the mapping for empty item stacks
         if (data.isEmpty() || data.getItem() == null) {
-            // Skip the mapping for empty item stacks
             return data;
         }
-        return super.apply(data, context);
+
+        // Apply the pipeline
+        ItemStack mapped = super.apply(data, context);
+
+        // If changes were made, enclose the server-side item stack
+        if (!data.equals(mapped)) {
+            EncloseServerSideItemStack.encloseServerSide(mapped, data);
+        }
+
+        // Return the result
+        return mapped;
+
     }
 
     @Override

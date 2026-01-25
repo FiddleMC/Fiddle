@@ -1,6 +1,13 @@
 --- a/net/minecraft/world/item/ItemStack.java
 +++ b/net/minecraft/world/item/ItemStack.java
-@@ -202,6 +_,14 @@
+@@ -196,12 +_,20 @@
+                 } else {
+                     Holder<Item> holder = Item.STREAM_CODEC.decode(buffer);
+                     DataComponentPatch dataComponentPatch = codec.decode(buffer);
+-                    return new ItemStack(holder, varInt, dataComponentPatch);
++                    return org.fiddlemc.fiddle.impl.packetmapping.item.encloseserverside.EncloseServerSideItemStack.extractServerSideOrKeepReceived(new ItemStack(holder, varInt, dataComponentPatch)); // Fiddle - Item mapping - Enclose server-side - Apply at ItemStack decoding
+                 }
+             }
  
              @Override
              public void encode(RegistryFriendlyByteBuf buffer, ItemStack value) {
