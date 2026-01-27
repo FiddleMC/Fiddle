@@ -1,6 +1,6 @@
 --- a/net/minecraft/network/Connection.java
 +++ b/net/minecraft/network/Connection.java
-@@ -55,7 +_,14 @@
+@@ -55,7 +_,15 @@
  import org.slf4j.Marker;
  import org.slf4j.MarkerFactory;
  
@@ -13,14 +13,16 @@
 +        return this.clientView;
 +    }
 +    // Fiddle end - Client view - Lookup - Implement for Connection - Getter
++    public final org.fiddlemc.fiddle.impl.packetmapping.item.reverse.ItemMappingReverser itemMappingReverser; // Fiddle - Item mapping - Reverse - Store reverser in Connection
      private static final float AVERAGE_PACKETS_SMOOTHING = 0.75F;
      private static final Logger LOGGER = LogUtils.getLogger();
      public static final Marker ROOT_MARKER = MarkerFactory.getMarker("NETWORK");
-@@ -130,12 +_,14 @@
+@@ -130,12 +_,15 @@
  
      public Connection(PacketFlow receiving) {
          this.receiving = receiving;
 +        this.clientView = new org.fiddlemc.fiddle.impl.clientview.JavaDefaultClientViewImpl(this)/* TODO determine actual view */; // Fiddle - Client view - Set - Field
++        this.itemMappingReverser = new org.fiddlemc.fiddle.impl.packetmapping.item.reverse.ItemMappingReverser(); // Fiddle - Item mapping - Reverse - Store reverser in Connection
      }
  
      @Override

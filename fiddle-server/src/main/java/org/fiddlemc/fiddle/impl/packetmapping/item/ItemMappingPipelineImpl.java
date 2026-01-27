@@ -1,7 +1,9 @@
 package org.fiddlemc.fiddle.impl.packetmapping.item;
 
 import io.papermc.paper.plugin.lifecycle.event.PaperLifecycleEvent;
-import it.unimi.dsi.fastutil.ints.IntObjectPair;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.ints.IntIntPair;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
@@ -11,7 +13,6 @@ import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingPipeline;
 import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMapping;
 import org.fiddlemc.fiddle.impl.java.util.serviceloader.NoArgsConstructorServiceProviderImpl;
 import org.fiddlemc.fiddle.impl.packetmapping.PacketDataMappingPipelineImpl;
-import org.fiddlemc.fiddle.impl.packetmapping.item.encloseserverside.EncloseServerSideItemStack;
 import org.jspecify.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,15 +51,15 @@ public final class ItemMappingPipelineImpl extends PacketDataMappingPipelineImpl
         public void invalidate() {
 
             // Bake the mappings
-            Map<List<NMSItemMapping>, List<IntObjectPair<Item>>> transposed = new HashMap<>();
+            Map<List<NMSItemMapping>, List<IntIntPair>> transposed = new HashMap<>();
             for (int awarenessLevelI = 0; awarenessLevelI < this.registrar.mappings.length; awarenessLevelI++) {
-                for (Map.Entry<Item, List<NMSItemMapping>> entry : this.registrar.mappings[awarenessLevelI].entrySet()) {
-                    transposed.computeIfAbsent(entry.getValue(), $ -> new ArrayList<>()).add(IntObjectPair.of(awarenessLevelI, entry.getKey()));
+                for (Int2ObjectMap.Entry<List<NMSItemMapping>> entry : this.registrar.mappings[awarenessLevelI].int2ObjectEntrySet()) {
+                    transposed.computeIfAbsent(entry.getValue(), $ -> new ArrayList<>()).add(IntIntPair.of(awarenessLevelI, entry.getKey()));
                 }
             }
-            for (Map.Entry<List<NMSItemMapping>, List<IntObjectPair<Item>>> entry : transposed.entrySet()) {
-                for (IntObjectPair<Item> target : entry.getValue()) {
-                    ItemMappingPipelineImpl.this.mappings[target.firstInt()].put(target.second(), entry.getKey().toArray(NMSItemMapping[]::new));
+            for (Map.Entry<List<NMSItemMapping>, List<IntIntPair>> entry : transposed.entrySet()) {
+                for (IntIntPair target : entry.getValue()) {
+                    ItemMappingPipelineImpl.this.mappings[target.firstInt()].put(target.secondInt(), entry.getKey().toArray(NMSItemMapping[]::new));
                 }
             }
 
@@ -74,24 +75,24 @@ public final class ItemMappingPipelineImpl extends PacketDataMappingPipelineImpl
      *
      * <p>
      * The mappings are organized in an array where {@link ClientView.AwarenessLevel#ordinal()}
-     * is the index, and then in a map where {@link Item} is the key.
+     * is the index, and then in a map where {@link Item#indexInItemRegistry} is the key.
      * The array does not contain null values, but some maps may not contain every item as a key.
      * The maps do not contain empty arrays.
      * </p>
      */
-    private final Map<Item, NMSItemMapping[]>[] mappings;
+    private final Int2ObjectMap<NMSItemMapping[]>[] mappings;
 
     private ItemMappingPipelineImpl() {
-        this.mappings = new Map[ClientView.AwarenessLevel.values().length];
+        this.mappings = new Int2ObjectMap[ClientView.AwarenessLevel.values().length];
         for (int i = 0; i < this.mappings.length; i++) {
-            this.mappings[i] = new HashMap<>(16, 0.5f);
+            this.mappings[i] = new Int2ObjectOpenHashMap<>(16, 0.5f);
         }
     }
 
     @Override
     public NMSItemMapping @Nullable [] getMappingsThatMayApplyTo(ItemStack data, ItemMappingContext context) {
-        Map<Item, NMSItemMapping[]> mapForAwarenessLevel = this.mappings[context.getClientView().getAwarenessLevel().ordinal()];
-        return mapForAwarenessLevel.get(data.getItem());
+        Int2ObjectMap<NMSItemMapping[]> mapForAwarenessLevel = this.mappings[context.getClientView().getAwarenessLevel().ordinal()];
+        return mapForAwarenessLevel.get(data.getItem().indexInItemRegistry);
     }
 
     @Override
@@ -110,9 +111,12 @@ public final class ItemMappingPipelineImpl extends PacketDataMappingPipelineImpl
         // Apply the pipeline
         ItemStack mapped = super.apply(data, context);
 
-        // If changes were made, enclose the server-side item stack
+        // If changes were made, make sure the mapping can be reversed
         if (!data.equals(mapped)) {
-            EncloseServerSideItemStack.encloseServerSide(mapped, data);
+            org.fiddlemc.fiddle.impl.packetmapping.item.reverse.@Nullable ItemMappingReverser itemMappingReverser = ((org.fiddlemc.fiddle.impl.clientview.ClientViewImpl) context.getClientView()).getItemMappingReverser();
+            if (itemMappingReverser != null) {
+                mapped = itemMappingReverser.makeReversible(mapped, data);
+            }
         }
 
         // Return the result

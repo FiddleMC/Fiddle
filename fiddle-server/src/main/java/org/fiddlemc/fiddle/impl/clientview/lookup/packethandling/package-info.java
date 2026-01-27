@@ -2,7 +2,7 @@
  * <h1>Module: Client view - Lookup - During packet handling</h1>
  *
  * <p>
- * Allows for looking up the client view for which a packet is being sent, during its handling.
+ * Allows for looking up the client view for which a packet is being sent or received, during its handling.
  * The view is tracked along (and can therefore be looked up from):
  * <ul>
  *     <li>
@@ -22,14 +22,14 @@
  * <p>
  * <h3>Minecraft changes</h3>
  * <ul>
- *     <li>{@link net.minecraft.network.Connection} - To store the lookup in the channel</li>
+ *     <li>{@link net.minecraft.network.Connection} - To store the lookup in the channel.</li>
  *     <li>
- *         {@link net.minecraft.network.PacketEncoder} - To copy the lookup from the channel
- *         to the thread-local variable
+ *         {@link net.minecraft.network.PacketDecoder} and {@link net.minecraft.network.PacketEncoder} -
+ *         To copy the lookup from the channel to the thread-local variable.
  *     </li>
  *     <li>
  *         {@link net.minecraft.network.FriendlyByteBuf} - To copy the lookup from the thread-local variable
- *         to the write buffer
+ *         to the write buffer.
  *     </li>
  * </ul>
  * </p>

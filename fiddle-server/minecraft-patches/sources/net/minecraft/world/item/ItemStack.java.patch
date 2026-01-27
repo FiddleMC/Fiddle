@@ -1,11 +1,18 @@
 --- a/net/minecraft/world/item/ItemStack.java
 +++ b/net/minecraft/world/item/ItemStack.java
-@@ -196,12 +_,20 @@
+@@ -196,12 +_,27 @@
                  } else {
                      Holder<Item> holder = Item.STREAM_CODEC.decode(buffer);
                      DataComponentPatch dataComponentPatch = codec.decode(buffer);
 -                    return new ItemStack(holder, varInt, dataComponentPatch);
-+                    return org.fiddlemc.fiddle.impl.packetmapping.item.encloseserverside.EncloseServerSideItemStack.extractServerSideOrKeepReceived(new ItemStack(holder, varInt, dataComponentPatch)); // Fiddle - Item mapping - Enclose server-side - Apply at ItemStack decoding
++                    // Fiddle start - Item mapping - Reverse - Apply at ItemStack decoding
++                    org.fiddlemc.fiddle.impl.packetmapping.item.reverse.@Nullable ItemMappingReverser itemMappingReverser = ((org.fiddlemc.fiddle.impl.clientview.ClientViewImpl) buffer.getClientViewOrFallback()).getItemMappingReverser();
++                    ItemStack received = new ItemStack(holder, varInt, dataComponentPatch);
++                    if (itemMappingReverser != null) {
++                        received = itemMappingReverser.reverseMappingIfPossible(received);
++                    }
++                    return received;
++                    // Fiddle end - Item mapping - Reverse - Apply at ItemStack decoding
                  }
              }
  

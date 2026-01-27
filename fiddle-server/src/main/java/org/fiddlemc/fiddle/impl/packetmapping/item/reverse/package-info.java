@@ -1,9 +1,9 @@
 /**
- * <h1>Module: Item mapping - Enclose server-side</h1>
+ * <h1>Module: Item mapping - Reverse</h1>
  *
  * <p>
- * Encloses the server-side item stack in the data of item stacks sent to the client,
- * and extracts it again when received.
+ * Allows for the original server-side item to be retrieved from the item stacks sent to the client,
+ * and applies this reverse mapping to received item stacks.
  * </p>
  *
  * <p>
@@ -17,11 +17,15 @@
  * <p>
  * <h3>Minecraft changes</h3>
  * <ul>
- *     <li>{@link net.minecraft.world.item.ItemStack} - To extract the enclosed item stack in received packets.</li>
+ *     <li>{@link net.minecraft.world.item.ItemStack} - To reverse-map the item stack in received packets.</li>
+ *     <li>
+ *         {@link net.minecraft.network.Connection} - To store a
+ *         {@link org.fiddlemc.fiddle.impl.packetmapping.item.reverse.ItemMappingReverser instance}.
+ *     </li>
  * </ul>
  * </p>
  */
 @NullMarked
-package org.fiddlemc.fiddle.impl.packetmapping.item.encloseserverside;
+package org.fiddlemc.fiddle.impl.packetmapping.item.reverse;
 
 import org.jspecify.annotations.NullMarked;

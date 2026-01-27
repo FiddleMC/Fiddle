@@ -4,16 +4,25 @@ import net.minecraft.network.Connection;
 import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.entity.Player;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
+import org.fiddlemc.fiddle.impl.packetmapping.item.reverse.ItemMappingReverser;
 import org.jspecify.annotations.Nullable;
 
 /**
- * A {@link ClientView} that adds methods to get Minecraft internals.
+ * An extension of the {@link ClientView} interface that adds methods to get Minecraft internals.
+ *
+ * <p>
+ * Every instance of {@link ClientView} is also an instance of {@link NMSClientView}.
+ * </p>
  */
 public interface NMSClientView extends ClientView {
 
     /**
      * @return The {@link Connection} of this client,
      * or null if not available.
+     *
+     * <p>
+     * The connection (if present) instance stays the same during the entire connection session of a client.
+     * </p>
      */
     @Nullable Connection getConnection();
 
