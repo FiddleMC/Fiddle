@@ -10,6 +10,7 @@
  * <ul>
  *     <li>{@link net.minecraft.server.dedicated.DedicatedServer} - To fire the pipeline compose event.</li>
  *     <li>{@link net.minecraft.world.item.ItemStack} - To call the mapping pipeline during encoding.</li>
+ *     <li>{@link net.minecraft.world.item.crafting.Ingredient} - To call the mapping pipeline during encoding.</li>
  * </ul>
  * </p>
  */

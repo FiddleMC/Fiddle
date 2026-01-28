@@ -376,7 +376,7 @@ public class ItemMappingReverser {
             this.lock.acquireUninterruptibly();
             try {
                 @Nullable List<ExistingMapping> existingMappings = this.existingMappingsBySentHashedKey.get(lookupKey);
-                if (!existingMappings.isEmpty()) {
+                if (existingMappings != null && !existingMappings.isEmpty()) {
                     serverSideHashedKey = existingMappings.get(existingMappings.size() - 1).serverSideWithCount1HashedKey;
                 }
             } finally {

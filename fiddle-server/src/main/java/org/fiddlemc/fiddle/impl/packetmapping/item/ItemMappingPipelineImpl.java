@@ -1,9 +1,12 @@
 package org.fiddlemc.fiddle.impl.packetmapping.item;
 
 import io.papermc.paper.plugin.lifecycle.event.PaperLifecycleEvent;
+import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntIntPair;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderSet;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
@@ -11,6 +14,7 @@ import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingContext;
 import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingHandle;
 import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingPipeline;
 import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMapping;
+import org.fiddlemc.fiddle.impl.clientview.lookup.packethandling.ClientViewLookupThreadLocal;
 import org.fiddlemc.fiddle.impl.java.util.serviceloader.NoArgsConstructorServiceProviderImpl;
 import org.fiddlemc.fiddle.impl.packetmapping.PacketDataMappingPipelineImpl;
 import org.jspecify.annotations.Nullable;
@@ -122,6 +126,56 @@ public final class ItemMappingPipelineImpl extends PacketDataMappingPipelineImpl
         // Return the result
         return mapped;
 
+    }
+
+    /**
+     * Similar to {@link #apply}, but for a whole item type.
+     *
+     * @return The mapped {@link Item}, on a best-attempt basis.
+     */
+    public Item apply(Item data, ItemMappingContext context) {
+        return apply(new ItemStack(data), context).getItem();
+    }
+
+    /**
+     * Convenience function for {@link #apply(Item, ItemMappingContext)},
+     * analogous to {@link #applyGenerically(ItemStack)}.
+     */
+    public Item applyGenerically(Item data) {
+        return this.apply(data, this.createGenericContext(ClientViewLookupThreadLocal.getThreadLocalClientViewOrFallback()));
+    }
+
+    /**
+     * Convenience function to call {@link #apply(Item, ItemMappingContext)}
+     * for all items in the given {@link HolderSet}.
+     *
+     * @return A {@link HolderSet} of mapped {@link Item}s.
+     * This {@link HolderSet} may be the given {@code data}, and if not, the {@link Holder}s inside
+     * may be those in {@code data}.
+     */
+    public HolderSet<Item> apply(HolderSet<Item> data, ItemMappingContext context) {
+        Int2ObjectMap<Item> fromToMap = new Int2ObjectArrayMap<>();
+        List<Holder<Item>> result = new ArrayList<>(data.size());
+        boolean changed = false;
+        for (int i = 0; i < data.size(); i++) {
+            Holder<Item> holder = data.get(i);
+            Item item = holder.value();
+            int id = item.indexInItemRegistry;
+            Item mapped = fromToMap.computeIfAbsent(id, $ -> this.apply(item, context));
+            if (mapped != item) {
+                changed = true;
+            }
+            result.add(changed ? Holder.direct(mapped) : holder);
+        }
+        return changed ? HolderSet.direct(result) : data;
+    }
+
+    /**
+     * Convenience function for {@link #apply(HolderSet, ItemMappingContext)},
+     * analogous to {@link #applyGenerically(ItemStack)}.
+     */
+    public HolderSet<Item> applyGenerically(HolderSet<Item> data) {
+        return this.apply(data, this.createGenericContext(ClientViewLookupThreadLocal.getThreadLocalClientViewOrFallback()));
     }
 
     @Override
