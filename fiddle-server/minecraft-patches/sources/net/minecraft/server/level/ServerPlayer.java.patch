@@ -1,0 +1,33 @@
+--- a/net/minecraft/server/level/ServerPlayer.java
++++ b/net/minecraft/server/level/ServerPlayer.java
+@@ -272,12 +_,14 @@
+     private long timeEntitySatOnShoulder;
+     private CompoundTag shoulderEntityLeft = new CompoundTag();
+     private CompoundTag shoulderEntityRight = new CompoundTag();
+-    public final ContainerSynchronizer containerSynchronizer = new ContainerSynchronizer() {
+-        private final LoadingCache<TypedDataComponent<?>, Integer> cache = CacheBuilder.newBuilder()
+-            .maximumSize(256L)
++    // Fiddle start - Item mapping - Reverse - Reverse-map hashed item stacks - Expose hashing mechanism
++    public static LoadingCache<TypedDataComponent<?>, Integer> createHashingCache(net.minecraft.core.RegistryAccess registryAccess, long maximumSize) {
++        return CacheBuilder.newBuilder()
++            .maximumSize(maximumSize)
++            // Fiddle end - Item mapping - Reverse - Reverse-map hashed item stacks - Expose hashing mechanism
+             .build(
+                 new CacheLoader<TypedDataComponent<?>, Integer>() {
+-                    private final DynamicOps<HashCode> registryHashOps = ServerPlayer.this.registryAccess().createSerializationContext(HashOps.CRC32C_INSTANCE);
++                    private final DynamicOps<HashCode> registryHashOps = registryAccess.createSerializationContext(HashOps.CRC32C_INSTANCE); // Fiddle - Item mapping - Reverse - Reverse-map hashed item stacks - Expose hashing mechanism
+ 
+                     @Override
+                     public Integer load(TypedDataComponent<?> component) {
+@@ -287,6 +_,11 @@
+                     }
+                 }
+             );
++        // Fiddle start - Item mapping - Reverse - Reverse-map hashed item stacks - Expose hashing mechanism
++    }
++    public final ContainerSynchronizer containerSynchronizer = new ContainerSynchronizer() {
++        private final LoadingCache<TypedDataComponent<?>, Integer> cache = createHashingCache(ServerPlayer.this.registryAccess(), 256L);
++        // Fiddle end - Item mapping - Reverse - Reverse-map hashed item stacks - Expose hashing mechanism
+ 
+         @Override
+         public void sendInitialData(AbstractContainerMenu container, List<ItemStack> items, ItemStack carried, int[] remoteDataSlots) {

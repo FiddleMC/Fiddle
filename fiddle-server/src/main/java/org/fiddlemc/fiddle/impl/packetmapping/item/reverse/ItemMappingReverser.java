@@ -1,14 +1,23 @@
 package org.fiddlemc.fiddle.impl.packetmapping.item.reverse;
 
+import com.google.common.cache.LoadingCache;
 import com.mojang.serialization.DynamicOps;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.component.TypedDataComponent;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.HashedPatchMap;
+import net.minecraft.network.HashedStack;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
 import org.jspecify.annotations.Nullable;
@@ -17,6 +26,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.Semaphore;
 
@@ -46,6 +56,20 @@ public class ItemMappingReverser {
         return TAG_OPS;
     }
 
+    /**
+     * The cached return value fo {@link #hashGenerator},
+     * or null if not cached yet.
+     */
+    private static HashedPatchMap.@Nullable HashGenerator HASH_GENERATOR;
+
+    private static HashedPatchMap.HashGenerator hashGenerator() {
+        if (HASH_GENERATOR == null) {
+            LoadingCache<TypedDataComponent<?>, Integer> loadingCache = ServerPlayer.createHashingCache(MinecraftServer.getServer().registryAccess(), 32768L);
+            HASH_GENERATOR = loadingCache::getUnchecked;
+        }
+        return HASH_GENERATOR;
+    }
+
     private final Semaphore lock = new Semaphore(1);
     private int nextId = 0;
 
@@ -66,6 +90,11 @@ public class ItemMappingReverser {
      */
     private final Map<Tag, List<ExistingMapping>> existingMappingsBySentBeforeAddingIdTag = new HashMap<>();
 
+    /**
+     * All current {@link ExistingMapping}s by their {@link ExistingMapping#sentAfterAddingIdWithCount1HashedKey}.
+     */
+    private final Map<HashedStackKey, List<ExistingMapping>> existingMappingsBySentHashedKey = new TreeMap<>();
+
     private static class ExistingMapping {
 
         final int id;
@@ -82,7 +111,12 @@ public class ItemMappingReverser {
         final ItemStack serverSideWithCount1;
 
         /**
-         * The server-side item stack, with {@linkplain ItemStack#getCount() count} 1, as a {@link Tag}.
+         * {@link #serverSideWithCount1} as a {@link HashedStackKey}.
+         */
+        final HashedStackKey serverSideWithCount1HashedKey;
+
+        /**
+         * {@link #serverSideWithCount1} as a {@link Tag}.
          */
         final Tag serverSideWithCount1Tag;
 
@@ -98,13 +132,20 @@ public class ItemMappingReverser {
          */
         final ItemStack sentAfterAddingIdWithCount1;
 
-        ExistingMapping(int id, final ItemStack serverSideWithCount1, final Tag serverSideWithCount1Tag, final Tag sentBeforeAddingIdWithCount1Tag, final ItemStack sentAfterAddingIdWithCount1) {
+        /**
+         * {@link #sentBeforeAddingIdWithCount1Tag} as a {@link HashedStackKey}.
+         */
+        final HashedStackKey sentAfterAddingIdWithCount1HashedKey;
+
+        ExistingMapping(int id, ItemStack serverSideWithCount1, Tag serverSideWithCount1Tag, Tag sentBeforeAddingIdWithCount1Tag, ItemStack sentAfterAddingIdWithCount1) {
             this.id = id;
             this.setTimeLastUsed();
             this.serverSideWithCount1 = serverSideWithCount1;
+            this.serverSideWithCount1HashedKey = HashedStackKey.of(serverSideWithCount1);
             this.serverSideWithCount1Tag = serverSideWithCount1Tag;
             this.sentBeforeAddingIdWithCount1Tag = sentBeforeAddingIdWithCount1Tag;
             this.sentAfterAddingIdWithCount1 = sentAfterAddingIdWithCount1;
+            this.sentAfterAddingIdWithCount1HashedKey = HashedStackKey.of(sentAfterAddingIdWithCount1);
         }
 
         void setTimeLastUsed() {
@@ -126,6 +167,93 @@ public class ItemMappingReverser {
                 mappings.remove(this);
                 return mappings.isEmpty() ? null : mappings;
             });
+            reverser.existingMappingsBySentHashedKey.compute(this.sentAfterAddingIdWithCount1HashedKey, ($, mappings) -> {
+                if (mappings == null) {
+                    return null;
+                }
+                mappings.remove(this);
+                return mappings.isEmpty() ? null : mappings;
+            });
+        }
+
+    }
+
+    private static class HashedStackKey implements Comparable<HashedStackKey> {
+
+        final Item item;
+        final Holder<Item> itemHolder;
+        final HashedPatchMap hashedPatchmap;
+
+        HashedStackKey(Item item, Holder<Item> itemHolder, HashedPatchMap hashedPatchmap) {
+            this.item = item;
+            this.itemHolder = itemHolder;
+            this.hashedPatchmap = hashedPatchmap;
+        }
+
+        @Override
+        public int compareTo(HashedStackKey o) {
+            int compare = Integer.compare(this.item.indexInItemRegistry, o.item.indexInItemRegistry);
+            if (compare != 0) {
+                return compare;
+            }
+            int addedSize = this.hashedPatchmap.addedComponents().size();
+            compare = Integer.compare(addedSize, o.hashedPatchmap.addedComponents().size());
+            if (compare != 0) {
+                return compare;
+            }
+            int removedSize = this.hashedPatchmap.removedComponents().size();
+            compare = Integer.compare(removedSize, o.hashedPatchmap.removedComponents().size());
+            if (compare != 0) {
+                return compare;
+            }
+            List<DataComponentType<?>> types1 = this.hashedPatchmap.addedComponents().keySet().stream().sorted(Comparator.comparingInt(BuiltInRegistries.DATA_COMPONENT_TYPE::getId)).toList();
+            List<DataComponentType<?>> types2 = o.hashedPatchmap.addedComponents().keySet().stream().sorted(Comparator.comparingInt(BuiltInRegistries.DATA_COMPONENT_TYPE::getId)).toList();
+            for (int i = 0; i < addedSize; i++) {
+                DataComponentType<?> type1 = types1.get(i);
+                DataComponentType<?> type2 = types2.get(i);
+                int id1 = BuiltInRegistries.DATA_COMPONENT_TYPE.getId(type1);
+                int id2 = BuiltInRegistries.DATA_COMPONENT_TYPE.getId(type2);
+                compare = Integer.compare(id1, id2);
+                if (compare != 0) {
+                    return compare;
+                }
+                int val1 = this.hashedPatchmap.addedComponents().get(type1);
+                int val2 = o.hashedPatchmap.addedComponents().get(type2);
+                compare = Integer.compare(val1, val2);
+                if (compare != 0) {
+                    return compare;
+                }
+            }
+            types1 = this.hashedPatchmap.removedComponents().stream().sorted(Comparator.comparingInt(BuiltInRegistries.DATA_COMPONENT_TYPE::getId)).toList();
+            types2 = o.hashedPatchmap.removedComponents().stream().sorted(Comparator.comparingInt(BuiltInRegistries.DATA_COMPONENT_TYPE::getId)).toList();
+            for (int i = 0; i < removedSize; i++) {
+                DataComponentType<?> type1 = types1.get(i);
+                DataComponentType<?> type2 = types2.get(i);
+                int id1 = BuiltInRegistries.DATA_COMPONENT_TYPE.getId(type1);
+                int id2 = BuiltInRegistries.DATA_COMPONENT_TYPE.getId(type2);
+                compare = Integer.compare(id1, id2);
+                if (compare != 0) {
+                    return compare;
+                }
+            }
+            return 0;
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            return obj instanceof HashedStackKey o && this.compareTo(o) == 0;
+        }
+
+        HashedStack withCount(int count) {
+            return new HashedStack.ActualItem(this.itemHolder, count, this.hashedPatchmap);
+        }
+
+        static HashedStackKey of(HashedStack.ActualItem actualItem) {
+            return new HashedStackKey(actualItem.item().value(), actualItem.item(), actualItem.components());
+        }
+
+        static HashedStackKey of(ItemStack itemStack) {
+            return new HashedStackKey(itemStack.getItem(), itemStack.getItemHolder(), HashedPatchMap.create(itemStack.getComponentsPatch(), hashGenerator()));
         }
 
     }
@@ -177,6 +305,7 @@ public class ItemMappingReverser {
             this.existingMappingsById.put(id, existingMapping);
             this.existingMappingsByTimeLastUsed.add(existingMapping);
             existingMappings.add(existingMapping);
+            this.existingMappingsBySentHashedKey.computeIfAbsent(existingMapping.sentAfterAddingIdWithCount1HashedKey, $ -> new ArrayList<>(1)).add(existingMapping);
 
             // Remove mappings if outdated or too many
             while (this.existingMappingsByTimeLastUsed.size() >= MAX_REMEMBER_MAPPING_COUNT) {
@@ -233,5 +362,31 @@ public class ItemMappingReverser {
         return received;
     }
 
+    /**
+     * Reverses the mapping that was applied to the {@code received} hashed item stack.
+     *
+     * @param received The {@link HashedStack} that was received from a client.
+     * @return The original server-side {@link HashedStack},
+     * or {@code received} if none could be determined.
+     */
+    public HashedStack reverseMappingIfPossible(HashedStack received) {
+        if (received instanceof HashedStack.ActualItem actualItem) {
+            HashedStackKey lookupKey = HashedStackKey.of(actualItem);
+            @Nullable HashedStackKey serverSideHashedKey = null;
+            this.lock.acquireUninterruptibly();
+            try {
+                @Nullable List<ExistingMapping> existingMappings = this.existingMappingsBySentHashedKey.get(lookupKey);
+                if (!existingMappings.isEmpty()) {
+                    serverSideHashedKey = existingMappings.get(existingMappings.size() - 1).serverSideWithCount1HashedKey;
+                }
+            } finally {
+                this.lock.release();
+            }
+            if (serverSideHashedKey != null) {
+                return serverSideHashedKey.withCount(actualItem.count());
+            }
+        }
+        return received;
+    }
 
 }

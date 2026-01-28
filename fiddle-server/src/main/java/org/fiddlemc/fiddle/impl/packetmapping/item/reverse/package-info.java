@@ -17,11 +17,13 @@
  * <p>
  * <h3>Minecraft changes</h3>
  * <ul>
- *     <li>{@link net.minecraft.world.item.ItemStack} - To reverse-map the item stack in received packets.</li>
+ *     <li>{@link net.minecraft.world.item.ItemStack} - To reverse-map the item stacks in received packets.</li>
+ *     <li>{@link net.minecraft.network.HashedStack} - To reverse-map the hashed stacks in received packets.</li>
  *     <li>
  *         {@link net.minecraft.network.Connection} - To store a
  *         {@link org.fiddlemc.fiddle.impl.packetmapping.item.reverse.ItemMappingReverser instance}.
  *     </li>
+ *     <li>{@link net.minecraft.server.level.ServerPlayer} - To expose the hashed item stack hashing mechanism.</li>
  * </ul>
  * </p>
  */

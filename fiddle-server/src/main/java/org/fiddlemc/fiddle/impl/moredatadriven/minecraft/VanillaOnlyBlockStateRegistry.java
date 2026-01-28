@@ -1,5 +1,3 @@
-// Fiddle - modded registries - vanilla-only registries - create - block state
-
 package org.fiddlemc.fiddle.impl.moredatadriven.minecraft;
 
 import net.minecraft.core.IdMapper;
