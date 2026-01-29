@@ -8,7 +8,7 @@ import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEventType;
 import io.papermc.paper.plugin.lifecycle.event.types.PrioritizableLifecycleEventType;
 import org.bukkit.NamespacedKey;
 import org.fiddlemc.fiddle.api.bukkit.enuminjection.KeyedSourceBukkitEnumSynchronizer;
-import org.fiddlemc.fiddle.impl.java.enuminjection.EnumInjector;
+import org.fiddlemc.fiddle.impl.util.java.enuminjection.EnumInjector;
 import org.jspecify.annotations.Nullable;
 
 /**

@@ -11,6 +11,7 @@ import org.fiddlemc.fiddle.api.packetmapping.PacketDataMappingContext;
 import org.fiddlemc.fiddle.api.packetmapping.PacketDataMappingHandle;
 import org.fiddlemc.fiddle.api.packetmapping.PacketDataMappingPipeline;
 import org.fiddlemc.fiddle.api.packetmapping.PacketDataMappingRegistrar;
+import org.fiddlemc.fiddle.api.util.pipeline.MappingPipelineComposeEvent;
 import org.fiddlemc.fiddle.impl.clientview.lookup.packethandling.ClientViewLookupThreadLocal;
 import org.jspecify.annotations.Nullable;
 
@@ -24,7 +25,7 @@ public abstract class PacketDataMappingPipelineImpl<T, H extends PacketDataMappi
      */
     protected abstract String getEventTypeNamePrefix();
 
-    public final class ComposeEventType extends PrioritizableLifecycleEventType.Simple<BootstrapContext, ComposeEvent<T, R>> {
+    public final class ComposeEventType extends PrioritizableLifecycleEventType.Simple<BootstrapContext, MappingPipelineComposeEvent<R>> {
 
         private ComposeEventType() {
             super(PacketDataMappingPipelineImpl.this.getEventTypeNamePrefix() + "/compose", BootstrapContext.class);
@@ -47,9 +48,9 @@ public abstract class PacketDataMappingPipelineImpl<T, H extends PacketDataMappi
     }
 
     /**
-     * A base implementation of {@link ComposeEvent}.
+     * A base implementation of {@link MappingPipelineComposeEvent}.
      */
-    public class ComposeEventImpl implements ComposeEvent<T, R>, PaperLifecycleEvent {
+    public class ComposeEventImpl implements MappingPipelineComposeEvent<R>, PaperLifecycleEvent {
 
         /**
          * The return value for {@link #getRegistrar},
@@ -105,7 +106,7 @@ public abstract class PacketDataMappingPipelineImpl<T, H extends PacketDataMappi
     /**
      * Creates a new {@linkplain R registrar} instance for {@link #fireComposeEvent}.
      */
-    protected <CE extends ComposeEvent<T, R> & PaperLifecycleEvent> CE createComposeEvent() {
+    protected <CE extends MappingPipelineComposeEvent<R> & PaperLifecycleEvent> CE createComposeEvent() {
         return (CE) new ComposeEventImpl(this.createRegistrar());
     }
 

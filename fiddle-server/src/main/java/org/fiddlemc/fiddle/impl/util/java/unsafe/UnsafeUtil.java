@@ -1,6 +1,6 @@
-package org.fiddlemc.fiddle.impl.java.util.unsafe;
+package org.fiddlemc.fiddle.impl.util.java.unsafe;
 
-import org.fiddlemc.fiddle.impl.java.util.reflect.ReflectionUtil;
+import org.fiddlemc.fiddle.impl.util.java.reflect.ReflectionUtil;
 import org.jspecify.annotations.Nullable;
 import sun.misc.Unsafe;
 import java.lang.reflect.Field;

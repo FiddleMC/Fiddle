@@ -1,37 +1,12 @@
 package org.fiddlemc.fiddle.api.packetmapping;
 
-import io.papermc.paper.plugin.bootstrap.BootstrapContext;
-import io.papermc.paper.plugin.lifecycle.event.LifecycleEvent;
-import io.papermc.paper.plugin.lifecycle.event.handler.configuration.PrioritizedLifecycleEventHandlerConfiguration;
-import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEventType;
+import org.fiddlemc.fiddle.api.util.pipeline.MappingPipeline;
 import org.jspecify.annotations.Nullable;
 
 /**
  * A pipeline that applies {@linkplain PacketDataMapping mappings} to packet data of type {@link T}.
  */
-public interface PacketDataMappingPipeline<T, H extends PacketDataMappingHandle<T>, C extends PacketDataMappingContext, M extends PacketDataMapping<T, H, C>, R extends PacketDataMappingRegistrar<? extends T>> {
-
-    /**
-     * @return The {@link LifecycleEventType} for the {@link ComposeEvent}.
-     */
-    LifecycleEventType<BootstrapContext, ComposeEvent<T, R>, PrioritizedLifecycleEventHandlerConfiguration<BootstrapContext>> composeEventType();
-
-    /**
-     * A {@link LifecycleEvent} that fires when this pipeline is composed.
-     *
-     * <p>
-     * Mappings can be registered in handlers of this event,
-     * by using the {@link #getRegistrar()}.
-     * </p>
-     */
-    interface ComposeEvent<T, R extends PacketDataMappingRegistrar<? extends T>> extends LifecycleEvent {
-
-        /**
-         * The registrar to register mappings with.
-         */
-        R getRegistrar();
-
-    }
+public interface PacketDataMappingPipeline<T, H extends PacketDataMappingHandle<T>, C extends PacketDataMappingContext, M extends PacketDataMapping<T, H, C>, R extends PacketDataMappingRegistrar<? extends T>> extends MappingPipeline<R> {
 
     /**
      * @return The smallest possible list containing all mappings in this pipeline

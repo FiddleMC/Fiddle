@@ -1,4 +1,6 @@
-package org.fiddlemc.fiddle.impl.java.util.serviceloader;
+package org.fiddlemc.fiddle.impl.util.java.serviceloader;
+
+import org.fiddlemc.fiddle.impl.java.util.serviceloader.GenericServiceProvider;
 
 import java.util.HashMap;
 import java.util.Map;

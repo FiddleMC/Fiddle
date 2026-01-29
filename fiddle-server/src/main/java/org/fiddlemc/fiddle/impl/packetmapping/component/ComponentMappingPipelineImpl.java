@@ -14,7 +14,8 @@ import org.fiddlemc.fiddle.api.packetmapping.component.ComponentMappingContext;
 import org.fiddlemc.fiddle.api.packetmapping.component.ComponentMappingHandle;
 import org.fiddlemc.fiddle.api.packetmapping.component.ComponentMappingPipeline;
 import org.fiddlemc.fiddle.api.packetmapping.component.nms.NMSComponentMapping;
-import org.fiddlemc.fiddle.impl.java.util.serviceloader.NoArgsConstructorServiceProviderImpl;
+import org.fiddlemc.fiddle.api.util.pipeline.MappingPipelineComposeEvent;
+import org.fiddlemc.fiddle.impl.util.java.serviceloader.NoArgsConstructorServiceProviderImpl;
 import org.fiddlemc.fiddle.impl.packetmapping.PacketDataMappingPipelineImpl;
 import org.jspecify.annotations.Nullable;
 
@@ -107,7 +108,7 @@ public final class ComponentMappingPipelineImpl extends PacketDataMappingPipelin
     }
 
     @Override
-    protected <CE extends ComposeEvent<Component, ComponentMappingRegistrarImpl> & PaperLifecycleEvent> CE createComposeEvent() {
+    protected <CE extends MappingPipelineComposeEvent<ComponentMappingRegistrarImpl> & PaperLifecycleEvent> CE createComposeEvent() {
         return (CE) new ComposeEventImpl(this.createRegistrar());
     }
 

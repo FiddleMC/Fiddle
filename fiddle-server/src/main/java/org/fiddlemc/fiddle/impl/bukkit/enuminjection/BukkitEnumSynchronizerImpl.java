@@ -3,7 +3,7 @@ package org.fiddlemc.fiddle.impl.bukkit.enuminjection;
 import com.mojang.logging.LogUtils;
 import net.minecraft.server.dedicated.DedicatedServer;
 import org.fiddlemc.fiddle.api.bukkit.enuminjection.BukkitEnumSynchronizer;
-import org.fiddlemc.fiddle.impl.java.enuminjection.EnumInjector;
+import org.fiddlemc.fiddle.impl.util.java.enuminjection.EnumInjector;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import java.util.List;

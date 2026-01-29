@@ -1,4 +1,4 @@
-package org.fiddlemc.fiddle.impl.java.util.serviceloader;
+package org.fiddlemc.fiddle.impl.util.java.serviceloader;
 
 import java.lang.reflect.Constructor;
 

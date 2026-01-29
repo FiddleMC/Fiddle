@@ -6,10 +6,10 @@
  * </p>
  *
  * <p>
- * Currently provides {@link org.fiddlemc.fiddle.impl.java.util.function.ConsumerThrowsException}.
+ * Currently provides {@link org.fiddlemc.fiddle.impl.util.java.function.ConsumerThrowsException}.
  * </p>
  */
 @NullMarked
-package org.fiddlemc.fiddle.impl.java.util.function;
+package org.fiddlemc.fiddle.impl.util.java.function;
 
 import org.jspecify.annotations.NullMarked;

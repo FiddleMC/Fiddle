@@ -1,8 +1,8 @@
-package org.fiddlemc.fiddle.impl.java.enuminjection;
+package org.fiddlemc.fiddle.impl.util.java.enuminjection;
 
-import org.fiddlemc.fiddle.impl.java.util.function.ConsumerThrowsException;
-import org.fiddlemc.fiddle.impl.java.util.reflect.ReflectionUtil;
-import org.fiddlemc.fiddle.impl.java.util.unsafe.UnsafeUtil;
+import org.fiddlemc.fiddle.impl.util.java.function.ConsumerThrowsException;
+import org.fiddlemc.fiddle.impl.util.java.reflect.ReflectionUtil;
+import org.fiddlemc.fiddle.impl.util.java.unsafe.UnsafeUtil;
 import org.jspecify.annotations.Nullable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;

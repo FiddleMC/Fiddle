@@ -1,4 +1,4 @@
-package org.fiddlemc.fiddle.impl.java.util.function;
+package org.fiddlemc.fiddle.impl.util.java.function;
 
 import java.util.function.Consumer;
 
