@@ -1,10 +1,10 @@
-package org.fiddlemc.fiddle.impl.pipeline;
+package org.fiddlemc.fiddle.impl.util.mappingpipeline;
 
 import io.papermc.paper.plugin.bootstrap.BootstrapContext;
 import io.papermc.paper.plugin.lifecycle.event.types.PrioritizableLifecycleEventType;
-import org.fiddlemc.fiddle.api.util.pipeline.MappingPipelineComposeEvent;
-import org.fiddlemc.fiddle.api.util.pipeline.MappingPipelineComposeEventType;
-import org.fiddlemc.fiddle.api.util.pipeline.MappingPipelineRegistrar;
+import org.fiddlemc.fiddle.api.util.mappingpipeline.MappingPipelineComposeEvent;
+import org.fiddlemc.fiddle.api.util.mappingpipeline.MappingPipelineComposeEventType;
+import org.fiddlemc.fiddle.api.util.mappingpipeline.MappingPipelineRegistrar;
 
 /**
  * A base implementation of {@link MappingPipelineComposeEventType}.

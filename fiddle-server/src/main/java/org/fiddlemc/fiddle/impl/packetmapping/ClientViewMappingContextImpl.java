@@ -1,16 +1,16 @@
 package org.fiddlemc.fiddle.impl.packetmapping;
 
 import org.fiddlemc.fiddle.api.clientview.ClientView;
-import org.fiddlemc.fiddle.api.packetmapping.PacketDataMappingContext;
+import org.fiddlemc.fiddle.api.packetmapping.ClientViewMappingContext;
 
 /**
- * A base implementation of {@link PacketDataMappingContext}.
+ * A base implementation of {@link ClientViewMappingContext}.
  */
-public class PacketDataMappingContextImpl implements PacketDataMappingContext {
+public class ClientViewMappingContextImpl implements ClientViewMappingContext {
 
     private final ClientView clientView;
 
-    public PacketDataMappingContextImpl(ClientView clientView) {
+    public ClientViewMappingContextImpl(ClientView clientView) {
         this.clientView = clientView;
     }
 

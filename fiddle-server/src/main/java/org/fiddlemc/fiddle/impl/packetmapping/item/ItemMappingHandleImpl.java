@@ -1,18 +1,17 @@
 package org.fiddlemc.fiddle.impl.packetmapping.item;
 
 import net.minecraft.world.item.ItemStack;
-import org.fiddlemc.fiddle.api.packetmapping.PacketDataMappingHandle;
-import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingHandle;
-import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMapping;
-import org.fiddlemc.fiddle.impl.packetmapping.MutablePacketDataMappingHandleImpl;
+import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingContext;
+import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMappingHandle;
+import org.fiddlemc.fiddle.impl.util.mappingpipeline.WithContextMappingHandleImpl;
 
 /**
- * The {@link PacketDataMappingHandle} implementation for {@link NMSItemMapping}s.
+ * The implementation of {@link NMSItemMappingHandle}.
  */
-public class ItemMappingHandleImpl extends MutablePacketDataMappingHandleImpl<ItemStack, ItemStack> implements ItemMappingHandle<ItemStack> {
+public class ItemMappingHandleImpl extends WithContextMappingHandleImpl<ItemStack, ItemStack, ItemMappingContext> implements NMSItemMappingHandle {
 
-    public ItemMappingHandleImpl(ItemStack original) {
-        super(original);
+    public ItemMappingHandleImpl(final ItemStack data, final ItemMappingContext context) {
+        super(data, context);
     }
 
     @Override

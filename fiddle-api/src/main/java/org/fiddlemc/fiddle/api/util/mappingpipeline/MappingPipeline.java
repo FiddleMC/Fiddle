@@ -1,4 +1,4 @@
-package org.fiddlemc.fiddle.api.util.pipeline;
+package org.fiddlemc.fiddle.api.util.mappingpipeline;
 
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEventType;
 
@@ -10,6 +10,6 @@ public interface MappingPipeline<R extends MappingPipelineRegistrar> {
     /**
      * @return The {@link LifecycleEventType} for this pipeline.
      */
-    MappingPipelineComposeEventType<R> composeEventType();
+    MappingPipelineComposeEventType<? extends R> composeEventType();
 
 }

@@ -1,4 +1,4 @@
-package org.fiddlemc.fiddle.api.util.pipeline;
+package org.fiddlemc.fiddle.api.util.mappingpipeline;
 
 import io.papermc.paper.plugin.bootstrap.BootstrapContext;
 import io.papermc.paper.plugin.lifecycle.event.handler.configuration.PrioritizedLifecycleEventHandlerConfiguration;

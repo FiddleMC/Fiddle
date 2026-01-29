@@ -1,15 +1,9 @@
-package org.fiddlemc.fiddle.api.packetmapping;
+package org.fiddlemc.fiddle.api.util.mappingpipeline;
 
 /**
- * A handle for the data being mapped in a {@link PacketDataMapping}.
+ * A handle for the data that a mapping is being applied on.
  */
-public interface PacketDataMappingHandle<T> {
-
-    /**
-     * @return The original data, before any mappings were applied.
-     * The returned instance must not be modified.
-     */
-    T getOriginal();
+public interface MappingHandle<T> {
 
     /**
      * @return The current data, after potential previous mappings were applied.

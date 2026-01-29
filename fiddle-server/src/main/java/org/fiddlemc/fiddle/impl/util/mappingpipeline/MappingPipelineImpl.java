@@ -1,27 +1,27 @@
-package org.fiddlemc.fiddle.impl.pipeline;
+package org.fiddlemc.fiddle.impl.util.mappingpipeline;
 
 import io.papermc.paper.plugin.lifecycle.event.LifecycleEventRunner;
 import io.papermc.paper.plugin.lifecycle.event.PaperLifecycleEvent;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEventType;
-import org.fiddlemc.fiddle.api.util.pipeline.MappingPipeline;
-import org.fiddlemc.fiddle.api.util.pipeline.MappingPipelineComposeEvent;
-import org.fiddlemc.fiddle.api.util.pipeline.MappingPipelineComposeEventType;
-import org.fiddlemc.fiddle.api.util.pipeline.MappingPipelineRegistrar;
+import org.fiddlemc.fiddle.api.util.mappingpipeline.MappingPipeline;
+import org.fiddlemc.fiddle.api.util.mappingpipeline.MappingPipelineComposeEvent;
+import org.fiddlemc.fiddle.api.util.mappingpipeline.MappingPipelineComposeEventType;
+import org.fiddlemc.fiddle.api.util.mappingpipeline.MappingPipelineRegistrar;
 import org.jspecify.annotations.Nullable;
 
 /**
  * A base implementation of {@link MappingPipeline}.
  */
-public abstract class MappingPipelineImpl<R extends MappingPipelineRegistrar> implements MappingPipeline<R> {
+public abstract class MappingPipelineImpl<R extends MappingPipelineRegistrar, RI extends R, CE extends MappingPipelineComposeEvent<RI> & PaperLifecycleEvent> implements MappingPipeline<R> {
 
     /**
      * The cached return value of {@link #composeEventType()},
      * or null if not cached yet.
      */
-    private @Nullable MappingPipelineComposeEventType<R> composeEventType;
+    private @Nullable MappingPipelineComposeEventType<RI> composeEventType;
 
     @Override
-    public MappingPipelineComposeEventType<R> composeEventType() {
+    public MappingPipelineComposeEventType<RI> composeEventType() {
         if (this.composeEventType == null) {
             this.composeEventType = this.createComposeEventType();
         }
@@ -40,21 +40,19 @@ public abstract class MappingPipelineImpl<R extends MappingPipelineRegistrar> im
         return this.getEventTypeNamePrefix() + "/compose";
     }
 
-    protected MappingPipelineComposeEventType<R> createComposeEventType() {
+    protected MappingPipelineComposeEventType<RI> createComposeEventType() {
         return new MappingPipelineComposeEventTypeImpl<>(this.getEventTypeName());
     }
 
     /**
-     * @return A new {@linkplain R registrar} instance.
+     * @return A new {@linkplain RI registrar} instance.
      */
-    protected abstract R createRegistrar();
+    protected abstract RI createRegistrar();
 
     /**
      * @return A new {@link MappingPipelineComposeEvent}.
      */
-    protected <CE extends MappingPipelineComposeEvent<R> & PaperLifecycleEvent> CE createComposeEvent() {
-        return (CE) new MappingPipelineComposeEventImpl<>(this, this.createRegistrar());
-    }
+    protected abstract CE createComposeEvent();
 
     /**
      * {@linkplain LifecycleEventRunner#callEvent Fires} a {@link MappingPipelineComposeEvent} for this pipeline.
@@ -66,6 +64,17 @@ public abstract class MappingPipelineImpl<R extends MappingPipelineRegistrar> im
     /**
      * Copies the mappings registered in the registrar to this pipeline.
      */
-    public abstract void copyMappingsFrom(R registrar);
+    public abstract void copyMappingsFrom(RI registrar);
+
+    /**
+     * An implementation of {@link MappingPipelineImpl} using {@link MappingPipelineComposeEventImpl}.
+     */
+    public static abstract class Simple<R extends MappingPipelineRegistrar, RI extends R> extends MappingPipelineImpl<R, RI, MappingPipelineComposeEventImpl<R, RI>> {
+
+        protected MappingPipelineComposeEventImpl<R, RI> createComposeEvent() {
+            return new MappingPipelineComposeEventImpl<>(this, this.createRegistrar());
+        }
+
+    }
 
 }

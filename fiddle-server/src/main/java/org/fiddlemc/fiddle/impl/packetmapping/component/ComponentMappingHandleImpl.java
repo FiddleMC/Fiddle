@@ -2,21 +2,17 @@ package org.fiddlemc.fiddle.impl.packetmapping.component;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.world.item.ItemStack;
-import org.fiddlemc.fiddle.api.packetmapping.PacketDataMappingHandle;
-import org.fiddlemc.fiddle.api.packetmapping.component.ComponentMappingHandle;
-import org.fiddlemc.fiddle.api.packetmapping.component.nms.NMSComponentMapping;
-import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingHandle;
-import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMapping;
-import org.fiddlemc.fiddle.impl.packetmapping.MutablePacketDataMappingHandleImpl;
+import org.fiddlemc.fiddle.api.packetmapping.ClientViewMappingContext;
+import org.fiddlemc.fiddle.api.packetmapping.component.nms.NMSComponentMappingHandle;
+import org.fiddlemc.fiddle.impl.util.mappingpipeline.WithContextMappingHandleImpl;
 
 /**
- * The {@link PacketDataMappingHandle} implementation for {@link NMSComponentMapping}s.
+ * The implementation of {@link NMSComponentMappingHandle}.
  */
-public class ComponentMappingHandleImpl extends MutablePacketDataMappingHandleImpl<Component, MutableComponent> implements ComponentMappingHandle<Component, MutableComponent> {
+public class ComponentMappingHandleImpl extends WithContextMappingHandleImpl<Component, MutableComponent, ClientViewMappingContext> implements NMSComponentMappingHandle {
 
-    public ComponentMappingHandleImpl(Component original) {
-        super(original);
+    public ComponentMappingHandleImpl(Component data, ClientViewMappingContext context) {
+        super(data, context);
     }
 
     @Override

@@ -1,11 +1,11 @@
 package org.fiddlemc.fiddle.api.packetmapping.item;
 
-import org.fiddlemc.fiddle.api.packetmapping.PacketDataMappingContext;
+import org.fiddlemc.fiddle.api.packetmapping.ClientViewMappingContext;
 
 /**
- * A {@link PacketDataMappingContext} for the {@link ItemMappingPipeline}.
+ * A {@link ClientViewMappingContext} for the {@link ItemMappingPipeline}.
  */
-public interface ItemMappingContext extends PacketDataMappingContext {
+public interface ItemMappingContext extends ClientViewMappingContext {
 
     /**
      * @return Whether the item stack on which this mapping is being applied

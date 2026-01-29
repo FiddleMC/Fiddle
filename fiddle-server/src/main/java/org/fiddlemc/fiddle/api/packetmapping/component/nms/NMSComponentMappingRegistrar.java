@@ -2,7 +2,6 @@ package org.fiddlemc.fiddle.api.packetmapping.component.nms;
 
 import java.util.List;
 import java.util.function.Consumer;
-import net.minecraft.network.chat.Component;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
 import org.fiddlemc.fiddle.api.packetmapping.component.ComponentMappingPipeline;
 import org.fiddlemc.fiddle.api.packetmapping.component.ComponentMappingRegistrar;

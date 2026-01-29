@@ -1,6 +1,5 @@
 package org.fiddlemc.fiddle.impl.packetmapping.item;
 
-import io.papermc.paper.plugin.lifecycle.event.PaperLifecycleEvent;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -11,13 +10,16 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
 import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingContext;
-import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingHandle;
 import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingPipeline;
+import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingRegistrar;
 import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMapping;
-import org.fiddlemc.fiddle.api.util.pipeline.MappingPipelineComposeEvent;
-import org.fiddlemc.fiddle.impl.clientview.lookup.packethandling.ClientViewLookupThreadLocal;
+import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMappingHandle;
+import org.fiddlemc.fiddle.impl.clientview.ClientViewImpl;
+import org.fiddlemc.fiddle.impl.packetmapping.WithClientViewContextSingleStepMappingPipeline;
+import org.fiddlemc.fiddle.impl.packetmapping.item.reverse.ItemMappingReverser;
+import org.fiddlemc.fiddle.impl.util.mappingpipeline.MappingPipelineImpl;
+import org.fiddlemc.fiddle.impl.util.mappingpipeline.WithContextSingleStepMappingPipeline;
 import org.fiddlemc.fiddle.impl.util.java.serviceloader.NoArgsConstructorServiceProviderImpl;
-import org.fiddlemc.fiddle.impl.packetmapping.PacketDataMappingPipelineImpl;
 import org.jspecify.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,9 +29,9 @@ import java.util.Map;
 /**
  * A pipeline of {@link NMSItemMapping}s.
  */
-public final class ItemMappingPipelineImpl extends PacketDataMappingPipelineImpl<ItemStack, ItemMappingHandle<ItemStack>, ItemMappingContext, NMSItemMapping, ItemMappingRegistrarImpl> implements ItemMappingPipeline<ItemStack, ItemMappingHandle<ItemStack>, ItemMappingContext, NMSItemMapping, ItemMappingRegistrarImpl> {
+public final class ItemMappingPipelineImpl extends MappingPipelineImpl.Simple<ItemMappingRegistrar, ItemMappingRegistrarImpl> implements WithClientViewContextSingleStepMappingPipeline<ItemStack, ItemMappingContext, NMSItemMappingHandle, ItemMappingRegistrar>, ItemMappingPipeline {
 
-    public static final class ServiceProviderImpl extends NoArgsConstructorServiceProviderImpl<ItemMappingPipeline<ItemStack, ItemMappingHandle<ItemStack>, ItemMappingContext, NMSItemMapping, ItemMappingRegistrarImpl>, ItemMappingPipelineImpl> implements ServiceProvider<ItemStack, ItemMappingHandle<ItemStack>, ItemMappingContext, NMSItemMapping, ItemMappingRegistrarImpl> {
+    public static final class ServiceProviderImpl extends NoArgsConstructorServiceProviderImpl<ItemMappingPipeline, ItemMappingPipelineImpl> implements ServiceProvider {
 
         public ServiceProviderImpl() {
             super(ItemMappingPipelineImpl.class);
@@ -66,14 +68,19 @@ public final class ItemMappingPipelineImpl extends PacketDataMappingPipelineImpl
     }
 
     @Override
-    public NMSItemMapping @Nullable [] getMappingsThatMayApplyTo(ItemStack data, ItemMappingContext context) {
-        Int2ObjectMap<NMSItemMapping[]> mapForAwarenessLevel = this.mappings[context.getClientView().getAwarenessLevel().ordinal()];
-        return mapForAwarenessLevel.get(data.getItem().indexInItemRegistry);
+    public NMSItemMapping @Nullable [] getMappingsThatMayApplyTo(NMSItemMappingHandle handle) {
+        Int2ObjectMap<NMSItemMapping[]> mapForAwarenessLevel = this.mappings[handle.getContext().getClientView().getAwarenessLevel().ordinal()];
+        return mapForAwarenessLevel.get(handle.getOriginal().getItem().indexInItemRegistry);
     }
 
     @Override
-    public ItemMappingHandleImpl createHandle(ItemStack data) {
-        return new ItemMappingHandleImpl(data);
+    public NMSItemMappingHandle createHandle(ItemStack data, ItemMappingContext context) {
+        return new ItemMappingHandleImpl(data, context);
+    }
+
+    @Override
+    public ItemMappingContextImpl createGenericContext(ClientView clientView) {
+        return new ItemMappingContextImpl(clientView, false, false);
     }
 
     @Override
@@ -85,11 +92,11 @@ public final class ItemMappingPipelineImpl extends PacketDataMappingPipelineImpl
         }
 
         // Apply the pipeline
-        ItemStack mapped = super.apply(data, context);
+        ItemStack mapped = WithClientViewContextSingleStepMappingPipeline.super.apply(data, context);
 
         // If changes were made, make sure the mapping can be reversed
         if (!data.equals(mapped)) {
-            org.fiddlemc.fiddle.impl.packetmapping.item.reverse.@Nullable ItemMappingReverser itemMappingReverser = ((org.fiddlemc.fiddle.impl.clientview.ClientViewImpl) context.getClientView()).getItemMappingReverser();
+            @Nullable ItemMappingReverser itemMappingReverser = ((ClientViewImpl) context.getClientView()).getItemMappingReverser();
             if (itemMappingReverser != null) {
                 mapped = itemMappingReverser.makeReversible(mapped, data);
             }
@@ -111,10 +118,10 @@ public final class ItemMappingPipelineImpl extends PacketDataMappingPipelineImpl
 
     /**
      * Convenience function for {@link #apply(Item, ItemMappingContext)},
-     * analogous to {@link #applyGenerically(ItemStack)}.
+     * analogous to {@link WithContextSingleStepMappingPipeline#applyGenerically}.
      */
     public Item applyGenerically(Item data) {
-        return this.apply(data, this.createGenericContext(ClientViewLookupThreadLocal.getThreadLocalClientViewOrFallback()));
+        return this.apply(data, this.createGenericContext());
     }
 
     /**
@@ -144,15 +151,10 @@ public final class ItemMappingPipelineImpl extends PacketDataMappingPipelineImpl
 
     /**
      * Convenience function for {@link #apply(HolderSet, ItemMappingContext)},
-     * analogous to {@link #applyGenerically(ItemStack)}.
+     * analogous to {@link WithContextSingleStepMappingPipeline#applyGenerically}.
      */
     public HolderSet<Item> applyGenerically(HolderSet<Item> data) {
-        return this.apply(data, this.createGenericContext(ClientViewLookupThreadLocal.getThreadLocalClientViewOrFallback()));
-    }
-
-    @Override
-    protected ItemMappingContextImpl createGenericContext(ClientView clientView) {
-        return new ItemMappingContextImpl(clientView, false, false);
+        return this.apply(data, this.createGenericContext());
     }
 
     @Override
@@ -161,7 +163,7 @@ public final class ItemMappingPipelineImpl extends PacketDataMappingPipelineImpl
     }
 
     @Override
-    public void copyMappingsFrom(final ItemMappingRegistrarImpl registrar) {
+    public void copyMappingsFrom(ItemMappingRegistrarImpl registrar) {
         Map<List<NMSItemMapping>, List<IntIntPair>> transposed = new HashMap<>();
         for (int awarenessLevelI = 0; awarenessLevelI < registrar.mappings.length; awarenessLevelI++) {
             for (Int2ObjectMap.Entry<List<NMSItemMapping>> entry : registrar.mappings[awarenessLevelI].int2ObjectEntrySet()) {
