@@ -13,8 +13,10 @@ import org.fiddlemc.fiddle.api.clientview.ClientView;
 import org.fiddlemc.fiddle.api.packetmapping.component.ComponentMappingContext;
 import org.fiddlemc.fiddle.api.packetmapping.component.ComponentMappingHandle;
 import org.fiddlemc.fiddle.api.packetmapping.component.ComponentMappingPipeline;
+import org.fiddlemc.fiddle.api.packetmapping.component.ComponentMappingRegistrar;
 import org.fiddlemc.fiddle.api.packetmapping.component.nms.NMSComponentMapping;
 import org.fiddlemc.fiddle.api.util.pipeline.MappingPipelineComposeEvent;
+import org.fiddlemc.fiddle.impl.pipeline.MappingPipelineComposeEventImpl;
 import org.fiddlemc.fiddle.impl.util.java.serviceloader.NoArgsConstructorServiceProviderImpl;
 import org.fiddlemc.fiddle.impl.packetmapping.PacketDataMappingPipelineImpl;
 import org.jspecify.annotations.Nullable;
@@ -38,35 +40,7 @@ public final class ComponentMappingPipelineImpl extends PacketDataMappingPipelin
 
     @Override
     protected String getEventTypeNamePrefix() {
-        return "fiddle_component_mapping";
-    }
-
-    private final class ComposeEventImpl extends PacketDataMappingPipelineImpl<Component, ComponentMappingHandle<Component, MutableComponent>, ComponentMappingContext, NMSComponentMapping, ComponentMappingRegistrarImpl>.ComposeEventImpl {
-
-        public ComposeEventImpl(ComponentMappingRegistrarImpl registrar) {
-            super(registrar);
-        }
-
-        @Override
-        public void invalidate() {
-
-            // Bake the mappings
-            // TODO
-            Map<List<NMSComponentMapping>, IntList> transposed = new HashMap<>();
-            for (int awarenessLevelI = 0; awarenessLevelI < this.registrar.mappings.length; awarenessLevelI++) {
-                transposed.computeIfAbsent(this.registrar.mappings[awarenessLevelI], $ -> new IntArrayList()).add(awarenessLevelI);
-            }
-            for (Map.Entry<List<NMSComponentMapping>, IntList> entry : transposed.entrySet()) {
-                for (int target : entry.getValue()) {
-                    ComponentMappingPipelineImpl.this.mappings[target] = entry.getKey().toArray(NMSComponentMapping[]::new);
-                }
-            }
-
-            // Continue with invalidation
-            super.invalidate();
-
-        }
-
+        return "fiddle_component_mapping_pipeline";
     }
 
     /**
@@ -108,8 +82,16 @@ public final class ComponentMappingPipelineImpl extends PacketDataMappingPipelin
     }
 
     @Override
-    protected <CE extends MappingPipelineComposeEvent<ComponentMappingRegistrarImpl> & PaperLifecycleEvent> CE createComposeEvent() {
-        return (CE) new ComposeEventImpl(this.createRegistrar());
+    public void copyMappingsFrom(final ComponentMappingRegistrarImpl registrar) {
+        Map<List<NMSComponentMapping>, IntList> transposed = new HashMap<>();
+        for (int awarenessLevelI = 0; awarenessLevelI < registrar.mappings.length; awarenessLevelI++) {
+            transposed.computeIfAbsent(registrar.mappings[awarenessLevelI], $ -> new IntArrayList()).add(awarenessLevelI);
+        }
+        for (Map.Entry<List<NMSComponentMapping>, IntList> entry : transposed.entrySet()) {
+            for (int target : entry.getValue()) {
+                this.mappings[target] = entry.getKey().toArray(NMSComponentMapping[]::new);
+            }
+        }
     }
 
 }

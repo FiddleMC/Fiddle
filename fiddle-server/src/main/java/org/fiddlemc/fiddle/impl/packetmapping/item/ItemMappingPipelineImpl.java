@@ -43,36 +43,7 @@ public final class ItemMappingPipelineImpl extends PacketDataMappingPipelineImpl
 
     @Override
     protected String getEventTypeNamePrefix() {
-        return "fiddle_item_mapping";
-    }
-
-    private final class ComposeEventImpl extends PacketDataMappingPipelineImpl<ItemStack, ItemMappingHandle<ItemStack>, ItemMappingContext, NMSItemMapping, ItemMappingRegistrarImpl>.ComposeEventImpl {
-
-        public ComposeEventImpl(ItemMappingRegistrarImpl registrar) {
-            super(registrar);
-        }
-
-        @Override
-        public void invalidate() {
-
-            // Bake the mappings
-            Map<List<NMSItemMapping>, List<IntIntPair>> transposed = new HashMap<>();
-            for (int awarenessLevelI = 0; awarenessLevelI < this.registrar.mappings.length; awarenessLevelI++) {
-                for (Int2ObjectMap.Entry<List<NMSItemMapping>> entry : this.registrar.mappings[awarenessLevelI].int2ObjectEntrySet()) {
-                    transposed.computeIfAbsent(entry.getValue(), $ -> new ArrayList<>()).add(IntIntPair.of(awarenessLevelI, entry.getKey()));
-                }
-            }
-            for (Map.Entry<List<NMSItemMapping>, List<IntIntPair>> entry : transposed.entrySet()) {
-                for (IntIntPair target : entry.getValue()) {
-                    ItemMappingPipelineImpl.this.mappings[target.firstInt()].put(target.secondInt(), entry.getKey().toArray(NMSItemMapping[]::new));
-                }
-            }
-
-            // Continue with invalidation
-            super.invalidate();
-
-        }
-
+        return "fiddle_item_mapping_pipeline";
     }
 
     /**
@@ -190,8 +161,18 @@ public final class ItemMappingPipelineImpl extends PacketDataMappingPipelineImpl
     }
 
     @Override
-    protected <CE extends MappingPipelineComposeEvent<ItemMappingRegistrarImpl> & PaperLifecycleEvent> CE createComposeEvent() {
-        return (CE) new ComposeEventImpl(this.createRegistrar());
+    public void copyMappingsFrom(final ItemMappingRegistrarImpl registrar) {
+        Map<List<NMSItemMapping>, List<IntIntPair>> transposed = new HashMap<>();
+        for (int awarenessLevelI = 0; awarenessLevelI < registrar.mappings.length; awarenessLevelI++) {
+            for (Int2ObjectMap.Entry<List<NMSItemMapping>> entry : registrar.mappings[awarenessLevelI].int2ObjectEntrySet()) {
+                transposed.computeIfAbsent(entry.getValue(), $ -> new ArrayList<>()).add(IntIntPair.of(awarenessLevelI, entry.getKey()));
+            }
+        }
+        for (Map.Entry<List<NMSItemMapping>, List<IntIntPair>> entry : transposed.entrySet()) {
+            for (IntIntPair target : entry.getValue()) {
+                this.mappings[target.firstInt()].put(target.secondInt(), entry.getKey().toArray(NMSItemMapping[]::new));
+            }
+        }
     }
 
 }

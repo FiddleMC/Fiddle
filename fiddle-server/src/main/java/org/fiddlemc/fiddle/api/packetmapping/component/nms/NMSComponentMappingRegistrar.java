@@ -11,7 +11,7 @@ import org.fiddlemc.fiddle.api.packetmapping.component.ComponentMappingRegistrar
  * Provides functionality to register {@link NMSComponentMapping}s
  * to the {@link ComponentMappingPipeline}.
  */
-public interface NMSComponentMappingRegistrar extends ComponentMappingRegistrar<Component> {
+public interface NMSComponentMappingRegistrar extends ComponentMappingRegistrar {
 
     /**
      * Registers a mapping.
