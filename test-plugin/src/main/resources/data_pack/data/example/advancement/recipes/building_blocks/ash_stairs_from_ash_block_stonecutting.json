@@ -26,7 +26,7 @@
   ],
   "rewards": {
     "recipes": [
-      "minecraft:ash_stairs_from_ash_block_stonecutting"
+      "example:ash_stairs_from_ash_block_stonecutting"
     ]
   }
 }
