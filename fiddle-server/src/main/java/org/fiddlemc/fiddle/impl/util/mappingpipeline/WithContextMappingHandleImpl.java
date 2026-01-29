@@ -14,8 +14,8 @@ public class WithContextMappingHandleImpl<T, MT extends T, C extends MappingCont
      */
     protected final C context;
 
-    public WithContextMappingHandleImpl(T data, C context) {
-        super(data);
+    public WithContextMappingHandleImpl(T data, C context, boolean isDataMutable) {
+        super(data, isDataMutable);
         this.context = context;
     }
 

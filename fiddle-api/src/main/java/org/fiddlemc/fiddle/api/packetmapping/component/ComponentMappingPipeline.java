@@ -7,7 +7,7 @@ import org.fiddlemc.fiddle.impl.java.util.serviceloader.GenericServiceProvider;
 /**
  * A pipeline of component mappings.
  */
-public interface ComponentMappingPipeline extends MappingPipeline<ComponentMappingRegistrar> {
+public interface ComponentMappingPipeline extends MappingPipeline<ComponentMappingPipelineRegistrar> {
 
     /**
      * An internal interface to get the {@link ComponentMappingPipeline} instance.

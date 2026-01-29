@@ -2,20 +2,24 @@ package org.fiddlemc.fiddle.impl.bukkit.enuminjection;
 
 import com.mojang.logging.LogUtils;
 import net.minecraft.server.dedicated.DedicatedServer;
-import org.fiddlemc.fiddle.api.bukkit.enuminjection.BukkitEnumSynchronizer;
+import org.fiddlemc.fiddle.api.bukkit.enuminjection.BukkitEnumNameMappingHandle;
+import org.fiddlemc.fiddle.api.bukkit.enuminjection.BukkitEnumNameMappingPipeline;
+import org.fiddlemc.fiddle.api.bukkit.enuminjection.BukkitEnumNameMappingPipelineRegistrar;
 import org.fiddlemc.fiddle.impl.util.java.enuminjection.EnumInjector;
+import org.fiddlemc.fiddle.impl.util.mappingpipeline.SingleStepMappingPipeline;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import java.util.List;
 
 /**
- * The implementation of {@link BukkitEnumSynchronizer}.
+ * A class that injects new values into a Bukkit enum {@link E}
+ * that correspond to values from another source (of type {@link S}).
  *
  * <p>
  * To apply the synchronization, call {@link #run}.
  * </p>
  */
-public abstract class BukkitEnumSynchronizerImpl<E extends Enum<E>, T, I extends EnumInjector<E>> implements BukkitEnumSynchronizer<E, T> {
+public abstract class BukkitEnumSynchronizer<E extends Enum<E>, S, I extends EnumInjector<E>, P extends BukkitEnumNameMappingPipelineImpl<S> & SingleStepMappingPipeline<String, BukkitEnumNameMappingHandle<S>, BukkitEnumNameMappingPipelineRegistrar<S>>> {
 
     private static final Logger LOGGER = LogUtils.getLogger();
 
@@ -26,16 +30,21 @@ public abstract class BukkitEnumSynchronizerImpl<E extends Enum<E>, T, I extends
     private @Nullable I injector;
 
     /**
+     * @return The {@link BukkitEnumNameMappingPipeline} used by this synchronizer.
+     */
+    protected abstract P getNameMappingPipeline();
+
+    /**
      * Acquires the injector used by this synchronizer.
      *
      * @return The desired return value of {@link #getInjector()}.
-     * @throws Exception                If something unexpected goes wrong.
+     * @throws Exception If something unexpected goes wrong.
      */
     protected abstract I createInjector() throws Exception;
 
     /**
      * @return The {@link EnumInjector} used by this synchronizer.
-     * @throws Exception                If something unexpected goes wrong.
+     * @throws Exception If something unexpected goes wrong.
      */
     protected I getInjector() throws Exception {
         if (this.injector == null) {
@@ -45,18 +54,26 @@ public abstract class BukkitEnumSynchronizerImpl<E extends Enum<E>, T, I extends
     }
 
     /**
-     * @return The source values for the injected new values.
+     * @return The source values that new values must be injected for.
      */
-    protected abstract List<T> getSourceValues();
+    protected abstract List<S> getSourceValues();
 
     /**
      * Stages an enum value for the given name and source value.
      *
      * @param enumName    The {@link Enum#name()} for the new value.
      * @param sourceValue The source value for which this new value is being injected.
-     * @throws Exception                If something unexpected goes wrong.
+     * @throws Exception If something unexpected goes wrong.
      */
-    protected abstract void stage(String enumName, T sourceValue) throws Exception;
+    protected abstract void stage(String enumName, S sourceValue) throws Exception;
+
+    /**
+     * @param sourceValue A source value.
+     * @return The desired {@link Enum#name()} for the corresponding new value,
+     * before any pipeline mappings are applied.
+     * While not generally enforced, this should only consist of uppercase letters, digits and underscores.
+     */
+    protected abstract String getInitialEnumName(S sourceValue) throws EnumNameMappingException;
 
     /**
      * @param sourceValue A source value.
@@ -64,7 +81,12 @@ public abstract class BukkitEnumSynchronizerImpl<E extends Enum<E>, T, I extends
      * While not generally enforced, this should only consist of uppercase letters, digits and underscores.
      * @throws EnumNameMappingException When the source value cannot be mapped to an acceptable enum name.
      */
-    protected abstract String determineEnumName(T sourceValue) throws EnumNameMappingException;
+    protected String determineEnumName(S sourceValue) throws EnumNameMappingException {
+        // Get the original name
+        String originalName = this.getInitialEnumName(sourceValue);
+        // Apply the mappings
+        return this.getNameMappingPipeline().apply(new BukkitEnumNameMappingHandleImpl<>(originalName, sourceValue));
+    }
 
     /**
      * @param enumName A string being considered for an enum value's {@link Enum#name()}.
@@ -102,7 +124,7 @@ public abstract class BukkitEnumSynchronizerImpl<E extends Enum<E>, T, I extends
     public void run() throws EnumNameMappingException, Exception {
 
         // Get the source values
-        List<T> sourceValues = this.getSourceValues();
+        List<S> sourceValues = this.getSourceValues();
 
         // Skip if there is nothing to synchronize
         if (sourceValues.isEmpty()) {
@@ -110,7 +132,7 @@ public abstract class BukkitEnumSynchronizerImpl<E extends Enum<E>, T, I extends
         }
 
         // Stage the new values
-        for (T sourceValue : sourceValues) {
+        for (S sourceValue : sourceValues) {
             // Determine the enum name
             String enumName = this.determineEnumName(sourceValue);
             // Verify sure the resulting enum name is valid

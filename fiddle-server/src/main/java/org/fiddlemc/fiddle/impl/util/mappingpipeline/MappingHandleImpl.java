@@ -28,11 +28,12 @@ public class MappingHandleImpl<T, MT extends T> implements MutableMappingHandle<
     /**
      * Whether {@link #data} is mutable, and of type {@link MT}.
      */
-    protected boolean isDataMutable = false;
+    protected boolean isDataMutable;
 
-    public MappingHandleImpl(T data) {
+    public MappingHandleImpl(T data, boolean isDataMutable) {
         this.original = data;
         this.data = data;
+        this.isDataMutable = isDataMutable;
     }
 
     @Override

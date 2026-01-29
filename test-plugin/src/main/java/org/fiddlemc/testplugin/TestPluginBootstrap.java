@@ -16,16 +16,16 @@ import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
 import org.bukkit.NamespacedKey;
-import org.fiddlemc.fiddle.api.bukkit.enuminjection.material.MaterialEnumSynchronizer;
+import org.fiddlemc.fiddle.api.bukkit.enuminjection.material.MaterialEnumNameMappingPipeline;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
 import org.fiddlemc.fiddle.api.moredatadriven.paper.BlockRegistryEventProvider;
 import org.fiddlemc.fiddle.api.moredatadriven.paper.ItemRegistryEventProvider;
 import org.fiddlemc.fiddle.api.moredatadriven.paper.nms.NMSBlockRegistryEntryBuilder;
 import org.fiddlemc.fiddle.api.moredatadriven.paper.nms.NMSItemRegistryEntryBuilder;
 import org.fiddlemc.fiddle.api.packetmapping.component.ComponentMappingPipeline;
-import org.fiddlemc.fiddle.api.packetmapping.component.nms.NMSComponentMappingRegistrar;
+import org.fiddlemc.fiddle.api.packetmapping.component.nms.NMSComponentMappingPipelineRegistrar;
 import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingPipeline;
-import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMappingRegistrar;
+import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMappingPipelineRegistrar;
 import org.fiddlemc.testplugin.data.PluginBlocks;
 import org.fiddlemc.testplugin.data.PluginItems;
 import org.jetbrains.annotations.NotNull;
@@ -69,7 +69,8 @@ public class TestPluginBootstrap implements PluginBootstrap {
             event.registry().register(TypedKey.create(RegistryKey.BLOCK, Key.key("example:ash_stairs")), builder -> {
                 NMSBlockRegistryEntryBuilder nmsBuilder = (NMSBlockRegistryEntryBuilder) builder;
                 // Use a factory that returns StairBlock to add new stairs
-                nmsBuilder.nmsFactory(properties -> new StairBlock(PluginBlocks.ASH_BLOCK.get().defaultBlockState(), properties) {});
+                nmsBuilder.nmsFactory(properties -> new StairBlock(PluginBlocks.ASH_BLOCK.get().defaultBlockState(), properties) {
+                });
             });
         });
 
@@ -105,18 +106,20 @@ public class TestPluginBootstrap implements PluginBootstrap {
         });
 
         // Use a custom enum name, just to show that we can (but please don't do this yourself unless you really know what you are doing)
-        context.getLifecycleManager().registerEventHandler(MaterialEnumSynchronizer.get().determineEnumNameEventType(), event -> {
-            NamespacedKey key = event.getSourceValue().getLeft();
-            if (key.equals(NamespacedKey.fromString("example:ash"))) {
-                event.setDeterminedEnumName("ASHES_TO_DUST");
-                context.getLogger().info("Changed enum name for " + key + " to " + event.getDeterminedEnumName());
-            }
+        context.getLifecycleManager().registerEventHandler(MaterialEnumNameMappingPipeline.get().composeEventType(), event -> {
+            event.getRegistrar().register(handle -> {
+                NamespacedKey key = handle.getSourceValue().getLeft();
+                if (key.equals(NamespacedKey.fromString("example:ash"))) {
+                    handle.set("ASHES_TO_DUST");
+                    context.getLogger().info("Changed enum name for " + key + " to " + handle.getImmutable());
+                }
+            });
         });
 
         // Register item mappings
         context.getLifecycleManager().registerEventHandler(ItemMappingPipeline.get().composeEventType(), event -> {
             context.getLogger().info("Registering item mappings...");
-            NMSItemMappingRegistrar registrar = (NMSItemMappingRegistrar) event.getRegistrar();
+            NMSItemMappingPipelineRegistrar registrar = (NMSItemMappingPipelineRegistrar) event.getRegistrar();
             // Map ash to gunpowder
             registrar.register(ClientView.AwarenessLevel.JAVA_DEFAULT, PluginItems.ASH.get(), handle -> {
                 ItemStack itemStack = handle.getMutable();
@@ -148,7 +151,7 @@ public class TestPluginBootstrap implements PluginBootstrap {
         // Register component mappings
         context.getLifecycleManager().registerEventHandler(ComponentMappingPipeline.get().composeEventType(), event -> {
             context.getLogger().info("Registering component mappings...");
-            NMSComponentMappingRegistrar registrar = (NMSComponentMappingRegistrar) event.getRegistrar();
+            NMSComponentMappingPipelineRegistrar registrar = (NMSComponentMappingPipelineRegistrar) event.getRegistrar();
             // Map the translatables
             registrar.register(ClientView.AwarenessLevel.getThatDoNotAlwaysUnderstandsAllServerSideTranslatables(), handle -> {
                 if (handle.getContext().getClientView().understandsAllServerSideTranslatables()) return;

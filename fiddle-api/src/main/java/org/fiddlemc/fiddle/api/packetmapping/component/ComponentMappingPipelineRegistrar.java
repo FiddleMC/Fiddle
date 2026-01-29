@@ -9,5 +9,5 @@ import org.fiddlemc.fiddle.api.util.mappingpipeline.MappingPipelineRegistrar;
  * Currently, this must be cast to {@code NMSComponentMappingRegistrar} to be used.
  * </p>
  */
-public interface ComponentMappingRegistrar extends MappingPipelineRegistrar {
+public interface ComponentMappingPipelineRegistrar extends MappingPipelineRegistrar {
 }

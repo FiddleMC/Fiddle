@@ -11,7 +11,7 @@ import net.minecraft.world.item.ItemStack;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
 import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingContext;
 import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingPipeline;
-import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingRegistrar;
+import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingPipelineRegistrar;
 import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMapping;
 import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMappingHandle;
 import org.fiddlemc.fiddle.impl.clientview.ClientViewImpl;
@@ -29,7 +29,7 @@ import java.util.Map;
 /**
  * A pipeline of {@link NMSItemMapping}s.
  */
-public final class ItemMappingPipelineImpl extends MappingPipelineImpl.Simple<ItemMappingRegistrar, ItemMappingRegistrarImpl> implements WithClientViewContextSingleStepMappingPipeline<ItemStack, ItemMappingContext, NMSItemMappingHandle, ItemMappingRegistrar>, ItemMappingPipeline {
+public final class ItemMappingPipelineImpl extends MappingPipelineImpl.Simple<ItemMappingPipelineRegistrar, ItemMappingPipelineRegistrarImpl> implements WithClientViewContextSingleStepMappingPipeline<ItemStack, ItemMappingContext, NMSItemMappingHandle, ItemMappingPipelineRegistrar>, ItemMappingPipeline {
 
     public static final class ServiceProviderImpl extends NoArgsConstructorServiceProviderImpl<ItemMappingPipeline, ItemMappingPipelineImpl> implements ServiceProvider {
 
@@ -75,7 +75,7 @@ public final class ItemMappingPipelineImpl extends MappingPipelineImpl.Simple<It
 
     @Override
     public NMSItemMappingHandle createHandle(ItemStack data, ItemMappingContext context) {
-        return new ItemMappingHandleImpl(data, context);
+        return new ItemMappingHandleImpl(data, context, false);
     }
 
     @Override
@@ -158,12 +158,12 @@ public final class ItemMappingPipelineImpl extends MappingPipelineImpl.Simple<It
     }
 
     @Override
-    protected ItemMappingRegistrarImpl createRegistrar() {
-        return new ItemMappingRegistrarImpl();
+    protected ItemMappingPipelineRegistrarImpl createRegistrar() {
+        return new ItemMappingPipelineRegistrarImpl();
     }
 
     @Override
-    public void copyMappingsFrom(ItemMappingRegistrarImpl registrar) {
+    public void copyMappingsFrom(ItemMappingPipelineRegistrarImpl registrar) {
         Map<List<NMSItemMapping>, List<IntIntPair>> transposed = new HashMap<>();
         for (int awarenessLevelI = 0; awarenessLevelI < registrar.mappings.length; awarenessLevelI++) {
             for (Int2ObjectMap.Entry<List<NMSItemMapping>> entry : registrar.mappings[awarenessLevelI].int2ObjectEntrySet()) {

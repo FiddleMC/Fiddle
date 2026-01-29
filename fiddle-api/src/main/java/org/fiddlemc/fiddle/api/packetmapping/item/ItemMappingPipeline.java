@@ -7,7 +7,7 @@ import java.util.ServiceLoader;
 /**
  * A pipeline of item mappings.
  */
-public interface ItemMappingPipeline extends MappingPipeline<ItemMappingRegistrar> {
+public interface ItemMappingPipeline extends MappingPipeline<ItemMappingPipelineRegistrar> {
 
     /**
      * An internal interface to get the {@link ItemMappingPipeline} instance.

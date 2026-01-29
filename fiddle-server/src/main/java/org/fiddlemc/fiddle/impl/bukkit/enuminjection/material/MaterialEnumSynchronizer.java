@@ -7,9 +7,8 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
 import org.bukkit.block.BlockType;
 import org.bukkit.inventory.ItemType;
-import org.fiddlemc.fiddle.api.bukkit.enuminjection.material.MaterialEnumSynchronizer;
-import org.fiddlemc.fiddle.impl.bukkit.enuminjection.KeyedSourceBukkitEnumSynchronizerImpl;
-import org.fiddlemc.fiddle.impl.util.java.serviceloader.NoArgsConstructorServiceProviderImpl;
+import org.fiddlemc.fiddle.impl.bukkit.enuminjection.BukkitEnumSynchronizer;
+import org.fiddlemc.fiddle.impl.bukkit.enuminjection.KeyedSourceBukkitEnumSynchronizer;
 import org.jspecify.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -17,23 +16,25 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The implementation of {@link MaterialEnumSynchronizer}.
+ * The {@link BukkitEnumSynchronizer} for {@link Material}.
  */
-public final class MaterialEnumSynchronizerImpl extends KeyedSourceBukkitEnumSynchronizerImpl<Material, Triple<NamespacedKey, @Nullable BlockType, @Nullable ItemType>, MaterialEnumInjector> implements MaterialEnumSynchronizer {
+public final class MaterialEnumSynchronizer extends KeyedSourceBukkitEnumSynchronizer<Material, Triple<NamespacedKey, @Nullable BlockType, @Nullable ItemType>, MaterialEnumInjector, MaterialEnumNameMappingPipelineImpl> {
 
-    public static final class ServiceProviderImpl extends NoArgsConstructorServiceProviderImpl<MaterialEnumSynchronizer, MaterialEnumSynchronizerImpl> implements ServiceProvider {
+    private static @Nullable MaterialEnumSynchronizer INSTANCE;
 
-        public ServiceProviderImpl() {
-            super(MaterialEnumSynchronizerImpl.class);
+    public static MaterialEnumSynchronizer get() {
+        if (INSTANCE == null) {
+            INSTANCE = new MaterialEnumSynchronizer();
         }
-
+        return INSTANCE;
     }
 
-    public static MaterialEnumSynchronizerImpl get() {
-        return (MaterialEnumSynchronizerImpl) MaterialEnumSynchronizer.get();
+    private MaterialEnumSynchronizer() {
     }
 
-    private MaterialEnumSynchronizerImpl() {
+    @Override
+    protected MaterialEnumNameMappingPipelineImpl getNameMappingPipeline() {
+        return MaterialEnumNameMappingPipelineImpl.get();
     }
 
     @Override
@@ -86,11 +87,6 @@ public final class MaterialEnumSynchronizerImpl extends KeyedSourceBukkitEnumSyn
     @Override
     protected NamespacedKey getKey(Triple<NamespacedKey, @Nullable BlockType, @Nullable ItemType> sourceValue) {
         return sourceValue.getLeft();
-    }
-
-    @Override
-    protected String getEventTypeNamePrefix() {
-        return "fiddle_material_enum_synchronizer";
     }
 
 }

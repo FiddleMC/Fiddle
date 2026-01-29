@@ -11,8 +11,8 @@ import org.fiddlemc.fiddle.impl.util.mappingpipeline.WithContextMappingHandleImp
  */
 public class ComponentMappingHandleImpl extends WithContextMappingHandleImpl<Component, MutableComponent, ClientViewMappingContext> implements NMSComponentMappingHandle {
 
-    public ComponentMappingHandleImpl(Component data, ClientViewMappingContext context) {
-        super(data, context);
+    public ComponentMappingHandleImpl(Component data, ClientViewMappingContext context, boolean isDataMutable) {
+        super(data, context, isDataMutable);
     }
 
     @Override

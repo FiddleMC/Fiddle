@@ -10,8 +10,8 @@ import org.fiddlemc.fiddle.impl.util.mappingpipeline.WithContextMappingHandleImp
  */
 public class ItemMappingHandleImpl extends WithContextMappingHandleImpl<ItemStack, ItemStack, ItemMappingContext> implements NMSItemMappingHandle {
 
-    public ItemMappingHandleImpl(final ItemStack data, final ItemMappingContext context) {
-        super(data, context);
+    public ItemMappingHandleImpl(final ItemStack data, final ItemMappingContext context, boolean isDataMutable) {
+        super(data, context, isDataMutable);
     }
 
     @Override

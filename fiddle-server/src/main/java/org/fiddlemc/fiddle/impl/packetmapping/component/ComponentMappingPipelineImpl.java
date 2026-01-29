@@ -10,7 +10,7 @@ import net.minecraft.network.chat.Component;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
 import org.fiddlemc.fiddle.api.packetmapping.ClientViewMappingContext;
 import org.fiddlemc.fiddle.api.packetmapping.component.ComponentMappingPipeline;
-import org.fiddlemc.fiddle.api.packetmapping.component.ComponentMappingRegistrar;
+import org.fiddlemc.fiddle.api.packetmapping.component.ComponentMappingPipelineRegistrar;
 import org.fiddlemc.fiddle.api.packetmapping.component.nms.NMSComponentMapping;
 import org.fiddlemc.fiddle.api.packetmapping.component.nms.NMSComponentMappingHandle;
 import org.fiddlemc.fiddle.impl.packetmapping.WithClientViewContextSingleStepMappingPipeline;
@@ -21,7 +21,7 @@ import org.jspecify.annotations.Nullable;
 /**
  * A pipeline of {@link NMSComponentMapping}s.
  */
-public final class ComponentMappingPipelineImpl extends MappingPipelineImpl.Simple<ComponentMappingRegistrar, ComponentMappingRegistrarImpl> implements WithClientViewContextSingleStepMappingPipeline.Simple<Component, NMSComponentMappingHandle, ComponentMappingRegistrar>, ComponentMappingPipeline {
+public final class ComponentMappingPipelineImpl extends MappingPipelineImpl.Simple<ComponentMappingPipelineRegistrar, ComponentMappingPipelineRegistrarImpl> implements WithClientViewContextSingleStepMappingPipeline.Simple<Component, NMSComponentMappingHandle, ComponentMappingPipelineRegistrar>, ComponentMappingPipeline {
 
     public static final class ServiceProviderImpl extends NoArgsConstructorServiceProviderImpl<ComponentMappingPipeline, ComponentMappingPipelineImpl> implements ServiceProvider {
 
@@ -60,7 +60,7 @@ public final class ComponentMappingPipelineImpl extends MappingPipelineImpl.Simp
 
     @Override
     public NMSComponentMappingHandle createHandle(Component data, ClientViewMappingContext context) {
-        return new ComponentMappingHandleImpl(data, context);
+        return new ComponentMappingHandleImpl(data, context, false);
     }
 
     @Override
@@ -69,12 +69,12 @@ public final class ComponentMappingPipelineImpl extends MappingPipelineImpl.Simp
     }
 
     @Override
-    protected ComponentMappingRegistrarImpl createRegistrar() {
-        return new ComponentMappingRegistrarImpl();
+    protected ComponentMappingPipelineRegistrarImpl createRegistrar() {
+        return new ComponentMappingPipelineRegistrarImpl();
     }
 
     @Override
-    public void copyMappingsFrom(ComponentMappingRegistrarImpl registrar) {
+    public void copyMappingsFrom(ComponentMappingPipelineRegistrarImpl registrar) {
         Map<List<NMSComponentMapping>, IntList> transposed = new HashMap<>();
         for (int awarenessLevelI = 0; awarenessLevelI < registrar.mappings.length; awarenessLevelI++) {
             transposed.computeIfAbsent(registrar.mappings[awarenessLevelI], $ -> new IntArrayList()).add(awarenessLevelI);

@@ -5,7 +5,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.world.item.Item;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
 import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMapping;
-import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMappingRegistrar;
+import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMappingPipelineRegistrar;
 import org.fiddlemc.fiddle.impl.moredatadriven.minecraft.ItemRegistry;
 import org.jspecify.annotations.Nullable;
 import java.util.ArrayList;
@@ -13,9 +13,9 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * The implementation of {@link NMSItemMappingRegistrar}.
+ * The implementation of {@link NMSItemMappingPipelineRegistrar}.
  */
-public final class ItemMappingRegistrarImpl implements NMSItemMappingRegistrar {
+public final class ItemMappingPipelineRegistrarImpl implements NMSItemMappingPipelineRegistrar {
 
     /**
      * The registered mappings.
@@ -29,7 +29,7 @@ public final class ItemMappingRegistrarImpl implements NMSItemMappingRegistrar {
      */
     final Int2ObjectMap<List<NMSItemMapping>>[] mappings;
 
-    public ItemMappingRegistrarImpl() {
+    public ItemMappingPipelineRegistrarImpl() {
         this.mappings = new Int2ObjectMap[ClientView.AwarenessLevel.values().length];
         for (int i = 0; i < this.mappings.length; i++) {
             this.mappings[i] = new Int2ObjectOpenHashMap<>();

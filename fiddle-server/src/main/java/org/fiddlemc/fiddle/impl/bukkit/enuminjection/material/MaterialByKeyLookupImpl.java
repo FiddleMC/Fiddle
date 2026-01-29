@@ -4,7 +4,7 @@ import net.kyori.adventure.key.Key;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.fiddlemc.fiddle.api.bukkit.enuminjection.material.MaterialByKeyLookup;
-import org.fiddlemc.fiddle.impl.bukkit.enuminjection.KeyedSourceBukkitEnumSynchronizerImpl;
+import org.fiddlemc.fiddle.impl.bukkit.enuminjection.KeyedSourceBukkitEnumSynchronizer;
 import org.fiddlemc.fiddle.impl.util.java.serviceloader.NoArgsConstructorServiceProviderImpl;
 import org.jspecify.annotations.Nullable;
 import java.util.HashMap;
@@ -163,9 +163,9 @@ public final class MaterialByKeyLookupImpl implements MaterialByKeyLookup {
         }
 
         // Try it as a string without the Fiddle enum prefix
-        if (lowerCaseString.startsWith(KeyedSourceBukkitEnumSynchronizerImpl.DEFAULT_ENUM_PREFIX.toLowerCase(Locale.ROOT))) {
-            if (lowerCaseString.length() > KeyedSourceBukkitEnumSynchronizerImpl.DEFAULT_ENUM_PREFIX.length()) {
-                foundMaterial = this.lookupWithoutColon(lowerCaseString.substring(KeyedSourceBukkitEnumSynchronizerImpl.DEFAULT_ENUM_PREFIX.length()));
+        if (lowerCaseString.startsWith(KeyedSourceBukkitEnumSynchronizer.DEFAULT_ENUM_PREFIX.toLowerCase(Locale.ROOT))) {
+            if (lowerCaseString.length() > KeyedSourceBukkitEnumSynchronizer.DEFAULT_ENUM_PREFIX.length()) {
+                foundMaterial = this.lookupWithoutColon(lowerCaseString.substring(KeyedSourceBukkitEnumSynchronizer.DEFAULT_ENUM_PREFIX.length()));
                 if (foundMaterial != null) {
                     return foundMaterial;
                 }

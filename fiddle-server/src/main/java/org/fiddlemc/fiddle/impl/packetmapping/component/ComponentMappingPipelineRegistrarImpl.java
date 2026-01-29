@@ -5,12 +5,12 @@ import java.util.List;
 import java.util.function.Consumer;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
 import org.fiddlemc.fiddle.api.packetmapping.component.nms.NMSComponentMapping;
-import org.fiddlemc.fiddle.api.packetmapping.component.nms.NMSComponentMappingRegistrar;
+import org.fiddlemc.fiddle.api.packetmapping.component.nms.NMSComponentMappingPipelineRegistrar;
 
 /**
- * The implementation of {@link NMSComponentMappingRegistrar}.
+ * The implementation of {@link NMSComponentMappingPipelineRegistrar}.
  */
-public final class ComponentMappingRegistrarImpl implements NMSComponentMappingRegistrar {
+public final class ComponentMappingPipelineRegistrarImpl implements NMSComponentMappingPipelineRegistrar {
 
     /**
      * The registered mappings.
@@ -21,7 +21,7 @@ public final class ComponentMappingRegistrarImpl implements NMSComponentMappingR
      */
     final List<NMSComponentMapping>[] mappings;
 
-    public ComponentMappingRegistrarImpl() {
+    public ComponentMappingPipelineRegistrarImpl() {
         this.mappings = new List[ClientView.AwarenessLevel.values().length];
         for (int i = 0; i < this.mappings.length; i++) {
             this.mappings[i] = new ArrayList<>(1);

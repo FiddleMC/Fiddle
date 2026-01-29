@@ -3,7 +3,7 @@ package org.fiddlemc.fiddle.api.packetmapping.item.nms;
 import net.minecraft.world.item.Item;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
 import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingPipeline;
-import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingRegistrar;
+import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingPipelineRegistrar;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -12,7 +12,7 @@ import java.util.function.Consumer;
  * Provides functionality to register {@link NMSItemMapping}s
  * to the {@link ItemMappingPipeline}.
  */
-public interface NMSItemMappingRegistrar extends ItemMappingRegistrar {
+public interface NMSItemMappingPipelineRegistrar extends ItemMappingPipelineRegistrar {
 
     /**
      * Registers a mapping.
