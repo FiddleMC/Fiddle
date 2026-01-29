@@ -21,12 +21,14 @@ public interface NMSItemRegistryEntryBuilder extends ItemRegistryEntry.Builder, 
 
     /**
      * Sets the factory to use for an item for a block with the {@linkplain #getKey same} {@link Identifier},
+     * calls {@link Item.Properties#useBlockDescriptionPrefix()},
      * and marks this builder as using NMS.
      */
     void nmsFactoryForBlock();
 
     /**
-     * Sets the factory to use for an item for a block with the given {@link Identifier},
+     * Sets the factory to use for an item for a block with the given {@link Identifier},,
+     * calls {@link Item.Properties#useBlockDescriptionPrefix()},
      * and marks this builder as using NMS.
      *
      * @param blockIdentifier The identifier of the block.
@@ -34,13 +36,15 @@ public interface NMSItemRegistryEntryBuilder extends ItemRegistryEntry.Builder, 
     void nmsFactoryForBlock(Identifier blockIdentifier);
 
     /**
-     * Sets the factory to use for an item for a block with the {@linkplain #getKey same} {@link Identifier},
+     * Sets the factory to use for an item for a block with the {@linkplain #getKey same} {@link Identifier},,
+     * calls {@link Item.Properties#useBlockDescriptionPrefix()},
      * and marks this builder as using NMS.
      */
     void nmsFactoryForBlock(BiFunction<Block, Item.Properties, BlockItem> factory);
 
     /**
-     * Sets the factory to use for an item for a block with the given {@link Identifier},
+     * Sets the factory to use for an item for a block with the given {@link Identifier},,
+     * calls {@link Item.Properties#useBlockDescriptionPrefix()},
      * and marks this builder as using NMS.
      *
      * @param blockIdentifier The identifier of the block.

@@ -12,6 +12,7 @@ import java.util.function.Supplier;
 public final class PluginItems {
     public static Supplier<Item> ASH = item("example:ash");
     public static Supplier<Item> ASH_BLOCK = item("example:ash_block");
+    public static Supplier<Item> ASH_STAIRS = item("example:ash_stairs");
 
     private static Supplier<Item> item(String key) {
         return Suppliers.memoize(() -> BuiltInRegistries.ITEM.getValue(Identifier.parse(key)));

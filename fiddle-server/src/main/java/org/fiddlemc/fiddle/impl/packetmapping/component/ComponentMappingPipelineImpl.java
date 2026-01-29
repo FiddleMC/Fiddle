@@ -1,5 +1,6 @@
 package org.fiddlemc.fiddle.impl.packetmapping.component;
 
+import io.papermc.paper.adventure.AdventureComponent;
 import io.papermc.paper.plugin.lifecycle.event.PaperLifecycleEvent;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
@@ -88,6 +89,11 @@ public final class ComponentMappingPipelineImpl extends PacketDataMappingPipelin
     @Override
     public ComponentMappingHandleImpl createHandle(Component data) {
         return new ComponentMappingHandleImpl(data);
+    }
+
+    @Override
+    public Component apply(final Component data, final ComponentMappingContext context) {
+        return super.apply(data instanceof AdventureComponent adventureComponent ? adventureComponent.deepConverted() : data, context);
     }
 
     @Override

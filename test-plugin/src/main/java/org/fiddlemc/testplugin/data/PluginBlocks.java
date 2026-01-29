@@ -11,6 +11,7 @@ import java.util.function.Supplier;
  */
 public final class PluginBlocks {
     public static Supplier<Block> ASH_BLOCK = block("example:ash_block");
+    public static Supplier<Block> ASH_STAIRS = block("example:ash_stairs");
 
     private static Supplier<Block> block(String key) {
         return Suppliers.memoize(() -> BuiltInRegistries.BLOCK.getValue(Identifier.parse(key)));

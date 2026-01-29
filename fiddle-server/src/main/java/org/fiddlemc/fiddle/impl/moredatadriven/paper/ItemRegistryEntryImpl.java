@@ -74,7 +74,8 @@ public abstract class ItemRegistryEntryImpl implements ItemRegistryEntry, Settab
 
         @Override
         public void nmsFactoryForBlock(Identifier blockIdentifier, BiFunction<Block, Item.Properties, BlockItem> factory) {
-            this.nmsFactory = properties -> factory.apply(BlockRegistry.get().getValue(blockIdentifier), properties);
+            this.nmsFactory(properties -> factory.apply(BlockRegistry.get().getValue(blockIdentifier), properties));
+            this.nmsProperties(Item.Properties::useBlockDescriptionPrefix);
         }
 
         @Override
