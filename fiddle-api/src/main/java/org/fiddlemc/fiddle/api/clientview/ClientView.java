@@ -46,6 +46,13 @@ public interface ClientView {
     @Nullable Player getPlayer();
 
     /**
+     * @return The locale (lower-case, in the format that Minecraft uses,
+     * such as "{@code ja_jp}" for Japanese) of this client,
+     * or null if not available.
+     */
+    @Nullable String getLocale();
+
+    /**
      * @return True only if this client understands all server-side translatables
      * (such as in the case of a client that has loaded the resource pack containing them),
      * false if it can not be guaranteed.

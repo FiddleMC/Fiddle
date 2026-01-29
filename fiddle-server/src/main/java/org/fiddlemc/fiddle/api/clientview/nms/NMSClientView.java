@@ -4,8 +4,8 @@ import net.minecraft.network.Connection;
 import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.entity.Player;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
-import org.fiddlemc.fiddle.impl.packetmapping.item.reverse.ItemMappingReverser;
 import org.jspecify.annotations.Nullable;
+import java.util.Locale;
 
 /**
  * An extension of the {@link ClientView} interface that adds methods to get Minecraft internals.
@@ -39,6 +39,12 @@ public interface NMSClientView extends ClientView {
     default @Nullable Player getPlayer() {
         @Nullable ServerPlayer nmsPlayer = this.getNMSPlayer();
         return nmsPlayer == null ? null : nmsPlayer.getBukkitEntity();
+    }
+
+    @Override
+    default @Nullable String getLocale() {
+        @Nullable ServerPlayer nmsPlayer = this.getNMSPlayer();
+        return nmsPlayer == null ? null : nmsPlayer.language.toLowerCase(Locale.ROOT);
     }
 
 }

@@ -14,6 +14,7 @@ import org.fiddlemc.fiddle.api.packetmapping.component.ComponentMappingPipelineR
 import org.fiddlemc.fiddle.api.packetmapping.component.nms.NMSComponentMapping;
 import org.fiddlemc.fiddle.api.packetmapping.component.nms.NMSComponentMappingHandle;
 import org.fiddlemc.fiddle.impl.packetmapping.WithClientViewContextSingleStepMappingPipeline;
+import org.fiddlemc.fiddle.impl.packetmapping.component.translatable.ServerSideTranslationComponentMapping;
 import org.fiddlemc.fiddle.impl.util.mappingpipeline.MappingPipelineImpl;
 import org.fiddlemc.fiddle.impl.util.java.serviceloader.NoArgsConstructorServiceProviderImpl;
 import org.jspecify.annotations.Nullable;
@@ -70,7 +71,16 @@ public final class ComponentMappingPipelineImpl extends MappingPipelineImpl.Simp
 
     @Override
     protected ComponentMappingPipelineRegistrarImpl createRegistrar() {
-        return new ComponentMappingPipelineRegistrarImpl();
+
+        // Create the registrar
+        ComponentMappingPipelineRegistrarImpl registrar = new ComponentMappingPipelineRegistrarImpl();
+
+        // Register the server-side translation mapping
+        registrar.register(ClientView.AwarenessLevel.getThatDoNotAlwaysUnderstandsAllServerSideTranslatables(), new ServerSideTranslationComponentMapping());
+
+        // Return the registrar
+        return registrar;
+
     }
 
     @Override

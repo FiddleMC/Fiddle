@@ -2,6 +2,7 @@ package org.fiddlemc.fiddle.impl.clientview;
 
 import net.minecraft.network.Connection;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A simple implementation of {@link ClientView}

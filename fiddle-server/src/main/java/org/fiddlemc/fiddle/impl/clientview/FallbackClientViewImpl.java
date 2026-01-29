@@ -2,7 +2,6 @@ package org.fiddlemc.fiddle.impl.clientview;
 
 import net.minecraft.network.Connection;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
-import org.fiddlemc.fiddle.api.clientview.nms.NMSClientView;
 import org.fiddlemc.fiddle.impl.packetmapping.item.reverse.ItemMappingReverser;
 import org.jspecify.annotations.Nullable;
 

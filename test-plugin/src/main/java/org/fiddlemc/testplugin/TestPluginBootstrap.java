@@ -8,8 +8,6 @@ import io.papermc.paper.registry.TypedKey;
 import net.kyori.adventure.key.Key;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.ComponentContents;
-import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.StairBlock;
@@ -22,8 +20,7 @@ import org.fiddlemc.fiddle.api.moredatadriven.paper.BlockRegistryEventProvider;
 import org.fiddlemc.fiddle.api.moredatadriven.paper.ItemRegistryEventProvider;
 import org.fiddlemc.fiddle.api.moredatadriven.paper.nms.NMSBlockRegistryEntryBuilder;
 import org.fiddlemc.fiddle.api.moredatadriven.paper.nms.NMSItemRegistryEntryBuilder;
-import org.fiddlemc.fiddle.api.packetmapping.component.ComponentMappingPipeline;
-import org.fiddlemc.fiddle.api.packetmapping.component.nms.NMSComponentMappingPipelineRegistrar;
+import org.fiddlemc.fiddle.api.packetmapping.component.translatable.ServerSideTranslationRegistrar;
 import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingPipeline;
 import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMappingPipelineRegistrar;
 import org.fiddlemc.testplugin.data.PluginBlocks;
@@ -148,26 +145,15 @@ public class TestPluginBootstrap implements PluginBootstrap {
             });
         });
 
-        // Register component mappings
-        context.getLifecycleManager().registerEventHandler(ComponentMappingPipeline.get().composeEventType(), event -> {
-            context.getLogger().info("Registering component mappings...");
-            NMSComponentMappingPipelineRegistrar registrar = (NMSComponentMappingPipelineRegistrar) event.getRegistrar();
-            // Map the translatables
-            registrar.register(ClientView.AwarenessLevel.getThatDoNotAlwaysUnderstandsAllServerSideTranslatables(), handle -> {
-                if (handle.getContext().getClientView().understandsAllServerSideTranslatables()) return;
-                ComponentContents contents = handle.getImmutable().getContents();
-                if (contents instanceof TranslatableContents translatableContents) {
-                    String key = translatableContents.getKey();
-                    if (key.equals(PluginItems.ASH.get().getDescriptionId())) {
-                        handle.setMutable(Component.translatableWithFallback(key, "Ash"));
-                    } else if (key.equals(PluginItems.ASH_BLOCK.get().getDescriptionId())) {
-                        handle.setMutable(Component.translatableWithFallback(key, "Ash block"));
-                    } else if (key.equals(PluginItems.ASH_STAIRS.get().getDescriptionId())) {
-                        handle.setMutable(Component.translatableWithFallback(key, "Ash stairs"));
-                    }
-                }
-            });
-        });
+        // Register translations
+        ServerSideTranslationRegistrar translationRegistrar = ServerSideTranslationRegistrar.get();
+        // For the custom blocks and items
+        translationRegistrar.register("item.example.ash", "Ash");
+        translationRegistrar.register("item.example.ash", "灰", "ja_jp", ServerSideTranslationRegistrar.FallbackScope.LANGUAGE_GROUP, true);
+        translationRegistrar.register("block.example.ash_block", "Ash block");
+        translationRegistrar.register("block.example.ash_stairs", "Ash stairs");
+        // Override the vanilla bookshelf name just to show that we can
+        translationRegistrar.register("block.minecraft.bookshelf", "Booky Bookshelf");
 
     }
 
