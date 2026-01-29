@@ -6,7 +6,7 @@ import org.jspecify.annotations.Nullable;
 /**
  * A pipeline that applies {@linkplain PacketDataMapping mappings} to packet data of type {@link T}.
  */
-public interface PacketDataMappingPipeline<T, H extends PacketDataMappingHandle<T>, C extends PacketDataMappingContext, M extends PacketDataMapping<T, H, C>, R extends PacketDataMappingRegistrar<? extends T>> extends MappingPipeline<R> {
+public interface PacketDataMappingPipeline<T, H extends PacketDataMappingHandle<T>, C extends PacketDataMappingContext, M extends PacketDataMapping<T, H, C>, R extends org.fiddlemc.fiddle.api.util.pipeline.MappingPipelineRegistrar> extends MappingPipeline<R> {
 
     /**
      * @return The smallest possible list containing all mappings in this pipeline

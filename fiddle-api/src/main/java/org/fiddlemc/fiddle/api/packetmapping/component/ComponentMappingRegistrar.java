@@ -1,6 +1,6 @@
 package org.fiddlemc.fiddle.api.packetmapping.component;
 
-import org.fiddlemc.fiddle.api.packetmapping.PacketDataMappingRegistrar;
+import org.fiddlemc.fiddle.api.util.pipeline.MappingPipelineRegistrar;
 
 /**
  * Provides functionality to register {@linkplain ComponentMapping}s to the {@link ComponentMappingPipeline}.
@@ -9,5 +9,5 @@ import org.fiddlemc.fiddle.api.packetmapping.PacketDataMappingRegistrar;
  * Currently, this must be cast to {@code NMSComponentMappingRegistrar} to be used.
  * </p>
  */
-public interface ComponentMappingRegistrar<T> extends PacketDataMappingRegistrar<T> {
+public interface ComponentMappingRegistrar<T> extends MappingPipelineRegistrar {
 }

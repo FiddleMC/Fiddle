@@ -10,7 +10,6 @@ import org.fiddlemc.fiddle.api.packetmapping.PacketDataMapping;
 import org.fiddlemc.fiddle.api.packetmapping.PacketDataMappingContext;
 import org.fiddlemc.fiddle.api.packetmapping.PacketDataMappingHandle;
 import org.fiddlemc.fiddle.api.packetmapping.PacketDataMappingPipeline;
-import org.fiddlemc.fiddle.api.packetmapping.PacketDataMappingRegistrar;
 import org.fiddlemc.fiddle.api.util.pipeline.MappingPipelineComposeEvent;
 import org.fiddlemc.fiddle.impl.clientview.lookup.packethandling.ClientViewLookupThreadLocal;
 import org.jspecify.annotations.Nullable;
@@ -18,7 +17,7 @@ import org.jspecify.annotations.Nullable;
 /**
  * A base implementation of {@link PacketDataMappingPipeline}.
  */
-public abstract class PacketDataMappingPipelineImpl<T, H extends PacketDataMappingHandle<T>, C extends PacketDataMappingContext, M extends PacketDataMapping<T, H, C>, R extends PacketDataMappingRegistrar<? extends T>> implements PacketDataMappingPipeline<T, H, C, M, R> {
+public abstract class PacketDataMappingPipelineImpl<T, H extends PacketDataMappingHandle<T>, C extends PacketDataMappingContext, M extends PacketDataMapping<T, H, C>, R extends org.fiddlemc.fiddle.api.util.pipeline.MappingPipelineRegistrar> implements PacketDataMappingPipeline<T, H, C, M, R> {
 
     /**
      * The prefix for the {@link LifecycleEventType#name()} of events for this pipeline.
