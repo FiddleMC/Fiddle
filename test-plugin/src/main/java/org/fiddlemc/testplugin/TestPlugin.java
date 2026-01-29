@@ -1,17 +1,20 @@
 package org.fiddlemc.testplugin;
 
-import org.bukkit.Bukkit;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
-import org.bukkit.inventory.ShapelessRecipe;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.fiddlemc.testplugin.data.PluginItemTypes;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
 @SuppressWarnings("unused")
-public final class TestPlugin extends JavaPlugin {
+public final class TestPlugin extends JavaPlugin implements Listener {
 
     private Logger logger;
 
@@ -39,16 +42,20 @@ public final class TestPlugin extends JavaPlugin {
             .filter(type -> !type.isLegacy() && !type.getKey().namespace().equals(NamespacedKey.MINECRAFT_NAMESPACE))
             .forEach(type -> this.logger.info("* " + type.name() + " = " + type.getKey()));
 
-        // Register crafting recipes
-        this.registerCraftingRecipes();
+        // Register as a listener
+        this.getServer().getPluginManager().registerEvents(this, this);
 
     }
 
-    private void registerCraftingRecipes() {
-        // 9 x Ash -> Ash block
-        Bukkit.addRecipe(new ShapelessRecipe(NamespacedKey.fromString("example:ash_block"), PluginItemTypes.ASH_BLOCK.get().createItemStack()).addIngredient(9, PluginItemTypes.ASH.get().createItemStack()));
-        // Ash block -> 9x Ash
-        Bukkit.addRecipe(new ShapelessRecipe(NamespacedKey.fromString("example:ash_from_block"), PluginItemTypes.ASH.get().createItemStack(9)).addIngredient(PluginItemTypes.ASH_BLOCK.get().createItemStack()));
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onEntityPickupItem(EntityPickupItemEvent event) {
+        if (event.getEntity() instanceof Player player) {
+            // Plugins can use the custom blocks and items as a Material
+            Material type = event.getItem().getItemStack().getType();
+            if (type.key().namespace().equals("example")) {
+                player.sendMessage(Component.text("You picked up a custom item: ").append(Component.translatable(type)));
+            }
+        }
     }
 
 }

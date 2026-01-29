@@ -1,9 +1,36 @@
 --- a/net/minecraft/world/item/Item.java
 +++ b/net/minecraft/world/item/Item.java
-@@ -120,6 +_,71 @@
+@@ -101,7 +_,24 @@
+         .validate(
+             holder -> holder.is(Items.AIR.builtInRegistryHolder()) ? DataResult.error(() -> "Item must not be minecraft:air") : DataResult.success(holder)
+         );
+-    public static final StreamCodec<RegistryFriendlyByteBuf, Holder<Item>> STREAM_CODEC = ByteBufCodecs.holderRegistry(Registries.ITEM);
++    // Fiddle start - Item mapping - Wrap codec for items
++    public static final StreamCodec<RegistryFriendlyByteBuf, Holder<Item>> STREAM_CODEC = new net.minecraft.network.codec.StreamCodec<>() {
++
++        @Override
++        public Holder<Item> decode(final RegistryFriendlyByteBuf buffer) {
++            return UNMAPPED_STREAM_CODEC.decode(buffer);
++        }
++
++        @Override
++        public void encode(final RegistryFriendlyByteBuf buffer, final Holder<Item> value) {
++            Item item = value.value();
++            Item mappedItem = org.fiddlemc.fiddle.impl.packetmapping.item.ItemMappingPipelineImpl.get().applyGenerically(item);
++            UNMAPPED_STREAM_CODEC.encode(buffer, mappedItem == item ? value : Holder.direct(mappedItem));
++        }
++
++    };
++    private static final StreamCodec<RegistryFriendlyByteBuf, Holder<Item>> UNMAPPED_STREAM_CODEC = ByteBufCodecs.holderRegistry(Registries.ITEM);
++    // Fiddle end - Item mapping - Wrap codec for items
+     private static final Logger LOGGER = LogUtils.getLogger();
+     public static final Map<Block, Item> BY_BLOCK = Maps.newHashMap();
+     public static final Identifier BASE_ATTACK_DAMAGE_ID = Identifier.withDefaultNamespace("base_attack_damage");
+@@ -119,6 +_,71 @@
+     public static int getId(Item item) {
          return item == null ? 0 : BuiltInRegistries.ITEM.getId(item);
      }
- 
++
 +    // Fiddle start - More data-driven - Minecraft registries - Cache block and item values
 +    /**
 +     * The {@link net.minecraft.resources.Identifier} with which this item is registered in
@@ -68,7 +95,6 @@
 +        this.isVanilla = true;
 +    }
 +    // Fiddle end - More data-driven - Vanilla flag
-+
+ 
      public static Item byId(int id) {
          return BuiltInRegistries.ITEM.byId(id);
-     }

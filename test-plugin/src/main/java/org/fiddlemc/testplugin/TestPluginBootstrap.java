@@ -2,6 +2,7 @@ package org.fiddlemc.testplugin;
 
 import io.papermc.paper.plugin.bootstrap.BootstrapContext;
 import io.papermc.paper.plugin.bootstrap.PluginBootstrap;
+import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import io.papermc.paper.registry.RegistryKey;
 import io.papermc.paper.registry.TypedKey;
 import net.kyori.adventure.key.Key;
@@ -26,12 +27,25 @@ import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingPipeline;
 import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMappingRegistrar;
 import org.fiddlemc.testplugin.data.PluginItems;
 import org.jetbrains.annotations.NotNull;
+import java.io.IOException;
+import java.net.URISyntaxException;
 
 @SuppressWarnings("unused")
 public class TestPluginBootstrap implements PluginBootstrap {
 
     @Override
     public void bootstrap(@NotNull BootstrapContext context) {
+
+        // Make sure the included data pack is loaded
+        context.getLifecycleManager().registerEventHandler(LifecycleEvents.DATAPACK_DISCOVERY.newHandler(
+            event -> {
+                try {
+                    event.registrar().discoverPack(this.getClass().getResource("/data_pack").toURI(), "provided");
+                } catch (URISyntaxException | IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        ));
 
         // Register custom blocks
         context.getLifecycleManager().registerEventHandler(BlockRegistryEventProvider.BLOCK.compose(), event -> {
