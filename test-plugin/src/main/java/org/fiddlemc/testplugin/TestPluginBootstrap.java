@@ -16,6 +16,7 @@ import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
 import org.bukkit.NamespacedKey;
+import org.bukkit.inventory.ItemType;
 import org.fiddlemc.fiddle.api.bukkit.enuminjection.material.MaterialEnumNameMappingPipeline;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
 import org.fiddlemc.fiddle.api.moredatadriven.paper.BlockRegistryEventProvider;
@@ -25,9 +26,9 @@ import org.fiddlemc.fiddle.api.moredatadriven.paper.nms.NMSItemRegistryEntryBuil
 import org.fiddlemc.fiddle.api.packetmapping.component.translatable.ServerSideTranslationRegistrar;
 import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingPipeline;
 import org.fiddlemc.fiddle.api.packetmapping.item.builtin.BuiltInItemMapper;
-import org.fiddlemc.fiddle.api.packetmapping.item.builtin.nms.NMSBuiltInItemMapperComposeEvent;
 import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMappingPipelineComposeEvent;
 import org.fiddlemc.testplugin.data.PluginBlocks;
+import org.fiddlemc.testplugin.data.PluginItemTypes;
 import org.fiddlemc.testplugin.data.PluginItems;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.Nullable;
@@ -122,10 +123,9 @@ public class TestPluginBootstrap implements PluginBootstrap {
         // Configure basic item mappings
         context.getLifecycleManager().registerEventHandler(BuiltInItemMapper.get().compose(), event -> {
             context.getLogger().info("Configuring built-in item mapper...");
-            NMSBuiltInItemMapperComposeEvent nmsEvent = (NMSBuiltInItemMapperComposeEvent) event;
-            nmsEvent.mapItem(ClientView.AwarenessLevel.JAVA_DEFAULT, PluginItems.ASH.get(), Items.GUNPOWDER);
-            nmsEvent.mapItem(ClientView.AwarenessLevel.JAVA_DEFAULT, PluginItems.ASH_BLOCK.get(), Items.LIGHT_GRAY_CONCRETE_POWDER);
-            nmsEvent.mapItem(ClientView.AwarenessLevel.JAVA_DEFAULT, PluginItems.ASH_STAIRS.get(), Items.ANDESITE_STAIRS);
+            event.mapItem(ClientView.AwarenessLevel.JAVA_DEFAULT, PluginItemTypes.ASH.get(), ItemType.GUNPOWDER);
+            event.mapItem(ClientView.AwarenessLevel.JAVA_DEFAULT, PluginItemTypes.ASH_BLOCK.get(), ItemType.LIGHT_GRAY_CONCRETE_POWDER);
+            event.mapItem(ClientView.AwarenessLevel.JAVA_DEFAULT, PluginItemTypes.ASH_STAIRS.get(), ItemType.ANDESITE_STAIRS);
         });
 
         // Register more custom item mapping code

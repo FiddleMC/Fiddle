@@ -1,6 +1,8 @@
 package org.fiddlemc.fiddle.api.packetmapping.item.builtin.nms;
 
 import net.minecraft.world.item.Item;
+import org.bukkit.craftbukkit.inventory.CraftItemType;
+import org.bukkit.inventory.ItemType;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
 import org.fiddlemc.fiddle.api.packetmapping.item.builtin.BuiltInItemMapperComposeEvent;
 import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMappingUtilities;
@@ -20,6 +22,22 @@ public interface NMSBuiltInItemMapperComposeEvent extends BuiltInItemMapperCompo
      * The same as {@link #mapItem(ClientView.AwarenessLevel, Item, Item)},
      * but for each of the given awareness levels.
      */
-    void mapItem(ClientView.AwarenessLevel[] awarenessLevels, Item from, Item to);
+    default void mapItem(ClientView.AwarenessLevel[] awarenessLevels, Item from, Item to) {
+        for (ClientView.AwarenessLevel awarenessLevel : awarenessLevels) {
+            this.mapItem(awarenessLevel, from, to);
+        }
+    }
+
+    @Override
+    default void mapItem(ClientView.AwarenessLevel awarenessLevel, ItemType from, ItemType to) {
+        this.mapItem(awarenessLevel, CraftItemType.bukkitToMinecraftNew(from), CraftItemType.bukkitToMinecraftNew(to));
+    }
+
+    @Override
+    default void mapItem(ClientView.AwarenessLevel[] awarenessLevels, ItemType from, ItemType to) {
+        for (ClientView.AwarenessLevel awarenessLevel : awarenessLevels) {
+            this.mapItem(awarenessLevel, from, to);
+        }
+    }
 
 }

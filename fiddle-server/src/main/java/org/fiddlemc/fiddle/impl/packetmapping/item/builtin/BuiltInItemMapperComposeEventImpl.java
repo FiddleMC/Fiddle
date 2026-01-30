@@ -22,11 +22,4 @@ public final class BuiltInItemMapperComposeEventImpl implements PaperLifecycleEv
         this.mapper.mappedItems[awarenessLevel.ordinal()].put(from, to);
     }
 
-    @Override
-    public void mapItem(final ClientView.AwarenessLevel[] awarenessLevels, final Item from, final Item to) {
-        for (ClientView.AwarenessLevel awarenessLevel : awarenessLevels) {
-            this.mapItem(awarenessLevel, from, to);
-        }
-    }
-
 }
