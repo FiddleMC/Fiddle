@@ -91,7 +91,7 @@ public class ItemMappingReverser {
     private final Map<Tag, List<ExistingMapping>> existingMappingsBySentBeforeAddingIdTag = new HashMap<>();
 
     /**
-     * All current {@link ExistingMapping}s by their {@link ExistingMapping#sentAfterAddingIdWithCount1HashedKey}.
+     * All current {@link ExistingMapping}s by their {@link ExistingMapping#sentAfterAddingIdWithCount1AfterEncodingHashedKey}.
      */
     private final Map<HashedStackKey, List<ExistingMapping>> existingMappingsBySentHashedKey = new TreeMap<>();
 
@@ -133,9 +133,10 @@ public class ItemMappingReverser {
         final ItemStack sentAfterAddingIdWithCount1;
 
         /**
-         * {@link #sentBeforeAddingIdWithCount1Tag} as a {@link HashedStackKey}.
+         * {@link #sentAfterAddingIdWithCount1}, but guaranteed to be the version after encoding
+         * (see {@link #updateSent}), as a {@link HashedStackKey}.
          */
-        final HashedStackKey sentAfterAddingIdWithCount1HashedKey;
+        HashedStackKey sentAfterAddingIdWithCount1AfterEncodingHashedKey;
 
         ExistingMapping(int id, ItemStack serverSideWithCount1, Tag serverSideWithCount1Tag, Tag sentBeforeAddingIdWithCount1Tag, ItemStack sentAfterAddingIdWithCount1) {
             this.id = id;
@@ -145,7 +146,11 @@ public class ItemMappingReverser {
             this.serverSideWithCount1Tag = serverSideWithCount1Tag;
             this.sentBeforeAddingIdWithCount1Tag = sentBeforeAddingIdWithCount1Tag;
             this.sentAfterAddingIdWithCount1 = sentAfterAddingIdWithCount1;
-            this.sentAfterAddingIdWithCount1HashedKey = HashedStackKey.of(sentAfterAddingIdWithCount1);
+            this.updateSentAfterAddingIdWithCount1AfterEncoding(sentAfterAddingIdWithCount1);
+        }
+
+        void updateSentAfterAddingIdWithCount1AfterEncoding(ItemStack sentAfterAddingIdWithCount1AfterEncoding) {
+            this.sentAfterAddingIdWithCount1AfterEncodingHashedKey = HashedStackKey.of(sentAfterAddingIdWithCount1AfterEncoding);
         }
 
         void setTimeLastUsed() {
@@ -160,17 +165,11 @@ public class ItemMappingReverser {
 
         void removeFromAllExceptByTimeLastUsed(ItemMappingReverser reverser) {
             reverser.existingMappingsById.remove(this.id);
-            reverser.existingMappingsBySentBeforeAddingIdTag.compute(this.sentBeforeAddingIdWithCount1Tag, ($, mappings) -> {
-                if (mappings == null) {
-                    return null;
-                }
+            reverser.existingMappingsBySentBeforeAddingIdTag.computeIfPresent(this.sentBeforeAddingIdWithCount1Tag, ($, mappings) -> {
                 mappings.remove(this);
                 return mappings.isEmpty() ? null : mappings;
             });
-            reverser.existingMappingsBySentHashedKey.compute(this.sentAfterAddingIdWithCount1HashedKey, ($, mappings) -> {
-                if (mappings == null) {
-                    return null;
-                }
+            reverser.existingMappingsBySentHashedKey.computeIfPresent(this.sentAfterAddingIdWithCount1AfterEncodingHashedKey, ($, mappings) -> {
                 mappings.remove(this);
                 return mappings.isEmpty() ? null : mappings;
             });
@@ -259,6 +258,26 @@ public class ItemMappingReverser {
     }
 
     /**
+     * @return A unique id for the item stack if the given {@link ItemStack} has been made reversible already,
+     * or null otherwise.
+     */
+    public @Nullable Integer getReversibilityId(ItemStack sent) {
+        @Nullable CustomData customData = sent.get(DataComponents.CUSTOM_DATA);
+        if (customData == null) {
+            return null;
+        }
+        CompoundTag tag = customData.getUnsafe();
+        if (tag == null) {
+            return null;
+        }
+        Tag idTag = tag.get(ID_TAG_KEY);
+        if (idTag instanceof IntTag intTag) {
+            return intTag.intValue();
+        }
+        return null;
+    }
+
+    /**
      * Makes the sent item stack to {@linkplain #reverseMappingIfPossible reversible}
      * into the server-side item stack.
      *
@@ -305,7 +324,7 @@ public class ItemMappingReverser {
             this.existingMappingsById.put(id, existingMapping);
             this.existingMappingsByTimeLastUsed.add(existingMapping);
             existingMappings.add(existingMapping);
-            this.existingMappingsBySentHashedKey.computeIfAbsent(existingMapping.sentAfterAddingIdWithCount1HashedKey, $ -> new ArrayList<>(1)).add(existingMapping);
+            this.existingMappingsBySentHashedKey.computeIfAbsent(existingMapping.sentAfterAddingIdWithCount1AfterEncodingHashedKey, $ -> new ArrayList<>(1)).add(existingMapping);
 
             // Remove mappings if outdated or too many
             while (this.existingMappingsByTimeLastUsed.size() >= MAX_REMEMBER_MAPPING_COUNT) {
@@ -329,6 +348,36 @@ public class ItemMappingReverser {
             this.lock.release();
         }
 
+    }
+
+    /**
+     * Can be called if the actual sent {@link ItemStack} is different
+     * from the one that a reversible version is already saved of.
+     * This may happen if an {@link ItemStack} is modified when it is being encoded, even after having
+     * applied item mappings, for example, if individual components are encoded differently due to
+     * component mappings being applied to them.
+     */
+    public void updateSent(int id, ItemStack sent) {
+        this.lock.acquireUninterruptibly();
+        try {
+
+            // Get the mapping by its id
+            @Nullable ExistingMapping existingMapping = this.existingMappingsById.get(id);
+            if (existingMapping == null) {
+                return;
+            }
+
+            HashedStackKey oldHashedStackKey = existingMapping.sentAfterAddingIdWithCount1AfterEncodingHashedKey;
+            this.existingMappingsBySentHashedKey.computeIfPresent(oldHashedStackKey, ($, mappings) -> {
+                mappings.remove(existingMapping);
+                return mappings.isEmpty() ? null : mappings;
+            });
+            existingMapping.updateSentAfterAddingIdWithCount1AfterEncoding(sent.copyWithCount(1));
+            this.existingMappingsBySentHashedKey.computeIfAbsent(existingMapping.sentAfterAddingIdWithCount1AfterEncodingHashedKey, $ -> new ArrayList<>(1)).add(existingMapping);
+
+        } finally {
+            this.lock.release();
+        }
     }
 
     /**

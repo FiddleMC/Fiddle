@@ -1,15 +1,29 @@
 --- a/net/minecraft/world/item/ItemStack.java
 +++ b/net/minecraft/world/item/ItemStack.java
-@@ -196,12 +_,27 @@
+@@ -190,18 +_,53 @@
+         return new StreamCodec<RegistryFriendlyByteBuf, ItemStack>() {
+             @Override
+             public ItemStack decode(RegistryFriendlyByteBuf buffer) {
++                // Fiddle start - Item mapping - Reverse - Apply at ItemStack decoding
++                return this.decode(buffer, true);
++            }
++
++            public ItemStack decode(RegistryFriendlyByteBuf buffer, boolean attemptReversing) {
++                // Fiddle end - Item mapping - Reverse - Apply at ItemStack decoding
+                 int varInt = buffer.readVarInt();
+                 if (varInt <= 0) {
+                     return ItemStack.EMPTY;
                  } else {
                      Holder<Item> holder = Item.STREAM_CODEC.decode(buffer);
                      DataComponentPatch dataComponentPatch = codec.decode(buffer);
 -                    return new ItemStack(holder, varInt, dataComponentPatch);
 +                    // Fiddle start - Item mapping - Reverse - Apply at ItemStack decoding
-+                    org.fiddlemc.fiddle.impl.packetmapping.item.reverse.@Nullable ItemMappingReverser itemMappingReverser = ((org.fiddlemc.fiddle.impl.clientview.ClientViewImpl) buffer.getClientViewOrFallback()).getItemMappingReverser();
 +                    ItemStack received = new ItemStack(holder, varInt, dataComponentPatch);
-+                    if (itemMappingReverser != null) {
-+                        received = itemMappingReverser.reverseMappingIfPossible(received);
++                    if (attemptReversing) {
++                        org.fiddlemc.fiddle.impl.packetmapping.item.reverse.@Nullable ItemMappingReverser itemMappingReverser = ((org.fiddlemc.fiddle.impl.clientview.ClientViewImpl) buffer.getClientViewOrFallback()).getItemMappingReverser();
++                        if (itemMappingReverser != null) {
++                            received = itemMappingReverser.reverseMappingIfPossible(received);
++                        }
 +                    }
 +                    return received;
 +                    // Fiddle end - Item mapping - Reverse - Apply at ItemStack decoding
@@ -21,7 +35,19 @@
 +                // Fiddle start - Item mapping - Implementation - Apply at ItemStack encoding
 +                org.fiddlemc.fiddle.impl.packetmapping.item.ItemMappingContextImpl itemMappingContext = new org.fiddlemc.fiddle.impl.packetmapping.item.ItemMappingContextImpl(buffer.getClientViewOrFallback(), buffer.isEncodingItemFrameItem, buffer.isEncodingStonecutterRecipeResult);
 +                ItemStack mappedValue = org.fiddlemc.fiddle.impl.packetmapping.item.ItemMappingPipelineImpl.get().apply(value, itemMappingContext);
++                org.fiddlemc.fiddle.impl.packetmapping.item.reverse.@Nullable ItemMappingReverser itemMappingReverser = ((org.fiddlemc.fiddle.impl.clientview.ClientViewImpl) buffer.getClientViewOrFallback()).getItemMappingReverser();
++                @Nullable Integer reversibilityId = itemMappingReverser == null ? null : itemMappingReverser.getReversibilityId(value);
++                int writerIndexBeforeEncoding = buffer.writerIndex();
 +                this.encodeUnmapped(buffer, mappedValue);
++                if (reversibilityId != null) {
++                    int readerIndexBeforeReading = buffer.readerIndex();
++                    buffer.readerIndex(writerIndexBeforeEncoding);
++                    ItemStack parsed = this.decode(buffer, false);
++                    if (!matches(parsed, mappedValue)) {
++                        itemMappingReverser.updateSent(reversibilityId, parsed);
++                    }
++                    buffer.readerIndex(readerIndexBeforeReading);
++                }
 +            }
 +
 +            private void encodeUnmapped(RegistryFriendlyByteBuf buffer, ItemStack value) {
