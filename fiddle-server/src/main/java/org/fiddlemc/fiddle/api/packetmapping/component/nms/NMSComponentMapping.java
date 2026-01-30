@@ -3,7 +3,7 @@ package org.fiddlemc.fiddle.api.packetmapping.component.nms;
 import org.fiddlemc.fiddle.api.util.mappingpipeline.SingleStepMapping;
 
 /**
- * A mapping that can be registered with the {@link NMSComponentMappingPipelineRegistrar}.
+ * A mapping that can be registered with the {@link NMSComponentMappingPipelineComposeEvent}.
  */
 @FunctionalInterface
 public interface NMSComponentMapping extends SingleStepMapping<NMSComponentMappingHandle> {

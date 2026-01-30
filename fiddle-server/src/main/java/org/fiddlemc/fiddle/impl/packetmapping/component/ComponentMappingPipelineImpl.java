@@ -10,19 +10,19 @@ import net.minecraft.network.chat.Component;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
 import org.fiddlemc.fiddle.api.packetmapping.ClientViewMappingContext;
 import org.fiddlemc.fiddle.api.packetmapping.component.ComponentMappingPipeline;
-import org.fiddlemc.fiddle.api.packetmapping.component.ComponentMappingPipelineRegistrar;
+import org.fiddlemc.fiddle.api.packetmapping.component.ComponentMappingPipelineComposeEvent;
 import org.fiddlemc.fiddle.api.packetmapping.component.nms.NMSComponentMapping;
 import org.fiddlemc.fiddle.api.packetmapping.component.nms.NMSComponentMappingHandle;
 import org.fiddlemc.fiddle.impl.packetmapping.WithClientViewContextSingleStepMappingPipeline;
 import org.fiddlemc.fiddle.impl.packetmapping.component.translatable.ServerSideTranslationComponentMapping;
-import org.fiddlemc.fiddle.impl.util.mappingpipeline.MappingPipelineImpl;
+import org.fiddlemc.fiddle.impl.util.composable.ComposableImpl;
 import org.fiddlemc.fiddle.impl.util.java.serviceloader.NoArgsConstructorServiceProviderImpl;
 import org.jspecify.annotations.Nullable;
 
 /**
  * A pipeline of {@link NMSComponentMapping}s.
  */
-public final class ComponentMappingPipelineImpl extends MappingPipelineImpl.Simple<ComponentMappingPipelineRegistrar, ComponentMappingPipelineRegistrarImpl> implements WithClientViewContextSingleStepMappingPipeline.Simple<Component, NMSComponentMappingHandle, ComponentMappingPipelineRegistrar>, ComponentMappingPipeline {
+public final class ComponentMappingPipelineImpl extends ComposableImpl<ComponentMappingPipelineComposeEvent, ComponentMappingPipelineComposeEventImpl> implements WithClientViewContextSingleStepMappingPipeline.Simple<Component, NMSComponentMappingHandle, ComponentMappingPipelineComposeEvent>, ComponentMappingPipeline {
 
     public static final class ServiceProviderImpl extends NoArgsConstructorServiceProviderImpl<ComponentMappingPipeline, ComponentMappingPipelineImpl> implements ServiceProvider {
 
@@ -70,24 +70,20 @@ public final class ComponentMappingPipelineImpl extends MappingPipelineImpl.Simp
     }
 
     @Override
-    protected ComponentMappingPipelineRegistrarImpl createRegistrar() {
-
-        // Create the registrar
-        ComponentMappingPipelineRegistrarImpl registrar = new ComponentMappingPipelineRegistrarImpl();
-
+    protected ComponentMappingPipelineComposeEventImpl createComposeEvent() {
+        // Create the event
+        ComponentMappingPipelineComposeEventImpl event = new ComponentMappingPipelineComposeEventImpl();
         // Register the server-side translation mapping
-        registrar.register(ClientView.AwarenessLevel.getThatDoNotAlwaysUnderstandsAllServerSideTranslatables(), new ServerSideTranslationComponentMapping());
-
-        // Return the registrar
-        return registrar;
-
+        event.register(ClientView.AwarenessLevel.getThatDoNotAlwaysUnderstandsAllServerSideTranslatables(), new ServerSideTranslationComponentMapping());
+        // Return the event
+        return event;
     }
 
     @Override
-    public void copyMappingsFrom(ComponentMappingPipelineRegistrarImpl registrar) {
+    protected void copyInformationFromEvent(ComponentMappingPipelineComposeEventImpl event) {
         Map<List<NMSComponentMapping>, IntList> transposed = new HashMap<>();
-        for (int awarenessLevelI = 0; awarenessLevelI < registrar.mappings.length; awarenessLevelI++) {
-            transposed.computeIfAbsent(registrar.mappings[awarenessLevelI], $ -> new IntArrayList()).add(awarenessLevelI);
+        for (int awarenessLevelI = 0; awarenessLevelI < event.mappings.length; awarenessLevelI++) {
+            transposed.computeIfAbsent(event.mappings[awarenessLevelI], $ -> new IntArrayList()).add(awarenessLevelI);
         }
         for (Map.Entry<List<NMSComponentMapping>, IntList> entry : transposed.entrySet()) {
             for (int target : entry.getValue()) {

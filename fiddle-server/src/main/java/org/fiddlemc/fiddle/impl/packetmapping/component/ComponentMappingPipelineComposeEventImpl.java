@@ -3,14 +3,15 @@ package org.fiddlemc.fiddle.impl.packetmapping.component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import io.papermc.paper.plugin.lifecycle.event.PaperLifecycleEvent;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
 import org.fiddlemc.fiddle.api.packetmapping.component.nms.NMSComponentMapping;
-import org.fiddlemc.fiddle.api.packetmapping.component.nms.NMSComponentMappingPipelineRegistrar;
+import org.fiddlemc.fiddle.api.packetmapping.component.nms.NMSComponentMappingPipelineComposeEvent;
 
 /**
- * The implementation of {@link NMSComponentMappingPipelineRegistrar}.
+ * The implementation of {@link NMSComponentMappingPipelineComposeEvent}.
  */
-public final class ComponentMappingPipelineRegistrarImpl implements NMSComponentMappingPipelineRegistrar {
+public final class ComponentMappingPipelineComposeEventImpl implements PaperLifecycleEvent, NMSComponentMappingPipelineComposeEvent {
 
     /**
      * The registered mappings.
@@ -21,7 +22,7 @@ public final class ComponentMappingPipelineRegistrarImpl implements NMSComponent
      */
     final List<NMSComponentMapping>[] mappings;
 
-    public ComponentMappingPipelineRegistrarImpl() {
+    public ComponentMappingPipelineComposeEventImpl() {
         this.mappings = new List[ClientView.AwarenessLevel.values().length];
         for (int i = 0; i < this.mappings.length; i++) {
             this.mappings[i] = new ArrayList<>(1);

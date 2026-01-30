@@ -1,17 +1,18 @@
 package org.fiddlemc.fiddle.api.packetmapping.component.translatable;
 
+import org.fiddlemc.fiddle.api.util.composable.Composable;
 import org.fiddlemc.fiddle.impl.java.util.serviceloader.GenericServiceProvider;
 import org.jspecify.annotations.Nullable;
 import java.util.ServiceLoader;
 
 /**
- * Provides functionality to register server-side translations.
+ * Provides functionality to use server-side translations.
  *
  * <p>
  * This can also be used to override existing translations.
  * </p>
  */
-public interface ServerSideTranslationRegistrar {
+public interface ServerSideTranslationRegistrar extends Composable<ServerSideTranslationRegistrarComposeEvent> {
 
     /**
      * An internal interface to get the {@link ServerSideTranslationRegistrar} instance.
@@ -64,42 +65,6 @@ public interface ServerSideTranslationRegistrar {
          */
         ALL
     }
-
-    /**
-     * The same as {@link #register(String, String, String, FallbackScope, boolean)},
-     * but with:
-     * <ul>
-     *     <li>{@code locale} = {@code en_us}</li>
-     *     <li>{@code fallbackScope} = {@link FallbackScope#ALL}</li>
-     *     <li>{@code overrideClientSide} = {@code true}</li>
-     * </ul>
-     */
-    default void register(String key, String translation) {
-        this.register(key, translation, "en_us", FallbackScope.ALL, true);
-    }
-
-    /**
-     * Register a new translation.
-     *
-     * <p>
-     * Translations that are registered later
-     * replace translations that are registered with the same parameters before.
-     * </p>
-     *
-     * <p>
-     * Translations can also replace Minecraft vanilla translations,
-     * such as for the key "{@code block.minecraft.bookshelf}".
-     * </p>
-     *
-     * @param key                The lower-case key, for example "{@code item.example.ash}".
-     * @param translation        The desired translation, for example "{@code 灰}".
-     * @param locale             A lower-case locale that exists in Minecraft,
-     *                           for example "{@code ja_jp}" for Japanese.
-     * @param fallbackScope      The extent to which the translation can serve as a fallback.
-     * @param overrideClientSide Whether this translation also overrides translations already registered
-     *                           on the client (such as vanilla names for Minecraft blocks and items).
-     */
-    void register(String key, String translation, String locale, FallbackScope fallbackScope, boolean overrideClientSide);
 
     /**
      * A registered server-side translation.

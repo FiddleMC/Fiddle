@@ -11,13 +11,13 @@ import net.minecraft.world.item.ItemStack;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
 import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingContext;
 import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingPipeline;
-import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingPipelineRegistrar;
+import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingPipelineComposeEvent;
 import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMapping;
 import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMappingHandle;
 import org.fiddlemc.fiddle.impl.clientview.ClientViewImpl;
 import org.fiddlemc.fiddle.impl.packetmapping.WithClientViewContextSingleStepMappingPipeline;
 import org.fiddlemc.fiddle.impl.packetmapping.item.reverse.ItemMappingReverser;
-import org.fiddlemc.fiddle.impl.util.mappingpipeline.MappingPipelineImpl;
+import org.fiddlemc.fiddle.impl.util.composable.ComposableImpl;
 import org.fiddlemc.fiddle.impl.util.mappingpipeline.WithContextSingleStepMappingPipeline;
 import org.fiddlemc.fiddle.impl.util.java.serviceloader.NoArgsConstructorServiceProviderImpl;
 import org.jspecify.annotations.Nullable;
@@ -29,7 +29,7 @@ import java.util.Map;
 /**
  * A pipeline of {@link NMSItemMapping}s.
  */
-public final class ItemMappingPipelineImpl extends MappingPipelineImpl.Simple<ItemMappingPipelineRegistrar, ItemMappingPipelineRegistrarImpl> implements WithClientViewContextSingleStepMappingPipeline<ItemStack, ItemMappingContext, NMSItemMappingHandle, ItemMappingPipelineRegistrar>, ItemMappingPipeline {
+public final class ItemMappingPipelineImpl extends ComposableImpl<ItemMappingPipelineComposeEvent, ItemMappingPipelineComposeEventImpl> implements WithClientViewContextSingleStepMappingPipeline<ItemStack, ItemMappingContext, NMSItemMappingHandle, ItemMappingPipelineComposeEvent>, ItemMappingPipeline {
 
     public static final class ServiceProviderImpl extends NoArgsConstructorServiceProviderImpl<ItemMappingPipeline, ItemMappingPipelineImpl> implements ServiceProvider {
 
@@ -158,15 +158,15 @@ public final class ItemMappingPipelineImpl extends MappingPipelineImpl.Simple<It
     }
 
     @Override
-    protected ItemMappingPipelineRegistrarImpl createRegistrar() {
-        return new ItemMappingPipelineRegistrarImpl();
+    protected ItemMappingPipelineComposeEventImpl createComposeEvent() {
+        return new ItemMappingPipelineComposeEventImpl();
     }
 
     @Override
-    public void copyMappingsFrom(ItemMappingPipelineRegistrarImpl registrar) {
+    protected void copyInformationFromEvent(ItemMappingPipelineComposeEventImpl event) {
         Map<List<NMSItemMapping>, List<IntIntPair>> transposed = new HashMap<>();
-        for (int awarenessLevelI = 0; awarenessLevelI < registrar.mappings.length; awarenessLevelI++) {
-            for (Int2ObjectMap.Entry<List<NMSItemMapping>> entry : registrar.mappings[awarenessLevelI].int2ObjectEntrySet()) {
+        for (int awarenessLevelI = 0; awarenessLevelI < event.mappings.length; awarenessLevelI++) {
+            for (Int2ObjectMap.Entry<List<NMSItemMapping>> entry : event.mappings[awarenessLevelI].int2ObjectEntrySet()) {
                 transposed.computeIfAbsent(entry.getValue(), $ -> new ArrayList<>()).add(IntIntPair.of(awarenessLevelI, entry.getKey()));
             }
         }

@@ -1,13 +1,14 @@
 package org.fiddlemc.fiddle.api.packetmapping.component;
 
 import java.util.ServiceLoader;
-import org.fiddlemc.fiddle.api.util.mappingpipeline.MappingPipeline;
+
+import org.fiddlemc.fiddle.api.util.composable.Composable;
 import org.fiddlemc.fiddle.impl.java.util.serviceloader.GenericServiceProvider;
 
 /**
  * A pipeline of component mappings.
  */
-public interface ComponentMappingPipeline extends MappingPipeline<ComponentMappingPipelineRegistrar> {
+public interface ComponentMappingPipeline extends Composable<ComponentMappingPipelineComposeEvent> {
 
     /**
      * An internal interface to get the {@link ComponentMappingPipeline} instance.

@@ -1,14 +1,14 @@
 package org.fiddlemc.fiddle.impl.util.mappingpipeline;
 
+import io.papermc.paper.plugin.lifecycle.event.LifecycleEvent;
 import org.fiddlemc.fiddle.api.util.mappingpipeline.MappingContext;
-import org.fiddlemc.fiddle.api.util.mappingpipeline.MappingPipelineRegistrar;
 import org.fiddlemc.fiddle.api.util.mappingpipeline.SingleStepMapping;
 import org.fiddlemc.fiddle.api.util.mappingpipeline.WithContextMappingHandle;
 
 /**
  * A {@link SingleStepMappingPipeline} for {@link WithContextMappingHandle}s.
  */
-public interface WithContextSingleStepMappingPipeline<T, C extends MappingContext, H extends WithContextMappingHandle<T, C>, R extends MappingPipelineRegistrar> extends SingleStepMappingPipeline<T, H, R> {
+public interface WithContextSingleStepMappingPipeline<T, C extends MappingContext, H extends WithContextMappingHandle<T, C>, E extends LifecycleEvent> extends SingleStepMappingPipeline<T, H, E> {
 
     /**
      * @return A new handle for the given data and context.

@@ -1,6 +1,6 @@
 package org.fiddlemc.fiddle.api.bukkit.enuminjection;
 
-import org.fiddlemc.fiddle.api.util.mappingpipeline.MappingPipeline;
+import org.fiddlemc.fiddle.api.util.composable.Composable;
 
 /**
  * A pipeline for mappings to map a source value into a {@link Enum#name()} for a value of a Bukkit enum.
@@ -13,5 +13,5 @@ import org.fiddlemc.fiddle.api.util.mappingpipeline.MappingPipeline;
  * Other naming styles may lead to collisions or other plugins parsing strings incorrectly.
  * </p>
  */
-public interface BukkitEnumNameMappingPipeline<S> extends MappingPipeline<BukkitEnumNameMappingPipelineRegistrar<S>> {
+public interface BukkitEnumNameMappingPipeline<S> extends Composable<BukkitEnumNameMappingPipelineComposeEvent<S>> {
 }

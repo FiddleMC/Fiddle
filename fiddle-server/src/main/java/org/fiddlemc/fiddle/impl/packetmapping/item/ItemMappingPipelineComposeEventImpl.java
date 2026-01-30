@@ -1,11 +1,12 @@
 package org.fiddlemc.fiddle.impl.packetmapping.item;
 
+import io.papermc.paper.plugin.lifecycle.event.PaperLifecycleEvent;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.world.item.Item;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
 import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMapping;
-import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMappingPipelineRegistrar;
+import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMappingPipelineComposeEvent;
 import org.fiddlemc.fiddle.impl.moredatadriven.minecraft.ItemRegistry;
 import org.jspecify.annotations.Nullable;
 import java.util.ArrayList;
@@ -13,9 +14,9 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * The implementation of {@link NMSItemMappingPipelineRegistrar}.
+ * The implementation of {@link NMSItemMappingPipelineComposeEvent}.
  */
-public final class ItemMappingPipelineRegistrarImpl implements NMSItemMappingPipelineRegistrar {
+public final class ItemMappingPipelineComposeEventImpl implements PaperLifecycleEvent, NMSItemMappingPipelineComposeEvent {
 
     /**
      * The registered mappings.
@@ -29,7 +30,7 @@ public final class ItemMappingPipelineRegistrarImpl implements NMSItemMappingPip
      */
     final Int2ObjectMap<List<NMSItemMapping>>[] mappings;
 
-    public ItemMappingPipelineRegistrarImpl() {
+    public ItemMappingPipelineComposeEventImpl() {
         this.mappings = new Int2ObjectMap[ClientView.AwarenessLevel.values().length];
         for (int i = 0; i < this.mappings.length; i++) {
             this.mappings[i] = new Int2ObjectOpenHashMap<>();

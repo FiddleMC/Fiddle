@@ -4,13 +4,13 @@ import java.util.List;
 import java.util.function.Consumer;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
 import org.fiddlemc.fiddle.api.packetmapping.component.ComponentMappingPipeline;
-import org.fiddlemc.fiddle.api.packetmapping.component.ComponentMappingPipelineRegistrar;
+import org.fiddlemc.fiddle.api.packetmapping.component.ComponentMappingPipelineComposeEvent;
 
 /**
  * Provides functionality to register {@link NMSComponentMapping}s
  * to the {@link ComponentMappingPipeline}.
  */
-public interface NMSComponentMappingPipelineRegistrar extends ComponentMappingPipelineRegistrar {
+public interface NMSComponentMappingPipelineComposeEvent extends ComponentMappingPipelineComposeEvent {
 
     /**
      * Registers a mapping.

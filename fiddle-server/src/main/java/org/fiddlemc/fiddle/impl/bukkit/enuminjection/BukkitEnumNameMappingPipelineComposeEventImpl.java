@@ -1,7 +1,8 @@
 package org.fiddlemc.fiddle.impl.bukkit.enuminjection;
 
+import io.papermc.paper.plugin.lifecycle.event.PaperLifecycleEvent;
 import org.fiddlemc.fiddle.api.bukkit.enuminjection.BukkitEnumNameMappingHandle;
-import org.fiddlemc.fiddle.api.bukkit.enuminjection.BukkitEnumNameMappingPipelineRegistrar;
+import org.fiddlemc.fiddle.api.bukkit.enuminjection.BukkitEnumNameMappingPipelineComposeEvent;
 import org.fiddlemc.fiddle.api.util.mappingpipeline.SingleStepMapping;
 import org.jspecify.annotations.Nullable;
 import java.util.ArrayList;
@@ -9,9 +10,9 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * The implementation of {@link BukkitEnumNameMappingPipelineRegistrar}.
+ * The implementation of {@link BukkitEnumNameMappingPipelineComposeEvent}.
  */
-public final class BukkitEnumNameMappingPipelineRegistrarImpl<S> implements BukkitEnumNameMappingPipelineRegistrar<S> {
+public final class BukkitEnumNameMappingPipelineComposeEventImpl<S> implements PaperLifecycleEvent, BukkitEnumNameMappingPipelineComposeEvent<S> {
 
     /**
      * The registered mappings,

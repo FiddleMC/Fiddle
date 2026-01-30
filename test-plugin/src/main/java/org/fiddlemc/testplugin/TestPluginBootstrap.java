@@ -10,6 +10,7 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
@@ -22,7 +23,7 @@ import org.fiddlemc.fiddle.api.moredatadriven.paper.nms.NMSBlockRegistryEntryBui
 import org.fiddlemc.fiddle.api.moredatadriven.paper.nms.NMSItemRegistryEntryBuilder;
 import org.fiddlemc.fiddle.api.packetmapping.component.translatable.ServerSideTranslationRegistrar;
 import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingPipeline;
-import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMappingPipelineRegistrar;
+import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMappingPipelineComposeEvent;
 import org.fiddlemc.testplugin.data.PluginBlocks;
 import org.fiddlemc.testplugin.data.PluginItems;
 import org.jetbrains.annotations.NotNull;
@@ -103,8 +104,8 @@ public class TestPluginBootstrap implements PluginBootstrap {
         });
 
         // Use a custom enum name, just to show that we can (but please don't do this yourself unless you really know what you are doing)
-        context.getLifecycleManager().registerEventHandler(MaterialEnumNameMappingPipeline.get().composeEventType(), event -> {
-            event.getRegistrar().register(handle -> {
+        context.getLifecycleManager().registerEventHandler(MaterialEnumNameMappingPipeline.get().compose(), event -> {
+            event.register(handle -> {
                 NamespacedKey key = handle.getSourceValue().getLeft();
                 if (key.equals(NamespacedKey.fromString("example:ash"))) {
                     handle.set("ASHES_TO_DUST");
@@ -114,11 +115,11 @@ public class TestPluginBootstrap implements PluginBootstrap {
         });
 
         // Register item mappings
-        context.getLifecycleManager().registerEventHandler(ItemMappingPipeline.get().composeEventType(), event -> {
+        context.getLifecycleManager().registerEventHandler(ItemMappingPipeline.get().compose(), event -> {
             context.getLogger().info("Registering item mappings...");
-            NMSItemMappingPipelineRegistrar registrar = (NMSItemMappingPipelineRegistrar) event.getRegistrar();
+            NMSItemMappingPipelineComposeEvent nmsEvent = (NMSItemMappingPipelineComposeEvent) event;
             // Map ash to gunpowder
-            registrar.register(ClientView.AwarenessLevel.JAVA_DEFAULT, PluginItems.ASH.get(), handle -> {
+            nmsEvent.register(ClientView.AwarenessLevel.JAVA_DEFAULT, PluginItems.ASH.get(), handle -> {
                 ItemStack itemStack = handle.getMutable();
                 // Change the type
                 itemStack.setItem(Items.GUNPOWDER);
@@ -126,7 +127,7 @@ public class TestPluginBootstrap implements PluginBootstrap {
                 itemStack.set(DataComponents.ITEM_NAME, Component.translatable("item.example.ash"));
             });
             // Map ash blocks to light gray concrete powder
-            registrar.register(ClientView.AwarenessLevel.getThatDoNotAlwaysUnderstandsAllServerSideItems(), PluginItems.ASH_BLOCK.get(), handle -> {
+            nmsEvent.register(ClientView.AwarenessLevel.getThatDoNotAlwaysUnderstandsAllServerSideItems(), PluginItems.ASH_BLOCK.get(), handle -> {
                 if (handle.getContext().getClientView().understandsAllServerSideItems()) return;
                 ItemStack itemStack = handle.getMutable();
                 // Change the type
@@ -135,7 +136,7 @@ public class TestPluginBootstrap implements PluginBootstrap {
                 itemStack.set(DataComponents.ITEM_NAME, Component.translatable("block.example.ash_block"));
             });
             // Map ash stairs to andesite stairs
-            registrar.register(ClientView.AwarenessLevel.getThatDoNotAlwaysUnderstandsAllServerSideItems(), PluginItems.ASH_STAIRS.get(), handle -> {
+            nmsEvent.register(ClientView.AwarenessLevel.getThatDoNotAlwaysUnderstandsAllServerSideItems(), PluginItems.ASH_STAIRS.get(), handle -> {
                 if (handle.getContext().getClientView().understandsAllServerSideItems()) return;
                 ItemStack itemStack = handle.getMutable();
                 // Change the type
@@ -146,14 +147,15 @@ public class TestPluginBootstrap implements PluginBootstrap {
         });
 
         // Register translations
-        ServerSideTranslationRegistrar translationRegistrar = ServerSideTranslationRegistrar.get();
-        // For the custom blocks and items
-        translationRegistrar.register("item.example.ash", "Ash");
-        translationRegistrar.register("item.example.ash", "灰", "ja_jp", ServerSideTranslationRegistrar.FallbackScope.LANGUAGE_GROUP, true);
-        translationRegistrar.register("block.example.ash_block", "Ash block");
-        translationRegistrar.register("block.example.ash_stairs", "Ash stairs");
-        // Override the vanilla bookshelf name just to show that we can
-        translationRegistrar.register("block.minecraft.bookshelf", "Booky Bookshelf");
+        context.getLifecycleManager().registerEventHandler(ServerSideTranslationRegistrar.get().compose(), event -> {
+            // For the custom blocks and items
+            event.register(PluginItems.ASH.get().getDescriptionId(), "Ash");
+            event.register(PluginItems.ASH.get().getDescriptionId(), "灰", "ja_jp", ServerSideTranslationRegistrar.FallbackScope.LANGUAGE_GROUP, true);
+            event.register(PluginItems.ASH_BLOCK.get().getDescriptionId(), "Ash block");
+            event.register(PluginItems.ASH_STAIRS.get().getDescriptionId(), "Ash stairs");
+            // Override the vanilla bookshelf name just to show that we can
+            event.register(Blocks.BOOKSHELF.getDescriptionId(), "Booky Bookshelf");
+        });
 
     }
 

@@ -1,6 +1,6 @@
 package org.fiddlemc.fiddle.api.bukkit.enuminjection;
 
-import org.fiddlemc.fiddle.api.util.mappingpipeline.MappingPipelineRegistrar;
+import io.papermc.paper.plugin.lifecycle.event.LifecycleEvent;
 import org.fiddlemc.fiddle.api.util.mappingpipeline.SingleStepMapping;
 import java.util.List;
 import java.util.function.Consumer;
@@ -8,7 +8,7 @@ import java.util.function.Consumer;
 /**
  * Provides functionality to register mappings to a {@link BukkitEnumNameMappingPipeline}.
  */
-public interface BukkitEnumNameMappingPipelineRegistrar<S> extends MappingPipelineRegistrar {
+public interface BukkitEnumNameMappingPipelineComposeEvent<S> extends LifecycleEvent {
 
     /**
      * Registers a mapping.
