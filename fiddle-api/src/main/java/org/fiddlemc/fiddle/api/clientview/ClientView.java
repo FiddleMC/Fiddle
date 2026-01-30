@@ -159,6 +159,24 @@ public interface ClientView {
         }
 
         /**
+         * Return value for {@link #getAll()},
+         * or null if not initialized yet.
+         */
+        private static AwarenessLevel @Nullable [] all;
+
+        /**
+         * Convenience function that returns all {@link AwarenessLevel}s.
+         *
+         * @return An array of {@link AwarenessLevel}s.
+         */
+        public static AwarenessLevel[] getAll() {
+            if (all == null) {
+                all = values();
+            }
+            return all;
+        }
+
+        /**
          * Return value for {@link #getThatDoNotAlwaysUnderstandsAllServerSideTranslatables()},
          * or null if not initialized yet.
          */
@@ -172,7 +190,7 @@ public interface ClientView {
          */
         public static AwarenessLevel[] getThatDoNotAlwaysUnderstandsAllServerSideTranslatables() {
             if (thatDoNotAlwaysUnderstandsAllServerSideTranslatables == null) {
-                thatDoNotAlwaysUnderstandsAllServerSideTranslatables = Arrays.stream(AwarenessLevel.values()).filter(level -> !level.alwaysUnderstandsAllServerSideTranslatables).toArray(AwarenessLevel[]::new);
+                thatDoNotAlwaysUnderstandsAllServerSideTranslatables = Arrays.stream(getAll()).filter(level -> !level.alwaysUnderstandsAllServerSideTranslatables).toArray(AwarenessLevel[]::new);
             }
             return thatDoNotAlwaysUnderstandsAllServerSideTranslatables;
         }
@@ -191,7 +209,7 @@ public interface ClientView {
          */
         public static AwarenessLevel[] getThatDoNotAlwaysUnderstandsAllServerSideItems() {
             if (thatDoNotAlwaysUnderstandsAllServerSideItems == null) {
-                thatDoNotAlwaysUnderstandsAllServerSideItems = Arrays.stream(AwarenessLevel.values()).filter(level -> !level.alwaysUnderstandsAllServerSideItems).toArray(AwarenessLevel[]::new);
+                thatDoNotAlwaysUnderstandsAllServerSideItems = Arrays.stream(getAll()).filter(level -> !level.alwaysUnderstandsAllServerSideItems).toArray(AwarenessLevel[]::new);
             }
             return thatDoNotAlwaysUnderstandsAllServerSideItems;
         }

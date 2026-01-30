@@ -16,6 +16,7 @@ import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMapping;
 import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMappingHandle;
 import org.fiddlemc.fiddle.impl.clientview.ClientViewImpl;
 import org.fiddlemc.fiddle.impl.packetmapping.WithClientViewContextSingleStepMappingPipeline;
+import org.fiddlemc.fiddle.impl.packetmapping.item.builtin.BuiltInItemMapperImpl;
 import org.fiddlemc.fiddle.impl.packetmapping.item.reverse.ItemMappingReverser;
 import org.fiddlemc.fiddle.impl.util.composable.ComposableImpl;
 import org.fiddlemc.fiddle.impl.util.mappingpipeline.WithContextSingleStepMappingPipeline;
@@ -61,7 +62,7 @@ public final class ItemMappingPipelineImpl extends ComposableImpl<ItemMappingPip
     private final Int2ObjectMap<NMSItemMapping[]>[] mappings;
 
     private ItemMappingPipelineImpl() {
-        this.mappings = new Int2ObjectMap[ClientView.AwarenessLevel.values().length];
+        this.mappings = new Int2ObjectMap[ClientView.AwarenessLevel.getAll().length];
         for (int i = 0; i < this.mappings.length; i++) {
             this.mappings[i] = new Int2ObjectOpenHashMap<>(16, 0.5f);
         }
@@ -159,7 +160,14 @@ public final class ItemMappingPipelineImpl extends ComposableImpl<ItemMappingPip
 
     @Override
     protected ItemMappingPipelineComposeEventImpl createComposeEvent() {
-        return new ItemMappingPipelineComposeEventImpl();
+        // Create the event
+        ItemMappingPipelineComposeEventImpl event = new ItemMappingPipelineComposeEventImpl();
+        // Register the built-in mappings
+        BuiltInItemMapperImpl builtInItemMapper = BuiltInItemMapperImpl.get();
+        builtInItemMapper.fireComposeEvent();
+        builtInItemMapper.registerMappings(event);
+        // Return the event
+        return event;
     }
 
     @Override

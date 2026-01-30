@@ -10,6 +10,7 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.ItemLore;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.material.MapColor;
@@ -23,12 +24,16 @@ import org.fiddlemc.fiddle.api.moredatadriven.paper.nms.NMSBlockRegistryEntryBui
 import org.fiddlemc.fiddle.api.moredatadriven.paper.nms.NMSItemRegistryEntryBuilder;
 import org.fiddlemc.fiddle.api.packetmapping.component.translatable.ServerSideTranslationRegistrar;
 import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingPipeline;
+import org.fiddlemc.fiddle.api.packetmapping.item.builtin.BuiltInItemMapper;
+import org.fiddlemc.fiddle.api.packetmapping.item.builtin.nms.NMSBuiltInItemMapperComposeEvent;
 import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMappingPipelineComposeEvent;
 import org.fiddlemc.testplugin.data.PluginBlocks;
 import org.fiddlemc.testplugin.data.PluginItems;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.Nullable;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.List;
 
 @SuppressWarnings("unused")
 public class TestPluginBootstrap implements PluginBootstrap {
@@ -114,36 +119,55 @@ public class TestPluginBootstrap implements PluginBootstrap {
             });
         });
 
-        // Register item mappings
+        // Configure basic item mappings
+        context.getLifecycleManager().registerEventHandler(BuiltInItemMapper.get().compose(), event -> {
+            context.getLogger().info("Configuring built-in item mapper...");
+            NMSBuiltInItemMapperComposeEvent nmsEvent = (NMSBuiltInItemMapperComposeEvent) event;
+            nmsEvent.mapItem(ClientView.AwarenessLevel.JAVA_DEFAULT, PluginItems.ASH.get(), Items.GUNPOWDER);
+            nmsEvent.mapItem(ClientView.AwarenessLevel.JAVA_DEFAULT, PluginItems.ASH_BLOCK.get(), Items.LIGHT_GRAY_CONCRETE_POWDER);
+            nmsEvent.mapItem(ClientView.AwarenessLevel.JAVA_DEFAULT, PluginItems.ASH_STAIRS.get(), Items.ANDESITE_STAIRS);
+        });
+
+        // Register more custom item mapping code
         context.getLifecycleManager().registerEventHandler(ItemMappingPipeline.get().compose(), event -> {
-            context.getLogger().info("Registering item mappings...");
+            context.getLogger().info("Registering custom item mappings...");
             NMSItemMappingPipelineComposeEvent nmsEvent = (NMSItemMappingPipelineComposeEvent) event;
-            // Map ash to gunpowder
-            nmsEvent.register(ClientView.AwarenessLevel.JAVA_DEFAULT, PluginItems.ASH.get(), handle -> {
-                ItemStack itemStack = handle.getMutable();
-                // Change the type
-                itemStack.setItem(Items.GUNPOWDER);
-                // Set the desired item name
-                itemStack.set(DataComponents.ITEM_NAME, Component.translatable("item.example.ash"));
+
+            // Screw around with ash stairs a bit, to demonstrate that we can do whatever we want to the client-side view
+            nmsEvent.register(ClientView.AwarenessLevel.JAVA_DEFAULT, PluginItems.ASH_STAIRS.get(), handle -> {
+                ItemStack immutable = handle.getImmutable();
+                // Make the item name bold
+                Component itemName = immutable.getItemName();
+                if (!itemName.getStyle().isBold()) {
+                    handle.getMutable().set(DataComponents.ITEM_NAME, itemName.copy().setStyle(itemName.getStyle().withBold(true)));
+                }
+                // Give it an enchantment glint
+                if (!Boolean.TRUE.equals(immutable.get(DataComponents.ENCHANTMENT_GLINT_OVERRIDE))) {
+                    handle.getMutable().set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
+                }
+                // Add some lore
+                @Nullable ItemLore lore = immutable.get(DataComponents.LORE);
+                Component toAdd = Component.literal("You can craft these stairs from ").append(Component.translatable(PluginItems.ASH_BLOCK.get().getDescriptionId()));
+                if (lore == null) {
+                    lore = new ItemLore(List.of(toAdd));
+                } else {
+                    lore = lore.withLineAdded(toAdd);
+                }
+                handle.getMutable().set(DataComponents.LORE, lore);
             });
-            // Map ash blocks to light gray concrete powder
-            nmsEvent.register(ClientView.AwarenessLevel.getThatDoNotAlwaysUnderstandsAllServerSideItems(), PluginItems.ASH_BLOCK.get(), handle -> {
-                if (handle.getContext().getClientView().understandsAllServerSideItems()) return;
-                ItemStack itemStack = handle.getMutable();
-                // Change the type
-                itemStack.setItem(Items.LIGHT_GRAY_CONCRETE_POWDER);
-                // Set the desired item name
-                itemStack.set(DataComponents.ITEM_NAME, Component.translatable("block.example.ash_block"));
+
+            // Add helpful lore to crafting tables without affecting the server-side data
+            nmsEvent.register(ClientView.AwarenessLevel.getAll(), Items.CRAFTING_TABLE, handle -> {
+                @Nullable ItemLore lore = handle.getImmutable().get(DataComponents.LORE);
+                Component toAdd = Component.literal("This is a very important block for beginners");
+                if (lore == null) {
+                    lore = new ItemLore(List.of(toAdd));
+                } else {
+                    lore = lore.withLineAdded(toAdd);
+                }
+                handle.getMutable().set(DataComponents.LORE, lore);
             });
-            // Map ash stairs to andesite stairs
-            nmsEvent.register(ClientView.AwarenessLevel.getThatDoNotAlwaysUnderstandsAllServerSideItems(), PluginItems.ASH_STAIRS.get(), handle -> {
-                if (handle.getContext().getClientView().understandsAllServerSideItems()) return;
-                ItemStack itemStack = handle.getMutable();
-                // Change the type
-                itemStack.setItem(Items.ANDESITE_STAIRS);
-                // Set the desired item name
-                itemStack.set(DataComponents.ITEM_NAME, Component.translatable(PluginItems.ASH_STAIRS.get().getDescriptionId()));
-            });
+
         });
 
         // Register translations

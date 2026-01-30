@@ -31,7 +31,7 @@ public final class ItemMappingPipelineComposeEventImpl implements PaperLifecycle
     final Int2ObjectMap<List<NMSItemMapping>>[] mappings;
 
     public ItemMappingPipelineComposeEventImpl() {
-        this.mappings = new Int2ObjectMap[ClientView.AwarenessLevel.values().length];
+        this.mappings = new Int2ObjectMap[ClientView.AwarenessLevel.getAll().length];
         for (int i = 0; i < this.mappings.length; i++) {
             this.mappings[i] = new Int2ObjectOpenHashMap<>();
         }

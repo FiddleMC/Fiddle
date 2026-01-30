@@ -64,8 +64,22 @@ public final class ServerSideTranslationRegistrarImpl extends ComposableImpl<Ser
 
     }
 
+    /**
+     * @return Whether any translations are registered for the given key.
+     */
+    public boolean hasAny(String key) {
+        String lowerCaseKey = key.toLowerCase(Locale.ROOT);
+        RegisteredTranslationsForKey registeredTranslationsForKey = this.registeredTranslations.get(lowerCaseKey);
+        if (registeredTranslationsForKey != null) {
+            if (registeredTranslationsForKey.genericTranslation != null || (registeredTranslationsForKey.languageGroupTranslations != null && !registeredTranslationsForKey.languageGroupTranslations.isEmpty()) || !registeredTranslationsForKey.localeTranslations.isEmpty()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
-    public @Nullable ServerSideTranslation get(final String key, final @Nullable String locale) {
+    public @Nullable ServerSideTranslation get(String key, @Nullable String locale) {
         String lowerCaseKey = key.toLowerCase(Locale.ROOT);
         @Nullable String lowerCaseLocale = locale == null ? null : locale.toLowerCase(Locale.ROOT);
         @Nullable RegisteredTranslationsForKey translationsForKey = registeredTranslations.get(lowerCaseKey);

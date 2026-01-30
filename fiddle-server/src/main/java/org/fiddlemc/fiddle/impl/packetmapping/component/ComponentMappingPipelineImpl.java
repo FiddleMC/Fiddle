@@ -51,7 +51,7 @@ public final class ComponentMappingPipelineImpl extends ComposableImpl<Component
     private final NMSComponentMapping[][] mappings;
 
     private ComponentMappingPipelineImpl() {
-        this.mappings = new NMSComponentMapping[ClientView.AwarenessLevel.values().length][];
+        this.mappings = new NMSComponentMapping[ClientView.AwarenessLevel.getAll().length][];
     }
 
     @Override

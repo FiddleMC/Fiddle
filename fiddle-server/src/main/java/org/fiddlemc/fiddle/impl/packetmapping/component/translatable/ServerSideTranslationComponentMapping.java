@@ -3,6 +3,7 @@ package org.fiddlemc.fiddle.impl.packetmapping.component.translatable;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentContents;
 import net.minecraft.network.chat.contents.TranslatableContents;
+import org.fiddlemc.fiddle.api.clientview.ClientView;
 import org.fiddlemc.fiddle.api.packetmapping.component.nms.NMSComponentMapping;
 import org.fiddlemc.fiddle.api.packetmapping.component.nms.NMSComponentMappingHandle;
 import org.fiddlemc.fiddle.api.packetmapping.component.translatable.ServerSideTranslationRegistrar;
@@ -16,11 +17,12 @@ public final class ServerSideTranslationComponentMapping implements NMSComponent
 
     @Override
     public void apply(final NMSComponentMappingHandle handle) {
-        if (handle.getContext().getClientView().understandsAllServerSideTranslatables()) return;
+        ClientView clientView = handle.getContext().getClientView();
+        if (clientView.understandsAllServerSideTranslatables()) return;
         ComponentContents contents = handle.getImmutable().getContents();
         if (contents instanceof TranslatableContents translatableContents) {
             String key = translatableContents.getKey();
-            ServerSideTranslationRegistrar.ServerSideTranslation translation = ServerSideTranslationRegistrar.get().get(key, handle.getContext().getClientView().getLocale());
+            ServerSideTranslationRegistrar.ServerSideTranslation translation = ServerSideTranslationRegistrar.get().get(key, clientView.getLocale());
             if (translation != null) {
                 if (translation.overrideClientSide()) {
                     handle.setMutable(Component.literal(translation.translation()));

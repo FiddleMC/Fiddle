@@ -10,10 +10,10 @@
  * <h3>Minecraft changes</h3>
  * <ul>
  *     <li>
- *         {@link net.minecraft.world.entity.decoration.ItemFrame} -
- *         To use the custom serializer for the item frame's item.
+ *         {@link net.minecraft.network.syncher.SynchedEntityData} -
+ *         To detect serialized item frames and set the detection result.
  *     </li>
- *     <li>{@link net.minecraft.network.FriendlyByteBuf} - To store the detection result.</li>
+ *     <li>{@link net.minecraft.network.FriendlyByteBuf} - To hold the detection result.</li>
  * </ul>
  * </p>
  */

@@ -23,7 +23,7 @@ public final class ComponentMappingPipelineComposeEventImpl implements PaperLife
     final List<NMSComponentMapping>[] mappings;
 
     public ComponentMappingPipelineComposeEventImpl() {
-        this.mappings = new List[ClientView.AwarenessLevel.values().length];
+        this.mappings = new List[ClientView.AwarenessLevel.getAll().length];
         for (int i = 0; i < this.mappings.length; i++) {
             this.mappings[i] = new ArrayList<>(1);
         }
