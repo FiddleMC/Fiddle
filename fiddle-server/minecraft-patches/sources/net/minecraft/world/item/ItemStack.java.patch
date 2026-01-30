@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/item/ItemStack.java
 +++ b/net/minecraft/world/item/ItemStack.java
-@@ -190,18 +_,53 @@
+@@ -190,18 +_,67 @@
          return new StreamCodec<RegistryFriendlyByteBuf, ItemStack>() {
              @Override
              public ItemStack decode(RegistryFriendlyByteBuf buffer) {
@@ -34,19 +34,33 @@
              public void encode(RegistryFriendlyByteBuf buffer, ItemStack value) {
 +                // Fiddle start - Item mapping - Implementation - Apply at ItemStack encoding
 +                org.fiddlemc.fiddle.impl.packetmapping.item.ItemMappingContextImpl itemMappingContext = new org.fiddlemc.fiddle.impl.packetmapping.item.ItemMappingContextImpl(buffer.getClientViewOrFallback(), buffer.isEncodingItemFrameItem, buffer.isEncodingStonecutterRecipeResult);
-+                ItemStack mappedValue = org.fiddlemc.fiddle.impl.packetmapping.item.ItemMappingPipelineImpl.get().apply(value, itemMappingContext);
 +                org.fiddlemc.fiddle.impl.packetmapping.item.reverse.@Nullable ItemMappingReverser itemMappingReverser = ((org.fiddlemc.fiddle.impl.clientview.ClientViewImpl) buffer.getClientViewOrFallback()).getItemMappingReverser();
-+                @Nullable Integer reversibilityId = itemMappingReverser == null ? null : itemMappingReverser.getReversibilityId(value);
-+                int writerIndexBeforeEncoding = buffer.writerIndex();
-+                this.encodeUnmapped(buffer, mappedValue);
-+                if (reversibilityId != null) {
++                ItemStack mappedValue = org.fiddlemc.fiddle.impl.packetmapping.item.ItemMappingPipelineImpl.get().apply(value, itemMappingContext);
++                if (itemMappingReverser != null) {
++                    long reservedId = -1;
++                    if (mappedValue != value) {
++                        reservedId = itemMappingReverser.reserveAndAttachId(mappedValue, value);
++                    }
++                    int writerIndexBeforeEncoding = buffer.writerIndex();
++                    this.encodeUnmapped(buffer, mappedValue);
 +                    int readerIndexBeforeReading = buffer.readerIndex();
 +                    buffer.readerIndex(writerIndexBeforeEncoding);
-+                    ItemStack parsed = this.decode(buffer, false);
-+                    if (!matches(parsed, mappedValue)) {
-+                        itemMappingReverser.updateSent(reversibilityId, parsed);
-+                    }
++                    ItemStack actuallySent = this.decode(buffer, false);
 +                    buffer.readerIndex(readerIndexBeforeReading);
++                    if (!matches(actuallySent, mappedValue)) {
++                        if (reservedId == -1) {
++                            mappedValue = mappedValue.copy();
++                        }
++                        reservedId = itemMappingReverser.reserveAndAttachId(actuallySent, value);
++                        itemMappingReverser.attachId(mappedValue, reservedId);
++                        buffer.writerIndex(writerIndexBeforeEncoding);
++                        this.encodeUnmapped(buffer, mappedValue);
++                    }
++                    if (reservedId != -1) {
++                        itemMappingReverser.storeAsReversible(reservedId, actuallySent);
++                    }
++                } else {
++                    this.encodeUnmapped(buffer, mappedValue);
 +                }
 +            }
 +

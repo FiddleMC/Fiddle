@@ -86,26 +86,12 @@ public final class ItemMappingPipelineImpl extends ComposableImpl<ItemMappingPip
 
     @Override
     public ItemStack apply(ItemStack data, ItemMappingContext context) {
-
         // Skip the mapping for empty item stacks
         if (data.isEmpty() || data.getItem() == null) {
             return data;
         }
-
         // Apply the pipeline
-        ItemStack mapped = WithClientViewContextSingleStepMappingPipeline.super.apply(data, context);
-
-        // If changes were made, make sure the mapping can be reversed
-        if (!data.equals(mapped)) {
-            @Nullable ItemMappingReverser itemMappingReverser = ((ClientViewImpl) context.getClientView()).getItemMappingReverser();
-            if (itemMappingReverser != null) {
-                mapped = itemMappingReverser.makeReversible(mapped, data);
-            }
-        }
-
-        // Return the result
-        return mapped;
-
+        return WithClientViewContextSingleStepMappingPipeline.super.apply(data, context);
     }
 
     /**
