@@ -9,6 +9,11 @@ import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMappingUtilities;
 
 /**
  * Extends {@link BuiltInItemMapperComposeEvent} with NMS support.
+ *
+ * <p>
+ * For performance reasons, input should be as specific as possible.
+ * This means arrays should be as small as possible.
+ * </p>
  */
 public interface NMSBuiltInItemMapperComposeEvent extends BuiltInItemMapperComposeEvent {
 
@@ -19,8 +24,7 @@ public interface NMSBuiltInItemMapperComposeEvent extends BuiltInItemMapperCompo
     void mapItem(ClientView.AwarenessLevel awarenessLevel, Item from, Item to);
 
     /**
-     * The same as {@link #mapItem(ClientView.AwarenessLevel, Item, Item)},
-     * but for each of the given awareness levels.
+     * @see #mapItem(ClientView.AwarenessLevel, ItemType, ItemType)
      */
     default void mapItem(ClientView.AwarenessLevel[] awarenessLevels, Item from, Item to) {
         for (ClientView.AwarenessLevel awarenessLevel : awarenessLevels) {

@@ -9,6 +9,11 @@ import org.fiddlemc.fiddle.api.packetmapping.component.ComponentMappingPipelineC
 /**
  * Provides functionality to register {@link NMSComponentMapping}s
  * to the {@link ComponentMappingPipeline}.
+ *
+ * <p>
+ * For performance reasons, input should be as specific as possible.
+ * This means arrays should be as small as possible.
+ * </p>
  */
 public interface NMSComponentMappingPipelineComposeEvent extends ComponentMappingPipelineComposeEvent {
 
@@ -21,12 +26,7 @@ public interface NMSComponentMappingPipelineComposeEvent extends ComponentMappin
     void register(ClientView.AwarenessLevel awarenessLevel, NMSComponentMapping mapping);
 
     /**
-     * Registers a mapping.
-     *
-     * @param awarenessLevels The {@link ClientView.AwarenessLevel}s to which the mapping applies
-     *                        (without duplicates).
-     *                        For performance reasons, this array should be made as small as possible.
-     * @param mapping         The {@link NMSComponentMapping} to register.
+     * @see #register(ClientView.AwarenessLevel, NMSComponentMapping)
      */
     void register(ClientView.AwarenessLevel[] awarenessLevels, NMSComponentMapping mapping);
 

@@ -6,6 +6,15 @@ import org.fiddlemc.fiddle.api.clientview.ClientView;
 
 /**
  * Provides functionality to customize mappings performed by the {@link BuiltInItemMapper}.
+ *
+ * <p>
+ * Extended functionality is available by casting to {@code NMSBuiltInItemMapperComposeEvent}.
+ * </p>
+ *
+ * <p>
+ * For performance reasons, input should be as specific as possible.
+ * This means arrays should be as small as possible.
+ * </p>
  */
 public interface BuiltInItemMapperComposeEvent extends LifecycleEvent {
 
@@ -17,8 +26,7 @@ public interface BuiltInItemMapperComposeEvent extends LifecycleEvent {
     void mapItem(ClientView.AwarenessLevel awarenessLevel, ItemType from, ItemType to);
 
     /**
-     * The same as {@link #mapItem(ClientView.AwarenessLevel, ItemType, ItemType)},
-     * but for each of the given awareness levels.
+     * @see #mapItem(ClientView.AwarenessLevel, ItemType, ItemType)
      */
     default void mapItem(ClientView.AwarenessLevel[] awarenessLevels, ItemType from, ItemType to) {
         for (ClientView.AwarenessLevel awarenessLevel : awarenessLevels) {

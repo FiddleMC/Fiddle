@@ -11,6 +11,11 @@ import java.util.function.Consumer;
 /**
  * Provides functionality to register {@link NMSItemMapping}s
  * to the {@link ItemMappingPipeline}.
+ *
+ * <p>
+ * For performance reasons, input should be as specific as possible.
+ * This means arrays should be as small as possible.
+ * </p>
  */
 public interface NMSItemMappingPipelineComposeEvent extends ItemMappingPipelineComposeEvent {
 
@@ -24,64 +29,33 @@ public interface NMSItemMappingPipelineComposeEvent extends ItemMappingPipelineC
     void register(ClientView.AwarenessLevel awarenessLevel, Item item, NMSItemMapping mapping);
 
     /**
-     * Registers a mapping.
-     *
-     * @param awarenessLevels The {@link ClientView.AwarenessLevel}s to which the mapping applies
-     *                        (without duplicates).
-     *                        For performance reasons, this array should be made as small as possible.
-     * @param item            The {@link Item} to which the mapping applies.
-     * @param mapping         The {@link NMSItemMapping} to register.
+     * @see #register(ClientView.AwarenessLevel, Item, NMSItemMapping)
      */
     void register(ClientView.AwarenessLevel[] awarenessLevels, Item item, NMSItemMapping mapping);
 
     /**
-     * Registers a mapping.
-     *
-     * @param awarenessLevel The {@link ClientView.AwarenessLevel} to which the mapping applies.
-     * @param items          The {@link Item}s to which the mapping applies
-     *                       (without duplicates).
-     *                       For performance reasons, this array should be made as small as possible.
-     * @param mapping        The {@link NMSItemMapping} to register.
+     * @see #register(ClientView.AwarenessLevel, Item, NMSItemMapping)
      */
     void register(ClientView.AwarenessLevel awarenessLevel, Item[] items, NMSItemMapping mapping);
 
     /**
-     * Registers a mapping.
-     *
-     * @param awarenessLevels The {@link ClientView.AwarenessLevel}s to which the mapping applies
-     *                        (without duplicates).
-     *                        For performance reasons, this array should be made as small as possible.
-     * @param items           The {@link Item}s to which the mapping applies
-     *                        (without duplicates).
-     *                        For performance reasons, this array should be made as small as possible.
-     * @param mapping         The {@link NMSItemMapping} to register.
+     * @see #register(ClientView.AwarenessLevel, Item, NMSItemMapping)
      */
     void register(ClientView.AwarenessLevel[] awarenessLevels, Item[] items, NMSItemMapping mapping);
 
     /**
-     * Registers a mapping that applies to all {@link Item}s.
+     * The same as {@link #register(ClientView.AwarenessLevel, Item, NMSItemMapping)},
+     * but for every {@link Item}.
      *
      * <p>
      * This negatively affects performance: try to use
      * {@link #register(ClientView.AwarenessLevel, Item[], NMSItemMapping)} instead.
      * </p>
-     *
-     * @param awarenessLevel The {@link ClientView.AwarenessLevel} to which the mapping applies.
-     * @param mapping        The {@link NMSItemMapping} to register.
      */
     void registerForAllItems(ClientView.AwarenessLevel awarenessLevel, NMSItemMapping mapping);
 
     /**
-     * Registers a mapping that applies to all {@link Item}s.
-     *
-     * <p>
-     * This negatively affects performance: try to use
-     * {@link #register(ClientView.AwarenessLevel[], Item[], NMSItemMapping)} instead.
-     * </p>
-     *
-     * @param awarenessLevels The {@link ClientView.AwarenessLevel}s to which the mapping applies.
-     *                        For performance reasons, this array should be made as small as possible.
-     * @param mapping         The {@link NMSItemMapping} to register.
+     * @see #registerForAllItems(ClientView.AwarenessLevel, NMSItemMapping)
      */
     void registerForAllItems(ClientView.AwarenessLevel[] awarenessLevels, NMSItemMapping mapping);
 

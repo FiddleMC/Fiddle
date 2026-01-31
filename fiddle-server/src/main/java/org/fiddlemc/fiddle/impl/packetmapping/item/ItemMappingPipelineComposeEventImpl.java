@@ -39,35 +39,35 @@ public final class ItemMappingPipelineComposeEventImpl implements PaperLifecycle
 
     @Override
     public void register(ClientView.AwarenessLevel awarenessLevel, Item item, NMSItemMapping mapping) {
-        Int2ObjectMap<List<NMSItemMapping>> mapForAwarenessLevel = this.getForAwarenessLevel(awarenessLevel);
-        List<NMSItemMapping> listForItem = mapForAwarenessLevel.computeIfAbsent(item.indexInItemRegistry, $ -> new ArrayList<>(1));
+        var mapForAwarenessLevel = this.getForAwarenessLevel(awarenessLevel);
+        var listForItem = mapForAwarenessLevel.computeIfAbsent(item.indexInItemRegistry, $ -> new ArrayList<>(1));
         listForItem.add(mapping);
     }
 
     @Override
     public void register(ClientView.AwarenessLevel[] awarenessLevels, Item item, NMSItemMapping mapping) {
-        for (ClientView.AwarenessLevel awarenessLevel : awarenessLevels) {
-            Int2ObjectMap<List<NMSItemMapping>> mapForAwarenessLevel = this.getForAwarenessLevel(awarenessLevel);
-            List<NMSItemMapping> listForItem = mapForAwarenessLevel.computeIfAbsent(item.indexInItemRegistry, $ -> new ArrayList<>(1));
+        for (var awarenessLevel : awarenessLevels) {
+            var mapForAwarenessLevel = this.getForAwarenessLevel(awarenessLevel);
+            var listForItem = mapForAwarenessLevel.computeIfAbsent(item.indexInItemRegistry, $ -> new ArrayList<>(1));
             listForItem.add(mapping);
         }
     }
 
     @Override
     public void register(ClientView.AwarenessLevel awarenessLevel, Item[] items, NMSItemMapping mapping) {
-        Int2ObjectMap<List<NMSItemMapping>> mapForAwarenessLevel = this.getForAwarenessLevel(awarenessLevel);
-        for (Item item : items) {
-            List<NMSItemMapping> listForItem = mapForAwarenessLevel.computeIfAbsent(item.indexInItemRegistry, $ -> new ArrayList<>(1));
+        var mapForAwarenessLevel = this.getForAwarenessLevel(awarenessLevel);
+        for (var item : items) {
+            var listForItem = mapForAwarenessLevel.computeIfAbsent(item.indexInItemRegistry, $ -> new ArrayList<>(1));
             listForItem.add(mapping);
         }
     }
 
     @Override
     public void register(ClientView.AwarenessLevel[] awarenessLevels, Item[] items, NMSItemMapping mapping) {
-        for (ClientView.AwarenessLevel awarenessLevel : awarenessLevels) {
-            Int2ObjectMap<List<NMSItemMapping>> mapForAwarenessLevel = this.getForAwarenessLevel(awarenessLevel);
-            for (Item item : items) {
-                List<NMSItemMapping> listForItem = mapForAwarenessLevel.computeIfAbsent(item.indexInItemRegistry, $ -> new ArrayList<>(1));
+        for (var awarenessLevel : awarenessLevels) {
+            var mapForAwarenessLevel = this.getForAwarenessLevel(awarenessLevel);
+            for (var item : items) {
+                var listForItem = mapForAwarenessLevel.computeIfAbsent(item.indexInItemRegistry, $ -> new ArrayList<>(1));
                 listForItem.add(mapping);
             }
         }
@@ -75,19 +75,19 @@ public final class ItemMappingPipelineComposeEventImpl implements PaperLifecycle
 
     @Override
     public void registerForAllItems(ClientView.AwarenessLevel awarenessLevel, NMSItemMapping mapping) {
-        Int2ObjectMap<List<NMSItemMapping>> mapForAwarenessLevel = this.getForAwarenessLevel(awarenessLevel);
+        var mapForAwarenessLevel = this.getForAwarenessLevel(awarenessLevel);
         ItemRegistry.get().stream().forEach(item -> {
-            List<NMSItemMapping> listForItem = mapForAwarenessLevel.computeIfAbsent(item.indexInItemRegistry, $ -> new ArrayList<>(1));
+            var listForItem = mapForAwarenessLevel.computeIfAbsent(item.indexInItemRegistry, $ -> new ArrayList<>(1));
             listForItem.add(mapping);
         });
     }
 
     @Override
     public void registerForAllItems(ClientView.AwarenessLevel[] awarenessLevels, NMSItemMapping mapping) {
-        for (ClientView.AwarenessLevel awarenessLevel : awarenessLevels) {
-            Int2ObjectMap<List<NMSItemMapping>> mapForAwarenessLevel = this.getForAwarenessLevel(awarenessLevel);
+        for (var awarenessLevel : awarenessLevels) {
+            var mapForAwarenessLevel = this.getForAwarenessLevel(awarenessLevel);
             ItemRegistry.get().stream().forEach(item -> {
-                List<NMSItemMapping> listForItem = mapForAwarenessLevel.computeIfAbsent(item.indexInItemRegistry, $ -> new ArrayList<>(1));
+                var listForItem = mapForAwarenessLevel.computeIfAbsent(item.indexInItemRegistry, $ -> new ArrayList<>(1));
                 listForItem.add(mapping);
             });
         }
@@ -95,7 +95,7 @@ public final class ItemMappingPipelineComposeEventImpl implements PaperLifecycle
 
     @Override
     public void changeRegistered(ClientView.AwarenessLevel awarenessLevel, Item item, Consumer<List<NMSItemMapping>> consumer) {
-        Int2ObjectMap<List<NMSItemMapping>> mapForAwarenessLevel = this.getForAwarenessLevel(awarenessLevel);
+        var mapForAwarenessLevel = this.getForAwarenessLevel(awarenessLevel);
         @Nullable List<NMSItemMapping> original = mapForAwarenessLevel.get(item.indexInItemRegistry);
         List<NMSItemMapping> passed = original != null ? original : new ArrayList<>(1);
         consumer.accept(passed);
@@ -104,7 +104,9 @@ public final class ItemMappingPipelineComposeEventImpl implements PaperLifecycle
                 mapForAwarenessLevel.remove(item.indexInItemRegistry);
             }
         } else {
-            mapForAwarenessLevel.put(item.indexInItemRegistry, passed);
+            if (original == null) {
+                mapForAwarenessLevel.put(item.indexInItemRegistry, passed);
+            }
         }
     }
 
