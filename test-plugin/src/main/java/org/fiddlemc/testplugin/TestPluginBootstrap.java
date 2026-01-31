@@ -123,9 +123,9 @@ public class TestPluginBootstrap implements PluginBootstrap {
         // Configure basic item mappings
         context.getLifecycleManager().registerEventHandler(BuiltInItemMapper.get().compose(), event -> {
             context.getLogger().info("Configuring built-in item mapper...");
-            event.mapItem(ClientView.AwarenessLevel.JAVA_DEFAULT, PluginItemTypes.ASH.get(), ItemType.GUNPOWDER);
-            event.mapItem(ClientView.AwarenessLevel.JAVA_DEFAULT, PluginItemTypes.ASH_BLOCK.get(), ItemType.LIGHT_GRAY_CONCRETE_POWDER);
-            event.mapItem(ClientView.AwarenessLevel.JAVA_DEFAULT, PluginItemTypes.ASH_STAIRS.get(), ItemType.ANDESITE_STAIRS);
+            event.mapItem(PluginItemTypes.ASH.get(), ItemType.GUNPOWDER);
+            event.mapItem(PluginItemTypes.ASH_BLOCK.get(), ItemType.LIGHT_GRAY_CONCRETE_POWDER);
+            event.mapItem(PluginItemTypes.ASH_STAIRS.get(), ItemType.ANDESITE_STAIRS);
         });
 
         // Register more custom item mapping code

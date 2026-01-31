@@ -20,6 +20,18 @@ public interface BuiltInItemMapperComposeEvent extends LifecycleEvent {
      * The same as {@link #mapItem(ClientView.AwarenessLevel, ItemType, ItemType)},
      * but for each of the given awareness levels.
      */
-    void mapItem(ClientView.AwarenessLevel[] awarenessLevels, ItemType from, ItemType to);
+    default void mapItem(ClientView.AwarenessLevel[] awarenessLevels, ItemType from, ItemType to) {
+        for (ClientView.AwarenessLevel awarenessLevel : awarenessLevels) {
+            this.mapItem(awarenessLevel, from, to);
+        }
+    }
+
+    /**
+     * The same as {@link #mapItem(ClientView.AwarenessLevel, ItemType, ItemType)},
+     * but for {@link ClientView.AwarenessLevel#getThatDoNotAlwaysUnderstandsAllServerSideItems()}.
+     */
+    default void mapItem(ItemType from, ItemType to) {
+        this.mapItem(ClientView.AwarenessLevel.getThatDoNotAlwaysUnderstandsAllServerSideItems(), from, to);
+    }
 
 }
