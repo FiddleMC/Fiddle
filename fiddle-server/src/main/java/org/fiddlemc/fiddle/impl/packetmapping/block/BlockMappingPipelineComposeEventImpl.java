@@ -306,14 +306,14 @@ public final class BlockMappingPipelineComposeEventImpl implements PaperLifecycl
 
     private static BlockState copyProperties(BlockState from, Block to) {
         BlockState state = to.defaultBlockState();
-        for (Property<?> property : from.getProperties()) {
-            copyPropertyValue(property, from, state);
+        for (Property<?> property : to.getStateDefinition().getProperties()) {
+            state = copyPropertyValue(property, from, state);
         }
         return state;
     }
 
-    private static <V extends Comparable<V>> void copyPropertyValue(Property<V> property, BlockState from, BlockState to) {
-        to.setValue(property, from.getValue(property));
+    private static <V extends Comparable<V>> BlockState copyPropertyValue(Property<V> property, BlockState from, BlockState to) {
+        return to.setValue(property, from.getValue(property));
     }
 
     private static BlockState[] toNMS(BlockData[] data) {

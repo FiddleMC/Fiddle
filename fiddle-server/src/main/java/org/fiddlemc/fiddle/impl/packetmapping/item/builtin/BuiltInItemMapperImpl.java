@@ -1,8 +1,13 @@
 package org.fiddlemc.fiddle.impl.packetmapping.item.builtin;
 
+import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.DebugStickState;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.properties.Property;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
 import org.fiddlemc.fiddle.api.packetmapping.item.builtin.BuiltInItemMapper;
 import org.fiddlemc.fiddle.api.packetmapping.item.builtin.BuiltInItemMapperComposeEvent;
@@ -14,6 +19,7 @@ import org.fiddlemc.fiddle.impl.util.java.serviceloader.NoArgsConstructorService
 import org.jspecify.annotations.Nullable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * The implementation of {@link BuiltInItemMapper}.
@@ -82,6 +88,17 @@ public final class BuiltInItemMapperImpl extends ComposableImpl<BuiltInItemMappe
             if (!mappedItemName.equals(itemName)) {
                 handle.getMutable().set(DataComponents.ITEM_NAME, mappedItemName);
             }
+        });
+
+        // Mapping to remove non-vanilla debug stick state
+        itemMappingPipelineComposeEvent.register(ClientView.AwarenessLevel.getThatDoNotAlwaysUnderstandsAllServerSideBlocks(), Items.DEBUG_STICK, handle -> {
+            if (handle.getContext().getClientView().understandsAllServerSideBlocks()) return;
+            @Nullable DebugStickState state = handle.getImmutable().get(DataComponents.DEBUG_STICK_STATE);
+            if (state == null) return;
+            Map<Holder<Block>, Property<?>> properties = state.properties();
+            if (properties.keySet().stream().allMatch(holder -> holder.value().isVanilla())) return;
+            Map<Holder<Block>, Property<?>> filteredProperties = properties.entrySet().stream().filter(entry -> entry.getKey().value().isVanilla()).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+            handle.getMutable().set(DataComponents.DEBUG_STICK_STATE, new DebugStickState(filteredProperties));
         });
 
         // Clear to save memory

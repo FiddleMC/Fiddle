@@ -121,17 +121,17 @@ public interface ClientView {
         JAVA_WITH_CLIENT_MOD(true, true, true); // TODO implement
 
         private final boolean alwaysUnderstandsAllServerSideTranslatables;
-        private final boolean alwaysUnderstandsAllServerSideItems;
         private final boolean alwaysUnderstandsAllServerSideBlocks;
+        private final boolean alwaysUnderstandsAllServerSideItems;
 
         AwarenessLevel(
             boolean alwaysUnderstandsAllServerSideTranslatables,
-            boolean alwaysUnderstandsAllServerSideItems,
-            boolean alwaysUnderstandsAllServerSideBlocks
+            boolean alwaysUnderstandsAllServerSideBlocks,
+            boolean alwaysUnderstandsAllServerSideItems
         ) {
             this.alwaysUnderstandsAllServerSideTranslatables = alwaysUnderstandsAllServerSideTranslatables;
-            this.alwaysUnderstandsAllServerSideItems = alwaysUnderstandsAllServerSideItems;
             this.alwaysUnderstandsAllServerSideBlocks = alwaysUnderstandsAllServerSideBlocks;
+            this.alwaysUnderstandsAllServerSideItems = alwaysUnderstandsAllServerSideItems;
         }
 
         /**
@@ -193,6 +193,25 @@ public interface ClientView {
                 thatDoNotAlwaysUnderstandsAllServerSideTranslatables = Arrays.stream(getAll()).filter(level -> !level.alwaysUnderstandsAllServerSideTranslatables).toArray(AwarenessLevel[]::new);
             }
             return thatDoNotAlwaysUnderstandsAllServerSideTranslatables;
+        }
+
+        /**
+         * Return value for {@link #getThatDoNotAlwaysUnderstandsAllServerSideBlocks()},
+         * or null if not initialized yet.
+         */
+        private static AwarenessLevel @Nullable [] thatDoNotAlwaysUnderstandsAllServerSideBlocks;
+
+        /**
+         * Convenience function that returns all {@link AwarenessLevel}s
+         * that have {@link #alwaysUnderstandsAllServerSideBlocks()} returning false.
+         *
+         * @return An array of {@link AwarenessLevel}s.
+         */
+        public static AwarenessLevel[] getThatDoNotAlwaysUnderstandsAllServerSideBlocks() {
+            if (thatDoNotAlwaysUnderstandsAllServerSideBlocks == null) {
+                thatDoNotAlwaysUnderstandsAllServerSideBlocks = Arrays.stream(getAll()).filter(level -> !level.alwaysUnderstandsAllServerSideBlocks).toArray(AwarenessLevel[]::new);
+            }
+            return thatDoNotAlwaysUnderstandsAllServerSideBlocks;
         }
 
         /**

@@ -15,6 +15,7 @@ import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingPipelineComposeEven
 import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMapping;
 import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMappingHandle;
 import org.fiddlemc.fiddle.impl.clientview.ClientViewImpl;
+import org.fiddlemc.fiddle.impl.moredatadriven.minecraft.ItemRegistry;
 import org.fiddlemc.fiddle.impl.packetmapping.WithClientViewContextSingleStepMappingPipeline;
 import org.fiddlemc.fiddle.impl.packetmapping.item.builtin.BuiltInItemMapperImpl;
 import org.fiddlemc.fiddle.impl.packetmapping.item.reverse.ItemMappingReverser;
@@ -54,24 +55,19 @@ public final class ItemMappingPipelineImpl extends ComposableImpl<ItemMappingPip
      *
      * <p>
      * The mappings are organized in an array where {@link ClientView.AwarenessLevel#ordinal()}
-     * is the index, and then in a map where {@link Item#indexInItemRegistry} is the key.
-     * The array does not contain null values, but some maps may not contain every item as a key.
-     * The maps do not contain empty arrays.
+     * is the index, and then in an array where {@link Item#indexInItemRegistry} is the index.
+     * The lowest-level array may be null, but will never be empty.
      * </p>
      */
-    private final Int2ObjectMap<NMSItemMapping[]>[] mappings;
+    private final NMSItemMapping[][][] mappings;
 
     private ItemMappingPipelineImpl() {
-        this.mappings = new Int2ObjectMap[ClientView.AwarenessLevel.getAll().length];
-        for (int i = 0; i < this.mappings.length; i++) {
-            this.mappings[i] = new Int2ObjectOpenHashMap<>(16, 0.5f);
-        }
+        this.mappings = new NMSItemMapping[ClientView.AwarenessLevel.getAll().length][][];
     }
 
     @Override
     public NMSItemMapping @Nullable [] getMappingsThatMayApplyTo(NMSItemMappingHandle handle) {
-        Int2ObjectMap<NMSItemMapping[]> mapForAwarenessLevel = this.mappings[handle.getContext().getClientView().getAwarenessLevel().ordinal()];
-        return mapForAwarenessLevel.get(handle.getOriginal().getItem().indexInItemRegistry);
+        return this.mappings[handle.getContext().getClientView().getAwarenessLevel().ordinal()][handle.getOriginal().getItem().indexInItemRegistry];
     }
 
     @Override
@@ -158,17 +154,26 @@ public final class ItemMappingPipelineImpl extends ComposableImpl<ItemMappingPip
 
     @Override
     protected void copyInformationFromEvent(ItemMappingPipelineComposeEventImpl event) {
-        Map<List<NMSItemMapping>, List<IntIntPair>> transposed = new HashMap<>();
+
+        // Initialize the mappings
+        for (int i = 0; i < this.mappings.length; i++) {
+            this.mappings[i] = new NMSItemMapping[ItemRegistry.get().size()][];
+        }
+
+        // Invert the mapping from id -> lists of mappings to list of mappings -> ids, so that we only have one reference per unique list
+        Map<List<NMSItemMapping>, List<IntIntPair>> invertedMappings = new HashMap<>();
         for (int awarenessLevelI = 0; awarenessLevelI < event.mappings.length; awarenessLevelI++) {
             for (Int2ObjectMap.Entry<List<NMSItemMapping>> entry : event.mappings[awarenessLevelI].int2ObjectEntrySet()) {
-                transposed.computeIfAbsent(entry.getValue(), $ -> new ArrayList<>()).add(IntIntPair.of(awarenessLevelI, entry.getKey()));
+                invertedMappings.computeIfAbsent(entry.getValue(), $ -> new ArrayList<>()).add(IntIntPair.of(awarenessLevelI, entry.getIntKey()));
             }
         }
-        for (Map.Entry<List<NMSItemMapping>, List<IntIntPair>> entry : transposed.entrySet()) {
+        // Invert back
+        for (Map.Entry<List<NMSItemMapping>, List<IntIntPair>> entry : invertedMappings.entrySet()) {
             for (IntIntPair target : entry.getValue()) {
-                this.mappings[target.firstInt()].put(target.secondInt(), entry.getKey().toArray(NMSItemMapping[]::new));
+                this.mappings[target.firstInt()][target.secondInt()] = entry.getKey().toArray(NMSItemMapping[]::new);
             }
         }
+
     }
 
 }

@@ -1,0 +1,11 @@
+--- a/net/minecraft/network/protocol/game/ClientboundBlockUpdatePacket.java
++++ b/net/minecraft/network/protocol/game/ClientboundBlockUpdatePacket.java
+@@ -14,7 +_,7 @@
+     public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundBlockUpdatePacket> STREAM_CODEC = StreamCodec.composite(
+         BlockPos.STREAM_CODEC,
+         ClientboundBlockUpdatePacket::getPos,
+-        ByteBufCodecs.idMapper(Block.BLOCK_STATE_REGISTRY),
++        org.fiddlemc.fiddle.impl.packetmapping.block.MappedBlockStateStreamCodec.PHYSICAL, // Fiddle - Block mapping - Implementation - Apply custom codec
+         ClientboundBlockUpdatePacket::getBlockState,
+         ClientboundBlockUpdatePacket::new
+     );
