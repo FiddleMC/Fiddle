@@ -75,7 +75,7 @@ public class TestPluginBootstrap implements PluginBootstrap {
                 var nmsBuilder = (NMSBlockRegistryEntryBuilder) builder;
                 nmsBuilder.nmsProperties(properties -> {
                     properties.pushReaction(PushReaction.DESTROY); // It breaks when pushed by a piston
-                    properties.requiresCorrectToolForDrops(); // It drops nothing unless broken with the right tool
+                    properties.requiresCorrectToolForDrops(); // It drops nothing unless broken with the right tool (a shovel, as defined in the included data pack)
                     properties.mapColor(MapColor.COLOR_LIGHT_GRAY); // It shows up light gray on maps
                 });
             });
@@ -156,7 +156,7 @@ public class TestPluginBootstrap implements PluginBootstrap {
      * <p>
      * This maps our custom blocks,
      * and also maps the vanilla {@code minecraft:birch_leaves} to {@code minecraft:orange_wool},
-     * to show that this also applies to vanilla.
+     * to show that you can also map vanilla blocks.
      * </p>
      */
     private void setBasicBlockMappings(@NotNull BootstrapContext context) {
@@ -177,12 +177,22 @@ public class TestPluginBootstrap implements PluginBootstrap {
      * <p>
      * This works by using {@link BuiltInItemMapper}, which does the heavy lifting for us.
      * </p>
+     *
+     * <p>
+     * This maps our custom items,
+     * and also maps the vanilla {@code minecraft:iron_axe} to {@code minecraft:echo_shard},
+     * to show that you can also map vanilla items.
+     * </p>
      */
     private void setBasicItemMappings(@NotNull BootstrapContext context) {
         context.getLifecycleManager().registerEventHandler(BuiltInItemMapper.get().compose(), event -> {
+
             event.mapItem(PluginItemTypes.ASH.get(), ItemType.GUNPOWDER);
             event.mapItem(PluginItemTypes.ASH_BLOCK.get(), ItemType.LIGHT_GRAY_CONCRETE_POWDER);
             event.mapItem(PluginItemTypes.ASH_STAIRS.get(), ItemType.ANDESITE_STAIRS);
+
+            event.mapItem(ItemType.IRON_AXE, ItemType.ECHO_SHARD);
+
         });
     }
 

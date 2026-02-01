@@ -39,20 +39,15 @@ public final class ItemMappingUtilitiesImpl implements NMSItemMappingUtilities {
             return false;
         }
 
-        // Save the original item name
-        Component originalItemName = immutable.getItemName();
-        if (originalItemName.equals(CommonComponents.EMPTY)) {
-            originalItemName = null;
-        }
-
-        // Save the original rarity
-        Rarity originalRarity = immutable.getRarity();
-
         // Change the item
         ItemStack mutable = handle.getMutable();
         mutable.setItem(newItem);
 
         // Restore the item name
+        Component originalItemName = immutable.getItemName();
+        if (originalItemName.equals(CommonComponents.EMPTY)) {
+            originalItemName = null;
+        }
         Component newItemName = mutable.getItemName();
         if (newItemName.equals(CommonComponents.EMPTY)) {
             newItemName = null;
@@ -66,6 +61,7 @@ public final class ItemMappingUtilitiesImpl implements NMSItemMappingUtilities {
         }
 
         // Restore the rarity
+        Rarity originalRarity = immutable.getRarity();
         Rarity newRarity = mutable.getRarity();
         if (!newRarity.equals(originalRarity)) {
             Rarity newRarityComponentValue;
@@ -83,6 +79,18 @@ public final class ItemMappingUtilitiesImpl implements NMSItemMappingUtilities {
             if (existingRarityComponentValue == null || !existingRarityComponentValue.equals(newRarityComponentValue)) {
                 mutable.set(DataComponents.RARITY, newRarityComponentValue);
             }
+        }
+
+        // Restore the max damage and damage
+        int originalMaxDamage = immutable.getMaxDamage();
+        int originalDamage = immutable.getDamageValue();
+        int newMaxDamage = mutable.getMaxDamage();
+        if (newMaxDamage != originalMaxDamage) {
+            mutable.set(DataComponents.MAX_DAMAGE, originalMaxDamage);
+        }
+        int newDamage = mutable.getDamageValue();
+        if (newDamage != originalDamage) {
+            mutable.set(DataComponents.DAMAGE, originalDamage);
         }
 
         // We made changes
