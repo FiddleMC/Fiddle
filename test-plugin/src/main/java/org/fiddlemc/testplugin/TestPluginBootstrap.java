@@ -47,15 +47,13 @@ public class TestPluginBootstrap implements PluginBootstrap {
      * It contains crafting recipes for the custom items we add.
      */
     private void loadIncludedDataPack(@NotNull BootstrapContext context) {
-        context.getLifecycleManager().registerEventHandler(LifecycleEvents.DATAPACK_DISCOVERY.newHandler(
-            event -> {
-                try {
-                    event.registrar().discoverPack(this.getClass().getResource("/data_pack").toURI(), "provided");
-                } catch (URISyntaxException | IOException e) {
-                    throw new RuntimeException(e);
-                }
+        context.getLifecycleManager().registerEventHandler(LifecycleEvents.DATAPACK_DISCOVERY, event -> {
+            try {
+                event.registrar().discoverPack(this.getClass().getResource("/data_pack").toURI(), "provided");
+            } catch (URISyntaxException | IOException e) {
+                throw new RuntimeException(e);
             }
-        ));
+        });
     }
 
     /**

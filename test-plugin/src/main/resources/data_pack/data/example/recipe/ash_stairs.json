@@ -1,16 +1,16 @@
 {
-    "type": "minecraft:crafting_shaped",
-    "category": "building",
-    "key": {
-        "#": "example:ash_block"
-    },
-    "pattern": [
-        "#  ",
-        "## ",
-        "###"
-    ],
-    "result": {
-        "count": 4,
-        "id": "example:ash_stairs"
-    }
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "#": "example:ash_block"
+  },
+  "pattern": [
+    "#  ",
+    "## ",
+    "###"
+  ],
+  "result": {
+    "count": 4,
+    "id": "example:ash_stairs"
+  }
 }
