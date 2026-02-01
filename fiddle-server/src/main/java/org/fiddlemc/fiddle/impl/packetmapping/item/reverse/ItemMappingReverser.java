@@ -10,7 +10,6 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.component.TypedDataComponent;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.IntTag;
 import net.minecraft.nbt.LongTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
@@ -369,8 +368,8 @@ public class ItemMappingReverser {
         @Nullable CustomData customData = received.get(DataComponents.CUSTOM_DATA);
         if (customData != null) {
             Tag idTag = customData.getUnsafe().get(ID_TAG_KEY);
-            if (idTag instanceof IntTag intTag) {
-                int id = intTag.intValue();
+            if (idTag instanceof LongTag longTag) {
+                long id = longTag.longValue();
                 @Nullable ExistingMapping existingMapping;
                 this.lock.acquireUninterruptibly();
                 try {
