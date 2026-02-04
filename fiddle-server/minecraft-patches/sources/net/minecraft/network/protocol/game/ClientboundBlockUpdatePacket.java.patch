@@ -1,11 +1,31 @@
 --- a/net/minecraft/network/protocol/game/ClientboundBlockUpdatePacket.java
 +++ b/net/minecraft/network/protocol/game/ClientboundBlockUpdatePacket.java
-@@ -14,7 +_,7 @@
-     public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundBlockUpdatePacket> STREAM_CODEC = StreamCodec.composite(
+@@ -11,7 +_,27 @@
+ import net.minecraft.world.level.block.state.BlockState;
+ 
+ public class ClientboundBlockUpdatePacket implements Packet<ClientGamePacketListener> {
+-    public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundBlockUpdatePacket> STREAM_CODEC = StreamCodec.composite(
++    // Fiddle start - Block mapping - Implementation - Apply to single block update
++    public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundBlockUpdatePacket> STREAM_CODEC = new StreamCodec<>() {
++
++        private static final StreamCodec<io.netty.buffer.ByteBuf, BlockState> BLOCK_STATE_CODEC = ByteBufCodecs.idMapper(Block.BLOCK_STATE_REGISTRY);
++
++        @Override
++        public void encode(RegistryFriendlyByteBuf buffer, ClientboundBlockUpdatePacket value) {
++            BlockPos pos = value.getPos();
++            BlockPos.STREAM_CODEC.encode(buffer, pos);
++            org.fiddlemc.fiddle.api.packetmapping.block.BlockStateMappingContext context = new org.fiddlemc.fiddle.impl.packetmapping.block.BlockStateMappingContextImpl(buffer.getClientViewOrFallback(), true, pos.getX(), pos.getY(), pos.getZ());
++            BLOCK_STATE_CODEC.encode(buffer, org.fiddlemc.fiddle.impl.packetmapping.block.BlockMappingPipelineImpl.get().apply(value.getBlockState(), context));
++        }
++
++        @Override
++        public ClientboundBlockUpdatePacket decode(RegistryFriendlyByteBuf buffer) {
++            return UNMAPPED_STREAM_CODEC.decode(buffer);
++        }
++
++    };
++    public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundBlockUpdatePacket> UNMAPPED_STREAM_CODEC = StreamCodec.composite(
++        // Fiddle end - Block mapping - Implementation - Apply to single block update
          BlockPos.STREAM_CODEC,
          ClientboundBlockUpdatePacket::getPos,
--        ByteBufCodecs.idMapper(Block.BLOCK_STATE_REGISTRY),
-+        org.fiddlemc.fiddle.impl.packetmapping.block.MappedBlockStateStreamCodec.PHYSICAL, // Fiddle - Block mapping - Implementation - Apply custom codec
-         ClientboundBlockUpdatePacket::getBlockState,
-         ClientboundBlockUpdatePacket::new
-     );
+         ByteBufCodecs.idMapper(Block.BLOCK_STATE_REGISTRY),

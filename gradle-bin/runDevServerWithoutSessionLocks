@@ -1,0 +1,9 @@
+#!/bin/sh
+
+# Runs the dev server after deleting session lock files (in IntelliJ, right-click -> Run 'runDevServerWithoutSessionLocks')
+
+cd ../run
+rm -f ./*/session.lock
+cd ..
+./gradlew :fiddle-server:runDevServer
+cd gradle-bin

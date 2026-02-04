@@ -14,3 +14,12 @@
      private static final Gson GSON = new Gson();
  
      @Override
+@@ -69,7 +_,7 @@
+ 
+         final OptionalInt buildNumber = BUILD_INFO.buildNumber();
+         if (buildNumber.isEmpty() && BUILD_INFO.gitCommit().isEmpty()) {
+-            COMPONENT_LOGGER.warn(text("*** You are running a development version without access to version information ***"));
++            // COMPONENT_LOGGER.warn(text("*** You are running a development version without access to version information ***")); // Fiddle - Branding changes - Version fetcher - Disable startup warning
+         } else {
+             final Optional<MinecraftVersionFetcher> apiResult = fetchMinecraftVersionList();
+             if (buildNumber.isPresent()) {

@@ -9,7 +9,7 @@ import java.util.ServiceLoader;
 import java.util.function.Supplier;
 
 /**
- * Some utilities for the mapping of {@link }
+ * Some utilities for the mapping of items.
  */
 public interface NMSItemMappingUtilities {
 

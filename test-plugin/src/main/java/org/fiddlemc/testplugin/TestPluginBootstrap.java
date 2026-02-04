@@ -26,6 +26,8 @@ import org.fiddlemc.fiddle.api.moredatadriven.paper.ItemRegistryEventProvider;
 import org.fiddlemc.fiddle.api.moredatadriven.paper.nms.NMSBlockRegistryEntryBuilder;
 import org.fiddlemc.fiddle.api.moredatadriven.paper.nms.NMSItemRegistryEntryBuilder;
 import org.fiddlemc.fiddle.api.packetmapping.block.BlockMappingPipeline;
+import org.fiddlemc.fiddle.api.packetmapping.block.nms.NMSBlockMappingPipelineComposeEvent;
+import org.fiddlemc.fiddle.api.packetmapping.block.nms.NMSComplexBlockStateMapping;
 import org.fiddlemc.fiddle.api.packetmapping.component.translatable.ServerSideTranslationRegistrar;
 import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingPipeline;
 import org.fiddlemc.fiddle.api.packetmapping.item.builtin.BuiltInItemMapper;
@@ -155,7 +157,7 @@ public class TestPluginBootstrap implements PluginBootstrap {
      *
      * <p>
      * This maps our custom blocks,
-     * and also maps the vanilla {@code minecraft:birch_leaves} to {@code minecraft:orange_wool},
+     * and also maps the vanilla {@code minecraft:birch_leaves} to {@code minecraft:copper_grate},
      * to show that you can also map vanilla blocks.
      * </p>
      */
@@ -165,7 +167,29 @@ public class TestPluginBootstrap implements PluginBootstrap {
             event.registerSimple(ClientView.AwarenessLevel.JAVA_DEFAULT, PluginBlockTypes.ASH_BLOCK.get(), BlockType.LIGHT_GRAY_CONCRETE_POWDER.createBlockData());
             event.registerStateToState(ClientView.AwarenessLevel.JAVA_DEFAULT, PluginBlockTypes.ASH_STAIRS.get(), BlockType.ANDESITE_STAIRS);
 
-            event.registerSimple(ClientView.AwarenessLevel.JAVA_DEFAULT, BlockType.BIRCH_LEAVES, BlockType.ORANGE_WOOL.createBlockData());
+            event.registerSimple(ClientView.AwarenessLevel.JAVA_DEFAULT, BlockType.BIRCH_LEAVES, BlockType.WAXED_COPPER_GRATE.createBlockData());
+
+        });
+    }
+
+    /**
+     * Configures more customized server-to-client mappings for blocks,
+     * as a demo that this is possible when needed.
+     *
+     * <p>
+     * We make gras followed a tiled pattern with moss by making its mapping depend on the coordinates.
+     * </p>
+     */
+    private void setComplexBlockMappings(@NotNull BootstrapContext context) {
+        context.getLifecycleManager().registerEventHandler(BlockMappingPipeline.get().compose(), event -> {
+            var nmsEvent = (NMSBlockMappingPipelineComposeEvent) event;
+
+            nmsEvent.registerComplex(ClientView.AwarenessLevel.JAVA_DEFAULT, Blocks.GRASS_BLOCK.defaultBlockState(), new NMSComplexBlockStateMapping(handle -> {
+                if (!handle.getContext().isStateOfPhysicalBlockInWorld()) return;
+                int coordinatesXor = handle.getContext().getPhysicalBlockX() ^ handle.getContext().getPhysicalBlockY() ^ handle.getContext().getPhysicalBlockZ();
+                if ((coordinatesXor & 1) == 0) return;
+                handle.set(Blocks.MOSS_BLOCK.defaultBlockState());
+            }, true));
 
         });
     }
@@ -212,7 +236,7 @@ public class TestPluginBootstrap implements PluginBootstrap {
         context.getLifecycleManager().registerEventHandler(ItemMappingPipeline.get().compose(), event -> {
             var nmsEvent = (NMSItemMappingPipelineComposeEvent) event;
 
-            nmsEvent.register(ClientView.AwarenessLevel.getAll(), Items.CRAFTING_TABLE, handle -> {
+            nmsEvent.register(ClientView.AwarenessLevel.getAll(), Items.CRAFTING_TABLE, (handle -> {
                 var newLines = Stream.of(
                     Component.literal("This is a very important block for beginners!"),
                     Component.literal("For example, it can be used to craft ").append(Component.translatable(PluginItems.ASH_BLOCK.get().getDescriptionId()))
@@ -220,7 +244,7 @@ public class TestPluginBootstrap implements PluginBootstrap {
                 var existingLore = handle.getImmutable().get(DataComponents.LORE);
                 handle.getMutable().set(DataComponents.LORE, existingLore == null ? new ItemLore(newLines) : existingLore.withLineAdded(newLines.get(0)).withLineAdded(newLines.get(1)));
 
-            });
+            }));
 
             nmsEvent.register(ClientView.AwarenessLevel.JAVA_DEFAULT, PluginItems.ASH_STAIRS.get(), handle -> {
                 var immutable = handle.getImmutable();
@@ -266,6 +290,7 @@ public class TestPluginBootstrap implements PluginBootstrap {
         addCustomItems(context);
         customizeEnumNameForAnItem(context);
         setBasicBlockMappings(context);
+        setComplexBlockMappings(context);
         setBasicItemMappings(context);
         setComplexItemMappings(context);
         setTranslations(context);

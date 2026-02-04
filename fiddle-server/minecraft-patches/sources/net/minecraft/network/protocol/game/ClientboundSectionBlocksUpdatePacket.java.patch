@@ -1,11 +1,17 @@
 --- a/net/minecraft/network/protocol/game/ClientboundSectionBlocksUpdatePacket.java
 +++ b/net/minecraft/network/protocol/game/ClientboundSectionBlocksUpdatePacket.java
-@@ -68,7 +_,7 @@
+@@ -68,7 +_,13 @@
          buffer.writeVarInt(this.positions.length);
  
          for (int i = 0; i < this.positions.length; i++) {
 -            buffer.writeVarLong((long)Block.getId(this.states[i]) << 12 | this.positions[i]);
-+            buffer.writeVarLong((long)Block.getId(org.fiddlemc.fiddle.impl.packetmapping.block.BlockMappingPipelineImpl.get().apply(this.states[i], new org.fiddlemc.fiddle.impl.packetmapping.block.BlockStateMappingContextImpl(buffer.getClientViewOrFallback(), true))) << 12 | this.positions[i]); // Fiddle - Block mapping - Implementation - Apply during section blocks update write
++            // Fiddle start - Block mapping - Implementation - Apply during section blocks update write
++            int x = this.sectionPos.relativeToBlockX(this.positions[i]);
++            int y = this.sectionPos.relativeToBlockY(this.positions[i]);
++            int z = this.sectionPos.relativeToBlockZ(this.positions[i]);
++            org.fiddlemc.fiddle.api.packetmapping.block.BlockStateMappingContext context = new org.fiddlemc.fiddle.impl.packetmapping.block.BlockStateMappingContextImpl(buffer.getClientViewOrFallback(), true, x, y, z);
++            buffer.writeVarLong((long)Block.getId(org.fiddlemc.fiddle.impl.packetmapping.block.BlockMappingPipelineImpl.get().apply(this.states[i], context)) << 12 | this.positions[i]);
++            // Fiddle end - Block mapping - Implementation - Apply during section blocks update write
          }
      }
  

@@ -1,0 +1,10 @@
+--- a/net/minecraft/world/level/chunk/LevelChunkSection.java
++++ b/net/minecraft/world/level/chunk/LevelChunkSection.java
+@@ -284,6 +_,7 @@
+         buffer.writeShort(this.nonEmptyBlockCount);
+         this.states.write(buffer, chunkPacketInfo, chunkSectionIndex);
+         this.biomes.write(buffer, null, chunkSectionIndex);
++        chunkPacketInfo.sectionEndIndexes[chunkSectionIndex] = buffer.writerIndex(); // Fiddle - Block mapping - Chunk packets - Track section end indexes
+     // Paper end - Anti-Xray - Add chunk packet info
+     }
+ 

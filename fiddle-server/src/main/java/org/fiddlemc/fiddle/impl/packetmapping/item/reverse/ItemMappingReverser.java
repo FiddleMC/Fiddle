@@ -162,10 +162,12 @@ public class ItemMappingReverser {
                 mappings.remove(this);
                 return mappings.isEmpty() ? null : mappings;
             });
-            reverser.existingMappingsBySentAfterAddingIdWithCount1HashedKey.computeIfPresent(this.sentAfterAddingIdWithCount1HashedKey, ($, mappings) -> {
-                mappings.remove(this);
-                return mappings.isEmpty() ? null : mappings;
-            });
+            if (this.sentAfterAddingIdWithCount1HashedKey != null) {
+                reverser.existingMappingsBySentAfterAddingIdWithCount1HashedKey.computeIfPresent(this.sentAfterAddingIdWithCount1HashedKey, ($, mappings) -> {
+                    mappings.remove(this);
+                    return mappings.isEmpty() ? null : mappings;
+                });
+            }
         }
 
     }

@@ -17,6 +17,7 @@ import org.fiddlemc.fiddle.impl.util.composable.ComposableImpl;
 import org.fiddlemc.fiddle.impl.util.java.serviceloader.NoArgsConstructorServiceProviderImpl;
 import org.jspecify.annotations.Nullable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,9 +71,16 @@ public final class BlockMappingPipelineImpl extends ComposableImpl<BlockMappingP
      */
     private final @Nullable BlockState[][] directMappings;
 
+    /**
+     * The same as {@link #directMappings}, but contains the {@link BlockState#indexInBlockStateRegistry},
+     * or -1 if the value in {@link #directMappings} would be null.
+     */
+    private final int[][] directMappingsAsIds;
+
     private BlockMappingPipelineImpl() {
         this.chainMappings = new NMSBlockStateMapping[ClientView.AwarenessLevel.getAll().length][][];
         this.directMappings = new BlockState[ClientView.AwarenessLevel.getAll().length][];
+        this.directMappingsAsIds = new int[this.directMappings.length][];
     }
 
     public BlockState apply(BlockState data, BlockStateMappingContext context) {
@@ -85,14 +93,51 @@ public final class BlockMappingPipelineImpl extends ComposableImpl<BlockMappingP
         // If there is a mapping chain, apply it
         NMSBlockStateMapping @Nullable [] chain = this.chainMappings[awarenessLevelI][data.indexInBlockStateRegistry];
         if (chain != null) {
-            BlockStateMappingHandleImpl handle = new BlockStateMappingHandleImpl(data, context, false);
-            for (NMSBlockStateMapping mapping : chain) {
-                mapping.apply(handle);
-            }
-            return handle.getImmutable();
+            return applyChain(data, context, chain);
         }
         // No mappings need to be applied
         return data;
+    }
+
+    public static BlockState applyChain(BlockState blockState, BlockStateMappingContext context, NMSBlockStateMapping[] chain) {
+        BlockStateMappingHandleImpl handle = new BlockStateMappingHandleImpl(blockState, context, false);
+        for (NMSBlockStateMapping mapping : chain) {
+            mapping.apply(handle);
+        }
+        return handle.getImmutable();
+    }
+
+    public static int applyChain(int blockStateId, BlockStateMappingContext context, NMSBlockStateMapping[] chain) {
+        return applyChain(BlockStateRegistry.get().byId(blockStateId), context, chain).indexInBlockStateRegistry;
+    }
+
+    /**
+     * @param awarenessLevelI A {@link ClientView.AwarenessLevel#ordinal()}.
+     * @param blockStateId A {@link BlockState#indexInBlockStateRegistry}.
+     * @return The {@link BlockState#indexInBlockStateRegistry} for the {@link BlockState}
+     * to which the {@link BlockState} with the given {@code blockStateId} is mapped,
+     * or -1 if there is no direct mapping.
+     */
+    public int getDirectMapping(int awarenessLevelI, int blockStateId) {
+        return this.directMappingsAsIds[awarenessLevelI][blockStateId];
+    }
+
+    /**
+     * @param awarenessLevelI A {@link ClientView.AwarenessLevel#ordinal()}.
+     * @param blockStateId A {@link BlockState#indexInBlockStateRegistry}.
+     * @return The chain mapping for the {@link BlockState} with the given {@code blockStateId},
+     * or null if there is no chain mapping.
+     */
+    public NMSBlockStateMapping @Nullable [] getChainMapping(int awarenessLevelI, int blockStateId) {
+        return this.chainMappings[awarenessLevelI][blockStateId];
+    }
+
+    public boolean hasAnyMapping(int awarenessLevelI, int blockStateId) {
+        return this.directMappingsAsIds[awarenessLevelI][blockStateId] != -1 || this.chainMappings[awarenessLevelI][blockStateId] != null;
+    }
+
+    public boolean hasAnyMapping(int awarenessLevelI, BlockState blockState) {
+        return this.hasAnyMapping(awarenessLevelI, blockState.indexInBlockStateRegistry);
     }
 
     @Override
@@ -110,8 +155,11 @@ public final class BlockMappingPipelineImpl extends ComposableImpl<BlockMappingP
 
         // Initialize the mappings
         for (int i = 0; i < this.chainMappings.length; i++) {
-            this.chainMappings[i] = new NMSBlockStateMapping[BlockStateRegistry.get().size()][];
-            this.directMappings[i] = new BlockState[BlockStateRegistry.get().size()];
+            int registrySize = BlockStateRegistry.get().size();
+            this.chainMappings[i] = new NMSBlockStateMapping[registrySize][];
+            this.directMappings[i] = new BlockState[registrySize];
+            this.directMappingsAsIds[i] = new int[registrySize];
+            Arrays.fill(this.directMappingsAsIds[i], -1);
         }
 
         // Invert the mapping from id -> lists of mappings to list of mappings -> ids, so that we only have one reference per unique list
@@ -127,6 +175,7 @@ public final class BlockMappingPipelineImpl extends ComposableImpl<BlockMappingP
                         break;
                     }
                 }
+                int fromId = entry.getIntKey();
                 if (containsComplexMapping) {
                     // If there is a complex mapping, add the list of mappings as a chain
                     // But first we can simplify it a bit by keeping only the last simple mapping in any contiguous subsequence of simple mappings
@@ -140,7 +189,9 @@ public final class BlockMappingPipelineImpl extends ComposableImpl<BlockMappingP
                     invertedChainMappings.computeIfAbsent(optimizedMappings, $ -> new ArrayList<>()).add(IntIntPair.of(awarenessLevelI, entry.getIntKey()));
                 } else {
                     // If there is no complex mapping, add this to the direct mappings
-                    this.directMappings[awarenessLevelI][entry.getIntKey()] = ((NMSSimpleBlockStateMapping) mappings.get(mappings.size() - 1)).getTo();
+                    BlockState to = ((NMSSimpleBlockStateMapping) mappings.get(mappings.size() - 1)).getTo();;
+                    this.directMappings[awarenessLevelI][fromId] = to;
+                    this.directMappingsAsIds[awarenessLevelI][fromId] = to.indexInBlockStateRegistry;
                 }
             }
         }

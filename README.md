@@ -18,50 +18,59 @@
 <table>
   <tr>
     <td>
-      <img src="https://media.discordapp.net/attachments/730768222298701824/1004518312295800853/6_fire.png">
+      <img src="https://media.discordapp.net/attachments/730768222298701824/1004518312295800853/6_fire.png?ex=69832154&is=6981cfd4&hm=59b407aba7e0176e906938bc4fa5d931f209bada11cd9afc2ea0ee15b00af53c&=&format=webp&quality=lossless&width=3808&height=2018">
     </td>
     <td>
-      <img src="https://media.discordapp.net/attachments/730768222298701824/1004518309028450344/1_bookshelves.png">
+      <img src="https://media.discordapp.net/attachments/730768222298701824/1004518309028450344/1_bookshelves.png?ex=69832153&is=6981cfd3&hm=58321064788b50970669e2d972112a4a2095b0360d89c77aa1d116193e9bccd4&=&format=webp&quality=lossless&width=3808&height=2018">
     </td>
     <td>
-      <img src="https://media.discordapp.net/attachments/730768222298701824/1004518310123143268/3_stone.png">
+      <img src="https://media.discordapp.net/attachments/730768222298701824/1004518310123143268/3_stone.png?ex=69832154&is=6981cfd4&hm=8624874abd5ce624f0a0c90073342ddeaa0476cead1310691f4e3c9a1aa8db8e&=&format=webp&quality=lossless&width=3808&height=2018">
     </td>
   </tr>
   <tr>
     <td>
-      <img src="https://media.discordapp.net/attachments/849617367214587924/994942217678487602/2022-07-08_14.16.47.png">
+      <img src="https://media.discordapp.net/attachments/730768222298701824/1004518311792488499/5_forest.png?ex=69832154&is=6981cfd4&hm=b277c912cd082408fb4411040492fd6758d6cdcc0e60a79ea630f0fc6339d084&=&format=webp&quality=lossless&width=3808&height=2018">
     </td>
     <td>
-      <img src="https://media.discordapp.net/attachments/730768222298701824/1004518313247907880/8_newblocks.png">
+      <img src="https://media.discordapp.net/attachments/730768222298701824/1004518313247907880/8_newblocks.png?ex=69832154&is=6981cfd4&hm=83d24c3c94c4b18b9c06aa57d4238ed97eb5276faa711e212bd64be9fb9fd258&=&format=webp&quality=lossless&width=3808&height=2018">
     </td>
     <td>
-      <img src="https://media.discordapp.net/attachments/730768222298701824/1004518314548142100/10_concrete.png">
+      <img src="https://media.discordapp.net/attachments/730768222298701824/1004518314548142100/10_concrete.png?ex=69832155&is=6981cfd5&hm=48affea1ef66e438a0ba3c6bfae42cf86cd6aeaad3af913377eef15724cefea3&=&format=webp&quality=lossless&width=3808&height=2018">
     </td>
   </tr>
 </table>
 
 <div align="center">
   <i>
-    Pictures from the version currently running live on the server ip <b>sucraft.org</b>
+    Pictures from the version currently running live on a public server (see <b>Demo</b> below)
   </i>
 </div>
 
 ## Introduction
 
-Fiddle is a Paper server fork that lets you add new blocks and items into Minecraft.
+Fiddle is a Paper server fork that lets plugins add new blocks and items into Minecraft.
 
 Fiddle:
-* works with (existing) Bukkit plugins[^1]
-* adds blocks and items into the game in the same way a Minecraft update would<!--* works with the vanilla client, both with/without a resource pack, and also offers a client-side mod with extra performance--><!--* modded blocks and items keep working after Minecraft updates-->
-* adding new blocks and items is simple using the standard resource and data pack format
-* allows Bukkit plugins to add and use custom blocks and items when on a Fiddle server
+* adds new blocks and items natively
+* works with existing Bukkit plugins
+* works with vanilla clients<!--, both with/without a resource pack, and also offers a client-side mod with extra performance--><!--* modded blocks and items keep working after Minecraft updates-->
 
 You are very welcome to help with implementation, testing, sharing knowledge or giving suggestions.
 
 ## Installation
 
-Fiddle is a drop-in replacement for Paper.\
-You can download <!--the latest stable JAR from [releases](https://github.com/FiddleMC/Fiddle/releases) and -->the latest development JAR from [actions](https://github.com/FiddleMC/Fiddle/actions).
+Fiddle is a drop-in replacement for Paper.
+
+There are no builds available at the moment, but you can build Fiddle yourself by cloning the project and doing:
+* `./gradlew applyPatches`
+* Create a runnable server jar with `./gradlew createMojmapPaperclipJar` (the jar file will be placed in `fiddle-server/build/libs`)
+
+You can run a test server (which [includes some example blocks and items](https://github.com/FiddleMC/Fiddle/blob/master/test-plugin/src/main/java/org/fiddlemc/testplugin/TestPluginBootstrap.java)):
+* Enable the test-plugin (uncomment a line in `test-plugin.settings.gradle.kts`)
+* `gradle-bin/refreshTestPluginDevBundle`
+* `./gradlew runDevServer`
+<!--
+You can download the latest stable JAR from [releases](https://github.com/FiddleMC/Fiddle/releases) and the latest development JAR from [actions](https://github.com/FiddleMC/Fiddle/actions).
 
 After running Fiddle once, you must open `fiddle.txt`, read the warning carefully, and set `modded=true`.
 
@@ -81,11 +90,13 @@ After running Fiddle once, you must open `fiddle.txt`, read the warning carefull
     </tr>
   </table>
 </div>
+-->
 
-[^1]: Some older plugins have still not updated to use 1.13+ namespaced ids. These plugins can still be used on Fiddle, but require having [backwards compatibility mode](https://github.com/FiddleMC/Fiddle/wiki/Plugin-compatibility#backwards-compatibility) enabled.
+## Adding custom blocks/items
 
-## Adding/creating blocks/items
+See the [wiki](https://github.com/FiddleMC/Fiddle/wiki)!
 
+<!--
 New content to add to the game, like blocks and items, are loaded by Fiddle from packs, similar to resource and data packs.\
 A pack is a `.zip` or `.rar` file. To install a pack, you can place it in the `fiddle_packs` folder in the server root.\
 *Example location:* `fiddle_packs/WillowTrees.zip`
@@ -93,12 +104,26 @@ A pack is a `.zip` or `.rar` file. To install a pack, you can place it in the `f
 You can download packs made by others, or [create your own packs](https://github.com/FiddleMC/Fiddle/wiki/Making-packs) and share them.
 
 Bukkit plugins can also add custom blocks and items.
+-->
 
-## Demo
+## Live demo
 
 An experimental version of Fiddle is already running on a small community server.\
-You can join *sucraft.org* and do `/warp Demo` to see it in action yourself.
+You can join *sucraft.org* (Minecraft 1.19.2) and do `/warp Demo` to see it in action yourself.
 
+## Soon
+
+The next goals of the project are:
+* Support block display entities
+* Support falling block entities
+* Automatically generate a resource pack
+* Plugins can add resource pack contents
+* Automatically server the resource pack
+* Automatic block/item mapping API
+
+Please feel free to join the project as a developer and contribute toward these goals!
+
+<!--
 ## Goals of the project
 
 ### Supports any player
@@ -127,3 +152,4 @@ This project has been made possible by:
 * the generous donation from <a href="https://github.com/pontaoski">Janet&nbsp;Blackquill</a>
 * the authors and maintainers of the Bukkit, [Spigot](https://www.spigotmc.org/) and [Paper](https://github.com/PaperMC/Paper) projects
 * everyone on GitHub and the [Discord](https://discord.gg/EduvcVmKS7) server who helps test Fiddle and provide feedback and suggestions
+-->

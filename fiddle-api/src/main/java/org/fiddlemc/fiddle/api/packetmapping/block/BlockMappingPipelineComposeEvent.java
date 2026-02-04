@@ -16,6 +16,10 @@ import org.fiddlemc.fiddle.api.clientview.ClientView;
  * For performance reasons, input should be as specific as possible.
  * This means arrays should be as small as possible.
  * </p>
+ *
+ * <p>
+ * Mapping from {@linkplain BlockType#isAir air} to non-air, or the other way around, will lead to glitches.
+ * </p>
  */
 public interface BlockMappingPipelineComposeEvent extends LifecycleEvent {
 

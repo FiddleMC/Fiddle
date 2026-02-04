@@ -17,4 +17,28 @@ public interface BlockStateMappingContext extends ClientViewMappingContext {
      */
     boolean isStateOfPhysicalBlockInWorld();
 
+    /**
+     * @return The x-coordinate of the physical block for which this mapping is being applied.
+     * This is only available if {@link #isStateOfPhysicalBlockInWorld()} is true
+     * and if {@link ComplexBlockStateMapping#requiresCoordinates()} was true.
+     * Otherwise, the returned value is meaningless.
+     */
+    int getPhysicalBlockX();
+
+    /**
+     * @return The y-coordinate of the physical block for which this mapping is being applied,
+     * This is only available if {@link #isStateOfPhysicalBlockInWorld()} is true
+     * and if {@link ComplexBlockStateMapping#requiresCoordinates()} was true.
+     * Otherwise, the returned value is meaningless.
+     */
+    int getPhysicalBlockY();
+
+    /**
+     * @return The z-coordinate of the physical block for which this mapping is being applied,
+     * This is only available if {@link #isStateOfPhysicalBlockInWorld()} is true
+     * and if {@link ComplexBlockStateMapping#requiresCoordinates()} was true.
+     * Otherwise, the returned value is meaningless.
+     */
+    int getPhysicalBlockZ();
+
 }

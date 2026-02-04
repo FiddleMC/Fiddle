@@ -1,0 +1,11 @@
+--- a/net/minecraft/server/players/PlayerList.java
++++ b/net/minecraft/server/players/PlayerList.java
+@@ -329,7 +_,7 @@
+                 .getOrThrow(net.minecraft.world.level.biome.Biomes.PLAINS);
+             player.connection.send(new net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket(
+                 new net.minecraft.world.level.chunk.EmptyLevelChunk(serverLevel, player.chunkPosition(), plains),
+-                serverLevel.getLightEngine(), (java.util.BitSet)null, (java.util.BitSet) null, true) // Paper - Anti-Xray
++                serverLevel.getLightEngine(), (java.util.BitSet)null, (java.util.BitSet) null, true, player) // Paper - Anti-Xray // Fiddle - Block mapping - Chunk packets - Pass the player
+             );
+         }
+         // Paper end - Send empty chunk

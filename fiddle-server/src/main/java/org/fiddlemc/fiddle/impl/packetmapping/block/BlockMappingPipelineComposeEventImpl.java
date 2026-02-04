@@ -48,11 +48,17 @@ public final class BlockMappingPipelineComposeEventImpl implements PaperLifecycl
 
     @Override
     public void registerSimple(final ClientView.AwarenessLevel awarenessLevel, final BlockState from, final BlockState to) {
+        if (from.equals(to)) {
+            return;
+        }
         this.register(this.getForAwarenessLevel(awarenessLevel), from, new SimpleBlockStateMappingImpl(to));
     }
 
     @Override
     public void registerSimple(final ClientView.AwarenessLevel[] awarenessLevels, final BlockState from, final BlockState to) {
+        if (from.equals(to)) {
+            return;
+        }
         var mapping = new SimpleBlockStateMappingImpl(to);
         for (var awarenessLevel : awarenessLevels) {
             this.register(this.getForAwarenessLevel(awarenessLevel), from, mapping);
@@ -64,6 +70,9 @@ public final class BlockMappingPipelineComposeEventImpl implements PaperLifecycl
         var mapForAwarenessLevel = this.getForAwarenessLevel(awarenessLevel);
         var mapping = new SimpleBlockStateMappingImpl(to);
         for (var fromElement : from) {
+            if (fromElement.equals(to)) {
+                continue;
+            }
             this.register(mapForAwarenessLevel, fromElement, mapping);
         }
     }
@@ -74,6 +83,9 @@ public final class BlockMappingPipelineComposeEventImpl implements PaperLifecycl
         for (var awarenessLevel : awarenessLevels) {
             var mapForAwarenessLevel = this.getForAwarenessLevel(awarenessLevel);
             for (var fromElement : from) {
+                if (fromElement.equals(to)) {
+                    continue;
+                }
                 this.register(mapForAwarenessLevel, fromElement, mapping);
             }
         }
@@ -104,6 +116,9 @@ public final class BlockMappingPipelineComposeEventImpl implements PaperLifecycl
         var mapForAwarenessLevel = this.getForAwarenessLevel(awarenessLevel);
         for (var toState : to.getStateDefinition().getPossibleStates()) {
             var fromState = copyProperties(toState, from);
+            if (fromState.equals(toState)) {
+                continue;
+            }
             this.register(mapForAwarenessLevel, fromState, new SimpleBlockStateMappingImpl(toState));
         }
     }
@@ -112,8 +127,11 @@ public final class BlockMappingPipelineComposeEventImpl implements PaperLifecycl
     public void registerStateToState(final ClientView.AwarenessLevel[] awarenessLevels, final Block from, final Block to) {
         var mapsForAwarenessLevels = this.getForAwarenessLevels(awarenessLevels);
         for (var toState : to.getStateDefinition().getPossibleStates()) {
-            var mapping = new SimpleBlockStateMappingImpl(toState);
             var fromState = copyProperties(toState, from);
+            if (fromState.equals(toState)) {
+                continue;
+            }
+            var mapping = new SimpleBlockStateMappingImpl(toState);
             for (var mapForAwarenessLevel : mapsForAwarenessLevels) {
                 this.register(mapForAwarenessLevel, fromState, mapping);
             }
@@ -127,6 +145,9 @@ public final class BlockMappingPipelineComposeEventImpl implements PaperLifecycl
             var mapping = new SimpleBlockStateMappingImpl(toState);
             for (var fromElement : from) {
                 var fromState = copyProperties(toState, fromElement);
+                if (fromState.equals(toState)) {
+                    continue;
+                }
                 this.register(mapForAwarenessLevel, fromState, mapping);
             }
         }
@@ -139,6 +160,9 @@ public final class BlockMappingPipelineComposeEventImpl implements PaperLifecycl
             var mapping = new SimpleBlockStateMappingImpl(toState);
             for (var fromElement : from) {
                 var fromState = copyProperties(toState, fromElement);
+                if (fromState.equals(toState)) {
+                    continue;
+                }
                 for (var mapForAwarenessLevel : mapsForAwarenessLevels) {
                     this.register(mapForAwarenessLevel, fromState, mapping);
                 }

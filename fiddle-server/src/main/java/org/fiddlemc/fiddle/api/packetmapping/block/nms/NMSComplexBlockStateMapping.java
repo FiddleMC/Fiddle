@@ -1,5 +1,9 @@
 package org.fiddlemc.fiddle.api.packetmapping.block.nms;
 
+import org.fiddlemc.fiddle.api.packetmapping.block.BlockStateMappingContext;
+import org.fiddlemc.fiddle.api.packetmapping.block.ComplexBlockStateMapping;
+import java.util.function.Consumer;
+
 /**
  * A complex mapping that can be registered with the {@link NMSBlockMappingPipelineComposeEvent}.
  *
@@ -17,7 +21,19 @@ package org.fiddlemc.fiddle.api.packetmapping.block.nms;
  * having a certain advancement), then when those factors change, any blocks influenced by it should be re-sent
  * to the player to avoid desynchronization.
  * </p>
+ *
+ * @param apply               The code to run.
+ * @param requiresCoordinates Whether this mapping requires the coordinates
+ *                            ({@link BlockStateMappingContext#getPhysicalBlockX()} and so on).
  */
-@FunctionalInterface
-public non-sealed interface NMSComplexBlockStateMapping extends NMSBlockStateMapping {
+public record NMSComplexBlockStateMapping(
+    Consumer<NMSBlockStateMappingHandle> apply,
+    boolean requiresCoordinates
+) implements ComplexBlockStateMapping, NMSBlockStateMapping {
+
+    @Override
+    public void apply(final NMSBlockStateMappingHandle handle) {
+        this.apply.accept(handle);
+    }
+
 }

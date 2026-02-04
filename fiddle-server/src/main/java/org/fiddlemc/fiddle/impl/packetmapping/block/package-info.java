@@ -9,6 +9,10 @@
  * <h3>Minecraft changes</h3>
  * <ul>
  *     <li>{@link net.minecraft.server.dedicated.DedicatedServer} - To fire the pipeline compose event.</li>
+ *     <li>
+ *         {@link net.minecraft.network.protocol.game.ClientboundSectionBlocksUpdatePacket},
+ *         {@link net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket} - To apply mappings.
+ *     </li>
  * </ul>
  * </p>
  */

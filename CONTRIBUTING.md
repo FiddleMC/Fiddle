@@ -1,12 +1,12 @@
-Thanks for wanting to contribute!
+Thanks for using Fiddle!
 
-Fiddle is still not finished, and maybe things that you would like are missing.
-If you would like to fix/add small things, feel free to make the desired changes and send in a PR.
-If you are considering large changes, feel free to do the same, but you can always ask on Discord if ideas for that were already worked on.
+Fiddle is still not finished. Maybe things that you would like are missing.
+If you would like to add or change something, feel free to make the desired changes and send in a PR.
+Of course, you can also make suggestions in Discord, although you may have to rely on someone actually implementing it.
 
 ### Code style
 
-Generally, stick to the same style as Paper, with a few things to keep in mind:
-* To stay agile, we try to keep changes to Minecraft/Paper files to a minimum. Try to create new classes under `src/main` rather than add fields and methods to Minecraft/Paper classes. An exception is creating inline fields instead of external maps (because of performance).
-* Every package acts like a small separate module: they have a clear purpose and documentation (including a recognizable name) in their `package-info.java`.
-* Changes to Minecraft/Paper files should have a `Fiddle - <module name> - <reason for this code change>` comment.
+Generally, stick to the same style as Paper:
+* Changes to Minecraft/Paper files should have a `Fiddle - <module name> - <reason for this code change>` comment
+* To stay agile, we try to keep changes to Minecraft/Paper files to a minimum where possible
+* Packages act like small separate modules: their purpose is briefly described in their `package-info.java`.
