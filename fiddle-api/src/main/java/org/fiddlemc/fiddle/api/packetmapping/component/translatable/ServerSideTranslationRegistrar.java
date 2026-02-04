@@ -39,10 +39,10 @@ public interface ServerSideTranslationRegistrar extends Composable<ServerSideTra
          * have the locale {@code en_gb}.
          * </p>
          */
-        LOCALE,
+        NONE,
         /**
          * The translation is used for the specific locale,
-         * but can also be used for other locales of the same language group if no {@link #LOCALE}
+         * but can also be used for other locales of the same language group if no specific
          * translation is available for that locale.
          *
          * <p>
@@ -54,8 +54,8 @@ public interface ServerSideTranslationRegistrar extends Composable<ServerSideTra
         LANGUAGE_GROUP,
         /**
          * The translation is used for the specific locale,
-         * but can also be used for any other locale if no {@link #LOCALE} or {@link #LANGUAGE_GROUP} translation is available
-         * for that locale.
+         * but can also be used for any other locale if no specific or {@link #LANGUAGE_GROUP} fallback
+         * translation is available for that locale.
          *
          * <p>
          * For example, when used with the locale {@code en_gb}, the translation will apply to users who

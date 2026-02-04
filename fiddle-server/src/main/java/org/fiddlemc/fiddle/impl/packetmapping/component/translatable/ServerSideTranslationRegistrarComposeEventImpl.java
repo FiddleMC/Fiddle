@@ -47,7 +47,7 @@ public final class ServerSideTranslationRegistrarComposeEventImpl implements Pap
                 translationsForKey.genericTranslation = translationToRegister;
             }
         }
-        if (!fallbackScope.equals(ServerSideTranslationRegistrar.FallbackScope.LOCALE)) {
+        if (!fallbackScope.equals(ServerSideTranslationRegistrar.FallbackScope.NONE)) {
             // Add as group fallback
             int underscoreIndex = locale.indexOf('_');
             if (underscoreIndex > 0) {

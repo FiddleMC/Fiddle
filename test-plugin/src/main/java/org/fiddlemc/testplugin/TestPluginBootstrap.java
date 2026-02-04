@@ -76,9 +76,9 @@ public class TestPluginBootstrap implements PluginBootstrap {
             event.registry().register(TypedKey.create(RegistryKey.BLOCK, Key.key("example:ash_block")), builder -> {
                 var nmsBuilder = (NMSBlockRegistryEntryBuilder) builder;
                 nmsBuilder.nmsProperties(properties -> {
-                    properties.pushReaction(PushReaction.DESTROY); // It breaks when pushed by a piston
                     properties.requiresCorrectToolForDrops(); // It drops nothing unless broken with the right tool (a shovel, as defined in the included data pack)
                     properties.mapColor(MapColor.COLOR_LIGHT_GRAY); // It shows up light gray on maps
+                    properties.pushReaction(PushReaction.DESTROY); // It breaks when pushed by a piston
                 });
             });
 
@@ -108,9 +108,6 @@ public class TestPluginBootstrap implements PluginBootstrap {
         context.getLifecycleManager().registerEventHandler(ItemRegistryEventProvider.ITEM.compose(), event -> {
 
             event.registry().register(TypedKey.create(RegistryKey.ITEM, Key.key("example:ash")), builder -> {
-                var nmsBuilder = (NMSItemRegistryEntryBuilder) builder;
-                nmsBuilder.nmsProperties(properties -> {
-                });
             });
 
             event.registry().register(TypedKey.create(RegistryKey.ITEM, Key.key("example:ash_block")), builder -> {
@@ -236,7 +233,7 @@ public class TestPluginBootstrap implements PluginBootstrap {
         context.getLifecycleManager().registerEventHandler(ItemMappingPipeline.get().compose(), event -> {
             var nmsEvent = (NMSItemMappingPipelineComposeEvent) event;
 
-            nmsEvent.register(ClientView.AwarenessLevel.getAll(), Items.CRAFTING_TABLE, (handle -> {
+            nmsEvent.register(ClientView.AwarenessLevel.getAll(), Items.CRAFTING_TABLE, handle -> {
                 var newLines = Stream.of(
                     Component.literal("This is a very important block for beginners!"),
                     Component.literal("For example, it can be used to craft ").append(Component.translatable(PluginItems.ASH_BLOCK.get().getDescriptionId()))
@@ -244,7 +241,7 @@ public class TestPluginBootstrap implements PluginBootstrap {
                 var existingLore = handle.getImmutable().get(DataComponents.LORE);
                 handle.getMutable().set(DataComponents.LORE, existingLore == null ? new ItemLore(newLines) : existingLore.withLineAdded(newLines.get(0)).withLineAdded(newLines.get(1)));
 
-            }));
+            });
 
             nmsEvent.register(ClientView.AwarenessLevel.JAVA_DEFAULT, PluginItems.ASH_STAIRS.get(), handle -> {
                 var immutable = handle.getImmutable();
