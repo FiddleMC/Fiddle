@@ -6,9 +6,9 @@
     Fiddle
   </h1>
   <h3>
-    A Paper server fork that lets you
+    A Paper fork that lets you
     <br>
-    add custom blocks and items
+    add real custom blocks and items
   </h3>
 
   [![Discord](https://img.shields.io/discord/1091830813240348732?color=5865F2&label=discord&style=for-the-badge)](https://discord.gg/EduvcVmKS7)
@@ -18,24 +18,24 @@
 <table>
   <tr>
     <td>
-      <img src="https://media.discordapp.net/attachments/730768222298701824/1004518312295800853/6_fire.png?ex=69832154&is=6981cfd4&hm=59b407aba7e0176e906938bc4fa5d931f209bada11cd9afc2ea0ee15b00af53c&=&format=webp&quality=lossless&width=3808&height=2018">
+      <img src="design/fire.png">
     </td>
     <td>
-      <img src="https://media.discordapp.net/attachments/730768222298701824/1004518309028450344/1_bookshelves.png?ex=69832153&is=6981cfd3&hm=58321064788b50970669e2d972112a4a2095b0360d89c77aa1d116193e9bccd4&=&format=webp&quality=lossless&width=3808&height=2018">
+      <img src="design/trees.png">
     </td>
     <td>
-      <img src="https://media.discordapp.net/attachments/730768222298701824/1004518310123143268/3_stone.png?ex=69832154&is=6981cfd4&hm=8624874abd5ce624f0a0c90073342ddeaa0476cead1310691f4e3c9a1aa8db8e&=&format=webp&quality=lossless&width=3808&height=2018">
+      <img src="design/stone.png">
     </td>
   </tr>
   <tr>
     <td>
-      <img src="https://media.discordapp.net/attachments/730768222298701824/1004518311792488499/5_forest.png?ex=69832154&is=6981cfd4&hm=b277c912cd082408fb4411040492fd6758d6cdcc0e60a79ea630f0fc6339d084&=&format=webp&quality=lossless&width=3808&height=2018">
+      <img src="design/newblocks.png">
     </td>
     <td>
-      <img src="https://media.discordapp.net/attachments/730768222298701824/1004518313247907880/8_newblocks.png?ex=69832154&is=6981cfd4&hm=83d24c3c94c4b18b9c06aa57d4238ed97eb5276faa711e212bd64be9fb9fd258&=&format=webp&quality=lossless&width=3808&height=2018">
+      <img src="design/bookshelves.png">
     </td>
     <td>
-      <img src="https://media.discordapp.net/attachments/730768222298701824/1004518314548142100/10_concrete.png?ex=69832155&is=6981cfd5&hm=48affea1ef66e438a0ba3c6bfae42cf86cd6aeaad3af913377eef15724cefea3&=&format=webp&quality=lossless&width=3808&height=2018">
+      <img src="design/concrete.png">
     </td>
   </tr>
 </table>
