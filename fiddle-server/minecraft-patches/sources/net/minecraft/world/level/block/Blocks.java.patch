@@ -4,13 +4,13 @@
  
      private static Block register(ResourceKey<Block> resourceKey, Function<BlockBehaviour.Properties, Block> factory, BlockBehaviour.Properties properties) {
          Block block = factory.apply(properties.setId(resourceKey));
-+        // Fiddle start - More data-driven - Vanilla flag
++        // Fiddle start - More data-driven - Vanilla flag - Implementation part
 +        block.markAsVanilla();
 +        // Currently, there is no way to modify block states of vanilla blocks, so we assume all block states of vanilla blocks are vanilla too
 +        for (BlockState blockState : block.getStateDefinition().getPossibleStates()) {
 +            blockState.markAsVanilla();
 +        }
-+        // Fiddle end - More data-driven - Vanilla flag
++        // Fiddle end - More data-driven - Vanilla flag - Implementation part
          return Registry.register(BuiltInRegistries.BLOCK, resourceKey, block);
      }
  

@@ -28,7 +28,7 @@
 +    public int indexInVanillaOnlyBlockStateRegistry = -1;
 +    // Fiddle end - More data-driven - Minecraft registries - Cache block and item values
 +
-+    // Fiddle start - More data-driven - Vanilla flag
++    // Fiddle start - More data-driven - Vanilla flag - Implementation part
 +    private boolean isVanilla;
 +
 +    /**
@@ -56,7 +56,7 @@
 +    public void markAsVanilla() {
 +        this.isVanilla = true;
 +    }
-+    // Fiddle end - More data-driven - Vanilla flag
++    // Fiddle end - More data-driven - Vanilla flag - Implementation part
 +
      @Override
      protected BlockState asState() {
