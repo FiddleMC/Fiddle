@@ -11,7 +11,7 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.block.CraftBlockType;
 import org.bukkit.craftbukkit.block.data.CraftBlockData;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
-import org.fiddlemc.fiddle.api.packetmapping.block.nms.NMSBlockMappingPipelineComposeEvent;
+import org.fiddlemc.fiddle.api.packetmapping.block.nms.NMSBlockMappingsComposeEvent;
 import org.fiddlemc.fiddle.api.packetmapping.block.nms.NMSBlockStateMapping;
 import org.jspecify.annotations.Nullable;
 import java.util.ArrayList;
@@ -19,9 +19,9 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * The implementation of {@link NMSBlockMappingPipelineComposeEvent}.
+ * The implementation of {@link NMSBlockMappingsComposeEvent}.
  */
-public final class BlockMappingPipelineComposeEventImpl implements PaperLifecycleEvent, NMSBlockMappingPipelineComposeEvent {
+public final class BlockMappingPipelineComposeEventImpl implements PaperLifecycleEvent, NMSBlockMappingsComposeEvent {
 
     /**
      * The registered mappings.

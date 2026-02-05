@@ -170,10 +170,10 @@ public class TestPluginBootstrap implements PluginBootstrap {
     private void setBasicBlockMappings(@NotNull BootstrapContext context) {
         context.getLifecycleManager().registerEventHandler(FiddleEvents.BLOCK_MAPPINGS, event -> {
 
-            event.registerSimple(ClientView.AwarenessLevel.JAVA_DEFAULT, PluginBlockTypes.ASH_BLOCK.get(), BlockType.LIGHT_GRAY_CONCRETE_POWDER.createBlockData());
+            event.registerSimpleToDefaultState(ClientView.AwarenessLevel.JAVA_DEFAULT, PluginBlockTypes.ASH_BLOCK.get(), BlockType.LIGHT_GRAY_CONCRETE_POWDER);
             event.registerStateToState(ClientView.AwarenessLevel.JAVA_DEFAULT, PluginBlockTypes.ASH_STAIRS.get(), BlockType.ANDESITE_STAIRS);
 
-            event.registerSimple(ClientView.AwarenessLevel.JAVA_DEFAULT, BlockType.BIRCH_LEAVES, BlockType.WAXED_COPPER_GRATE.createBlockData());
+            event.registerSimpleToDefaultState(ClientView.AwarenessLevel.JAVA_DEFAULT, BlockType.BIRCH_LEAVES, BlockType.WAXED_COPPER_GRATE);
 
         });
     }

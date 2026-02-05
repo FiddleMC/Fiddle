@@ -5,7 +5,7 @@ import org.fiddlemc.fiddle.api.packetmapping.block.ComplexBlockStateMapping;
 import java.util.function.Consumer;
 
 /**
- * A complex mapping that can be registered with the {@link NMSBlockMappingPipelineComposeEvent}.
+ * A complex mapping that can be registered with the {@link NMSBlockMappingsComposeEvent}.
  *
  * <p>
  * It represents a mapping that maps to the result of some {@linkplain #apply code}.
