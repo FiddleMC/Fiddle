@@ -1,4 +1,4 @@
-package org.fiddlemc.fiddle.api.branding;
+package org.fiddlemc.fiddle.impl.branding;
 
 import org.bukkit.NamespacedKey;
 
