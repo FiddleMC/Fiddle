@@ -1,7 +1,7 @@
 package org.fiddlemc.fiddle.api.packetmapping.component.translatable;
 
 import org.fiddlemc.fiddle.api.util.composable.Composable;
-import org.fiddlemc.fiddle.impl.java.util.serviceloader.GenericServiceProvider;
+import org.fiddlemc.fiddle.impl.java.serviceloader.GenericServiceProvider;
 import org.jspecify.annotations.Nullable;
 import java.util.ServiceLoader;
 

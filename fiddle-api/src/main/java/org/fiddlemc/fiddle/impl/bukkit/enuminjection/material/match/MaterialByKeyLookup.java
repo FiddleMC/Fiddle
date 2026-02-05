@@ -3,7 +3,7 @@ package org.fiddlemc.fiddle.impl.bukkit.enuminjection.material.match;
 import net.kyori.adventure.key.Key;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.fiddlemc.fiddle.impl.java.util.serviceloader.GenericServiceProvider;
+import org.fiddlemc.fiddle.impl.java.serviceloader.GenericServiceProvider;
 import org.jspecify.annotations.Nullable;
 import java.util.ServiceLoader;
 

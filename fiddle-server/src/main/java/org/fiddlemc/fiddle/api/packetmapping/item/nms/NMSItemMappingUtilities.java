@@ -2,11 +2,8 @@ package org.fiddlemc.fiddle.api.packetmapping.item.nms;
 
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import org.apache.commons.lang3.mutable.Mutable;
-import org.fiddlemc.fiddle.impl.java.util.serviceloader.GenericServiceProvider;
-import org.jspecify.annotations.Nullable;
+import org.fiddlemc.fiddle.impl.java.serviceloader.GenericServiceProvider;
 import java.util.ServiceLoader;
-import java.util.function.Supplier;
 
 /**
  * Some utilities for the mapping of items.

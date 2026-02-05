@@ -1,5 +1,5 @@
 /**
- * <h1>Module: Java functional utilities</h1>
+ * <h1>Java functional utilities</h1>
  *
  * <p>
  * Provides utilities related to functional programming and the {@link java.util.function} package.

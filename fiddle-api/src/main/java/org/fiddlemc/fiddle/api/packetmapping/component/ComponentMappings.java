@@ -3,7 +3,7 @@ package org.fiddlemc.fiddle.api.packetmapping.component;
 import java.util.ServiceLoader;
 
 import org.fiddlemc.fiddle.api.util.composable.Composable;
-import org.fiddlemc.fiddle.impl.java.util.serviceloader.GenericServiceProvider;
+import org.fiddlemc.fiddle.impl.java.serviceloader.GenericServiceProvider;
 
 /**
  * A service for the component mappings that Fiddle applies.

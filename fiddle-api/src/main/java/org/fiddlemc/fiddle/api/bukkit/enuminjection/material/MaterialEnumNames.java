@@ -6,7 +6,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.block.BlockType;
 import org.bukkit.inventory.ItemType;
 import org.fiddlemc.fiddle.api.bukkit.enuminjection.BukkitEnumNames;
-import org.fiddlemc.fiddle.impl.java.util.serviceloader.GenericServiceProvider;
+import org.fiddlemc.fiddle.impl.java.serviceloader.GenericServiceProvider;
 import org.jspecify.annotations.Nullable;
 import java.util.ServiceLoader;
 

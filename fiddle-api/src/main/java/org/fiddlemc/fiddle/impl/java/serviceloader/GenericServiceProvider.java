@@ -1,4 +1,4 @@
-package org.fiddlemc.fiddle.impl.java.util.serviceloader;
+package org.fiddlemc.fiddle.impl.java.serviceloader;
 
 /**
  * A simple service provider, where {@link #get} returns a singleton instance of a service {@link S}.

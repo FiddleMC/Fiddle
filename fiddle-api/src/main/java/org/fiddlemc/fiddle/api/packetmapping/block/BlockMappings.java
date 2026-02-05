@@ -1,7 +1,7 @@
 package org.fiddlemc.fiddle.api.packetmapping.block;
 
 import org.fiddlemc.fiddle.api.util.composable.Composable;
-import org.fiddlemc.fiddle.impl.java.util.serviceloader.GenericServiceProvider;
+import org.fiddlemc.fiddle.impl.java.serviceloader.GenericServiceProvider;
 import java.util.ServiceLoader;
 
 /**

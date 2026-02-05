@@ -1,5 +1,5 @@
 /**
- * <h1>Module: Java enum injection</h1>
+ * <h1>Java enum injection</h1>
  *
  * <p>
  * Provides {@link org.fiddlemc.fiddle.impl.util.java.enuminjection.EnumInjector},

@@ -1,5 +1,5 @@
 /**
- * <h1>Module: Java reflection utilities</h1>
+ * <h1>Java reflection utilities</h1>
  *
  * <p>
  * Provides convenience utilities for Java reflection,
