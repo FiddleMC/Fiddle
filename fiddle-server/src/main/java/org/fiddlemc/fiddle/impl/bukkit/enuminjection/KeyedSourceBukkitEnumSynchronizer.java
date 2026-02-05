@@ -2,15 +2,15 @@ package org.fiddlemc.fiddle.impl.bukkit.enuminjection;
 
 import java.util.Locale;
 import org.bukkit.NamespacedKey;
-import org.fiddlemc.fiddle.api.bukkit.enuminjection.BukkitEnumNameMappingHandle;
-import org.fiddlemc.fiddle.api.bukkit.enuminjection.BukkitEnumNameMappingPipelineComposeEvent;
+import org.fiddlemc.fiddle.api.bukkit.enuminjection.BukkitEnumNamePickHandle;
+import org.fiddlemc.fiddle.api.bukkit.enuminjection.BukkitEnumNamesComposeEvent;
 import org.fiddlemc.fiddle.impl.util.java.enuminjection.EnumInjector;
 import org.fiddlemc.fiddle.impl.util.mappingpipeline.SingleStepMappingPipeline;
 
 /**
  * A {@link BukkitEnumSynchronizer} for source values that have an associated {@link NamespacedKey}.
  */
-public abstract class KeyedSourceBukkitEnumSynchronizer<E extends Enum<E>, S, I extends EnumInjector<E>, P extends BukkitEnumNameMappingPipelineImpl<S> & SingleStepMappingPipeline<String, BukkitEnumNameMappingHandle<S>, BukkitEnumNameMappingPipelineComposeEvent<S>>> extends BukkitEnumSynchronizer<E, S, I, P> {
+public abstract class KeyedSourceBukkitEnumSynchronizer<E extends Enum<E>, S, I extends EnumInjector<E>, P extends BukkitEnumNameMappingPipelineImpl<S> & SingleStepMappingPipeline<String, BukkitEnumNamePickHandle<S>, BukkitEnumNamesComposeEvent<S>>> extends BukkitEnumSynchronizer<E, S, I, P> {
 
     public static final String DEFAULT_ENUM_PREFIX = "FIDDLE_";
 

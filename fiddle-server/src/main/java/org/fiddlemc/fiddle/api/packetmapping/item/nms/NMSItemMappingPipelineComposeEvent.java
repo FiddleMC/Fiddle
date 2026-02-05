@@ -2,22 +2,22 @@ package org.fiddlemc.fiddle.api.packetmapping.item.nms;
 
 import net.minecraft.world.item.Item;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
-import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingPipeline;
-import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingPipelineComposeEvent;
+import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappings;
+import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingsComposeEvent;
 
 import java.util.List;
 import java.util.function.Consumer;
 
 /**
  * Provides functionality to register {@link NMSItemMapping}s
- * to the {@link ItemMappingPipeline}.
+ * to the {@link ItemMappings}.
  *
  * <p>
  * For performance reasons, input should be as specific as possible.
  * This means arrays should be as small as possible.
  * </p>
  */
-public interface NMSItemMappingPipelineComposeEvent extends ItemMappingPipelineComposeEvent {
+public interface NMSItemMappingPipelineComposeEvent extends ItemMappingsComposeEvent {
 
     /**
      * Registers a mapping.

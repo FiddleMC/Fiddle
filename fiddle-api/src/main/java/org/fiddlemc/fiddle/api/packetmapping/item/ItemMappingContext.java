@@ -3,7 +3,7 @@ package org.fiddlemc.fiddle.api.packetmapping.item;
 import org.fiddlemc.fiddle.api.packetmapping.ClientViewMappingContext;
 
 /**
- * A {@link ClientViewMappingContext} for the {@link ItemMappingPipeline}.
+ * A {@link ClientViewMappingContext} for the {@link ItemMappings}.
  */
 public interface ItemMappingContext extends ClientViewMappingContext {
 

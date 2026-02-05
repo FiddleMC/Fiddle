@@ -14,7 +14,7 @@ import net.minecraft.world.level.chunk.Palette;
 import net.minecraft.world.level.chunk.PalettedContainer;
 import net.minecraft.world.level.chunk.SingleValuePalette;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
-import org.fiddlemc.fiddle.api.packetmapping.block.BlockMappingPipeline;
+import org.fiddlemc.fiddle.api.packetmapping.block.BlockMappings;
 import org.fiddlemc.fiddle.api.packetmapping.block.BlockStateMappingContext;
 import org.fiddlemc.fiddle.api.packetmapping.block.nms.NMSBlockStateMapping;
 import org.fiddlemc.fiddle.api.packetmapping.block.nms.NMSComplexBlockStateMapping;
@@ -111,7 +111,7 @@ public final class ChunkPacketBlockMapper {
     }
 
     /**
-     * Apply the block mappings registered with the {@link BlockMappingPipeline} to the {@link #packet}.
+     * Apply the block mappings registered with the {@link BlockMappings} to the {@link #packet}.
      */
     public void applyMappings() {
         // Do a check over all paletted containers to see if any mappings are necessary at all

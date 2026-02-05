@@ -2,7 +2,9 @@
  * <h1>Module: More data-driven - Registry API - Internals</h1>
  *
  * <p>
- * Opens up Paper internals to allow extending the Paper registry API.
+ * Opens up Paper internals to allow extending the Paper registry API,
+ * and has some classes that have an easier point of access somewhere else
+ * (typically {@link org.fiddlemc.fiddle.api.FiddleEvents}).
  * </p>
  *
  * <p>

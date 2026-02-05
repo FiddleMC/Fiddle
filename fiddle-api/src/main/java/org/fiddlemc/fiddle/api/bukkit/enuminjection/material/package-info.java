@@ -10,13 +10,6 @@
  * Also, modifies {@link org.bukkit.Material#matchMaterial}
  * to be more flexible towards plugins that make outdated assumptions.
  * </p>
- *
- * <p>
- * <h3>Paper changes</h3>
- * <ul>
- *     <li>{@link org.bukkit.Material} - To replace the {@code matchMaterial} implementation.</li>
- * </ul>
- * </p>
  */
 @NullMarked
 package org.fiddlemc.fiddle.api.bukkit.enuminjection.material;

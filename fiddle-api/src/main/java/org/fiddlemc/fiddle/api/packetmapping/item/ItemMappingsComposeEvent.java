@@ -4,7 +4,7 @@ import io.papermc.paper.plugin.lifecycle.event.LifecycleEvent;
 import org.bukkit.inventory.ItemStack;
 
 /**
- * Provides functionality to register mappings to the {@link ItemMappingPipeline}.
+ * Provides functionality to register mappings to the {@link ItemMappings}.
  *
  * <p>
  * Currently, this must be cast to {@code NMSItemMappingPipelineComposeEvent} to be used.
@@ -14,5 +14,5 @@ import org.bukkit.inventory.ItemStack;
  * Mapping from {@linkplain ItemStack#isEmpty empty} to non-empty, or the other way around, will lead to glitches.
  * </p>
  */
-public interface ItemMappingPipelineComposeEvent extends LifecycleEvent {
+public interface ItemMappingsComposeEvent extends LifecycleEvent {
 }

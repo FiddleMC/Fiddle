@@ -3,19 +3,19 @@ package org.fiddlemc.fiddle.api.packetmapping.component.nms;
 import java.util.List;
 import java.util.function.Consumer;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
-import org.fiddlemc.fiddle.api.packetmapping.component.ComponentMappingPipeline;
-import org.fiddlemc.fiddle.api.packetmapping.component.ComponentMappingPipelineComposeEvent;
+import org.fiddlemc.fiddle.api.packetmapping.component.ComponentMappings;
+import org.fiddlemc.fiddle.api.packetmapping.component.ComponentMappingsComposeEvent;
 
 /**
  * Provides functionality to register {@link NMSComponentMapping}s
- * to the {@link ComponentMappingPipeline}.
+ * to the {@link ComponentMappings}.
  *
  * <p>
  * For performance reasons, input should be as specific as possible.
  * This means arrays should be as small as possible.
  * </p>
  */
-public interface NMSComponentMappingPipelineComposeEvent extends ComponentMappingPipelineComposeEvent {
+public interface NMSComponentMappingPipelineComposeEvent extends ComponentMappingsComposeEvent {
 
     /**
      * Registers a mapping.

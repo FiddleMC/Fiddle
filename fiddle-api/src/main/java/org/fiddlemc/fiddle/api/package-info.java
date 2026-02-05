@@ -1,8 +1,8 @@
 /**
- * <h1>Module: General API</h1>
+ * <h1>General API</h1>
  *
  * <p>
- * API to interact with the other APIs.
+ * Convenient API access points for other parts of the API.
  * </p>
  */
 @NullMarked

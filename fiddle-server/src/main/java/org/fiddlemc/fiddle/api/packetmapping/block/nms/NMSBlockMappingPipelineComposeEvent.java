@@ -3,19 +3,19 @@ package org.fiddlemc.fiddle.api.packetmapping.block.nms;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
-import org.fiddlemc.fiddle.api.packetmapping.block.BlockMappingPipelineComposeEvent;
+import org.fiddlemc.fiddle.api.packetmapping.block.BlockMappingsComposeEvent;
 import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * Provides Minecraft internals functionality that extends {@link BlockMappingPipelineComposeEvent}.
+ * Provides Minecraft internals functionality that extends {@link BlockMappingsComposeEvent}.
  *
  * <p>
  * For performance reasons, input should be as specific as possible.
  * This means arrays should be as small as possible.
  * </p>
  */
-public interface NMSBlockMappingPipelineComposeEvent extends BlockMappingPipelineComposeEvent {
+public interface NMSBlockMappingPipelineComposeEvent extends BlockMappingsComposeEvent {
 
     /**
      * Register a simple mapping.

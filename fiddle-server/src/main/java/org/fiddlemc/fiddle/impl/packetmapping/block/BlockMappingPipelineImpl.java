@@ -1,15 +1,13 @@
 package org.fiddlemc.fiddle.impl.packetmapping.block;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntIntPair;
 import net.minecraft.world.level.block.state.BlockState;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
-import org.fiddlemc.fiddle.api.packetmapping.block.BlockMappingPipeline;
-import org.fiddlemc.fiddle.api.packetmapping.block.BlockMappingPipelineComposeEvent;
+import org.fiddlemc.fiddle.api.packetmapping.block.BlockMappings;
+import org.fiddlemc.fiddle.api.packetmapping.block.BlockMappingsComposeEvent;
 import org.fiddlemc.fiddle.api.packetmapping.block.BlockStateMappingContext;
 import org.fiddlemc.fiddle.api.packetmapping.block.nms.NMSBlockStateMapping;
-import org.fiddlemc.fiddle.api.packetmapping.block.nms.NMSBlockStateMappingHandle;
 import org.fiddlemc.fiddle.api.packetmapping.block.nms.NMSComplexBlockStateMapping;
 import org.fiddlemc.fiddle.api.packetmapping.block.nms.NMSSimpleBlockStateMapping;
 import org.fiddlemc.fiddle.impl.moredatadriven.minecraft.BlockStateRegistry;
@@ -25,9 +23,9 @@ import java.util.Map;
 /**
  * A pipeline of block mappings.
  */
-public final class BlockMappingPipelineImpl extends ComposableImpl<BlockMappingPipelineComposeEvent, BlockMappingPipelineComposeEventImpl> implements BlockMappingPipeline {
+public final class BlockMappingPipelineImpl extends ComposableImpl<BlockMappingsComposeEvent, BlockMappingPipelineComposeEventImpl> implements BlockMappings {
 
-    public static final class ServiceProviderImpl extends NoArgsConstructorServiceProviderImpl<BlockMappingPipeline, BlockMappingPipelineImpl> implements ServiceProvider {
+    public static final class ServiceProviderImpl extends NoArgsConstructorServiceProviderImpl<BlockMappings, BlockMappingPipelineImpl> implements ServiceProvider {
 
         public ServiceProviderImpl() {
             super(BlockMappingPipelineImpl.class);
@@ -36,7 +34,7 @@ public final class BlockMappingPipelineImpl extends ComposableImpl<BlockMappingP
     }
 
     public static BlockMappingPipelineImpl get() {
-        return (BlockMappingPipelineImpl) BlockMappingPipeline.get();
+        return (BlockMappingPipelineImpl) BlockMappings.get();
     }
 
     @Override

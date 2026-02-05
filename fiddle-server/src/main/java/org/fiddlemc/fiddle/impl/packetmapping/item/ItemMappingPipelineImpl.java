@@ -2,7 +2,6 @@ package org.fiddlemc.fiddle.impl.packetmapping.item;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntIntPair;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
@@ -10,15 +9,13 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
 import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingContext;
-import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingPipeline;
-import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingPipelineComposeEvent;
+import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappings;
+import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingsComposeEvent;
 import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMapping;
 import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMappingHandle;
-import org.fiddlemc.fiddle.impl.clientview.ClientViewImpl;
 import org.fiddlemc.fiddle.impl.moredatadriven.minecraft.ItemRegistry;
 import org.fiddlemc.fiddle.impl.packetmapping.WithClientViewContextSingleStepMappingPipeline;
 import org.fiddlemc.fiddle.impl.packetmapping.item.builtin.BuiltInItemMapperImpl;
-import org.fiddlemc.fiddle.impl.packetmapping.item.reverse.ItemMappingReverser;
 import org.fiddlemc.fiddle.impl.util.composable.ComposableImpl;
 import org.fiddlemc.fiddle.impl.util.mappingpipeline.WithContextSingleStepMappingPipeline;
 import org.fiddlemc.fiddle.impl.util.java.serviceloader.NoArgsConstructorServiceProviderImpl;
@@ -31,9 +28,9 @@ import java.util.Map;
 /**
  * A pipeline of {@link NMSItemMapping}s.
  */
-public final class ItemMappingPipelineImpl extends ComposableImpl<ItemMappingPipelineComposeEvent, ItemMappingPipelineComposeEventImpl> implements WithClientViewContextSingleStepMappingPipeline<ItemStack, ItemMappingContext, NMSItemMappingHandle, ItemMappingPipelineComposeEvent>, ItemMappingPipeline {
+public final class ItemMappingPipelineImpl extends ComposableImpl<ItemMappingsComposeEvent, ItemMappingPipelineComposeEventImpl> implements WithClientViewContextSingleStepMappingPipeline<ItemStack, ItemMappingContext, NMSItemMappingHandle, ItemMappingsComposeEvent>, ItemMappings {
 
-    public static final class ServiceProviderImpl extends NoArgsConstructorServiceProviderImpl<ItemMappingPipeline, ItemMappingPipelineImpl> implements ServiceProvider {
+    public static final class ServiceProviderImpl extends NoArgsConstructorServiceProviderImpl<ItemMappings, ItemMappingPipelineImpl> implements ServiceProvider {
 
         public ServiceProviderImpl() {
             super(ItemMappingPipelineImpl.class);
@@ -42,7 +39,7 @@ public final class ItemMappingPipelineImpl extends ComposableImpl<ItemMappingPip
     }
 
     public static ItemMappingPipelineImpl get() {
-        return (ItemMappingPipelineImpl) ItemMappingPipeline.get();
+        return (ItemMappingPipelineImpl) ItemMappings.get();
     }
 
     @Override

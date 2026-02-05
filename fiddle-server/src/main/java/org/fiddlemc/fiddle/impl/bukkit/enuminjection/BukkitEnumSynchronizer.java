@@ -2,9 +2,9 @@ package org.fiddlemc.fiddle.impl.bukkit.enuminjection;
 
 import com.mojang.logging.LogUtils;
 import net.minecraft.server.dedicated.DedicatedServer;
-import org.fiddlemc.fiddle.api.bukkit.enuminjection.BukkitEnumNameMappingHandle;
-import org.fiddlemc.fiddle.api.bukkit.enuminjection.BukkitEnumNameMappingPipeline;
-import org.fiddlemc.fiddle.api.bukkit.enuminjection.BukkitEnumNameMappingPipelineComposeEvent;
+import org.fiddlemc.fiddle.api.bukkit.enuminjection.BukkitEnumNamePickHandle;
+import org.fiddlemc.fiddle.api.bukkit.enuminjection.BukkitEnumNames;
+import org.fiddlemc.fiddle.api.bukkit.enuminjection.BukkitEnumNamesComposeEvent;
 import org.fiddlemc.fiddle.impl.util.java.enuminjection.EnumInjector;
 import org.fiddlemc.fiddle.impl.util.mappingpipeline.SingleStepMappingPipeline;
 import org.jspecify.annotations.Nullable;
@@ -19,7 +19,7 @@ import java.util.List;
  * To apply the synchronization, call {@link #run}.
  * </p>
  */
-public abstract class BukkitEnumSynchronizer<E extends Enum<E>, S, I extends EnumInjector<E>, P extends BukkitEnumNameMappingPipelineImpl<S> & SingleStepMappingPipeline<String, BukkitEnumNameMappingHandle<S>, BukkitEnumNameMappingPipelineComposeEvent<S>>> {
+public abstract class BukkitEnumSynchronizer<E extends Enum<E>, S, I extends EnumInjector<E>, P extends BukkitEnumNameMappingPipelineImpl<S> & SingleStepMappingPipeline<String, BukkitEnumNamePickHandle<S>, BukkitEnumNamesComposeEvent<S>>> {
 
     private static final Logger LOGGER = LogUtils.getLogger();
 
@@ -30,7 +30,7 @@ public abstract class BukkitEnumSynchronizer<E extends Enum<E>, S, I extends Enu
     private @Nullable I injector;
 
     /**
-     * @return The {@link BukkitEnumNameMappingPipeline} used by this synchronizer.
+     * @return The {@link BukkitEnumNames} used by this synchronizer.
      */
     protected abstract P getNameMappingPipeline();
 

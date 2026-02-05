@@ -6,7 +6,7 @@ import org.bukkit.block.data.BlockData;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
 
 /**
- * Provides functionality to register mappings to the {@link BlockMappingPipeline}.
+ * Provides functionality to register mappings to the {@link BlockMappings}.
  *
  * <p>
  * Extended functionality is available by casting to {@code NMSBlockMappingPipelineComposeEvent}.
@@ -21,7 +21,7 @@ import org.fiddlemc.fiddle.api.clientview.ClientView;
  * Mapping from {@linkplain BlockType#isAir air} to non-air, or the other way around, will lead to glitches.
  * </p>
  */
-public interface BlockMappingPipelineComposeEvent extends LifecycleEvent {
+public interface BlockMappingsComposeEvent extends LifecycleEvent {
 
     /**
      * Register a simple mapping.

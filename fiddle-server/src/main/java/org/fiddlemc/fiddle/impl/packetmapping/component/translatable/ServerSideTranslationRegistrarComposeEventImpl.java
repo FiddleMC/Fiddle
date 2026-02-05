@@ -1,15 +1,15 @@
 package org.fiddlemc.fiddle.impl.packetmapping.component.translatable;
 
 import io.papermc.paper.plugin.lifecycle.event.PaperLifecycleEvent;
-import org.fiddlemc.fiddle.api.packetmapping.component.translatable.ServerSideTranslationRegistrar;
-import org.fiddlemc.fiddle.api.packetmapping.component.translatable.ServerSideTranslationRegistrarComposeEvent;
+import org.fiddlemc.fiddle.api.packetmapping.component.translatable.ServerSideTranslations;
+import org.fiddlemc.fiddle.api.packetmapping.component.translatable.ServerSideTranslationsComposeEvent;
 import java.util.HashMap;
 import java.util.Locale;
 
 /**
- * The implementation of {@link ServerSideTranslationRegistrarComposeEvent}.
+ * The implementation of {@link ServerSideTranslationsComposeEvent}.
  */
-public final class ServerSideTranslationRegistrarComposeEventImpl implements PaperLifecycleEvent, ServerSideTranslationRegistrarComposeEvent {
+public final class ServerSideTranslationRegistrarComposeEventImpl implements PaperLifecycleEvent, ServerSideTranslationsComposeEvent {
 
     private final ServerSideTranslationRegistrarImpl registrar;
 
@@ -18,7 +18,7 @@ public final class ServerSideTranslationRegistrarComposeEventImpl implements Pap
     }
 
     @Override
-    public void register(final String key, final String translation, final String locale, final ServerSideTranslationRegistrar.FallbackScope fallbackScope, boolean overrideClientSide) {
+    public void register(final String key, final String translation, final String locale, final ServerSideTranslations.FallbackScope fallbackScope, boolean overrideClientSide) {
 
         // Do some basic checks for the arguments
         String lowerCaseKey = key.toLowerCase(Locale.ROOT);
@@ -40,14 +40,14 @@ public final class ServerSideTranslationRegistrarComposeEventImpl implements Pap
 
         // Add the translations
         ServerSideTranslationRegistrarImpl.RegisteredTranslationsForKey translationsForKey = this.registrar.registeredTranslations.computeIfAbsent(key, $ -> new ServerSideTranslationRegistrarImpl.RegisteredTranslationsForKey());
-        ServerSideTranslationRegistrar.ServerSideTranslation translationToRegister = new ServerSideTranslationRegistrar.ServerSideTranslation(translation, overrideClientSide);
-        if (fallbackScope.equals(ServerSideTranslationRegistrar.FallbackScope.ALL)) {
+        ServerSideTranslations.ServerSideTranslation translationToRegister = new ServerSideTranslations.ServerSideTranslation(translation, overrideClientSide);
+        if (fallbackScope.equals(ServerSideTranslations.FallbackScope.ALL)) {
             // Add as generic fallback
             if (translationsForKey.genericTranslation == null || overrideClientSide || !translationsForKey.genericTranslation.overrideClientSide()) {
                 translationsForKey.genericTranslation = translationToRegister;
             }
         }
-        if (!fallbackScope.equals(ServerSideTranslationRegistrar.FallbackScope.NONE)) {
+        if (!fallbackScope.equals(ServerSideTranslations.FallbackScope.NONE)) {
             // Add as group fallback
             int underscoreIndex = locale.indexOf('_');
             if (underscoreIndex > 0) {

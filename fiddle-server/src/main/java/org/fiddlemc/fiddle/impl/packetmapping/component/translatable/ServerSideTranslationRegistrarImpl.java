@@ -1,7 +1,7 @@
 package org.fiddlemc.fiddle.impl.packetmapping.component.translatable;
 
-import org.fiddlemc.fiddle.api.packetmapping.component.translatable.ServerSideTranslationRegistrar;
-import org.fiddlemc.fiddle.api.packetmapping.component.translatable.ServerSideTranslationRegistrarComposeEvent;
+import org.fiddlemc.fiddle.api.packetmapping.component.translatable.ServerSideTranslations;
+import org.fiddlemc.fiddle.api.packetmapping.component.translatable.ServerSideTranslationsComposeEvent;
 import org.fiddlemc.fiddle.impl.util.composable.ComposableImpl;
 import org.fiddlemc.fiddle.impl.util.java.serviceloader.NoArgsConstructorServiceProviderImpl;
 import org.jspecify.annotations.Nullable;
@@ -10,11 +10,11 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * The implementation of {@link ServerSideTranslationRegistrar}.
+ * The implementation of {@link ServerSideTranslations}.
  */
-public final class ServerSideTranslationRegistrarImpl extends ComposableImpl<ServerSideTranslationRegistrarComposeEvent, ServerSideTranslationRegistrarComposeEventImpl> implements ServerSideTranslationRegistrar {
+public final class ServerSideTranslationRegistrarImpl extends ComposableImpl<ServerSideTranslationsComposeEvent, ServerSideTranslationRegistrarComposeEventImpl> implements ServerSideTranslations {
 
-    public static final class ServiceProviderImpl extends NoArgsConstructorServiceProviderImpl<ServerSideTranslationRegistrar, ServerSideTranslationRegistrarImpl> implements ServiceProvider {
+    public static final class ServiceProviderImpl extends NoArgsConstructorServiceProviderImpl<ServerSideTranslations, ServerSideTranslationRegistrarImpl> implements ServiceProvider {
 
         public ServiceProviderImpl() {
             super(ServerSideTranslationRegistrarImpl.class);
@@ -23,7 +23,7 @@ public final class ServerSideTranslationRegistrarImpl extends ComposableImpl<Ser
     }
 
     public static ServerSideTranslationRegistrarImpl get() {
-        return (ServerSideTranslationRegistrarImpl) ServerSideTranslationRegistrar.get();
+        return (ServerSideTranslationRegistrarImpl) ServerSideTranslations.get();
     }
 
     @Override

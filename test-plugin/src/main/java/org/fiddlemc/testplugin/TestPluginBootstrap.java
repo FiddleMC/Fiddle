@@ -25,7 +25,7 @@ import org.fiddlemc.fiddle.api.moredatadriven.paper.nms.NMSBlockRegistryEntryBui
 import org.fiddlemc.fiddle.api.moredatadriven.paper.nms.NMSItemRegistryEntryBuilder;
 import org.fiddlemc.fiddle.api.packetmapping.block.nms.NMSBlockMappingPipelineComposeEvent;
 import org.fiddlemc.fiddle.api.packetmapping.block.nms.NMSComplexBlockStateMapping;
-import org.fiddlemc.fiddle.api.packetmapping.component.translatable.ServerSideTranslationRegistrar;
+import org.fiddlemc.fiddle.api.packetmapping.component.translatable.ServerSideTranslations;
 import org.fiddlemc.fiddle.api.packetmapping.item.builtin.BuiltInItemMapper;
 import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMappingPipelineComposeEvent;
 import org.fiddlemc.testplugin.data.PluginBlockTypes;
@@ -147,7 +147,7 @@ public class TestPluginBootstrap implements PluginBootstrap {
      * </p>
      */
     private void customizeEnumNameForAnItem(@NotNull BootstrapContext context) {
-        context.getLifecycleManager().registerEventHandler(FiddleEvents.MATERIAL_ENUM_MAPPING_PIPELINE_COMPOSE, event -> {
+        context.getLifecycleManager().registerEventHandler(FiddleEvents.MATERIAL_ENUM_NAMES, event -> {
             event.register(handle -> {
                 var key = handle.getSourceValue().getLeft();
                 if (key.equals(NamespacedKey.fromString("example:ash"))) {
@@ -168,7 +168,7 @@ public class TestPluginBootstrap implements PluginBootstrap {
      * </p>
      */
     private void setBasicBlockMappings(@NotNull BootstrapContext context) {
-        context.getLifecycleManager().registerEventHandler(FiddleEvents.BLOCK_MAPPING_PIPELINE_COMPOSE, event -> {
+        context.getLifecycleManager().registerEventHandler(FiddleEvents.BLOCK_MAPPINGS, event -> {
 
             event.registerSimple(ClientView.AwarenessLevel.JAVA_DEFAULT, PluginBlockTypes.ASH_BLOCK.get(), BlockType.LIGHT_GRAY_CONCRETE_POWDER.createBlockData());
             event.registerStateToState(ClientView.AwarenessLevel.JAVA_DEFAULT, PluginBlockTypes.ASH_STAIRS.get(), BlockType.ANDESITE_STAIRS);
@@ -187,7 +187,7 @@ public class TestPluginBootstrap implements PluginBootstrap {
      * </p>
      */
     private void setComplexBlockMappings(@NotNull BootstrapContext context) {
-        context.getLifecycleManager().registerEventHandler(FiddleEvents.BLOCK_MAPPING_PIPELINE_COMPOSE, event -> {
+        context.getLifecycleManager().registerEventHandler(FiddleEvents.BLOCK_MAPPINGS, event -> {
             var nmsEvent = (NMSBlockMappingPipelineComposeEvent) event;
 
             nmsEvent.registerComplex(ClientView.AwarenessLevel.JAVA_DEFAULT, Blocks.GRASS_BLOCK.defaultBlockState(), new NMSComplexBlockStateMapping(handle -> {
@@ -239,7 +239,7 @@ public class TestPluginBootstrap implements PluginBootstrap {
      * </p>
      */
     private void setComplexItemMappings(@NotNull BootstrapContext context) {
-        context.getLifecycleManager().registerEventHandler(FiddleEvents.ITEM_MAPPING_PIPELINE_COMPOSE, event -> {
+        context.getLifecycleManager().registerEventHandler(FiddleEvents.ITEM_MAPPINGS, event -> {
             var nmsEvent = (NMSItemMappingPipelineComposeEvent) event;
 
             nmsEvent.register(ClientView.AwarenessLevel.getAll(), Items.CRAFTING_TABLE, handle -> {
@@ -276,13 +276,13 @@ public class TestPluginBootstrap implements PluginBootstrap {
      * </p>
      */
     private void setTranslations(@NotNull BootstrapContext context) {
-        context.getLifecycleManager().registerEventHandler(FiddleEvents.SERVER_SIDE_TRANSLATION_REGISTRAR_COMPOSE, event -> {
+        context.getLifecycleManager().registerEventHandler(FiddleEvents.SERVER_SIDE_TRANSLATIONS, event -> {
 
             event.register(PluginItems.ASH.get().getDescriptionId(), "Ash");
             event.register(PluginItems.ASH_BLOCK.get().getDescriptionId(), "Ash block");
             event.register(PluginItems.ASH_STAIRS.get().getDescriptionId(), "Ash stairs");
 
-            event.register(PluginItems.ASH.get().getDescriptionId(), "灰", "ja_jp", ServerSideTranslationRegistrar.FallbackScope.LANGUAGE_GROUP);
+            event.register(PluginItems.ASH.get().getDescriptionId(), "灰", "ja_jp", ServerSideTranslations.FallbackScope.LANGUAGE_GROUP);
 
             event.register(Blocks.BOOKSHELF.getDescriptionId(), "Booky Bookshelf");
 

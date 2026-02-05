@@ -3,7 +3,7 @@ package org.fiddlemc.fiddle.api.bukkit.enuminjection;
 import org.fiddlemc.fiddle.api.util.composable.Composable;
 
 /**
- * A pipeline for mappings to map a source value into a {@link Enum#name()} for a value of a Bukkit enum.
+ * A service to determine an {@link Enum#name()} for a new value in a Bukkit enum, based on a source value.
  *
  * <p>
  * Don't use this unless you know what you are doing.
@@ -13,5 +13,5 @@ import org.fiddlemc.fiddle.api.util.composable.Composable;
  * Other naming styles may lead to collisions or other plugins parsing strings incorrectly.
  * </p>
  */
-public interface BukkitEnumNameMappingPipeline<S> extends Composable<BukkitEnumNameMappingPipelineComposeEvent<S>> {
+public interface BukkitEnumNames<S> extends Composable<BukkitEnumNamesComposeEvent<S>> {
 }

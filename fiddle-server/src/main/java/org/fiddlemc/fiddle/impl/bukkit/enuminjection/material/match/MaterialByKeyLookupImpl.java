@@ -1,9 +1,8 @@
-package org.fiddlemc.fiddle.impl.bukkit.enuminjection.material;
+package org.fiddlemc.fiddle.impl.bukkit.enuminjection.material.match;
 
 import net.kyori.adventure.key.Key;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.fiddlemc.fiddle.api.bukkit.enuminjection.material.MaterialByKeyLookup;
 import org.fiddlemc.fiddle.impl.bukkit.enuminjection.KeyedSourceBukkitEnumSynchronizer;
 import org.fiddlemc.fiddle.impl.util.java.serviceloader.NoArgsConstructorServiceProviderImpl;
 import org.jspecify.annotations.Nullable;

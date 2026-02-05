@@ -6,11 +6,11 @@ import net.minecraft.network.chat.contents.TranslatableContents;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
 import org.fiddlemc.fiddle.api.packetmapping.component.nms.NMSComponentMapping;
 import org.fiddlemc.fiddle.api.packetmapping.component.nms.NMSComponentMappingHandle;
-import org.fiddlemc.fiddle.api.packetmapping.component.translatable.ServerSideTranslationRegistrar;
+import org.fiddlemc.fiddle.api.packetmapping.component.translatable.ServerSideTranslations;
 
 /**
  * A {@link NMSComponentMapping} that applies
- * {@linkplain ServerSideTranslationRegistrar registered server-side translations}
+ * {@linkplain ServerSideTranslations registered server-side translations}
  * to {@link Component}s.
  */
 public final class ServerSideTranslationComponentMapping implements NMSComponentMapping {
@@ -22,7 +22,7 @@ public final class ServerSideTranslationComponentMapping implements NMSComponent
         ComponentContents contents = handle.getImmutable().getContents();
         if (contents instanceof TranslatableContents translatableContents) {
             String key = translatableContents.getKey();
-            ServerSideTranslationRegistrar.ServerSideTranslation translation = ServerSideTranslationRegistrar.get().get(key, clientView.getLocale());
+            ServerSideTranslations.ServerSideTranslation translation = ServerSideTranslations.get().get(key, clientView.getLocale());
             if (translation != null) {
                 if (translation.overrideClientSide()) {
                     handle.setMutable(Component.literal(translation.translation()));

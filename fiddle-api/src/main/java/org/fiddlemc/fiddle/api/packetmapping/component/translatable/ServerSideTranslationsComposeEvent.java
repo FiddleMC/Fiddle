@@ -3,27 +3,27 @@ package org.fiddlemc.fiddle.api.packetmapping.component.translatable;
 import io.papermc.paper.plugin.lifecycle.event.LifecycleEvent;
 
 /**
- * Provides functionality to register server-side translations to the {@link ServerSideTranslationRegistrar}.
+ * Provides functionality to register server-side translations to the {@link ServerSideTranslations}.
  */
-public interface ServerSideTranslationRegistrarComposeEvent extends LifecycleEvent {
+public interface ServerSideTranslationsComposeEvent extends LifecycleEvent {
 
     /**
-     * The same as {@link #register(String, String, String, ServerSideTranslationRegistrar.FallbackScope)},
+     * The same as {@link #register(String, String, String, ServerSideTranslations.FallbackScope)},
      * but with:
      * <ul>
      *     <li>{@code locale} = {@code en_us}</li>
-     *     <li>{@code fallbackScope} = {@link ServerSideTranslationRegistrar.FallbackScope#ALL}</li>
+     *     <li>{@code fallbackScope} = {@link ServerSideTranslations.FallbackScope#ALL}</li>
      * </ul>
      */
     default void register(String key, String translation) {
-        this.register(key, translation, "en_us", ServerSideTranslationRegistrar.FallbackScope.ALL);
+        this.register(key, translation, "en_us", ServerSideTranslations.FallbackScope.ALL);
     }
 
     /**
-     * The same as {@link #register(String, String, String, ServerSideTranslationRegistrar.FallbackScope, boolean)},
+     * The same as {@link #register(String, String, String, ServerSideTranslations.FallbackScope, boolean)},
      * but with {@code overrideClientSide} = {@code true}.
      */
-    default void register(String key, String translation, String locale, ServerSideTranslationRegistrar.FallbackScope fallbackScope) {
+    default void register(String key, String translation, String locale, ServerSideTranslations.FallbackScope fallbackScope) {
         this.register(key, translation, locale, fallbackScope, true);
     }
 
@@ -48,6 +48,6 @@ public interface ServerSideTranslationRegistrarComposeEvent extends LifecycleEve
      * @param overrideClientSide Whether this translation also overrides translations already registered
      *                           on the client (such as vanilla names for Minecraft blocks and items).
      */
-    void register(String key, String translation, String locale, ServerSideTranslationRegistrar.FallbackScope fallbackScope, boolean overrideClientSide);
+    void register(String key, String translation, String locale, ServerSideTranslations.FallbackScope fallbackScope, boolean overrideClientSide);
 
 }

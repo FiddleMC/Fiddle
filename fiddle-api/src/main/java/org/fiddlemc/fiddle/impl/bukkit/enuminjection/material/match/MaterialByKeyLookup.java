@@ -1,4 +1,4 @@
-package org.fiddlemc.fiddle.api.bukkit.enuminjection.material;
+package org.fiddlemc.fiddle.impl.bukkit.enuminjection.material.match;
 
 import net.kyori.adventure.key.Key;
 import org.bukkit.Material;
@@ -8,7 +8,7 @@ import org.jspecify.annotations.Nullable;
 import java.util.ServiceLoader;
 
 /**
- * Provides a flexible lookup from a {@link org.bukkit.NamespacedKey} to a {@link org.bukkit.Material}.
+ * Provides a flexible lookup from a {@link NamespacedKey} to a {@link org.bukkit.Material}.
  */
 public interface MaterialByKeyLookup {
 

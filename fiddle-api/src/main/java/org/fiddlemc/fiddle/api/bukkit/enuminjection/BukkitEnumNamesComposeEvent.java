@@ -6,16 +6,16 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * Provides functionality to register mappings to a {@link BukkitEnumNameMappingPipeline}.
+ * Provides functionality to register mappings to a {@link BukkitEnumNames}.
  */
-public interface BukkitEnumNameMappingPipelineComposeEvent<S> extends LifecycleEvent {
+public interface BukkitEnumNamesComposeEvent<S> extends LifecycleEvent {
 
     /**
      * Registers a mapping.
      *
      * @param mapping The mapping to register.
      */
-    void register(SingleStepMapping<BukkitEnumNameMappingHandle<S>> mapping);
+    void register(SingleStepMapping<BukkitEnumNamePickHandle<S>> mapping);
 
     /**
      * Changes the list of registered mappings.
@@ -27,6 +27,6 @@ public interface BukkitEnumNameMappingPipelineComposeEvent<S> extends LifecycleE
      *
      * @param consumer The consumer that applies the desired changes to the list of mappings.
      */
-    void changeRegistered(Consumer<List<SingleStepMapping<BukkitEnumNameMappingHandle<S>>>> consumer);
+    void changeRegistered(Consumer<List<SingleStepMapping<BukkitEnumNamePickHandle<S>>>> consumer);
 
 }

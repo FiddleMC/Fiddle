@@ -9,8 +9,8 @@ import java.util.Map;
 import net.minecraft.network.chat.Component;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
 import org.fiddlemc.fiddle.api.packetmapping.ClientViewMappingContext;
-import org.fiddlemc.fiddle.api.packetmapping.component.ComponentMappingPipeline;
-import org.fiddlemc.fiddle.api.packetmapping.component.ComponentMappingPipelineComposeEvent;
+import org.fiddlemc.fiddle.api.packetmapping.component.ComponentMappings;
+import org.fiddlemc.fiddle.api.packetmapping.component.ComponentMappingsComposeEvent;
 import org.fiddlemc.fiddle.api.packetmapping.component.nms.NMSComponentMapping;
 import org.fiddlemc.fiddle.api.packetmapping.component.nms.NMSComponentMappingHandle;
 import org.fiddlemc.fiddle.impl.packetmapping.WithClientViewContextSingleStepMappingPipeline;
@@ -22,9 +22,9 @@ import org.jspecify.annotations.Nullable;
 /**
  * A pipeline of {@link NMSComponentMapping}s.
  */
-public final class ComponentMappingPipelineImpl extends ComposableImpl<ComponentMappingPipelineComposeEvent, ComponentMappingPipelineComposeEventImpl> implements WithClientViewContextSingleStepMappingPipeline.Simple<Component, NMSComponentMappingHandle, ComponentMappingPipelineComposeEvent>, ComponentMappingPipeline {
+public final class ComponentMappingPipelineImpl extends ComposableImpl<ComponentMappingsComposeEvent, ComponentMappingPipelineComposeEventImpl> implements WithClientViewContextSingleStepMappingPipeline.Simple<Component, NMSComponentMappingHandle, ComponentMappingsComposeEvent>, ComponentMappings {
 
-    public static final class ServiceProviderImpl extends NoArgsConstructorServiceProviderImpl<ComponentMappingPipeline, ComponentMappingPipelineImpl> implements ServiceProvider {
+    public static final class ServiceProviderImpl extends NoArgsConstructorServiceProviderImpl<ComponentMappings, ComponentMappingPipelineImpl> implements ServiceProvider {
 
         public ServiceProviderImpl() {
             super(ComponentMappingPipelineImpl.class);
@@ -33,7 +33,7 @@ public final class ComponentMappingPipelineImpl extends ComposableImpl<Component
     }
 
     public static ComponentMappingPipelineImpl get() {
-        return (ComponentMappingPipelineImpl) ComponentMappingPipeline.get();
+        return (ComponentMappingPipelineImpl) ComponentMappings.get();
     }
 
     @Override

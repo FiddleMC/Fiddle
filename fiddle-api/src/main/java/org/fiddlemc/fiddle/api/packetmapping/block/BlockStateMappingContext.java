@@ -3,7 +3,7 @@ package org.fiddlemc.fiddle.api.packetmapping.block;
 import org.fiddlemc.fiddle.api.packetmapping.ClientViewMappingContext;
 
 /**
- * A {@link ClientViewMappingContext} for the {@link BlockMappingPipeline}.
+ * A {@link ClientViewMappingContext} for the {@link BlockMappings}.
  */
 public interface BlockStateMappingContext extends ClientViewMappingContext {
 

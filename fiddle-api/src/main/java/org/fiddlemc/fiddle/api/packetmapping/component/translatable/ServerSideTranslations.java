@@ -6,25 +6,25 @@ import org.jspecify.annotations.Nullable;
 import java.util.ServiceLoader;
 
 /**
- * Provides functionality to use server-side translations.
+ * A service for registered server-side translations.
  *
  * <p>
  * This can also be used to override existing translations.
  * </p>
  */
-public interface ServerSideTranslationRegistrar extends Composable<ServerSideTranslationRegistrarComposeEvent> {
+public interface ServerSideTranslations extends Composable<ServerSideTranslationsComposeEvent> {
 
     /**
-     * An internal interface to get the {@link ServerSideTranslationRegistrar} instance.
+     * An internal interface to get the {@link ServerSideTranslations} instance.
      */
-    interface ServiceProvider extends GenericServiceProvider<ServerSideTranslationRegistrar> {
+    interface ServiceProvider extends GenericServiceProvider<ServerSideTranslations> {
     }
 
     /**
-     * @return The {@link ServerSideTranslationRegistrar} instance.
+     * @return The {@link ServerSideTranslations} instance.
      */
-    static ServerSideTranslationRegistrar get() {
-        return ServiceLoader.load(ServerSideTranslationRegistrar.ServiceProvider.class, ServerSideTranslationRegistrar.ServiceProvider.class.getClassLoader()).findFirst().get().get();
+    static ServerSideTranslations get() {
+        return ServiceLoader.load(ServerSideTranslations.ServiceProvider.class, ServerSideTranslations.ServiceProvider.class.getClassLoader()).findFirst().get().get();
     }
 
     /**
