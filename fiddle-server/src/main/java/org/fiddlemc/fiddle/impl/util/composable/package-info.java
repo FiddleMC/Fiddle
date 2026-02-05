@@ -1,8 +1,8 @@
 /**
- * <h1>Module: Compose event utilities - Implementation</h1>
+ * <h1>Compose event utilities - Implementation part</h1>
  *
  * <p>
- * Base implementation of abstract registries that have a compose lifecycle event.
+ * Base implementation of {@link org.fiddlemc.fiddle.api.util.composable}.
  * </p>
  */
 @NullMarked

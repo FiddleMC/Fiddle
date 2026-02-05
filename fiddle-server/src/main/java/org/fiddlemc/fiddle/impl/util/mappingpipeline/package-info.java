@@ -1,8 +1,8 @@
 /**
- * <h1>Module: Mapping pipeline utilities - Implementation</h1>
+ * <h1>Mapping pipeline utilities - Implementation part</h1>
  *
  * <p>
- * Provides base implementations for mapping pipelines.
+ * Base implementation of {@link org.fiddlemc.fiddle.api.util.mappingpipeline}.
  * </p>
  */
 @NullMarked

@@ -1,5 +1,5 @@
 /**
- * <h1>Module: Mapping pipeline utilities - API</h1>
+ * <h1>Module: Mapping pipeline utilities - API part</h1>
  *
  * <p>
  * Adds API for abstract pipelines for mapping data.

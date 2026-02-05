@@ -1,5 +1,5 @@
 /**
- * <h1>Module: Compose event utilities - API</h1>
+ * <h1>Compose event utilities - API part</h1>
  *
  * <p>
  * Adds API for abstract registries that have a compose lifecycle event.
