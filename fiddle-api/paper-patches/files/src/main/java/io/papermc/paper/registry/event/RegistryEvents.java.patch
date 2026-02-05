@@ -1,0 +1,13 @@
+--- a/src/main/java/io/papermc/paper/registry/event/RegistryEvents.java
++++ b/src/main/java/io/papermc/paper/registry/event/RegistryEvents.java
+@@ -57,6 +_,10 @@
+     public static final RegistryEventProvider<ZombieNautilus.Variant, ZombieNautilusVariantRegistryEntry.Builder> ZOMBIE_NAUTILUS_VARIANT = create(RegistryKey.ZOMBIE_NAUTILUS_VARIANT);
+     public static final RegistryEventProvider<Dialog, DialogRegistryEntry.Builder> DIALOG = create(RegistryKey.DIALOG);
+     // End generate - RegistryEvents
++    // Fiddle start - More data-driven - Registry API - Add event providers
++    public static final RegistryEventProvider<org.bukkit.block.BlockType, org.fiddlemc.fiddle.api.moredatadriven.paper.BlockRegistryEntry.Builder> BLOCK = RegistryEventProviderImpl.create(RegistryKey.BLOCK);
++    public static final RegistryEventProvider<org.bukkit.inventory.ItemType, org.fiddlemc.fiddle.api.moredatadriven.paper.ItemRegistryEntry.Builder> ITEM = RegistryEventProviderImpl.create(RegistryKey.ITEM);
++    // Fiddle end - More data-driven - Registry API - Add event providers
+ 
+     private RegistryEvents() {
+     }

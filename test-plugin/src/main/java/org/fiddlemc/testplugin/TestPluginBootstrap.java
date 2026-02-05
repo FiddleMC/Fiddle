@@ -5,6 +5,7 @@ import io.papermc.paper.plugin.bootstrap.PluginBootstrap;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import io.papermc.paper.registry.RegistryKey;
 import io.papermc.paper.registry.TypedKey;
+import io.papermc.paper.registry.event.RegistryEvents;
 import net.kyori.adventure.key.Key;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponents;
@@ -21,8 +22,6 @@ import org.bukkit.block.BlockType;
 import org.bukkit.inventory.ItemType;
 import org.fiddlemc.fiddle.api.bukkit.enuminjection.material.MaterialEnumNameMappingPipeline;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
-import org.fiddlemc.fiddle.api.moredatadriven.paper.BlockRegistryEventProvider;
-import org.fiddlemc.fiddle.api.moredatadriven.paper.ItemRegistryEventProvider;
 import org.fiddlemc.fiddle.api.moredatadriven.paper.nms.NMSBlockRegistryEntryBuilder;
 import org.fiddlemc.fiddle.api.moredatadriven.paper.nms.NMSItemRegistryEntryBuilder;
 import org.fiddlemc.fiddle.api.packetmapping.block.BlockMappingPipeline;
@@ -71,7 +70,7 @@ public class TestPluginBootstrap implements PluginBootstrap {
      * </p>
      */
     private void addCustomBlocks(@NotNull BootstrapContext context) {
-        context.getLifecycleManager().registerEventHandler(BlockRegistryEventProvider.BLOCK.compose(), event -> {
+        context.getLifecycleManager().registerEventHandler(RegistryEvents.BLOCK.compose(), event -> {
 
             event.registry().register(TypedKey.create(RegistryKey.BLOCK, Key.key("example:ash_block")), builder -> {
                 var nmsBuilder = (NMSBlockRegistryEntryBuilder) builder;
@@ -105,7 +104,7 @@ public class TestPluginBootstrap implements PluginBootstrap {
      * </p>
      */
     private void addCustomItems(@NotNull BootstrapContext context) {
-        context.getLifecycleManager().registerEventHandler(ItemRegistryEventProvider.ITEM.compose(), event -> {
+        context.getLifecycleManager().registerEventHandler(RegistryEvents.ITEM.compose(), event -> {
 
             event.registry().register(TypedKey.create(RegistryKey.ITEM, Key.key("example:ash")), builder -> {
             });
