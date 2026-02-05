@@ -1,7 +1,7 @@
 package org.fiddlemc.fiddle.api.bukkit.enuminjection;
 
-import org.fiddlemc.fiddle.api.util.mappingpipeline.MappingFunctionHandle;
-import org.fiddlemc.fiddle.api.util.mappingpipeline.WithOriginalMappingFunctionHandle;
+import org.fiddlemc.fiddle.api.util.mapping.MappingFunctionHandle;
+import org.fiddlemc.fiddle.api.util.mapping.WithOriginalMappingFunctionHandle;
 
 /**
  * A {@link MappingFunctionHandle} for {@link BukkitEnumNames}s.

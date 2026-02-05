@@ -55,7 +55,7 @@ public final class ComponentMappingPipelineImpl extends ComposableImpl<Component
     }
 
     @Override
-    public NMSComponentMapping @Nullable [] getMappingsThatMayApplyTo(NMSComponentMappingHandle handle) {
+    public NMSComponentMapping @Nullable [] getStepsThatMayApplyTo(NMSComponentMappingHandle handle) {
         return this.mappings[handle.getContext().getClientView().getAwarenessLevel().ordinal()];
     }
 

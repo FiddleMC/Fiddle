@@ -3,14 +3,14 @@ package org.fiddlemc.fiddle.impl.packetmapping;
 import io.papermc.paper.plugin.lifecycle.event.LifecycleEvent;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
 import org.fiddlemc.fiddle.api.packetmapping.WithClientViewMappingFunctionContext;
-import org.fiddlemc.fiddle.api.util.mappingpipeline.WithContextMappingFunctionHandle;
+import org.fiddlemc.fiddle.api.util.mapping.WithContextMappingFunctionHandle;
 import org.fiddlemc.fiddle.impl.clientview.lookup.packethandling.ClientViewLookupThreadLocal;
 import org.fiddlemc.fiddle.impl.util.mappingpipeline.WithContextSingleStepMappingPipeline;
 
 /**
  * A {@link WithContextSingleStepMappingPipeline} for contexts of type {@link WithClientViewMappingFunctionContext}.
  */
-public interface WithClientViewContextSingleStepMappingPipeline<T, C extends WithClientViewMappingFunctionContext, H extends WithContextMappingFunctionHandle<T, C>, E extends LifecycleEvent> extends WithContextSingleStepMappingPipeline<T, C, H, E> {
+public interface WithClientViewContextSingleStepMappingPipeline<T, C extends WithClientViewMappingFunctionContext, H extends WithContextMappingFunctionHandle<T, C>> extends WithContextSingleStepMappingPipeline<T, C, H> {
 
     /**
      * Creates a generic {@linkplain C context} for {@link #applyGenerically},
@@ -33,7 +33,7 @@ public interface WithClientViewContextSingleStepMappingPipeline<T, C extends Wit
      * A simple implementation of {@link WithClientViewContextSingleStepMappingPipeline}
      * where the context is no more complex than {@link WithClientViewMappingFunctionContext}.
      */
-    interface Simple<T, H extends WithContextMappingFunctionHandle<T, WithClientViewMappingFunctionContext>, E extends LifecycleEvent> extends WithClientViewContextSingleStepMappingPipeline<T, WithClientViewMappingFunctionContext, H, E> {
+    interface Simple<T, H extends WithContextMappingFunctionHandle<T, WithClientViewMappingFunctionContext>, E extends LifecycleEvent> extends WithClientViewContextSingleStepMappingPipeline<T, WithClientViewMappingFunctionContext, H> {
 
         @Override
         default ClientViewMappingContextImpl createGenericContext(ClientView clientView) {

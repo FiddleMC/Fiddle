@@ -1,7 +1,7 @@
 package org.fiddlemc.fiddle.impl.util.mappingpipeline;
 
-import org.fiddlemc.fiddle.api.util.mappingpipeline.MappingFunctionContext;
-import org.fiddlemc.fiddle.api.util.mappingpipeline.WithContextMappingFunctionHandle;
+import org.fiddlemc.fiddle.api.util.mapping.MappingFunctionContext;
+import org.fiddlemc.fiddle.api.util.mapping.WithContextMappingFunctionHandle;
 
 /**
  * A base implementation of {@link WithContextMappingFunctionHandle},

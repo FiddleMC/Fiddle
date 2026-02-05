@@ -3,7 +3,6 @@ package org.fiddlemc.fiddle.impl.bukkit.enuminjection;
 import io.papermc.paper.plugin.lifecycle.event.PaperLifecycleEvent;
 import org.fiddlemc.fiddle.api.bukkit.enuminjection.BukkitEnumNamePickFunctionHandle;
 import org.fiddlemc.fiddle.api.bukkit.enuminjection.BukkitEnumNamesComposeEvent;
-import org.fiddlemc.fiddle.api.util.mappingpipeline.SingleStepMapping;
 import org.jspecify.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,10 +17,10 @@ public final class BukkitEnumNameMappingPipelineComposeEventImpl<S> implements P
      * The registered mappings,
      * or null if no mappings are registered.
      */
-    @Nullable List<SingleStepMapping<BukkitEnumNamePickFunctionHandle<S>>> mappings;
+    @Nullable List<Consumer<BukkitEnumNamePickFunctionHandle<S>>> mappings;
 
     @Override
-    public void register(final SingleStepMapping<BukkitEnumNamePickFunctionHandle<S>> mapping) {
+    public void register(Consumer<BukkitEnumNamePickFunctionHandle<S>> mapping) {
         if (this.mappings == null) {
             this.mappings = new ArrayList<>(1);
         }
@@ -29,8 +28,8 @@ public final class BukkitEnumNameMappingPipelineComposeEventImpl<S> implements P
     }
 
     @Override
-    public void changeRegistered(final Consumer<List<SingleStepMapping<BukkitEnumNamePickFunctionHandle<S>>>> consumer) {
-        List<SingleStepMapping<BukkitEnumNamePickFunctionHandle<S>>> passed = this.mappings != null ? this.mappings : new ArrayList<>(1);
+    public void changeRegistered(Consumer<List<Consumer<BukkitEnumNamePickFunctionHandle<S>>>> consumer) {
+        List<Consumer<BukkitEnumNamePickFunctionHandle<S>>> passed = this.mappings != null ? this.mappings : new ArrayList<>(1);
         consumer.accept(passed);
         if (passed.isEmpty() && this.mappings != null) {
             this.mappings = null;

@@ -21,10 +21,8 @@ import org.bukkit.block.BlockType;
 import org.bukkit.inventory.ItemType;
 import org.fiddlemc.fiddle.api.FiddleEvents;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
-import org.fiddlemc.fiddle.api.moredatadriven.paper.nms.NMSBlockRegistryEntryBuilder;
-import org.fiddlemc.fiddle.api.moredatadriven.paper.nms.NMSItemRegistryEntryBuilder;
-import org.fiddlemc.fiddle.api.packetmapping.block.nms.NMSBlockMappingPipelineComposeEvent;
-import org.fiddlemc.fiddle.api.packetmapping.block.nms.NMSComplexBlockStateMapping;
+import org.fiddlemc.fiddle.api.moredatadriven.paper.nms.BlockRegistryEntryBuilderNMS;
+import org.fiddlemc.fiddle.api.moredatadriven.paper.nms.ItemRegistryEntryBuilderNMS;
 import org.fiddlemc.fiddle.api.packetmapping.component.translatable.ServerSideTranslations;
 import org.fiddlemc.fiddle.api.packetmapping.item.builtin.BuiltInItemMapper;
 import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMappingPipelineComposeEvent;
@@ -45,12 +43,12 @@ public class TestPluginBootstrap implements PluginBootstrap {
         loadIncludedDataPack(context);
         addCustomBlocks(context);
         addCustomItems(context);
-        customizeEnumNameForAnItem(context);
         setBasicBlockMappings(context);
         setComplexBlockMappings(context);
         setBasicItemMappings(context);
         setComplexItemMappings(context);
         setTranslations(context);
+        customizeEnumNameForAnItem(context);
     }
 
     /**
@@ -80,11 +78,11 @@ public class TestPluginBootstrap implements PluginBootstrap {
      * </p>
      */
     private void addCustomBlocks(@NotNull BootstrapContext context) {
-        context.getLifecycleManager().registerEventHandler(FiddleEvents.BLOCK_REGISTRY_COMPOSE,event -> {
+        context.getLifecycleManager().registerEventHandler(FiddleEvents.BLOCK_REGISTRY_COMPOSE, event -> {
 
             event.registry().register(TypedKey.create(RegistryKey.BLOCK, Key.key("example:ash_block")), builder -> {
-                var nmsBuilder = (NMSBlockRegistryEntryBuilder) builder;
-                nmsBuilder.nmsProperties(properties -> {
+                var builderNMS = (BlockRegistryEntryBuilderNMS) builder;
+                builderNMS.propertiesNMS(properties -> {
                     properties.requiresCorrectToolForDrops(); // It drops nothing unless broken with the right tool (a shovel, as defined in the included data pack)
                     properties.mapColor(MapColor.COLOR_LIGHT_GRAY); // It shows up light gray on maps
                     properties.pushReaction(PushReaction.DESTROY); // It breaks when pushed by a piston
@@ -92,8 +90,8 @@ public class TestPluginBootstrap implements PluginBootstrap {
             });
 
             event.registry().register(TypedKey.create(RegistryKey.BLOCK, Key.key("example:ash_stairs")), builder -> {
-                var nmsBuilder = (NMSBlockRegistryEntryBuilder) builder;
-                nmsBuilder.nmsFactory(properties -> new StairBlock(PluginBlocks.ASH_BLOCK.get().defaultBlockState(), properties) {
+                var builderNMS = (BlockRegistryEntryBuilderNMS) builder;
+                builderNMS.factoryNMS(properties -> new StairBlock(PluginBlocks.ASH_BLOCK.get().defaultBlockState(), properties) {
                 }); // Use a factory that returns StairBlock to add new stairs
             });
 
@@ -120,9 +118,9 @@ public class TestPluginBootstrap implements PluginBootstrap {
             });
 
             event.registry().register(TypedKey.create(RegistryKey.ITEM, Key.key("example:ash_block")), builder -> {
-                var nmsBuilder = (NMSItemRegistryEntryBuilder) builder;
-                nmsBuilder.nmsFactoryForBlock(); // It's a block item
-                nmsBuilder.nmsProperties(properties -> {
+                var builderNMS = (ItemRegistryEntryBuilderNMS) builder;
+                builderNMS.factoryForBlockNMS(); // It's a block item
+                builderNMS.propertiesNMS(properties -> {
                     properties.stacksTo(32); // It stacks to 32
                     properties.fireResistant(); // It is resistant to fire
                     properties.craftRemainder(PluginItems.ASH.get()); // It leaves ash when used in a crafting recipe
@@ -130,30 +128,10 @@ public class TestPluginBootstrap implements PluginBootstrap {
             });
 
             event.registry().register(TypedKey.create(RegistryKey.ITEM, Key.key("example:ash_stairs")), builder -> {
-                var nmsBuilder = (NMSItemRegistryEntryBuilder) builder;
-                nmsBuilder.nmsFactoryForBlock(); // It's a block item
+                var builderNMS = (ItemRegistryEntryBuilderNMS) builder;
+                builderNMS.factoryForBlockNMS(); // It's a block item
             });
 
-        });
-    }
-
-    /**
-     * Sets a custom enum name <code>ASHES_TO_DUST</code> for the <code>example:ash</code> item,
-     * purely as a demo.
-     *
-     * <p>
-     * This is just intended as a demo that this is possible.
-     * Please don't do this yourself unless you really know what you are doing!
-     * </p>
-     */
-    private void customizeEnumNameForAnItem(@NotNull BootstrapContext context) {
-        context.getLifecycleManager().registerEventHandler(FiddleEvents.MATERIAL_ENUM_NAMES, event -> {
-            event.register(handle -> {
-                var key = handle.getSourceValue().getLeft();
-                if (key.equals(NamespacedKey.fromString("example:ash"))) {
-                    handle.set("ASHES_TO_DUST");
-                }
-            });
         });
     }
 
@@ -170,10 +148,18 @@ public class TestPluginBootstrap implements PluginBootstrap {
     private void setBasicBlockMappings(@NotNull BootstrapContext context) {
         context.getLifecycleManager().registerEventHandler(FiddleEvents.BLOCK_MAPPINGS, event -> {
 
-            event.registerSimpleToDefaultState(ClientView.AwarenessLevel.JAVA_DEFAULT, PluginBlockTypes.ASH_BLOCK.get(), BlockType.LIGHT_GRAY_CONCRETE_POWDER);
+            event.register(builder -> {
+                builder.awarenessLevel(ClientView.AwarenessLevel.JAVA_DEFAULT);
+                builder.fromBlockType(PluginBlockTypes.ASH_BLOCK.get());
+                builder.toDefaultStateOf(BlockType.LIGHT_GRAY_CONCRETE_POWDER);
+            });
             event.registerStateToState(ClientView.AwarenessLevel.JAVA_DEFAULT, PluginBlockTypes.ASH_STAIRS.get(), BlockType.ANDESITE_STAIRS);
 
-            event.registerSimpleToDefaultState(ClientView.AwarenessLevel.JAVA_DEFAULT, BlockType.BIRCH_LEAVES, BlockType.WAXED_COPPER_GRATE);
+            event.register(builder -> {
+                builder.awarenessLevel(ClientView.AwarenessLevel.JAVA_DEFAULT);
+                builder.fromBlockType(BlockType.BIRCH_LEAVES);
+                builder.toDefaultStateOf(BlockType.WAXED_COPPER_GRATE);
+            });
 
         });
     }
@@ -188,15 +174,16 @@ public class TestPluginBootstrap implements PluginBootstrap {
      */
     private void setComplexBlockMappings(@NotNull BootstrapContext context) {
         context.getLifecycleManager().registerEventHandler(FiddleEvents.BLOCK_MAPPINGS, event -> {
-            var nmsEvent = (NMSBlockMappingPipelineComposeEvent) event;
-
-            nmsEvent.registerComplex(ClientView.AwarenessLevel.JAVA_DEFAULT, Blocks.GRASS_BLOCK.defaultBlockState(), new NMSComplexBlockStateMapping(handle -> {
-                if (!handle.getContext().isStateOfPhysicalBlockInWorld()) return;
-                int coordinatesXor = handle.getContext().getPhysicalBlockX() ^ handle.getContext().getPhysicalBlockY() ^ handle.getContext().getPhysicalBlockZ();
-                if ((coordinatesXor & 1) == 0) return;
-                handle.set(Blocks.MOSS_BLOCK.defaultBlockState());
-            }, true));
-
+            event.register(builder -> {
+                builder.awarenessLevel(ClientView.AwarenessLevel.JAVA_DEFAULT);
+                builder.from(BlockType.GRASS_BLOCK.createBlockData());
+                builder.function(handle -> {
+                    if (!handle.getContext().isStateOfPhysicalBlockInWorld()) return;
+                    int coordinatesXor = handle.getContext().getPhysicalBlockX() ^ handle.getContext().getPhysicalBlockY() ^ handle.getContext().getPhysicalBlockZ();
+                    if ((coordinatesXor & 1) == 0) return;
+                    handle.set(BlockType.MOSS_BLOCK.createBlockData());
+                }, true);
+            });
         });
     }
 
@@ -286,6 +273,26 @@ public class TestPluginBootstrap implements PluginBootstrap {
 
             event.register(Blocks.BOOKSHELF.getDescriptionId(), "Booky Bookshelf");
 
+        });
+    }
+
+    /**
+     * Sets a custom enum name <code>ASHES_TO_DUST</code> for the <code>example:ash</code> item,
+     * purely as a demo.
+     *
+     * <p>
+     * This is just intended as a demo that this is possible.
+     * Please don't do this yourself unless you really know what you are doing!
+     * </p>
+     */
+    private void customizeEnumNameForAnItem(@NotNull BootstrapContext context) {
+        context.getLifecycleManager().registerEventHandler(FiddleEvents.MATERIAL_ENUM_NAMES, event -> {
+            event.register(handle -> {
+                var key = handle.getSourceValue().getLeft();
+                if (key.equals(NamespacedKey.fromString("example:ash"))) {
+                    handle.set("ASHES_TO_DUST");
+                }
+            });
         });
     }
 

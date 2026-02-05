@@ -2,9 +2,9 @@ package org.fiddlemc.fiddle.api.packetmapping.item.nms;
 
 import net.minecraft.world.item.ItemStack;
 import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingFunctionContext;
-import org.fiddlemc.fiddle.api.util.mappingpipeline.MutableMappingFunctionHandle;
-import org.fiddlemc.fiddle.api.util.mappingpipeline.WithContextMappingFunctionHandle;
-import org.fiddlemc.fiddle.api.util.mappingpipeline.WithOriginalMappingFunctionHandle;
+import org.fiddlemc.fiddle.api.util.mapping.MutableMappingFunctionHandle;
+import org.fiddlemc.fiddle.api.util.mapping.WithContextMappingFunctionHandle;
+import org.fiddlemc.fiddle.api.util.mapping.WithOriginalMappingFunctionHandle;
 
 /**
  * A handle provided to {@link NMSItemMapping}s.

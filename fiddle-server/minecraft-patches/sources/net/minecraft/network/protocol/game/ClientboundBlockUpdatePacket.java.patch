@@ -14,8 +14,8 @@
 +        public void encode(RegistryFriendlyByteBuf buffer, ClientboundBlockUpdatePacket value) {
 +            BlockPos pos = value.getPos();
 +            BlockPos.STREAM_CODEC.encode(buffer, pos);
-+            org.fiddlemc.fiddle.api.packetmapping.block.BlockStateMappingFunctionContext context = new org.fiddlemc.fiddle.impl.packetmapping.block.BlockStateMappingContextImpl(buffer.getClientViewOrFallback(), true, pos.getX(), pos.getY(), pos.getZ());
-+            BLOCK_STATE_CODEC.encode(buffer, org.fiddlemc.fiddle.impl.packetmapping.block.BlockMappingPipelineImpl.get().apply(value.getBlockState(), context));
++            org.fiddlemc.fiddle.api.packetmapping.block.BlockMappingFunctionContext context = new org.fiddlemc.fiddle.impl.packetmapping.block.BlockMappingContextImpl(buffer.getClientViewOrFallback(), true, pos.getX(), pos.getY(), pos.getZ());
++            BLOCK_STATE_CODEC.encode(buffer, org.fiddlemc.fiddle.impl.packetmapping.block.BlockMappingsImpl.get().apply(value.getBlockState(), context));
 +        }
 +
 +        @Override

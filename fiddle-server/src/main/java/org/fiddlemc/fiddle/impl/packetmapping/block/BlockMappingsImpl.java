@@ -4,12 +4,9 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.IntIntPair;
 import net.minecraft.world.level.block.state.BlockState;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
+import org.fiddlemc.fiddle.api.packetmapping.block.BlockMappingFunctionContext;
 import org.fiddlemc.fiddle.api.packetmapping.block.BlockMappings;
 import org.fiddlemc.fiddle.api.packetmapping.block.BlockMappingsComposeEvent;
-import org.fiddlemc.fiddle.api.packetmapping.block.BlockStateMappingFunctionContext;
-import org.fiddlemc.fiddle.api.packetmapping.block.nms.NMSBlockStateMapping;
-import org.fiddlemc.fiddle.api.packetmapping.block.nms.NMSComplexBlockStateMapping;
-import org.fiddlemc.fiddle.api.packetmapping.block.nms.NMSSimpleBlockStateMapping;
 import org.fiddlemc.fiddle.impl.moredatadriven.minecraft.BlockStateRegistry;
 import org.fiddlemc.fiddle.impl.util.composable.ComposableImpl;
 import org.fiddlemc.fiddle.impl.util.java.serviceloader.NoArgsConstructorServiceProviderImpl;
@@ -23,29 +20,29 @@ import java.util.Map;
 /**
  * A pipeline of block mappings.
  */
-public final class BlockMappingPipelineImpl extends ComposableImpl<BlockMappingsComposeEvent, BlockMappingPipelineComposeEventImpl> implements BlockMappings {
+public final class BlockMappingsImpl extends ComposableImpl<BlockMappingsComposeEvent<BlockMappingsStep>, BlockMappingsComposeEventImpl> implements BlockMappings<BlockMappingsStep> {
 
-    public static final class ServiceProviderImpl extends NoArgsConstructorServiceProviderImpl<BlockMappings, BlockMappingPipelineImpl> implements ServiceProvider {
+    public static final class ServiceProviderImpl extends NoArgsConstructorServiceProviderImpl<BlockMappings<?>, BlockMappingsImpl> implements ServiceProvider {
 
         public ServiceProviderImpl() {
-            super(BlockMappingPipelineImpl.class);
+            super(BlockMappingsImpl.class);
         }
 
     }
 
-    public static BlockMappingPipelineImpl get() {
-        return (BlockMappingPipelineImpl) BlockMappings.get();
+    public static BlockMappingsImpl get() {
+        return (BlockMappingsImpl) BlockMappings.get();
     }
 
     @Override
     protected String getEventTypeNamePrefix() {
-        return "fiddle_block_mapping_pipeline";
+        return "fiddle_block_mappings";
     }
 
     /**
-     * The registered mappings that must be performed in chains:
+     * The registered steps that must be performed in chains:
      * this includes only the mappings for {@link BlockState}s for which there was
-     * at least 1 {@linkplain NMSComplexBlockStateMapping complex} mapping.
+     * at least 1 {@link MinecraftFunctionBlockMappingsStep}.
      *
      * <p>
      * The mappings are organized in an array where {@link ClientView.AwarenessLevel#ordinal()}
@@ -53,12 +50,12 @@ public final class BlockMappingPipelineImpl extends ComposableImpl<BlockMappings
      * The lowest-level array may be null, but will never be empty.
      * </p>
      */
-    private final NMSBlockStateMapping[][][] chainMappings;
+    private final BlockMappingsStep[][][] chainMappings;
 
     /**
      * The registered mappings that can be applied directly:
      * this includes only the mappings for {@link BlockState}s for which there were only
-     * {@linkplain NMSSimpleBlockStateMapping simple} mappings,
+     * {@linkplain SimpleBlockMappingsStep simple} mappings,
      * meaning the mapping always returns the same value.
      *
      * <p>
@@ -75,13 +72,13 @@ public final class BlockMappingPipelineImpl extends ComposableImpl<BlockMappings
      */
     private final int[][] directMappingsAsIds;
 
-    private BlockMappingPipelineImpl() {
-        this.chainMappings = new NMSBlockStateMapping[ClientView.AwarenessLevel.getAll().length][][];
+    private BlockMappingsImpl() {
+        this.chainMappings = new BlockMappingsStep[ClientView.AwarenessLevel.getAll().length][][];
         this.directMappings = new BlockState[ClientView.AwarenessLevel.getAll().length][];
         this.directMappingsAsIds = new int[this.directMappings.length][];
     }
 
-    public BlockState apply(BlockState data, BlockStateMappingFunctionContext context) {
+    public BlockState apply(BlockState data, BlockMappingFunctionContext context) {
         int awarenessLevelI = context.getClientView().getAwarenessLevel().ordinal();
         // If there is a direct mapping, apply it
         @Nullable BlockState directMapping = this.directMappings[awarenessLevelI][data.indexInBlockStateRegistry];
@@ -89,7 +86,7 @@ public final class BlockMappingPipelineImpl extends ComposableImpl<BlockMappings
             return directMapping;
         }
         // If there is a mapping chain, apply it
-        NMSBlockStateMapping @Nullable [] chain = this.chainMappings[awarenessLevelI][data.indexInBlockStateRegistry];
+        BlockMappingsStep @Nullable [] chain = this.chainMappings[awarenessLevelI][data.indexInBlockStateRegistry];
         if (chain != null) {
             return applyChain(data, context, chain);
         }
@@ -97,15 +94,15 @@ public final class BlockMappingPipelineImpl extends ComposableImpl<BlockMappings
         return data;
     }
 
-    public static BlockState applyChain(BlockState blockState, BlockStateMappingFunctionContext context, NMSBlockStateMapping[] chain) {
-        BlockStateMappingHandleImpl handle = new BlockStateMappingHandleImpl(blockState, context, false);
-        for (NMSBlockStateMapping mapping : chain) {
+    public static BlockState applyChain(BlockState blockState, BlockMappingFunctionContext context, BlockMappingsStep[] chain) {
+        BlockMappingHandleNMSImpl handle = new BlockMappingHandleNMSImpl(blockState, context, false);
+        for (BlockMappingsStep mapping : chain) {
             mapping.apply(handle);
         }
         return handle.getImmutable();
     }
 
-    public static int applyChain(int blockStateId, BlockStateMappingFunctionContext context, NMSBlockStateMapping[] chain) {
+    public static int applyChain(int blockStateId, BlockMappingFunctionContext context, BlockMappingsStep[] chain) {
         return applyChain(BlockStateRegistry.get().byId(blockStateId), context, chain).indexInBlockStateRegistry;
     }
 
@@ -126,7 +123,7 @@ public final class BlockMappingPipelineImpl extends ComposableImpl<BlockMappings
      * @return The chain mapping for the {@link BlockState} with the given {@code blockStateId},
      * or null if there is no chain mapping.
      */
-    public NMSBlockStateMapping @Nullable [] getChainMapping(int awarenessLevelI, int blockStateId) {
+    public BlockMappingsStep @Nullable [] getChainMapping(int awarenessLevelI, int blockStateId) {
         return this.chainMappings[awarenessLevelI][blockStateId];
     }
 
@@ -139,9 +136,9 @@ public final class BlockMappingPipelineImpl extends ComposableImpl<BlockMappings
     }
 
     @Override
-    protected BlockMappingPipelineComposeEventImpl createComposeEvent() {
+    protected BlockMappingsComposeEventImpl createComposeEvent() {
         // Create the event
-        BlockMappingPipelineComposeEventImpl event = new BlockMappingPipelineComposeEventImpl();
+        BlockMappingsComposeEventImpl event = new BlockMappingsComposeEventImpl();
         // Register the built-in mappings
         // TODO
         // Return the event
@@ -149,54 +146,54 @@ public final class BlockMappingPipelineImpl extends ComposableImpl<BlockMappings
     }
 
     @Override
-    protected void copyInformationFromEvent(final BlockMappingPipelineComposeEventImpl event) {
+    protected void copyInformationFromEvent(final BlockMappingsComposeEventImpl event) {
 
         // Initialize the mappings
         for (int i = 0; i < this.chainMappings.length; i++) {
             int registrySize = BlockStateRegistry.get().size();
-            this.chainMappings[i] = new NMSBlockStateMapping[registrySize][];
+            this.chainMappings[i] = new BlockMappingsStep[registrySize][];
             this.directMappings[i] = new BlockState[registrySize];
             this.directMappingsAsIds[i] = new int[registrySize];
             Arrays.fill(this.directMappingsAsIds[i], -1);
         }
 
-        // Invert the mapping from id -> lists of mappings to list of mappings -> ids, so that we only have one reference per unique list
-        Map<List<NMSBlockStateMapping>, List<IntIntPair>> invertedChainMappings = new HashMap<>();
+        // Invert the mappings from id -> lists of steps to list of steps -> ids, so that we only have one reference per unique list
+        Map<List<BlockMappingsStep>, List<IntIntPair>> invertedChainMappings = new HashMap<>();
         for (int awarenessLevelI = 0; awarenessLevelI < event.mappings.length; awarenessLevelI++) {
-            for (Int2ObjectMap.Entry<List<NMSBlockStateMapping>> entry : event.mappings[awarenessLevelI].int2ObjectEntrySet()) {
-                List<NMSBlockStateMapping> mappings = entry.getValue();
-                // Do a check for if the list contains any complex mapping
-                boolean containsComplexMapping = false;
-                for (NMSBlockStateMapping mapping : mappings) {
-                    if (mapping instanceof NMSComplexBlockStateMapping) {
-                        containsComplexMapping = true;
+            for (Int2ObjectMap.Entry<List<BlockMappingsStep>> entry : event.mappings[awarenessLevelI].int2ObjectEntrySet()) {
+                List<BlockMappingsStep> mappings = entry.getValue();
+                // Do a check for if the list contains any function step
+                boolean containsFunction = false;
+                for (BlockMappingsStep mapping : mappings) {
+                    if (mapping instanceof FunctionBlockMappingsStep) {
+                        containsFunction = true;
                         break;
                     }
                 }
                 int fromId = entry.getIntKey();
-                if (containsComplexMapping) {
-                    // If there is a complex mapping, add the list of mappings as a chain
-                    // But first we can simplify it a bit by keeping only the last simple mapping in any contiguous subsequence of simple mappings
-                    List<NMSBlockStateMapping> optimizedMappings = new ArrayList<>(mappings.size());
+                if (containsFunction) {
+                    // If there is a function step, add the list of steps as a chain
+                    // But first we can simplify it a bit by keeping only the last simple step in any contiguous subsequence of simple mappings
+                    List<BlockMappingsStep> optimizedMappings = new ArrayList<>(mappings.size());
                     for (int i = 0; i < mappings.size(); i++) {
-                        NMSBlockStateMapping mapping = mappings.get(i);
-                        if (i == mappings.size() - 1 || mapping instanceof NMSComplexBlockStateMapping || mappings.get(i + 1) instanceof NMSComplexBlockStateMapping) {
+                        BlockMappingsStep mapping = mappings.get(i);
+                        if (i == mappings.size() - 1 || mapping instanceof FunctionBlockMappingsStep || mappings.get(i + 1) instanceof FunctionBlockMappingsStep) {
                             optimizedMappings.add(mapping);
                         }
                     }
                     invertedChainMappings.computeIfAbsent(optimizedMappings, $ -> new ArrayList<>()).add(IntIntPair.of(awarenessLevelI, entry.getIntKey()));
                 } else {
                     // If there is no complex mapping, add this to the direct mappings
-                    BlockState to = ((NMSSimpleBlockStateMapping) mappings.get(mappings.size() - 1)).getTo();;
+                    BlockState to = ((SimpleBlockMappingsStep) mappings.get(mappings.size() - 1)).to();;
                     this.directMappings[awarenessLevelI][fromId] = to;
                     this.directMappingsAsIds[awarenessLevelI][fromId] = to.indexInBlockStateRegistry;
                 }
             }
         }
         // Invert back
-        for (Map.Entry<List<NMSBlockStateMapping>, List<IntIntPair>> entry : invertedChainMappings.entrySet()) {
+        for (Map.Entry<List<BlockMappingsStep>, List<IntIntPair>> entry : invertedChainMappings.entrySet()) {
             for (IntIntPair target : entry.getValue()) {
-                this.chainMappings[target.firstInt()][target.secondInt()] = entry.getKey().toArray(NMSBlockStateMapping[]::new);
+                this.chainMappings[target.firstInt()][target.secondInt()] = entry.getKey().toArray(BlockMappingsStep[]::new);
             }
         }
 

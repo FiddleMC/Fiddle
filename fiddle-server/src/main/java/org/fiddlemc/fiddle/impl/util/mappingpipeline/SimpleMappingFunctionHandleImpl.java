@@ -1,8 +1,8 @@
 package org.fiddlemc.fiddle.impl.util.mappingpipeline;
 
-import org.fiddlemc.fiddle.api.util.mappingpipeline.MappingFunctionHandle;
-import org.fiddlemc.fiddle.api.util.mappingpipeline.MutableMappingFunctionHandle;
-import org.fiddlemc.fiddle.api.util.mappingpipeline.WithOriginalMappingFunctionHandle;
+import org.fiddlemc.fiddle.api.util.mapping.MappingFunctionHandle;
+import org.fiddlemc.fiddle.api.util.mapping.MutableMappingFunctionHandle;
+import org.fiddlemc.fiddle.api.util.mapping.WithOriginalMappingFunctionHandle;
 
 /**
  * A base implementation of {@link MappingFunctionHandle},

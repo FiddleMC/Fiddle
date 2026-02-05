@@ -1,7 +1,6 @@
 package org.fiddlemc.fiddle.api.bukkit.enuminjection;
 
 import io.papermc.paper.plugin.lifecycle.event.LifecycleEvent;
-import org.fiddlemc.fiddle.api.util.mappingpipeline.SingleStepMapping;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -15,7 +14,7 @@ public interface BukkitEnumNamesComposeEvent<S> extends LifecycleEvent {
      *
      * @param mapping The mapping to register.
      */
-    void register(SingleStepMapping<BukkitEnumNamePickFunctionHandle<S>> mapping);
+    void register(Consumer<BukkitEnumNamePickFunctionHandle<S>> mapping);
 
     /**
      * Changes the list of registered mappings.
@@ -27,6 +26,6 @@ public interface BukkitEnumNamesComposeEvent<S> extends LifecycleEvent {
      *
      * @param consumer The consumer that applies the desired changes to the list of mappings.
      */
-    void changeRegistered(Consumer<List<SingleStepMapping<BukkitEnumNamePickFunctionHandle<S>>>> consumer);
+    void changeRegistered(Consumer<List<Consumer<BukkitEnumNamePickFunctionHandle<S>>>> consumer);
 
 }

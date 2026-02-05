@@ -1,4 +1,4 @@
-package org.fiddlemc.fiddle.api.util.mappingpipeline;
+package org.fiddlemc.fiddle.api.util.mapping;
 
 /**
  * A handle for the data that a mapping function is being applied on.

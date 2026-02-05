@@ -1,33 +1,30 @@
 package org.fiddlemc.fiddle.impl.util.mappingpipeline;
 
-import io.papermc.paper.plugin.lifecycle.event.LifecycleEvent;
-import org.fiddlemc.fiddle.api.util.composable.Composable;
-import org.fiddlemc.fiddle.api.util.mappingpipeline.MappingFunctionHandle;
-import org.fiddlemc.fiddle.api.util.mappingpipeline.SingleStepMapping;
+import org.fiddlemc.fiddle.api.util.mapping.MappingFunctionHandle;
 import org.jspecify.annotations.Nullable;
 
 /**
- * A base implementation of a mapping pipeline for {@link SingleStepMapping}s.
+ * A pipeline that applies {@link MappingPipelineStep}s to an initial {@linkplain H handle}.
  */
-public interface SingleStepMappingPipeline<T, H extends MappingFunctionHandle<T>, E extends LifecycleEvent> extends Composable<E> {
+public interface SingleStepMappingPipeline<T, H extends MappingFunctionHandle<T>> {
 
     /**
-     * @return The smallest possible list containing all mappings in this pipeline
+     * @return The smallest possible list containing all steps in this pipeline
      * that may apply to the given handle.
      * It may be null to indicate that there are none.
      */
-    @Nullable SingleStepMapping<H> @Nullable [] getMappingsThatMayApplyTo(H handle);
+    @Nullable MappingPipelineStep<H> @Nullable [] getStepsThatMayApplyTo(H handle);
 
     /**
-     * {@linkplain SingleStepMapping#apply Applies} all applicable mappings to the input.
+     * {@linkplain MappingPipelineStep#apply Applies} all applicable steps to the input.
      *
      * @param handle The handle to map. The data in it may be mutated.
      * @return The resulting data, which may be the given instance if no changes were made.
      */
     default T apply(H handle) {
-        SingleStepMapping<H> @Nullable [] mappings = this.getMappingsThatMayApplyTo(handle);
+        MappingPipelineStep<H> @Nullable [] mappings = this.getStepsThatMayApplyTo(handle);
         if (mappings != null && mappings.length != 0) {
-            for (SingleStepMapping<H> mapping : mappings) {
+            for (MappingPipelineStep<H> mapping : mappings) {
                 mapping.apply(handle);
             }
         }

@@ -1,4 +1,4 @@
-package org.fiddlemc.fiddle.api.util.mappingpipeline;
+package org.fiddlemc.fiddle.api.util.mapping;
 
 /**
  * A {@link MappingFunctionHandle} that can provide context for the current mapping.

@@ -28,7 +28,7 @@ import java.util.Map;
 /**
  * A pipeline of {@link NMSItemMapping}s.
  */
-public final class ItemMappingPipelineImpl extends ComposableImpl<ItemMappingsComposeEvent, ItemMappingPipelineComposeEventImpl> implements WithClientViewContextSingleStepMappingPipeline<ItemStack, ItemMappingFunctionContext, NMSItemMappingHandle, ItemMappingsComposeEvent>, ItemMappings {
+public final class ItemMappingPipelineImpl extends ComposableImpl<ItemMappingsComposeEvent, ItemMappingPipelineComposeEventImpl> implements WithClientViewContextSingleStepMappingPipeline<ItemStack, ItemMappingFunctionContext, NMSItemMappingHandle>, ItemMappings {
 
     public static final class ServiceProviderImpl extends NoArgsConstructorServiceProviderImpl<ItemMappings, ItemMappingPipelineImpl> implements ServiceProvider {
 
@@ -63,7 +63,7 @@ public final class ItemMappingPipelineImpl extends ComposableImpl<ItemMappingsCo
     }
 
     @Override
-    public NMSItemMapping @Nullable [] getMappingsThatMayApplyTo(NMSItemMappingHandle handle) {
+    public NMSItemMapping @Nullable [] getStepsThatMayApplyTo(NMSItemMappingHandle handle) {
         return this.mappings[handle.getContext().getClientView().getAwarenessLevel().ordinal()][handle.getOriginal().getItem().indexInItemRegistry];
     }
 

@@ -1,7 +1,7 @@
 package org.fiddlemc.fiddle.api.packetmapping;
 
 import org.fiddlemc.fiddle.api.clientview.ClientView;
-import org.fiddlemc.fiddle.api.util.mappingpipeline.MappingFunctionContext;
+import org.fiddlemc.fiddle.api.util.mapping.MappingFunctionContext;
 
 /**
  * A {@link MappingFunctionContext} for mappings that happen in the context of some {@link ClientView}.

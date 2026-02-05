@@ -1,4 +1,4 @@
-package org.fiddlemc.fiddle.api.util.mappingpipeline;
+package org.fiddlemc.fiddle.api.util.mapping;
 
 /**
  * A {@link MappingFunctionHandle} where the original data can be observed.

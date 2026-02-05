@@ -9,7 +9,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import org.bukkit.block.BlockType;
 import org.fiddlemc.fiddle.api.moredatadriven.paper.registry.BlockRegistryEntry;
-import org.fiddlemc.fiddle.api.moredatadriven.paper.nms.NMSBlockRegistryEntryBuilder;
+import org.fiddlemc.fiddle.api.moredatadriven.paper.nms.BlockRegistryEntryBuilderNMS;
 import org.jspecify.annotations.Nullable;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -17,7 +17,7 @@ import java.util.function.Function;
 /**
  * The implementation of {@link BlockRegistryEntry}.
  */
-public abstract class BlockRegistryEntryImpl implements BlockRegistryEntry, SettableNMSKeyAwareRegistryEntry {
+public abstract class BlockRegistryEntryImpl implements BlockRegistryEntry, SettableKeyAwareRegistryEntryNMS {
 
     protected @Nullable Identifier key;
 
@@ -35,7 +35,7 @@ public abstract class BlockRegistryEntryImpl implements BlockRegistryEntry, Sett
         return this.key;
     }
 
-    public static final class BuilderImpl extends BlockRegistryEntryImpl implements NMSBlockRegistryEntryBuilder, PaperRegistryBuilder<Block, BlockType> {
+    public static final class BuilderImpl extends BlockRegistryEntryImpl implements BlockRegistryEntryBuilderNMS, PaperRegistryBuilder<Block, BlockType> {
 
         private @Nullable Function<Block.Properties, Block> nmsFactory;
         private BlockBehaviour.@Nullable Properties nmsProperties;
@@ -50,17 +50,17 @@ public abstract class BlockRegistryEntryImpl implements BlockRegistryEntry, Sett
         }
 
         @Override
-        public void nmsFactory(Function<BlockBehaviour.Properties, Block> factory) {
+        public void factoryNMS(Function<BlockBehaviour.Properties, Block> factory) {
             this.nmsFactory = factory;
         }
 
         @Override
-        public void nmsProperties(BlockBehaviour.Properties properties) {
+        public void propertiesNMS(BlockBehaviour.Properties properties) {
             this.nmsProperties = properties;
         }
 
         @Override
-        public void nmsProperties(Consumer<BlockBehaviour.Properties> properties) {
+        public void propertiesNMS(Consumer<BlockBehaviour.Properties> properties) {
             if (this.nmsProperties == null) {
                 this.nmsProperties = BlockBehaviour.Properties.of();
             }

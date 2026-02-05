@@ -1,4 +1,4 @@
-package org.fiddlemc.fiddle.api.util.mappingpipeline;
+package org.fiddlemc.fiddle.api.util.mapping;
 
 /**
  * The context in which a function mapping is being applied.

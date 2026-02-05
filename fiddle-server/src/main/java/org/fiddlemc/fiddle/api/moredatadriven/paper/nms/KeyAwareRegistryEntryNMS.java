@@ -6,7 +6,7 @@ import net.minecraft.resources.Identifier;
  * A registry entry that is aware of the {@linkplain Identifier key}
  * with which it is being registered to a registry.
  */
-public interface NMSKeyAwareRegistryEntry {
+public interface KeyAwareRegistryEntryNMS {
 
     /**
      * The key with w hich this entry is being registered,

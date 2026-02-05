@@ -1,4 +1,4 @@
-package org.fiddlemc.fiddle.api.util.mappingpipeline;
+package org.fiddlemc.fiddle.api.util.mapping;
 
 /**
  * A {@link MappingFunctionHandle} for a type {@link T} that can be mutated in-place as an instance of {@link MT}.

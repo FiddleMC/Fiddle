@@ -19,7 +19,7 @@ import java.util.List;
  * To apply the synchronization, call {@link #run}.
  * </p>
  */
-public abstract class BukkitEnumSynchronizer<E extends Enum<E>, S, I extends EnumInjector<E>, P extends BukkitEnumNameMappingPipelineImpl<S> & SingleStepMappingPipeline<String, BukkitEnumNamePickFunctionHandle<S>, BukkitEnumNamesComposeEvent<S>>> {
+public abstract class BukkitEnumSynchronizer<E extends Enum<E>, S, I extends EnumInjector<E>, P extends BukkitEnumNameMappingPipelineImpl<S> & SingleStepMappingPipeline<String, BukkitEnumNamePickFunctionHandle<S>>> {
 
     private static final Logger LOGGER = LogUtils.getLogger();
 

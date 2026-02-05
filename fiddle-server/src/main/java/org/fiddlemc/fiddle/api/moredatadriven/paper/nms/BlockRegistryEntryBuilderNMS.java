@@ -10,21 +10,21 @@ import java.util.function.Function;
 /**
  * A {@link BlockRegistryEntry.Builder} that allows building a {@link Block} using Minecraft internals.
  */
-public interface NMSBlockRegistryEntryBuilder extends BlockRegistryEntry.Builder, NMSKeyAwareRegistryEntry {
+public interface BlockRegistryEntryBuilderNMS extends BlockRegistryEntry.Builder, KeyAwareRegistryEntryNMS {
 
     /**
      * Sets the factory to use, and marks this builder as using NMS.
      */
-    void nmsFactory(Function<BlockBehaviour.Properties, Block> factory);
+    void factoryNMS(Function<BlockBehaviour.Properties, Block> factory);
 
     /**
      * Replaces the NMS properties for the block.
      */
-    void nmsProperties(BlockBehaviour.Properties properties);
+    void propertiesNMS(BlockBehaviour.Properties properties);
 
     /**
      * Modifies the NMS properties for the block.
      */
-    void nmsProperties(Consumer<BlockBehaviour.Properties> properties);
+    void propertiesNMS(Consumer<BlockBehaviour.Properties> properties);
 
 }

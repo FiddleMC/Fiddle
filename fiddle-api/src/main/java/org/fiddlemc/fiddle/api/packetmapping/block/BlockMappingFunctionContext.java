@@ -5,7 +5,7 @@ import org.fiddlemc.fiddle.api.packetmapping.WithClientViewMappingFunctionContex
 /**
  * A {@link WithClientViewMappingFunctionContext} for the {@link BlockMappings}.
  */
-public interface BlockStateMappingFunctionContext extends WithClientViewMappingFunctionContext {
+public interface BlockMappingFunctionContext extends WithClientViewMappingFunctionContext {
 
     /**
      * @return Whether the block state on which this mapping is being applied
@@ -20,7 +20,7 @@ public interface BlockStateMappingFunctionContext extends WithClientViewMappingF
     /**
      * @return The x-coordinate of the physical block for which this mapping is being applied.
      * This is only available if {@link #isStateOfPhysicalBlockInWorld()} is true
-     * and if {@link ComplexBlockStateMapping#requiresCoordinates()} was true.
+     * and if {@link BlockMappingBuilder#function} had {@code requiresCoordinates = true}.
      * Otherwise, the returned value is meaningless.
      */
     int getPhysicalBlockX();
@@ -28,7 +28,7 @@ public interface BlockStateMappingFunctionContext extends WithClientViewMappingF
     /**
      * @return The y-coordinate of the physical block for which this mapping is being applied,
      * This is only available if {@link #isStateOfPhysicalBlockInWorld()} is true
-     * and if {@link ComplexBlockStateMapping#requiresCoordinates()} was true.
+     * and if {@link BlockMappingBuilder#function} had {@code requiresCoordinates = true}.
      * Otherwise, the returned value is meaningless.
      */
     int getPhysicalBlockY();
@@ -36,7 +36,7 @@ public interface BlockStateMappingFunctionContext extends WithClientViewMappingF
     /**
      * @return The z-coordinate of the physical block for which this mapping is being applied,
      * This is only available if {@link #isStateOfPhysicalBlockInWorld()} is true
-     * and if {@link ComplexBlockStateMapping#requiresCoordinates()} was true.
+     * and if {@link BlockMappingBuilder#function} had {@code requiresCoordinates = true}.
      * Otherwise, the returned value is meaningless.
      */
     int getPhysicalBlockZ();

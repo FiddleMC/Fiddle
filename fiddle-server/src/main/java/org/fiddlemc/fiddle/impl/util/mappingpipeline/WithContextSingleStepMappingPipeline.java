@@ -1,14 +1,12 @@
 package org.fiddlemc.fiddle.impl.util.mappingpipeline;
 
-import io.papermc.paper.plugin.lifecycle.event.LifecycleEvent;
-import org.fiddlemc.fiddle.api.util.mappingpipeline.MappingFunctionContext;
-import org.fiddlemc.fiddle.api.util.mappingpipeline.SingleStepMapping;
-import org.fiddlemc.fiddle.api.util.mappingpipeline.WithContextMappingFunctionHandle;
+import org.fiddlemc.fiddle.api.util.mapping.MappingFunctionContext;
+import org.fiddlemc.fiddle.api.util.mapping.WithContextMappingFunctionHandle;
 
 /**
  * A {@link SingleStepMappingPipeline} for {@link WithContextMappingFunctionHandle}s.
  */
-public interface WithContextSingleStepMappingPipeline<T, C extends MappingFunctionContext, H extends WithContextMappingFunctionHandle<T, C>, E extends LifecycleEvent> extends SingleStepMappingPipeline<T, H, E> {
+public interface WithContextSingleStepMappingPipeline<T, C extends MappingFunctionContext, H extends WithContextMappingFunctionHandle<T, C>> extends SingleStepMappingPipeline<T, H> {
 
     /**
      * @return A new handle for the given data and context.
@@ -16,7 +14,7 @@ public interface WithContextSingleStepMappingPipeline<T, C extends MappingFuncti
     H createHandle(T data, C context);
 
     /**
-     * {@linkplain SingleStepMapping#apply Applies} all applicable mappings to the input.
+     * {@linkplain MappingPipelineStep#apply Applies} all applicable mappings to the input.
      *
      * @param data    The data to map. It may be mutated.
      * @param context The context of the mapping.

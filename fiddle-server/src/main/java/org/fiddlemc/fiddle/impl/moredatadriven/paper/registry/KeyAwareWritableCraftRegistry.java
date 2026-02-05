@@ -15,7 +15,7 @@ import java.util.function.Consumer;
  * A modified {@link WritableCraftRegistry}, where {@link #createApiWritableRegistry} returns
  * {@link KeyAwareApiWritableRegistry} instead of {@link WritableCraftRegistry.ApiWritableRegistry}.
  */
-public class KeyAwareWritableCraftRegistry<M, T extends Keyed, B extends SettableNMSKeyAwareRegistryEntry & PaperRegistryBuilder<M, T>> extends WritableCraftRegistry<M, T, B> {
+public class KeyAwareWritableCraftRegistry<M, T extends Keyed, B extends SettableKeyAwareRegistryEntryNMS & PaperRegistryBuilder<M, T>> extends WritableCraftRegistry<M, T, B> {
 
     public KeyAwareWritableCraftRegistry(final MappedRegistry<M> registry, final RegistryEntryMeta.Buildable<M, T, B> meta) {
         super(registry, meta);
@@ -28,7 +28,7 @@ public class KeyAwareWritableCraftRegistry<M, T extends Keyed, B extends Settabl
 
     /**
      * A modified {@link WritableCraftRegistry.ApiWritableRegistry},
-     * that calls {@link SettableNMSKeyAwareRegistryEntry#setKey}.
+     * that calls {@link SettableKeyAwareRegistryEntryNMS#setKey}.
      */
     public class KeyAwareApiWritableRegistry extends ApiWritableRegistry {
 

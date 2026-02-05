@@ -1,20 +1,20 @@
 package org.fiddlemc.fiddle.impl.packetmapping.block;
 
 import org.fiddlemc.fiddle.api.clientview.ClientView;
-import org.fiddlemc.fiddle.api.packetmapping.block.BlockStateMappingFunctionContext;
+import org.fiddlemc.fiddle.api.packetmapping.block.BlockMappingFunctionContext;
 import org.fiddlemc.fiddle.impl.packetmapping.ClientViewMappingContextImpl;
 
 /**
- * The implementation of {@link BlockStateMappingFunctionContext}.
+ * The implementation of {@link BlockMappingFunctionContext}.
  */
-public class BlockStateMappingContextImpl extends ClientViewMappingContextImpl implements BlockStateMappingFunctionContext {
+public class BlockMappingContextImpl extends ClientViewMappingContextImpl implements BlockMappingFunctionContext {
 
     private final boolean isStateOfPhysicalBlockInWorld;
     private final int physicalBlockX;
     private final int physicalBlockY;
     private final int physicalBlockZ;
 
-    public BlockStateMappingContextImpl(ClientView clientView, boolean isStateOfPhysicalBlockInWorld, int physicalBlockX, int physicalBlockY, int physicalBlockZ) {
+    public BlockMappingContextImpl(ClientView clientView, boolean isStateOfPhysicalBlockInWorld, int physicalBlockX, int physicalBlockY, int physicalBlockZ) {
         super(clientView);
         this.isStateOfPhysicalBlockInWorld = isStateOfPhysicalBlockInWorld;
         this.physicalBlockX = physicalBlockX;
@@ -22,11 +22,11 @@ public class BlockStateMappingContextImpl extends ClientViewMappingContextImpl i
         this.physicalBlockZ = physicalBlockZ;
     }
 
-    public BlockStateMappingContextImpl(ClientView clientView) {
+    public BlockMappingContextImpl(ClientView clientView) {
         this(clientView, false, 0, 0, 0);
     }
 
-    public BlockStateMappingContextImpl(ClientView clientView, int physicalBlockX, int physicalBlockY, int physicalBlockZ) {
+    public BlockMappingContextImpl(ClientView clientView, int physicalBlockX, int physicalBlockY, int physicalBlockZ) {
         this(clientView, true, physicalBlockX, physicalBlockY, physicalBlockZ);
     }
 
