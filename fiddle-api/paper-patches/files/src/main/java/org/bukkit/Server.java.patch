@@ -4,7 +4,7 @@
          }
          // Paper end
  
-+        // Fiddle start - Configuration - API
++        // Fiddle start - Configuration - API - API part
 +        /**
 +         * @deprecated Server config options may be renamed or removed without notice. Prefer using existing API
 +         *  wherever possible, rather than directly reading from a server config.
@@ -18,7 +18,7 @@
 +        {
 +            throw new UnsupportedOperationException("Not supported yet.");
 +        }
-+        // Fiddle end - Configuration - API
++        // Fiddle end - Configuration - API - API part
 +
          /**
           * Sends the component to the player

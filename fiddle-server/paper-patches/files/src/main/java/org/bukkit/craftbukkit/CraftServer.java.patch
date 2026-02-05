@@ -13,13 +13,13 @@
              return CraftServer.this.console.paperConfigurations.createLegacyObject(CraftServer.this.console);
          }
 +
-+        // Fiddle start - Configuration - API - Implementation
++        // Fiddle start - Configuration - API - Implementation part
 +        @Override
 +        public YamlConfiguration getFiddleConfig()
 +        {
 +            return org.fiddlemc.fiddle.impl.configuration.FiddleConfigurations.get(null).createLegacyObject(CraftServer.this.console);
 +        }
-+        // Fiddle end - Configuration - API - Implementation
++        // Fiddle end - Configuration - API - Implementation part
  
          @Override
          public void restart() {

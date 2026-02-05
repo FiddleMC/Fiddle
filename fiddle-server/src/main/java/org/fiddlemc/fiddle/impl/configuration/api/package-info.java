@@ -1,16 +1,8 @@
 /**
- * <h1>Module: Configuration - API - Implementation</h1>
+ * <h1>Configuration - API - Implementation part</h1>
  *
  * <p>
- * The {@code fiddle-server} part of the {@link org.fiddlemc.fiddle.api.configuration} package
- * in the {@code fiddle-api} module.
- * </p>
- *
- * <p>
- * <h3>Paper changes</h3>>
- * <ul>
- *     <li>{@link org.bukkit.craftbukkit.CraftServer} - To implement the API.</li>
- * </ul>
+ * Implementation of {@link org.fiddlemc.fiddle.api.configuration.api}.
  * </p>
  */
 @NullMarked
