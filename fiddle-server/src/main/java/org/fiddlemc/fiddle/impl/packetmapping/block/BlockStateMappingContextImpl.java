@@ -1,13 +1,13 @@
 package org.fiddlemc.fiddle.impl.packetmapping.block;
 
 import org.fiddlemc.fiddle.api.clientview.ClientView;
-import org.fiddlemc.fiddle.api.packetmapping.block.BlockStateMappingContext;
+import org.fiddlemc.fiddle.api.packetmapping.block.BlockStateMappingFunctionContext;
 import org.fiddlemc.fiddle.impl.packetmapping.ClientViewMappingContextImpl;
 
 /**
- * The implementation of {@link BlockStateMappingContext}.
+ * The implementation of {@link BlockStateMappingFunctionContext}.
  */
-public class BlockStateMappingContextImpl extends ClientViewMappingContextImpl implements BlockStateMappingContext {
+public class BlockStateMappingContextImpl extends ClientViewMappingContextImpl implements BlockStateMappingFunctionContext {
 
     private final boolean isStateOfPhysicalBlockInWorld;
     private final int physicalBlockX;

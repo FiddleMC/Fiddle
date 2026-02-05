@@ -1,6 +1,6 @@
 package org.fiddlemc.fiddle.impl.bukkit.enuminjection;
 
-import org.fiddlemc.fiddle.api.bukkit.enuminjection.BukkitEnumNamePickHandle;
+import org.fiddlemc.fiddle.api.bukkit.enuminjection.BukkitEnumNamePickFunctionHandle;
 import org.fiddlemc.fiddle.api.bukkit.enuminjection.BukkitEnumNames;
 import org.fiddlemc.fiddle.api.bukkit.enuminjection.BukkitEnumNamesComposeEvent;
 import org.fiddlemc.fiddle.api.util.mappingpipeline.SingleStepMapping;
@@ -11,13 +11,13 @@ import org.jspecify.annotations.Nullable;
 /**
  * Base implementation of {@link BukkitEnumNames}
  */
-public abstract class BukkitEnumNameMappingPipelineImpl<S> extends ComposableImpl<BukkitEnumNamesComposeEvent<S>, BukkitEnumNameMappingPipelineComposeEventImpl<S>> implements SingleStepMappingPipeline<String, BukkitEnumNamePickHandle<S>, BukkitEnumNamesComposeEvent<S>>, BukkitEnumNames<S> {
+public abstract class BukkitEnumNameMappingPipelineImpl<S> extends ComposableImpl<BukkitEnumNamesComposeEvent<S>, BukkitEnumNameMappingPipelineComposeEventImpl<S>> implements SingleStepMappingPipeline<String, BukkitEnumNamePickFunctionHandle<S>, BukkitEnumNamesComposeEvent<S>>, BukkitEnumNames<S> {
 
     /**
      * The registered mappings,
      * or null if there are no registered mappings.
      */
-    protected SingleStepMapping<BukkitEnumNamePickHandle<S>> @Nullable [] mappings;
+    protected SingleStepMapping<BukkitEnumNamePickFunctionHandle<S>> @Nullable [] mappings;
 
     @Override
     protected BukkitEnumNameMappingPipelineComposeEventImpl<S> createComposeEvent() {
@@ -32,7 +32,7 @@ public abstract class BukkitEnumNameMappingPipelineImpl<S> extends ComposableImp
     }
 
     @Override
-    public @Nullable SingleStepMapping<BukkitEnumNamePickHandle<S>> @Nullable [] getMappingsThatMayApplyTo(BukkitEnumNamePickHandle<S> handle) {
+    public @Nullable SingleStepMapping<BukkitEnumNamePickFunctionHandle<S>> @Nullable [] getMappingsThatMayApplyTo(BukkitEnumNamePickFunctionHandle<S> handle) {
         return this.mappings;
     }
 

@@ -1,12 +1,12 @@
 package org.fiddlemc.fiddle.impl.bukkit.enuminjection;
 
-import org.fiddlemc.fiddle.api.bukkit.enuminjection.BukkitEnumNamePickHandle;
-import org.fiddlemc.fiddle.impl.util.mappingpipeline.MappingHandleImpl;
+import org.fiddlemc.fiddle.api.bukkit.enuminjection.BukkitEnumNamePickFunctionHandle;
+import org.fiddlemc.fiddle.impl.util.mappingpipeline.SimpleMappingFunctionHandleImpl;
 
 /**
- * The implementation of {@link BukkitEnumNamePickHandle}.
+ * The implementation of {@link BukkitEnumNamePickFunctionHandle}.
  */
-public final class BukkitEnumNameMappingHandleImpl<S> extends MappingHandleImpl<String, String> implements BukkitEnumNamePickHandle<S> {
+public final class BukkitEnumNameMappingHandleImpl<S> extends SimpleMappingFunctionHandleImpl<String, String> implements BukkitEnumNamePickFunctionHandle<S> {
 
     private final S sourceValue;
 

@@ -1,11 +1,11 @@
 package org.fiddlemc.fiddle.api.packetmapping.block;
 
-import org.fiddlemc.fiddle.api.packetmapping.ClientViewMappingContext;
+import org.fiddlemc.fiddle.api.packetmapping.WithClientViewMappingFunctionContext;
 
 /**
- * A {@link ClientViewMappingContext} for the {@link BlockMappings}.
+ * A {@link WithClientViewMappingFunctionContext} for the {@link BlockMappings}.
  */
-public interface BlockStateMappingContext extends ClientViewMappingContext {
+public interface BlockStateMappingFunctionContext extends WithClientViewMappingFunctionContext {
 
     /**
      * @return Whether the block state on which this mapping is being applied

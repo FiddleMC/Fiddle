@@ -1,9 +1,9 @@
 package org.fiddlemc.fiddle.api.util.mappingpipeline;
 
 /**
- * A {@link MappingHandle} for a type {@link T} that can be mutated in-place as an instance of {@link MT}.
+ * A {@link MappingFunctionHandle} for a type {@link T} that can be mutated in-place as an instance of {@link MT}.
  */
-public interface MutableMappingHandle<T, MT extends T> extends MappingHandle<T> {
+public interface MutableMappingFunctionHandle<T, MT extends T> extends MappingFunctionHandle<T> {
 
     /**
      * @return The current data, which may be mutated in-place.

@@ -1,9 +1,9 @@
 package org.fiddlemc.fiddle.api.util.mappingpipeline;
 
 /**
- * A {@link MappingHandle} where the original data can be observed.
+ * A {@link MappingFunctionHandle} where the original data can be observed.
  */
-public interface WithOriginalMappingHandle<T> extends MappingHandle<T> {
+public interface WithOriginalMappingFunctionHandle<T> extends MappingFunctionHandle<T> {
 
     /**
      * @return The original data, before any mappings were applied.

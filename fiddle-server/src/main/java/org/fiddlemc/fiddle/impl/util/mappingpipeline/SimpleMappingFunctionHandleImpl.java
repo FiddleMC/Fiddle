@@ -1,14 +1,14 @@
 package org.fiddlemc.fiddle.impl.util.mappingpipeline;
 
-import org.fiddlemc.fiddle.api.util.mappingpipeline.MappingHandle;
-import org.fiddlemc.fiddle.api.util.mappingpipeline.MutableMappingHandle;
-import org.fiddlemc.fiddle.api.util.mappingpipeline.WithOriginalMappingHandle;
+import org.fiddlemc.fiddle.api.util.mappingpipeline.MappingFunctionHandle;
+import org.fiddlemc.fiddle.api.util.mappingpipeline.MutableMappingFunctionHandle;
+import org.fiddlemc.fiddle.api.util.mappingpipeline.WithOriginalMappingFunctionHandle;
 
 /**
- * A base implementation of {@link MappingHandle},
- * that also implements {@link MutableMappingHandle} and {@link WithOriginalMappingHandle}.
+ * A base implementation of {@link MappingFunctionHandle},
+ * that also implements {@link MutableMappingFunctionHandle} and {@link WithOriginalMappingFunctionHandle}.
  */
-public class MappingHandleImpl<T, MT extends T> implements MutableMappingHandle<T, MT>, WithOriginalMappingHandle<T> {
+public class SimpleMappingFunctionHandleImpl<T, MT extends T> implements MutableMappingFunctionHandle<T, MT>, WithOriginalMappingFunctionHandle<T> {
 
     /**
      * The original data;
@@ -30,7 +30,7 @@ public class MappingHandleImpl<T, MT extends T> implements MutableMappingHandle<
      */
     protected boolean isDataMutable;
 
-    public MappingHandleImpl(T data, boolean isDataMutable) {
+    public SimpleMappingFunctionHandleImpl(T data, boolean isDataMutable) {
         this.original = data;
         this.data = data;
         this.isDataMutable = isDataMutable;

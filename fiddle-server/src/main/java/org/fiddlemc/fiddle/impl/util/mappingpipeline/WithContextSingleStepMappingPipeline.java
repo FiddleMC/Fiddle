@@ -1,14 +1,14 @@
 package org.fiddlemc.fiddle.impl.util.mappingpipeline;
 
 import io.papermc.paper.plugin.lifecycle.event.LifecycleEvent;
-import org.fiddlemc.fiddle.api.util.mappingpipeline.MappingContext;
+import org.fiddlemc.fiddle.api.util.mappingpipeline.MappingFunctionContext;
 import org.fiddlemc.fiddle.api.util.mappingpipeline.SingleStepMapping;
-import org.fiddlemc.fiddle.api.util.mappingpipeline.WithContextMappingHandle;
+import org.fiddlemc.fiddle.api.util.mappingpipeline.WithContextMappingFunctionHandle;
 
 /**
- * A {@link SingleStepMappingPipeline} for {@link WithContextMappingHandle}s.
+ * A {@link SingleStepMappingPipeline} for {@link WithContextMappingFunctionHandle}s.
  */
-public interface WithContextSingleStepMappingPipeline<T, C extends MappingContext, H extends WithContextMappingHandle<T, C>, E extends LifecycleEvent> extends SingleStepMappingPipeline<T, H, E> {
+public interface WithContextSingleStepMappingPipeline<T, C extends MappingFunctionContext, H extends WithContextMappingFunctionHandle<T, C>, E extends LifecycleEvent> extends SingleStepMappingPipeline<T, H, E> {
 
     /**
      * @return A new handle for the given data and context.
@@ -38,7 +38,7 @@ public interface WithContextSingleStepMappingPipeline<T, C extends MappingContex
     C createGenericContext();
 
     /**
-     * Convenience method for {@link #apply(T, MappingContext)},
+     * Convenience method for {@link #apply(T, MappingFunctionContext)},
      * which can be called when a context is not available.
      */
     default T applyGenerically(T data) {

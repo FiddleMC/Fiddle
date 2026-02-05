@@ -7,7 +7,7 @@ public interface ComplexBlockStateMapping {
 
     /**
      * @return Whether this mapping requires the coordinates
-     * ({@link BlockStateMappingContext#getPhysicalBlockX()} and so on).
+     * ({@link BlockStateMappingFunctionContext#getPhysicalBlockX()} and so on).
      */
     boolean requiresCoordinates();
 

@@ -6,7 +6,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
 import org.fiddlemc.fiddle.api.packetmapping.block.BlockMappings;
 import org.fiddlemc.fiddle.api.packetmapping.block.BlockMappingsComposeEvent;
-import org.fiddlemc.fiddle.api.packetmapping.block.BlockStateMappingContext;
+import org.fiddlemc.fiddle.api.packetmapping.block.BlockStateMappingFunctionContext;
 import org.fiddlemc.fiddle.api.packetmapping.block.nms.NMSBlockStateMapping;
 import org.fiddlemc.fiddle.api.packetmapping.block.nms.NMSComplexBlockStateMapping;
 import org.fiddlemc.fiddle.api.packetmapping.block.nms.NMSSimpleBlockStateMapping;
@@ -81,7 +81,7 @@ public final class BlockMappingPipelineImpl extends ComposableImpl<BlockMappings
         this.directMappingsAsIds = new int[this.directMappings.length][];
     }
 
-    public BlockState apply(BlockState data, BlockStateMappingContext context) {
+    public BlockState apply(BlockState data, BlockStateMappingFunctionContext context) {
         int awarenessLevelI = context.getClientView().getAwarenessLevel().ordinal();
         // If there is a direct mapping, apply it
         @Nullable BlockState directMapping = this.directMappings[awarenessLevelI][data.indexInBlockStateRegistry];
@@ -97,7 +97,7 @@ public final class BlockMappingPipelineImpl extends ComposableImpl<BlockMappings
         return data;
     }
 
-    public static BlockState applyChain(BlockState blockState, BlockStateMappingContext context, NMSBlockStateMapping[] chain) {
+    public static BlockState applyChain(BlockState blockState, BlockStateMappingFunctionContext context, NMSBlockStateMapping[] chain) {
         BlockStateMappingHandleImpl handle = new BlockStateMappingHandleImpl(blockState, context, false);
         for (NMSBlockStateMapping mapping : chain) {
             mapping.apply(handle);
@@ -105,7 +105,7 @@ public final class BlockMappingPipelineImpl extends ComposableImpl<BlockMappings
         return handle.getImmutable();
     }
 
-    public static int applyChain(int blockStateId, BlockStateMappingContext context, NMSBlockStateMapping[] chain) {
+    public static int applyChain(int blockStateId, BlockStateMappingFunctionContext context, NMSBlockStateMapping[] chain) {
         return applyChain(BlockStateRegistry.get().byId(blockStateId), context, chain).indexInBlockStateRegistry;
     }
 

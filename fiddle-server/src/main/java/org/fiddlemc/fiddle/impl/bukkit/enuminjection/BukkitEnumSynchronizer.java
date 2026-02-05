@@ -2,7 +2,7 @@ package org.fiddlemc.fiddle.impl.bukkit.enuminjection;
 
 import com.mojang.logging.LogUtils;
 import net.minecraft.server.dedicated.DedicatedServer;
-import org.fiddlemc.fiddle.api.bukkit.enuminjection.BukkitEnumNamePickHandle;
+import org.fiddlemc.fiddle.api.bukkit.enuminjection.BukkitEnumNamePickFunctionHandle;
 import org.fiddlemc.fiddle.api.bukkit.enuminjection.BukkitEnumNames;
 import org.fiddlemc.fiddle.api.bukkit.enuminjection.BukkitEnumNamesComposeEvent;
 import org.fiddlemc.fiddle.impl.util.java.enuminjection.EnumInjector;
@@ -19,7 +19,7 @@ import java.util.List;
  * To apply the synchronization, call {@link #run}.
  * </p>
  */
-public abstract class BukkitEnumSynchronizer<E extends Enum<E>, S, I extends EnumInjector<E>, P extends BukkitEnumNameMappingPipelineImpl<S> & SingleStepMappingPipeline<String, BukkitEnumNamePickHandle<S>, BukkitEnumNamesComposeEvent<S>>> {
+public abstract class BukkitEnumSynchronizer<E extends Enum<E>, S, I extends EnumInjector<E>, P extends BukkitEnumNameMappingPipelineImpl<S> & SingleStepMappingPipeline<String, BukkitEnumNamePickFunctionHandle<S>, BukkitEnumNamesComposeEvent<S>>> {
 
     private static final Logger LOGGER = LogUtils.getLogger();
 

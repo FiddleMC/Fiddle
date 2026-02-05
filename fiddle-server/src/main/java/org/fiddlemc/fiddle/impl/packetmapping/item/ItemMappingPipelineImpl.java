@@ -8,7 +8,7 @@ import net.minecraft.core.HolderSet;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
-import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingContext;
+import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingFunctionContext;
 import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappings;
 import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingsComposeEvent;
 import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMapping;
@@ -28,7 +28,7 @@ import java.util.Map;
 /**
  * A pipeline of {@link NMSItemMapping}s.
  */
-public final class ItemMappingPipelineImpl extends ComposableImpl<ItemMappingsComposeEvent, ItemMappingPipelineComposeEventImpl> implements WithClientViewContextSingleStepMappingPipeline<ItemStack, ItemMappingContext, NMSItemMappingHandle, ItemMappingsComposeEvent>, ItemMappings {
+public final class ItemMappingPipelineImpl extends ComposableImpl<ItemMappingsComposeEvent, ItemMappingPipelineComposeEventImpl> implements WithClientViewContextSingleStepMappingPipeline<ItemStack, ItemMappingFunctionContext, NMSItemMappingHandle, ItemMappingsComposeEvent>, ItemMappings {
 
     public static final class ServiceProviderImpl extends NoArgsConstructorServiceProviderImpl<ItemMappings, ItemMappingPipelineImpl> implements ServiceProvider {
 
@@ -68,7 +68,7 @@ public final class ItemMappingPipelineImpl extends ComposableImpl<ItemMappingsCo
     }
 
     @Override
-    public NMSItemMappingHandle createHandle(ItemStack data, ItemMappingContext context) {
+    public NMSItemMappingHandle createHandle(ItemStack data, ItemMappingFunctionContext context) {
         return new ItemMappingHandleImpl(data, context, false);
     }
 
@@ -78,7 +78,7 @@ public final class ItemMappingPipelineImpl extends ComposableImpl<ItemMappingsCo
     }
 
     @Override
-    public ItemStack apply(ItemStack data, ItemMappingContext context) {
+    public ItemStack apply(ItemStack data, ItemMappingFunctionContext context) {
         // Skip the mapping for empty item stacks
         if (data.isEmpty() || data.getItem() == null) {
             return data;
@@ -92,12 +92,12 @@ public final class ItemMappingPipelineImpl extends ComposableImpl<ItemMappingsCo
      *
      * @return The mapped {@link Item}, on a best-attempt basis.
      */
-    public Item apply(Item data, ItemMappingContext context) {
+    public Item apply(Item data, ItemMappingFunctionContext context) {
         return apply(new ItemStack(data), context).getItem();
     }
 
     /**
-     * Convenience function for {@link #apply(Item, ItemMappingContext)},
+     * Convenience function for {@link #apply(Item, ItemMappingFunctionContext)},
      * analogous to {@link WithContextSingleStepMappingPipeline#applyGenerically}.
      */
     public Item applyGenerically(Item data) {
@@ -105,14 +105,14 @@ public final class ItemMappingPipelineImpl extends ComposableImpl<ItemMappingsCo
     }
 
     /**
-     * Convenience function to call {@link #apply(Item, ItemMappingContext)}
+     * Convenience function to call {@link #apply(Item, ItemMappingFunctionContext)}
      * for all items in the given {@link HolderSet}.
      *
      * @return A {@link HolderSet} of mapped {@link Item}s.
      * This {@link HolderSet} may be the given {@code data}, and if not, the {@link Holder}s inside
      * may be those in {@code data}.
      */
-    public HolderSet<Item> apply(HolderSet<Item> data, ItemMappingContext context) {
+    public HolderSet<Item> apply(HolderSet<Item> data, ItemMappingFunctionContext context) {
         Int2ObjectMap<Item> fromToMap = new Int2ObjectArrayMap<>();
         List<Holder<Item>> result = new ArrayList<>(data.size());
         boolean changed = false;
@@ -130,7 +130,7 @@ public final class ItemMappingPipelineImpl extends ComposableImpl<ItemMappingsCo
     }
 
     /**
-     * Convenience function for {@link #apply(HolderSet, ItemMappingContext)},
+     * Convenience function for {@link #apply(HolderSet, ItemMappingFunctionContext)},
      * analogous to {@link WithContextSingleStepMappingPipeline#applyGenerically}.
      */
     public HolderSet<Item> applyGenerically(HolderSet<Item> data) {

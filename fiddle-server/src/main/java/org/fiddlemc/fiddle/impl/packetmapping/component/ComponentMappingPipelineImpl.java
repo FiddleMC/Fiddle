@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import net.minecraft.network.chat.Component;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
-import org.fiddlemc.fiddle.api.packetmapping.ClientViewMappingContext;
+import org.fiddlemc.fiddle.api.packetmapping.WithClientViewMappingFunctionContext;
 import org.fiddlemc.fiddle.api.packetmapping.component.ComponentMappings;
 import org.fiddlemc.fiddle.api.packetmapping.component.ComponentMappingsComposeEvent;
 import org.fiddlemc.fiddle.api.packetmapping.component.nms.NMSComponentMapping;
@@ -60,12 +60,12 @@ public final class ComponentMappingPipelineImpl extends ComposableImpl<Component
     }
 
     @Override
-    public NMSComponentMappingHandle createHandle(Component data, ClientViewMappingContext context) {
+    public NMSComponentMappingHandle createHandle(Component data, WithClientViewMappingFunctionContext context) {
         return new ComponentMappingHandleImpl(data, context, false);
     }
 
     @Override
-    public Component apply(Component data, ClientViewMappingContext context) {
+    public Component apply(Component data, WithClientViewMappingFunctionContext context) {
         return WithClientViewContextSingleStepMappingPipeline.Simple.super.apply(data instanceof AdventureComponent adventureComponent ? adventureComponent.deepConverted() : data, context);
     }
 

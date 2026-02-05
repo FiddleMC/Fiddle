@@ -15,7 +15,7 @@ public interface BukkitEnumNamesComposeEvent<S> extends LifecycleEvent {
      *
      * @param mapping The mapping to register.
      */
-    void register(SingleStepMapping<BukkitEnumNamePickHandle<S>> mapping);
+    void register(SingleStepMapping<BukkitEnumNamePickFunctionHandle<S>> mapping);
 
     /**
      * Changes the list of registered mappings.
@@ -27,6 +27,6 @@ public interface BukkitEnumNamesComposeEvent<S> extends LifecycleEvent {
      *
      * @param consumer The consumer that applies the desired changes to the list of mappings.
      */
-    void changeRegistered(Consumer<List<SingleStepMapping<BukkitEnumNamePickHandle<S>>>> consumer);
+    void changeRegistered(Consumer<List<SingleStepMapping<BukkitEnumNamePickFunctionHandle<S>>>> consumer);
 
 }

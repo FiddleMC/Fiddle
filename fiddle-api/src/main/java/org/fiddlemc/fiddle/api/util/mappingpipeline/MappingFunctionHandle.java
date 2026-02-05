@@ -1,9 +1,9 @@
 package org.fiddlemc.fiddle.api.util.mappingpipeline;
 
 /**
- * A handle for the data that a mapping is being applied on.
+ * A handle for the data that a mapping function is being applied on.
  */
-public interface MappingHandle<T> {
+public interface MappingFunctionHandle<T> {
 
     /**
      * @return The current data, after potential previous mappings were applied.

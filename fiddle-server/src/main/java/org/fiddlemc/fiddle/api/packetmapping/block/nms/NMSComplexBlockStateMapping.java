@@ -1,6 +1,6 @@
 package org.fiddlemc.fiddle.api.packetmapping.block.nms;
 
-import org.fiddlemc.fiddle.api.packetmapping.block.BlockStateMappingContext;
+import org.fiddlemc.fiddle.api.packetmapping.block.BlockStateMappingFunctionContext;
 import org.fiddlemc.fiddle.api.packetmapping.block.ComplexBlockStateMapping;
 import java.util.function.Consumer;
 
@@ -24,7 +24,7 @@ import java.util.function.Consumer;
  *
  * @param apply               The code to run.
  * @param requiresCoordinates Whether this mapping requires the coordinates
- *                            ({@link BlockStateMappingContext#getPhysicalBlockX()} and so on).
+ *                            ({@link BlockStateMappingFunctionContext#getPhysicalBlockX()} and so on).
  */
 public record NMSComplexBlockStateMapping(
     Consumer<NMSBlockStateMappingHandle> apply,

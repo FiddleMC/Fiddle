@@ -1,13 +1,13 @@
 package org.fiddlemc.fiddle.impl.packetmapping.item;
 
 import org.fiddlemc.fiddle.api.clientview.ClientView;
-import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingContext;
+import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingFunctionContext;
 import org.fiddlemc.fiddle.impl.packetmapping.ClientViewMappingContextImpl;
 
 /**
- * The implementation of {@link ItemMappingContext}.
+ * The implementation of {@link ItemMappingFunctionContext}.
  */
-public class ItemMappingContextImpl extends ClientViewMappingContextImpl implements ItemMappingContext {
+public class ItemMappingContextImpl extends ClientViewMappingContextImpl implements ItemMappingFunctionContext {
 
     private final boolean isItemStackInItemFrame;
     private final boolean isStonecutterRecipeResult;

@@ -2,14 +2,14 @@ package org.fiddlemc.fiddle.impl.util.mappingpipeline;
 
 import io.papermc.paper.plugin.lifecycle.event.LifecycleEvent;
 import org.fiddlemc.fiddle.api.util.composable.Composable;
-import org.fiddlemc.fiddle.api.util.mappingpipeline.MappingHandle;
+import org.fiddlemc.fiddle.api.util.mappingpipeline.MappingFunctionHandle;
 import org.fiddlemc.fiddle.api.util.mappingpipeline.SingleStepMapping;
 import org.jspecify.annotations.Nullable;
 
 /**
  * A base implementation of a mapping pipeline for {@link SingleStepMapping}s.
  */
-public interface SingleStepMappingPipeline<T, H extends MappingHandle<T>, E extends LifecycleEvent> extends Composable<E> {
+public interface SingleStepMappingPipeline<T, H extends MappingFunctionHandle<T>, E extends LifecycleEvent> extends Composable<E> {
 
     /**
      * @return The smallest possible list containing all mappings in this pipeline
