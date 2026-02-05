@@ -5,7 +5,6 @@ import io.papermc.paper.plugin.bootstrap.PluginBootstrap;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import io.papermc.paper.registry.RegistryKey;
 import io.papermc.paper.registry.TypedKey;
-import io.papermc.paper.registry.event.RegistryEvents;
 import net.kyori.adventure.key.Key;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponents;
@@ -20,15 +19,13 @@ import net.minecraft.world.level.material.PushReaction;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.BlockType;
 import org.bukkit.inventory.ItemType;
-import org.fiddlemc.fiddle.api.bukkit.enuminjection.material.MaterialEnumNameMappingPipeline;
+import org.fiddlemc.fiddle.api.FiddleEvents;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
 import org.fiddlemc.fiddle.api.moredatadriven.paper.nms.NMSBlockRegistryEntryBuilder;
 import org.fiddlemc.fiddle.api.moredatadriven.paper.nms.NMSItemRegistryEntryBuilder;
-import org.fiddlemc.fiddle.api.packetmapping.block.BlockMappingPipeline;
 import org.fiddlemc.fiddle.api.packetmapping.block.nms.NMSBlockMappingPipelineComposeEvent;
 import org.fiddlemc.fiddle.api.packetmapping.block.nms.NMSComplexBlockStateMapping;
 import org.fiddlemc.fiddle.api.packetmapping.component.translatable.ServerSideTranslationRegistrar;
-import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingPipeline;
 import org.fiddlemc.fiddle.api.packetmapping.item.builtin.BuiltInItemMapper;
 import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMappingPipelineComposeEvent;
 import org.fiddlemc.testplugin.data.PluginBlockTypes;
@@ -42,6 +39,19 @@ import java.util.stream.Stream;
 
 @SuppressWarnings("unused")
 public class TestPluginBootstrap implements PluginBootstrap {
+
+    @Override
+    public void bootstrap(@NotNull BootstrapContext context) {
+        loadIncludedDataPack(context);
+        addCustomBlocks(context);
+        addCustomItems(context);
+        customizeEnumNameForAnItem(context);
+        setBasicBlockMappings(context);
+        setComplexBlockMappings(context);
+        setBasicItemMappings(context);
+        setComplexItemMappings(context);
+        setTranslations(context);
+    }
 
     /**
      * Makes sure the included data pack is loaded.
@@ -70,7 +80,7 @@ public class TestPluginBootstrap implements PluginBootstrap {
      * </p>
      */
     private void addCustomBlocks(@NotNull BootstrapContext context) {
-        context.getLifecycleManager().registerEventHandler(RegistryEvents.BLOCK.compose(), event -> {
+        context.getLifecycleManager().registerEventHandler(FiddleEvents.BLOCK_REGISTRY_COMPOSE,event -> {
 
             event.registry().register(TypedKey.create(RegistryKey.BLOCK, Key.key("example:ash_block")), builder -> {
                 var nmsBuilder = (NMSBlockRegistryEntryBuilder) builder;
@@ -104,7 +114,7 @@ public class TestPluginBootstrap implements PluginBootstrap {
      * </p>
      */
     private void addCustomItems(@NotNull BootstrapContext context) {
-        context.getLifecycleManager().registerEventHandler(RegistryEvents.ITEM.compose(), event -> {
+        context.getLifecycleManager().registerEventHandler(FiddleEvents.ITEM_REGISTRY_COMPOSE, event -> {
 
             event.registry().register(TypedKey.create(RegistryKey.ITEM, Key.key("example:ash")), builder -> {
             });
@@ -137,7 +147,7 @@ public class TestPluginBootstrap implements PluginBootstrap {
      * </p>
      */
     private void customizeEnumNameForAnItem(@NotNull BootstrapContext context) {
-        context.getLifecycleManager().registerEventHandler(MaterialEnumNameMappingPipeline.get().compose(), event -> {
+        context.getLifecycleManager().registerEventHandler(FiddleEvents.MATERIAL_ENUM_MAPPING_PIPELINE_COMPOSE, event -> {
             event.register(handle -> {
                 var key = handle.getSourceValue().getLeft();
                 if (key.equals(NamespacedKey.fromString("example:ash"))) {
@@ -158,7 +168,7 @@ public class TestPluginBootstrap implements PluginBootstrap {
      * </p>
      */
     private void setBasicBlockMappings(@NotNull BootstrapContext context) {
-        context.getLifecycleManager().registerEventHandler(BlockMappingPipeline.get().compose(), event -> {
+        context.getLifecycleManager().registerEventHandler(FiddleEvents.BLOCK_MAPPING_PIPELINE_COMPOSE, event -> {
 
             event.registerSimple(ClientView.AwarenessLevel.JAVA_DEFAULT, PluginBlockTypes.ASH_BLOCK.get(), BlockType.LIGHT_GRAY_CONCRETE_POWDER.createBlockData());
             event.registerStateToState(ClientView.AwarenessLevel.JAVA_DEFAULT, PluginBlockTypes.ASH_STAIRS.get(), BlockType.ANDESITE_STAIRS);
@@ -177,7 +187,7 @@ public class TestPluginBootstrap implements PluginBootstrap {
      * </p>
      */
     private void setComplexBlockMappings(@NotNull BootstrapContext context) {
-        context.getLifecycleManager().registerEventHandler(BlockMappingPipeline.get().compose(), event -> {
+        context.getLifecycleManager().registerEventHandler(FiddleEvents.BLOCK_MAPPING_PIPELINE_COMPOSE, event -> {
             var nmsEvent = (NMSBlockMappingPipelineComposeEvent) event;
 
             nmsEvent.registerComplex(ClientView.AwarenessLevel.JAVA_DEFAULT, Blocks.GRASS_BLOCK.defaultBlockState(), new NMSComplexBlockStateMapping(handle -> {
@@ -205,7 +215,7 @@ public class TestPluginBootstrap implements PluginBootstrap {
      * </p>
      */
     private void setBasicItemMappings(@NotNull BootstrapContext context) {
-        context.getLifecycleManager().registerEventHandler(BuiltInItemMapper.get().compose(), event -> {
+        context.getLifecycleManager().registerEventHandler(FiddleEvents.BUILT_IN_ITEM_MAPPER_COMPOSE, event -> {
 
             event.mapItem(PluginItemTypes.ASH.get(), ItemType.GUNPOWDER);
             event.mapItem(PluginItemTypes.ASH_BLOCK.get(), ItemType.LIGHT_GRAY_CONCRETE_POWDER);
@@ -229,7 +239,7 @@ public class TestPluginBootstrap implements PluginBootstrap {
      * </p>
      */
     private void setComplexItemMappings(@NotNull BootstrapContext context) {
-        context.getLifecycleManager().registerEventHandler(ItemMappingPipeline.get().compose(), event -> {
+        context.getLifecycleManager().registerEventHandler(FiddleEvents.ITEM_MAPPING_PIPELINE_COMPOSE, event -> {
             var nmsEvent = (NMSItemMappingPipelineComposeEvent) event;
 
             nmsEvent.register(ClientView.AwarenessLevel.getAll(), Items.CRAFTING_TABLE, handle -> {
@@ -266,7 +276,7 @@ public class TestPluginBootstrap implements PluginBootstrap {
      * </p>
      */
     private void setTranslations(@NotNull BootstrapContext context) {
-        context.getLifecycleManager().registerEventHandler(ServerSideTranslationRegistrar.get().compose(), event -> {
+        context.getLifecycleManager().registerEventHandler(FiddleEvents.SERVER_SIDE_TRANSLATION_REGISTRAR_COMPOSE, event -> {
 
             event.register(PluginItems.ASH.get().getDescriptionId(), "Ash");
             event.register(PluginItems.ASH_BLOCK.get().getDescriptionId(), "Ash block");
@@ -277,19 +287,6 @@ public class TestPluginBootstrap implements PluginBootstrap {
             event.register(Blocks.BOOKSHELF.getDescriptionId(), "Booky Bookshelf");
 
         });
-    }
-
-    @Override
-    public void bootstrap(@NotNull BootstrapContext context) {
-        loadIncludedDataPack(context);
-        addCustomBlocks(context);
-        addCustomItems(context);
-        customizeEnumNameForAnItem(context);
-        setBasicBlockMappings(context);
-        setComplexBlockMappings(context);
-        setBasicItemMappings(context);
-        setComplexItemMappings(context);
-        setTranslations(context);
     }
 
 }
