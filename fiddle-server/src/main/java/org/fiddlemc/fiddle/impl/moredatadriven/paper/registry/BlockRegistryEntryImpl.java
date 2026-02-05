@@ -1,4 +1,4 @@
-package org.fiddlemc.fiddle.impl.moredatadriven.paper;
+package org.fiddlemc.fiddle.impl.moredatadriven.paper.registry;
 
 import io.papermc.paper.registry.PaperRegistryBuilder;
 import io.papermc.paper.registry.data.util.Conversions;
@@ -8,7 +8,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import org.bukkit.block.BlockType;
-import org.fiddlemc.fiddle.api.moredatadriven.paper.BlockRegistryEntry;
+import org.fiddlemc.fiddle.api.moredatadriven.paper.registry.BlockRegistryEntry;
 import org.fiddlemc.fiddle.api.moredatadriven.paper.nms.NMSBlockRegistryEntryBuilder;
 import org.jspecify.annotations.Nullable;
 import java.util.function.Consumer;

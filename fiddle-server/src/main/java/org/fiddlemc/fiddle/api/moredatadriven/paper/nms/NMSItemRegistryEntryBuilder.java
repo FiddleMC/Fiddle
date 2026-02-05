@@ -7,7 +7,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import org.fiddlemc.fiddle.api.moredatadriven.paper.ItemRegistryEntry;
+import org.fiddlemc.fiddle.api.moredatadriven.paper.registry.ItemRegistryEntry;
 
 /**
  * An {@link ItemRegistryEntry.Builder} that allows building an {@link Item} using Minecraft internals.

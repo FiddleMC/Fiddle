@@ -2,7 +2,7 @@ package org.fiddlemc.fiddle.api.moredatadriven.paper.nms;
 
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
-import org.fiddlemc.fiddle.api.moredatadriven.paper.BlockRegistryEntry;
+import org.fiddlemc.fiddle.api.moredatadriven.paper.registry.BlockRegistryEntry;
 
 import java.util.function.Consumer;
 import java.util.function.Function;

@@ -1,4 +1,4 @@
-package org.fiddlemc.fiddle.impl.moredatadriven.paper;
+package org.fiddlemc.fiddle.impl.moredatadriven.paper.registry;
 
 import io.papermc.paper.adventure.PaperAdventure;
 import io.papermc.paper.registry.PaperRegistryBuilder;

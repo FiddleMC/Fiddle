@@ -1,4 +1,4 @@
-package org.fiddlemc.fiddle.impl.moredatadriven.paper;
+package org.fiddlemc.fiddle.impl.moredatadriven.paper.registry;
 
 import net.minecraft.resources.Identifier;
 import org.fiddlemc.fiddle.api.moredatadriven.paper.nms.NMSKeyAwareRegistryEntry;

@@ -1,4 +1,4 @@
-package org.fiddlemc.fiddle.impl.moredatadriven.paper;
+package org.fiddlemc.fiddle.impl.moredatadriven.paper.registry;
 
 import io.papermc.paper.registry.PaperRegistryBuilder;
 import io.papermc.paper.registry.data.util.Conversions;
@@ -9,7 +9,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import org.bukkit.inventory.ItemType;
-import org.fiddlemc.fiddle.api.moredatadriven.paper.ItemRegistryEntry;
+import org.fiddlemc.fiddle.api.moredatadriven.paper.registry.ItemRegistryEntry;
 import org.fiddlemc.fiddle.api.moredatadriven.paper.nms.NMSItemRegistryEntryBuilder;
 import org.fiddlemc.fiddle.impl.moredatadriven.minecraft.BlockRegistry;
 import org.jspecify.annotations.Nullable;

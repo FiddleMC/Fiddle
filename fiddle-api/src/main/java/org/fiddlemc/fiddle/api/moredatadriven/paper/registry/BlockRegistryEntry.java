@@ -1,4 +1,4 @@
-package org.fiddlemc.fiddle.api.moredatadriven.paper;
+package org.fiddlemc.fiddle.api.moredatadriven.paper.registry;
 
 import io.papermc.paper.registry.RegistryBuilder;
 import org.bukkit.block.BlockType;
