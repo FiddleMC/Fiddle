@@ -5,7 +5,7 @@ import org.bukkit.craftbukkit.inventory.CraftItemType;
 import org.bukkit.inventory.ItemType;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
 import org.fiddlemc.fiddle.api.packetmapping.item.builtin.BuiltInItemMapperComposeEvent;
-import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMappingUtilities;
+import org.fiddlemc.fiddle.api.packetmapping.item.nms.ItemMappingUtilitiesNMS;
 
 /**
  * Extends {@link BuiltInItemMapperComposeEvent} with NMS support.
@@ -19,7 +19,7 @@ public interface NMSBuiltInItemMapperComposeEvent extends BuiltInItemMapperCompo
 
     /**
      * Adds a mapping that maps the given {@code from} {@link Item} to the given {@code to} {@link Item},
-     * using {@link NMSItemMappingUtilities#setItemWhilePreservingRest}.
+     * using {@link ItemMappingUtilitiesNMS#setItemWhilePreservingRest}.
      */
     void mapItem(ClientView.AwarenessLevel awarenessLevel, Item from, Item to);
 

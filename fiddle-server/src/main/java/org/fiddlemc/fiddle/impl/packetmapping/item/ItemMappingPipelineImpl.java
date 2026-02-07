@@ -11,8 +11,7 @@ import org.fiddlemc.fiddle.api.clientview.ClientView;
 import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingFunctionContext;
 import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappings;
 import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingsComposeEvent;
-import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMapping;
-import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMappingHandle;
+import org.fiddlemc.fiddle.api.packetmapping.item.nms.ItemMappingHandleNMS;
 import org.fiddlemc.fiddle.impl.moredatadriven.minecraft.ItemRegistry;
 import org.fiddlemc.fiddle.impl.packetmapping.WithClientViewContextSingleStepMappingPipeline;
 import org.fiddlemc.fiddle.impl.packetmapping.item.builtin.BuiltInItemMapperImpl;
@@ -28,7 +27,7 @@ import java.util.Map;
 /**
  * A pipeline of {@link NMSItemMapping}s.
  */
-public final class ItemMappingPipelineImpl extends ComposableImpl<ItemMappingsComposeEvent, ItemMappingPipelineComposeEventImpl> implements WithClientViewContextSingleStepMappingPipeline<ItemStack, ItemMappingFunctionContext, NMSItemMappingHandle>, ItemMappings {
+public final class ItemMappingPipelineImpl extends ComposableImpl<ItemMappingsComposeEvent, ItemMappingsComposeEventNMSImpl> implements WithClientViewContextSingleStepMappingPipeline<ItemStack, ItemMappingFunctionContext, ItemMappingHandleNMS>, ItemMappings {
 
     public static final class ServiceProviderImpl extends NoArgsConstructorServiceProviderImpl<ItemMappings, ItemMappingPipelineImpl> implements ServiceProvider {
 
@@ -63,12 +62,12 @@ public final class ItemMappingPipelineImpl extends ComposableImpl<ItemMappingsCo
     }
 
     @Override
-    public NMSItemMapping @Nullable [] getStepsThatMayApplyTo(NMSItemMappingHandle handle) {
+    public NMSItemMapping @Nullable [] getStepsThatMayApplyTo(ItemMappingHandleNMS handle) {
         return this.mappings[handle.getContext().getClientView().getAwarenessLevel().ordinal()][handle.getOriginal().getItem().indexInItemRegistry];
     }
 
     @Override
-    public NMSItemMappingHandle createHandle(ItemStack data, ItemMappingFunctionContext context) {
+    public ItemMappingHandleNMS createHandle(ItemStack data, ItemMappingFunctionContext context) {
         return new ItemMappingHandleImpl(data, context, false);
     }
 
@@ -138,9 +137,9 @@ public final class ItemMappingPipelineImpl extends ComposableImpl<ItemMappingsCo
     }
 
     @Override
-    protected ItemMappingPipelineComposeEventImpl createComposeEvent() {
+    protected ItemMappingsComposeEventNMSImpl createComposeEvent() {
         // Create the event
-        ItemMappingPipelineComposeEventImpl event = new ItemMappingPipelineComposeEventImpl();
+        ItemMappingsComposeEventNMSImpl event = new ItemMappingsComposeEventNMSImpl();
         // Register the built-in mappings
         BuiltInItemMapperImpl builtInItemMapper = BuiltInItemMapperImpl.get();
         builtInItemMapper.fireComposeEvent();
@@ -150,7 +149,7 @@ public final class ItemMappingPipelineImpl extends ComposableImpl<ItemMappingsCo
     }
 
     @Override
-    protected void copyInformationFromEvent(ItemMappingPipelineComposeEventImpl event) {
+    protected void copyInformationFromEvent(ItemMappingsComposeEventNMSImpl event) {
 
         // Initialize the mappings
         for (int i = 0; i < this.mappings.length; i++) {

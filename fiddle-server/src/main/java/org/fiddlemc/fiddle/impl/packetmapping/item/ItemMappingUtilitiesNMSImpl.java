@@ -6,31 +6,31 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
-import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMappingHandle;
-import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMappingUtilities;
+import org.fiddlemc.fiddle.api.packetmapping.item.nms.ItemMappingHandleNMS;
+import org.fiddlemc.fiddle.api.packetmapping.item.nms.ItemMappingUtilitiesNMS;
 import org.fiddlemc.fiddle.impl.util.java.serviceloader.NoArgsConstructorServiceProviderImpl;
 import org.jspecify.annotations.Nullable;
 import java.util.Objects;
 
 /**
- * The implementation for {@link NMSItemMappingUtilities}.
+ * The implementation for {@link ItemMappingUtilitiesNMS}.
  */
-public final class ItemMappingUtilitiesImpl implements NMSItemMappingUtilities {
+public final class ItemMappingUtilitiesNMSImpl implements ItemMappingUtilitiesNMS {
 
-    public static final class ServiceProviderImpl extends NoArgsConstructorServiceProviderImpl<NMSItemMappingUtilities, ItemMappingUtilitiesImpl> implements ServiceProvider {
+    public static final class ServiceProviderImpl extends NoArgsConstructorServiceProviderImpl<ItemMappingUtilitiesNMS, ItemMappingUtilitiesNMSImpl> implements ServiceProvider {
 
         public ServiceProviderImpl() {
-            super(ItemMappingUtilitiesImpl.class);
+            super(ItemMappingUtilitiesNMSImpl.class);
         }
 
     }
 
-    public static ItemMappingUtilitiesImpl get() {
-        return (ItemMappingUtilitiesImpl) NMSItemMappingUtilities.get();
+    public static ItemMappingUtilitiesNMSImpl get() {
+        return (ItemMappingUtilitiesNMSImpl) ItemMappingUtilitiesNMS.get();
     }
 
     @Override
-    public boolean setItemWhilePreservingRest(final NMSItemMappingHandle handle, final Item newItem) {
+    public boolean setItemWhilePreservingRest(final ItemMappingHandleNMS handle, final Item newItem) {
 
         // Don't make changes if the item is already present
         ItemStack immutable = handle.getImmutable();

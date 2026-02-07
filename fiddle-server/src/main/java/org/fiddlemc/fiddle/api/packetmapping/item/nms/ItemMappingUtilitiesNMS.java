@@ -8,19 +8,19 @@ import java.util.ServiceLoader;
 /**
  * Some utilities for the mapping of items.
  */
-public interface NMSItemMappingUtilities {
+public interface ItemMappingUtilitiesNMS {
 
     /**
-     * An internal interface to get the {@link NMSItemMappingUtilities} instance.
+     * An internal interface to get the {@link ItemMappingUtilitiesNMS} instance.
      */
-    interface ServiceProvider extends GenericServiceProvider<NMSItemMappingUtilities> {
+    interface ServiceProvider extends GenericServiceProvider<ItemMappingUtilitiesNMS> {
     }
 
     /**
-     * @return The {@link NMSItemMappingUtilities} instance.
+     * @return The {@link ItemMappingUtilitiesNMS} instance.
      */
-    static NMSItemMappingUtilities get() {
-        return ServiceLoader.load(NMSItemMappingUtilities.ServiceProvider.class, NMSItemMappingUtilities.ServiceProvider.class.getClassLoader()).findFirst().get().get();
+    static ItemMappingUtilitiesNMS get() {
+        return ServiceLoader.load(ItemMappingUtilitiesNMS.ServiceProvider.class, ItemMappingUtilitiesNMS.ServiceProvider.class.getClassLoader()).findFirst().get().get();
     }
 
     /**
@@ -31,6 +31,6 @@ public interface NMSItemMappingUtilities {
      * @param newItem The new {@link Item} for the item stack.
      * @return Whether any changes were made.
      */
-    boolean setItemWhilePreservingRest(NMSItemMappingHandle handle, Item newItem);
+    boolean setItemWhilePreservingRest(ItemMappingHandleNMS handle, Item newItem);
 
 }

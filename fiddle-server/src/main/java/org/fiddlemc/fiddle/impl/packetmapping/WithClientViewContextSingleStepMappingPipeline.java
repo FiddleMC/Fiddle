@@ -1,6 +1,5 @@
 package org.fiddlemc.fiddle.impl.packetmapping;
 
-import io.papermc.paper.plugin.lifecycle.event.LifecycleEvent;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
 import org.fiddlemc.fiddle.api.packetmapping.WithClientViewMappingFunctionContext;
 import org.fiddlemc.fiddle.api.util.mapping.WithContextMappingFunctionHandle;
@@ -33,7 +32,7 @@ public interface WithClientViewContextSingleStepMappingPipeline<T, C extends Wit
      * A simple implementation of {@link WithClientViewContextSingleStepMappingPipeline}
      * where the context is no more complex than {@link WithClientViewMappingFunctionContext}.
      */
-    interface Simple<T, H extends WithContextMappingFunctionHandle<T, WithClientViewMappingFunctionContext>, E extends LifecycleEvent> extends WithClientViewContextSingleStepMappingPipeline<T, WithClientViewMappingFunctionContext, H> {
+    interface Simple<T, H extends WithContextMappingFunctionHandle<T, WithClientViewMappingFunctionContext>> extends WithClientViewContextSingleStepMappingPipeline<T, WithClientViewMappingFunctionContext, H> {
 
         @Override
         default ClientViewMappingContextImpl createGenericContext(ClientView clientView) {

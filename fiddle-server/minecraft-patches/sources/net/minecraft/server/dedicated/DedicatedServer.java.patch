@@ -37,7 +37,7 @@
          com.destroystokyo.paper.VersionHistoryManager.INSTANCE.getClass(); // Paper - load version history now
  
 +        org.fiddlemc.fiddle.impl.packetmapping.component.translatable.ServerSideTranslationRegistrarImpl.get().fireComposeEvent(); // Fiddle - Server-side translations - Implementation - Fire compose event to register translations
-+        org.fiddlemc.fiddle.impl.packetmapping.component.ComponentMappingPipelineImpl.get().fireComposeEvent(); // Fiddle - Component mapping - Implementation - Fire compose event to register mappings
++        org.fiddlemc.fiddle.impl.packetmapping.component.ComponentMappingsImpl.get().fireComposeEvent(); // Fiddle - Component mapping - Implementation - Fire compose event to register mappings
 +        org.fiddlemc.fiddle.impl.packetmapping.block.BlockMappingsImpl.get().fireComposeEvent(); // Fiddle - Block mapping - Implementation - Fire compose event to register mappings
 +        org.fiddlemc.fiddle.impl.packetmapping.item.ItemMappingPipelineImpl.get().fireComposeEvent(); // Fiddle - Item mapping - Implementation - Fire compose event to register mappings
 +

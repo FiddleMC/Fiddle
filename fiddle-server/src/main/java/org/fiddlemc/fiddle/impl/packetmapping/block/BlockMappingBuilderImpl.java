@@ -5,6 +5,7 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.block.data.CraftBlockData;
 import org.fiddlemc.fiddle.api.packetmapping.block.BlockMappingBuilder;
 import org.fiddlemc.fiddle.api.packetmapping.block.BlockMappingHandle;
+import java.util.Collection;
 
 /**
  * The implementation of {@link BlockMappingBuilder}.
@@ -12,8 +13,8 @@ import org.fiddlemc.fiddle.api.packetmapping.block.BlockMappingHandle;
 public class BlockMappingBuilderImpl extends AbstractBlockMappingBuilderImpl<BlockData, BlockMappingHandle> implements BlockMappingBuilder {
 
     @Override
-    protected Iterable<BlockState> getStatesToRegisterFor() {
-        return this.from.stream().map(value -> ((CraftBlockData) value).getState()).toList();
+    protected Collection<BlockData> getStatesToRegisterFor() {
+        return this.from;
     }
 
     @Override

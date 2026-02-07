@@ -11,9 +11,9 @@ import net.minecraft.world.level.block.state.properties.Property;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
 import org.fiddlemc.fiddle.api.packetmapping.item.builtin.BuiltInItemMapper;
 import org.fiddlemc.fiddle.api.packetmapping.item.builtin.BuiltInItemMapperComposeEvent;
-import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMappingUtilities;
-import org.fiddlemc.fiddle.impl.packetmapping.component.ComponentMappingPipelineImpl;
-import org.fiddlemc.fiddle.impl.packetmapping.item.ItemMappingPipelineComposeEventImpl;
+import org.fiddlemc.fiddle.api.packetmapping.item.nms.ItemMappingUtilitiesNMS;
+import org.fiddlemc.fiddle.impl.packetmapping.component.ComponentMappingsImpl;
+import org.fiddlemc.fiddle.impl.packetmapping.item.ItemMappingsComposeEventNMSImpl;
 import org.fiddlemc.fiddle.impl.util.composable.ComposableImpl;
 import org.fiddlemc.fiddle.impl.util.java.serviceloader.NoArgsConstructorServiceProviderImpl;
 import org.jspecify.annotations.Nullable;
@@ -66,7 +66,7 @@ public final class BuiltInItemMapperImpl extends ComposableImpl<BuiltInItemMappe
         return new BuiltInItemMapperComposeEventImpl(this);
     }
 
-    public void registerMappings(ItemMappingPipelineComposeEventImpl itemMappingPipelineComposeEvent) {
+    public void registerMappings(ItemMappingsComposeEventNMSImpl itemMappingPipelineComposeEvent) {
 
         // Mappings for mapped items
         for (ClientView.AwarenessLevel awarenessLevel : ClientView.AwarenessLevel.getAll()) {
@@ -75,7 +75,7 @@ public final class BuiltInItemMapperImpl extends ComposableImpl<BuiltInItemMappe
                 Item to = fromAndTo.getValue();
                 if (from != to) {
                     itemMappingPipelineComposeEvent.register(awarenessLevel, from, handle -> {
-                        NMSItemMappingUtilities.get().setItemWhilePreservingRest(handle, to);
+                        ItemMappingUtilitiesNMS.get().setItemWhilePreservingRest(handle, to);
                     });
                 }
             }
@@ -84,7 +84,7 @@ public final class BuiltInItemMapperImpl extends ComposableImpl<BuiltInItemMappe
         // Mappings to map default item name components
         itemMappingPipelineComposeEvent.registerForAllItems(ClientView.AwarenessLevel.getAll(), handle -> {
             Component itemName = handle.getImmutable().getItemName().copy();
-            Component mappedItemName = ComponentMappingPipelineImpl.get().apply(itemName, handle.getContext());
+            Component mappedItemName = ComponentMappingsImpl.get().apply(itemName, handle.getContext());
             if (!mappedItemName.equals(itemName)) {
                 handle.getMutable().set(DataComponents.ITEM_NAME, mappedItemName);
             }

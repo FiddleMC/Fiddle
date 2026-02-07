@@ -19,6 +19,9 @@ import java.util.function.Consumer;
  */
 public interface BlockMappingsComposeEventNMS<M> extends BlockMappingsComposeEvent<M> {
 
+    /**
+     * @see #register(Consumer)
+     */
     void registerNMS(Consumer<BlockMappingBuilderNMS> builderConsumer);
 
     /**
@@ -67,7 +70,7 @@ public interface BlockMappingsComposeEventNMS<M> extends BlockMappingsComposeEve
      * @see #registerStateToState(Collection, BlockType, BlockType)
      */
     default void registerStateToStateNMS(Collection<ClientView.AwarenessLevel> awarenessLevel, Block from, Block to) {
-        this.registerStateToState(awarenessLevel, Registry.BLOCK.getOrThrow(Key.key(from.keyInBlockRegistry.toString())), Registry.BLOCK.getOrThrow(Key.key(to.keyInBlockRegistry.toString())));
+        this.registerStateToState(awarenessLevel, Registry.BLOCK.getOrThrow(Key.key(from.keyInBlockRegistry.getNamespace(), from.keyInBlockRegistry.getPath())), Registry.BLOCK.getOrThrow(Key.key(to.keyInBlockRegistry.getNamespace(), to.keyInBlockRegistry.getPath())));
     }
 
 }

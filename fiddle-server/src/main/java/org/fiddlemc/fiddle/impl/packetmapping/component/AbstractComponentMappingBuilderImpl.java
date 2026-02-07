@@ -1,25 +1,23 @@
-package org.fiddlemc.fiddle.impl.packetmapping.block;
+package org.fiddlemc.fiddle.impl.packetmapping.component;
 
+import it.unimi.dsi.fastutil.Pair;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
-import it.unimi.dsi.fastutil.Pair;
 import net.minecraft.world.level.block.state.BlockState;
-import org.bukkit.block.data.BlockData;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
+import org.fiddlemc.fiddle.api.packetmapping.component.ComponentTarget;
 import org.jspecify.annotations.Nullable;
 
 /**
- * A common base for {@link BlockMappingBuilderImpl} and {@link BlockMappingBuilderNMSImpl}.
+ * A common base for {@link ComponentMappingBuilderImpl} and {@link ComponentMappingBuilderNMSImpl}.
  */
-public abstract class AbstractBlockMappingBuilderImpl<T, H> {
+public abstract class AbstractComponentMappingBuilderImpl<H> {
 
     protected @Nullable ArrayList<ClientView.AwarenessLevel> awarenessLevels;
-    protected @Nullable ArrayList<T> from;
-    protected @Nullable T to;
+    protected @Nullable ArrayList<ComponentTarget> from;
     protected @Nullable Consumer<H> function;
-    protected boolean functionRequiresCoordinates;
 
     public void awarenessLevel(Collection<ClientView.AwarenessLevel> awarenessLevels) {
         this.awarenessLevels = new ArrayList<>(awarenessLevels);
@@ -32,44 +30,34 @@ public abstract class AbstractBlockMappingBuilderImpl<T, H> {
         this.awarenessLevels.add(awarenessLevel);
     }
 
-    public void from(Collection<T> from) {
+    public void from(Collection<ComponentTarget> from) {
         this.from = new ArrayList<>(from);
     }
 
-    public void addFrom(T from) {
+    public void addFrom(ComponentTarget from) {
         if (this.from == null) {
             this.from = new ArrayList<>(1);
         }
         this.from.add(from);
     }
 
-    public void to(T to) {
-        this.to = to;
-    }
-
-    public void function(Consumer<H> function, boolean requiresCoordinates) {
+    public void function(Consumer<H> function) {
         this.function = function;
-        this.functionRequiresCoordinates = requiresCoordinates;
     }
 
-    abstract protected Collection<BlockData> getStatesToRegisterFor();
+    abstract protected ComponentMappingsStep createFunctionStep();
 
-    abstract protected BlockMappingsStep createFunctionStep();
-
-    abstract protected BlockState getSimpleTo();
-
-    private Iterable<Pair<ClientView.AwarenessLevel, BlockData>> getKeysToRegisterFor() {
-        Collection<BlockData> states = this.getStatesToRegisterFor();
-        List<Pair<ClientView.AwarenessLevel, BlockData>> keys = new ArrayList<>(this.awarenessLevels.size() * states.size());
+    private Iterable<Pair<ClientView.AwarenessLevel, ComponentTarget>> getKeysToRegisterFor() {
+        List<Pair<ClientView.AwarenessLevel, ComponentTarget>> keys = new ArrayList<>(this.awarenessLevels.size() * this.from.size());
         for (ClientView.AwarenessLevel awarenessLevel : this.awarenessLevels) {
-            for (BlockData state : states) {
-                keys.add(Pair.of(awarenessLevel, state));
+            for (ComponentTarget fromValue : this.from) {
+                keys.add(Pair.of(awarenessLevel, fromValue));
             }
         }
         return keys;
     }
 
-    public void registerWith(BlockMappingsComposeEventImpl event) {
+    public void registerWith(ComponentMappingsComposeEventImpl event) {
         if (this.awarenessLevels == null) {
             throw new IllegalStateException("No awareness level(s) were specified");
         }
@@ -80,11 +68,7 @@ public abstract class AbstractBlockMappingBuilderImpl<T, H> {
             event.register(this.getKeysToRegisterFor(), this.createFunctionStep());
             return;
         }
-        if (this.to != null) {
-            event.register(this.getKeysToRegisterFor(), new SimpleBlockMappingsStep(this.getSimpleTo()));
-            return;
-        }
-        throw new IllegalStateException("No to or function was specified");
+        throw new IllegalStateException("No function was specified");
     }
 
 }

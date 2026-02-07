@@ -11,8 +11,8 @@ import org.fiddlemc.fiddle.api.clientview.ClientView;
 import org.fiddlemc.fiddle.api.packetmapping.WithClientViewMappingFunctionContext;
 import org.fiddlemc.fiddle.api.packetmapping.component.ComponentMappings;
 import org.fiddlemc.fiddle.api.packetmapping.component.ComponentMappingsComposeEvent;
-import org.fiddlemc.fiddle.api.packetmapping.component.nms.NMSComponentMapping;
-import org.fiddlemc.fiddle.api.packetmapping.component.nms.NMSComponentMappingHandle;
+import org.fiddlemc.fiddle.api.packetmapping.component.ComponentTarget;
+import org.fiddlemc.fiddle.api.packetmapping.component.nms.ComponentMappingHandleNMS;
 import org.fiddlemc.fiddle.impl.packetmapping.WithClientViewContextSingleStepMappingPipeline;
 import org.fiddlemc.fiddle.impl.packetmapping.component.translatable.ServerSideTranslationComponentMapping;
 import org.fiddlemc.fiddle.impl.util.composable.ComposableImpl;
@@ -20,48 +20,50 @@ import org.fiddlemc.fiddle.impl.util.java.serviceloader.NoArgsConstructorService
 import org.jspecify.annotations.Nullable;
 
 /**
- * A pipeline of {@link NMSComponentMapping}s.
+ * A pipeline of component mappings.
  */
-public final class ComponentMappingPipelineImpl extends ComposableImpl<ComponentMappingsComposeEvent, ComponentMappingPipelineComposeEventImpl> implements WithClientViewContextSingleStepMappingPipeline.Simple<Component, NMSComponentMappingHandle, ComponentMappingsComposeEvent>, ComponentMappings {
+public final class ComponentMappingsImpl extends ComposableImpl<ComponentMappingsComposeEvent<ComponentMappingsStep>, ComponentMappingsComposeEventImpl> implements WithClientViewContextSingleStepMappingPipeline.Simple<Component, ComponentMappingHandleNMS>, ComponentMappings<ComponentMappingsStep> {
 
-    public static final class ServiceProviderImpl extends NoArgsConstructorServiceProviderImpl<ComponentMappings, ComponentMappingPipelineImpl> implements ServiceProvider {
+    public static final class ServiceProviderImpl extends NoArgsConstructorServiceProviderImpl<ComponentMappings<?>, ComponentMappingsImpl> implements ServiceProvider {
 
         public ServiceProviderImpl() {
-            super(ComponentMappingPipelineImpl.class);
+            super(ComponentMappingsImpl.class);
         }
 
     }
 
-    public static ComponentMappingPipelineImpl get() {
-        return (ComponentMappingPipelineImpl) ComponentMappings.get();
+    public static ComponentMappingsImpl get() {
+        return (ComponentMappingsImpl) ComponentMappings.get();
     }
 
     @Override
     protected String getEventTypeNamePrefix() {
-        return "fiddle_component_mapping_pipeline";
+        return "fiddle_component_mappings";
     }
 
     /**
-     * The registered mappings.
+     * The registered steps.
      *
      * <p>
-     * The mappings are organized in an array where {@link ClientView.AwarenessLevel#ordinal()} is the index.
+     * The mappings are organized in an array where {@link ClientView.AwarenessLevel#ordinal()}
+     * is the index, and then in an array where {@link ComponentTarget#ordinal()} is the index.
+     * The lowest-level array may be null, but will never be empty.
      * </p>
      */
-    private final NMSComponentMapping[][] mappings;
+    private final ComponentMappingsStep[][][] mappings;
 
-    private ComponentMappingPipelineImpl() {
-        this.mappings = new NMSComponentMapping[ClientView.AwarenessLevel.getAll().length][];
+    private ComponentMappingsImpl() {
+        this.mappings = new ComponentMappingsStep[ClientView.AwarenessLevel.getAll().length][][];
     }
 
     @Override
-    public NMSComponentMapping @Nullable [] getStepsThatMayApplyTo(NMSComponentMappingHandle handle) {
-        return this.mappings[handle.getContext().getClientView().getAwarenessLevel().ordinal()];
+    public ComponentMappingsStep @Nullable [] getStepsThatMayApplyTo(ComponentMappingHandleNMS handle) {
+        return this.mappings[handle.getContext().getClientView().getAwarenessLevel().ordinal()][ComponentTargetUtil.getMostSpecificTarget(handle.getOriginal())];
     }
 
     @Override
-    public NMSComponentMappingHandle createHandle(Component data, WithClientViewMappingFunctionContext context) {
-        return new ComponentMappingHandleImpl(data, context, false);
+    public ComponentMappingHandleNMS createHandle(Component data, WithClientViewMappingFunctionContext context) {
+        return new ComponentMappingHandleNMSImpl(data, context, false);
     }
 
     @Override
@@ -70,9 +72,9 @@ public final class ComponentMappingPipelineImpl extends ComposableImpl<Component
     }
 
     @Override
-    protected ComponentMappingPipelineComposeEventImpl createComposeEvent() {
+    protected ComponentMappingsComposeEventImpl createComposeEvent() {
         // Create the event
-        ComponentMappingPipelineComposeEventImpl event = new ComponentMappingPipelineComposeEventImpl();
+        ComponentMappingsComposeEventImpl event = new ComponentMappingsComposeEventImpl();
         // Register the server-side translation mapping
         event.register(ClientView.AwarenessLevel.getThatDoNotAlwaysUnderstandsAllServerSideTranslatables(), new ServerSideTranslationComponentMapping());
         // Return the event
@@ -80,7 +82,7 @@ public final class ComponentMappingPipelineImpl extends ComposableImpl<Component
     }
 
     @Override
-    protected void copyInformationFromEvent(ComponentMappingPipelineComposeEventImpl event) {
+    protected void copyInformationFromEvent(ComponentMappingsComposeEventImpl event) {
         Map<List<NMSComponentMapping>, IntList> transposed = new HashMap<>();
         for (int awarenessLevelI = 0; awarenessLevelI < event.mappings.length; awarenessLevelI++) {
             transposed.computeIfAbsent(event.mappings[awarenessLevelI], $ -> new IntArrayList()).add(awarenessLevelI);

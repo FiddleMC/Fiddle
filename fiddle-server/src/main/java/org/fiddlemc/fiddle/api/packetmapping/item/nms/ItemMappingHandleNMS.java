@@ -7,7 +7,7 @@ import org.fiddlemc.fiddle.api.util.mapping.WithContextMappingFunctionHandle;
 import org.fiddlemc.fiddle.api.util.mapping.WithOriginalMappingFunctionHandle;
 
 /**
- * A handle provided to {@link NMSItemMapping}s.
+ * A handle provided to code registered with {@link ItemMappingBuilderNMS#function}.
  */
-public interface NMSItemMappingHandle extends WithContextMappingFunctionHandle<ItemStack, ItemMappingFunctionContext>, WithOriginalMappingFunctionHandle<ItemStack>, MutableMappingFunctionHandle<ItemStack, ItemStack> {
+public interface ItemMappingHandleNMS extends WithContextMappingFunctionHandle<ItemStack, ItemMappingFunctionContext>, WithOriginalMappingFunctionHandle<ItemStack>, MutableMappingFunctionHandle<ItemStack, ItemStack> {
 }

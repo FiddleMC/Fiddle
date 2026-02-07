@@ -14,6 +14,11 @@ import java.util.function.Consumer;
 
 /**
  * Provides functionality to register mappings to the {@link BlockMappings}.
+ *
+ * <p>
+ * Casting this instance to {@code BlockMappingsComposeEventNMS} and using its methods
+ * with Minecraft internals gives slightly better performance.
+ * </p>
  */
 public interface BlockMappingsComposeEvent<M> extends BuilderComposeEvent<BlockMappingBuilder>, GetRegisteredComposeEvent<Pair<ClientView.AwarenessLevel, BlockData>, M>, ChangeRegisteredComposeEvent<Pair<ClientView.AwarenessLevel, BlockData>, M> {
 

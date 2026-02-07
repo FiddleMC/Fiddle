@@ -1,9 +1,10 @@
 package org.fiddlemc.fiddle.api.packetmapping.item;
 
 import org.fiddlemc.fiddle.api.packetmapping.WithClientViewMappingFunctionContext;
+import org.fiddlemc.fiddle.api.util.mapping.MappingFunctionContext;
 
 /**
- * A {@link WithClientViewMappingFunctionContext} for the {@link ItemMappings}.
+ * A {@link MappingFunctionContext} for the {@link ItemMappingHandle}s.
  */
 public interface ItemMappingFunctionContext extends WithClientViewMappingFunctionContext {
 

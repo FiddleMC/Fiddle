@@ -7,18 +7,18 @@ import java.util.ServiceLoader;
 /**
  * A service for the item mappings that Fiddle applies.
  */
-public interface ItemMappings extends Composable<ItemMappingsComposeEvent> {
+public interface ItemMappings<M> extends Composable<ItemMappingsComposeEvent<M>> {
 
     /**
      * An internal interface to get the {@link ItemMappings} instance.
      */
-    interface ServiceProvider extends GenericServiceProvider<ItemMappings> {
+    interface ServiceProvider extends GenericServiceProvider<ItemMappings<?>> {
     }
 
     /**
      * @return The {@link ItemMappings} instance.
      */
-    static ItemMappings get() {
+    static ItemMappings<?> get() {
         return ServiceLoader.load(ItemMappings.ServiceProvider.class, ItemMappings.ServiceProvider.class.getClassLoader()).findFirst().get().get();
     }
 
