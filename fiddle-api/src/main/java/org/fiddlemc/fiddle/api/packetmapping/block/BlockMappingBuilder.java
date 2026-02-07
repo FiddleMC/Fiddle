@@ -21,53 +21,53 @@ public interface BlockMappingBuilder extends AwarenessLevelMappingBuilder, FromB
      * It will be applied to every block state of that type.
      *
      * <p>
-     * This replaces any previous value set with {@link #from} or {@link #fromBlockType}.
+     * This replaces any previous value set with {@link #from} or {@link #fromEveryStateOf}.
      * </p>
      */
-    default void fromBlockType(BlockType from) {
-        this.fromBlockType(List.of(from));
+    default void fromEveryStateOf(BlockType from) {
+        this.fromEveryStateOf(List.of(from));
     }
 
     /**
-     * @see #fromBlockType(BlockType)
+     * @see #fromEveryStateOf(BlockType)
      */
-    default void fromBlockType(BlockType[] from) {
-        this.fromBlockType(Arrays.asList(from));
+    default void fromEveryStateOf(BlockType[] from) {
+        this.fromEveryStateOf(Arrays.asList(from));
     }
 
     /**
-     * @see #fromBlockType(BlockType)
+     * @see #fromEveryStateOf(BlockType)
      */
-    default void fromBlockType(Collection<BlockType> from) {
+    default void fromEveryStateOf(Collection<BlockType> from) {
         this.from(from.stream().flatMap(value -> value.createBlockDataStates().stream().map(state -> (BlockData) state)).toList());
     }
 
     /**
      * Adds a {@link BlockType} to which this mapping will be applied.
      *
-     * @see #fromBlockType(BlockType)
+     * @see #fromEveryStateOf(BlockType)
      */
-    default void addFromBlockType(BlockType from) {
+    default void addFromEveryStateOf(BlockType from) {
         for (BlockData value : from.createBlockDataStates()) {
             this.addFrom(value);
         }
     }
 
     /**
-     * @see #addFromBlockType(BlockType)
+     * @see #addFromEveryStateOf(BlockType)
      */
-    default void addFromBlockType(BlockType[] from) {
+    default void addFromEveryStateOf(BlockType[] from) {
         for (BlockType value : from) {
-            this.addFromBlockType(value);
+            this.addFromEveryStateOf(value);
         }
     }
 
     /**
-     * @see #addFromBlockType(BlockType)
+     * @see #addFromEveryStateOf(BlockType)
      */
-    default void addFromBlockType(Collection<BlockType> from) {
+    default void addFromEveryStateOf(Collection<BlockType> from) {
         for (BlockType value : from) {
-            this.addFromBlockType(value);
+            this.addFromEveryStateOf(value);
         }
     }
 
@@ -82,8 +82,8 @@ public interface BlockMappingBuilder extends AwarenessLevelMappingBuilder, FromB
     /**
      * @param requiresCoordinates Whether this mapping requires the coordinates
      *                            ({@link BlockMappingFunctionContext#getPhysicalBlockX()} and so on).
-     * @see FunctionBuilder#function
+     * @see FunctionBuilder#to
      */
-    void function(Consumer<BlockMappingHandle> function, boolean requiresCoordinates);
+    void to(Consumer<BlockMappingHandle> function, boolean requiresCoordinates);
 
 }

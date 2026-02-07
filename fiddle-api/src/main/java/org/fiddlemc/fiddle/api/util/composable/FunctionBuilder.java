@@ -39,6 +39,6 @@ public interface FunctionBuilder<T> {
      *
      * @param function            The function to apply.
      */
-    void function(Consumer<T> function);
+    void to(Consumer<T> function);
 
 }

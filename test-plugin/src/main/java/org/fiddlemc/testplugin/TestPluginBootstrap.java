@@ -6,12 +6,9 @@ import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import io.papermc.paper.registry.RegistryKey;
 import io.papermc.paper.registry.TypedKey;
 import net.kyori.adventure.key.Key;
-import net.minecraft.ChatFormatting;
-import net.minecraft.core.component.DataComponents;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.Style;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.component.ItemLore;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.material.MapColor;
@@ -24,7 +21,6 @@ import org.fiddlemc.fiddle.api.clientview.ClientView;
 import org.fiddlemc.fiddle.api.moredatadriven.paper.nms.BlockRegistryEntryBuilderNMS;
 import org.fiddlemc.fiddle.api.moredatadriven.paper.nms.ItemRegistryEntryBuilderNMS;
 import org.fiddlemc.fiddle.api.packetmapping.component.translatable.ServerSideTranslations;
-import org.fiddlemc.fiddle.api.packetmapping.item.nms.ItemMappingsComposeEventNMS;
 import org.fiddlemc.testplugin.data.PluginBlockTypes;
 import org.fiddlemc.testplugin.data.PluginBlocks;
 import org.fiddlemc.testplugin.data.PluginItemTypes;
@@ -32,6 +28,7 @@ import org.fiddlemc.testplugin.data.PluginItems;
 import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.stream.Stream;
 
 @SuppressWarnings("unused")
@@ -149,14 +146,14 @@ public class TestPluginBootstrap implements PluginBootstrap {
 
             event.register(builder -> {
                 builder.awarenessLevel(ClientView.AwarenessLevel.JAVA_DEFAULT);
-                builder.fromBlockType(PluginBlockTypes.ASH_BLOCK.get());
+                builder.fromEveryStateOf(PluginBlockTypes.ASH_BLOCK.get());
                 builder.toDefaultStateOf(BlockType.LIGHT_GRAY_CONCRETE_POWDER);
             });
             event.registerStateToState(ClientView.AwarenessLevel.JAVA_DEFAULT, PluginBlockTypes.ASH_STAIRS.get(), BlockType.ANDESITE_STAIRS);
 
             event.register(builder -> {
                 builder.awarenessLevel(ClientView.AwarenessLevel.JAVA_DEFAULT);
-                builder.fromBlockType(BlockType.BIRCH_LEAVES);
+                builder.fromEveryStateOf(BlockType.BIRCH_LEAVES);
                 builder.toDefaultStateOf(BlockType.WAXED_COPPER_GRATE);
             });
 
@@ -176,7 +173,7 @@ public class TestPluginBootstrap implements PluginBootstrap {
             event.register(builder -> {
                 builder.awarenessLevel(ClientView.AwarenessLevel.JAVA_DEFAULT);
                 builder.from(BlockType.GRASS_BLOCK.createBlockData());
-                builder.function(handle -> {
+                builder.to(handle -> {
                     if (!handle.getContext().isStateOfPhysicalBlockInWorld()) return;
                     int coordinatesXor = handle.getContext().getPhysicalBlockX() ^ handle.getContext().getPhysicalBlockY() ^ handle.getContext().getPhysicalBlockZ();
                     if ((coordinatesXor & 1) == 0) return;
@@ -200,23 +197,19 @@ public class TestPluginBootstrap implements PluginBootstrap {
         context.getLifecycleManager().registerEventHandler(FiddleEvents.ITEM_MAPPING, event -> {
 
             event.register(builder -> {
-                builder.awarenessLevel(ClientView.AwarenessLevel.getThatDoNotAlwaysUnderstandsAllServerSideItems());
                 builder.from(PluginItemTypes.ASH.get());
                 builder.to(ItemType.GUNPOWDER);
             });
             event.register(builder -> {
-                builder.awarenessLevel(ClientView.AwarenessLevel.getThatDoNotAlwaysUnderstandsAllServerSideItems());
                 builder.from(PluginItemTypes.ASH_BLOCK.get());
                 builder.to(ItemType.LIGHT_GRAY_CONCRETE_POWDER);
             });
             event.register(builder -> {
-                builder.awarenessLevel(ClientView.AwarenessLevel.getThatDoNotAlwaysUnderstandsAllServerSideItems());
                 builder.from(PluginItemTypes.ASH_STAIRS.get());
                 builder.to(ItemType.ANDESITE_STAIRS);
             });
 
             event.register(builder -> {
-                builder.awarenessLevel(ClientView.AwarenessLevel.getThatDoNotAlwaysUnderstandsAllServerSideItems());
                 builder.from(ItemType.IRON_AXE);
                 builder.to(ItemType.ECHO_SHARD);
             });
@@ -238,28 +231,31 @@ public class TestPluginBootstrap implements PluginBootstrap {
      */
     private void setComplexItemMappings(@NotNull BootstrapContext context) {
         context.getLifecycleManager().registerEventHandler(FiddleEvents.ITEM_MAPPING, event -> {
-            var eventNMS = (ItemMappingsComposeEventNMS<?>) event;
 
-            eventNMS.registerNMS(builder -> {
-                builder.awarenessLevel(ClientView.AwarenessLevel.getAll());
-                builder.from(Items.CRAFTING_TABLE);
-                builder.function(handle -> {
+            event.register(builder -> {
+                builder.everyAwarenessLevel();
+                builder.from(ItemType.CRAFTING_TABLE);
+                builder.to(handle -> {
                     var newLines = Stream.of(
-                        Component.literal("This is a very important block for beginners!"),
-                        Component.literal("For example, it can be used to craft ").append(Component.translatable(PluginItems.ASH_BLOCK.get().getDescriptionId()))
-                    ).map(line -> (Component) line.withStyle(Style.EMPTY.withItalic(false).withColor(5526612))).toList();
-                    var existingLore = handle.getImmutable().get(DataComponents.LORE);
-                    handle.getMutable().set(DataComponents.LORE, existingLore == null ? new ItemLore(newLines) : existingLore.withLineAdded(newLines.get(0)).withLineAdded(newLines.get(1)));
+                        Component.text("This is a very important block for beginners!"),
+                        Component.text("For example, it can be used to craft ").append(Component.translatable(PluginItems.ASH_BLOCK.get().getDescriptionId()))
+                    ).map(line -> line.decoration(TextDecoration.ITALIC, false).color(TextColor.color(5526612))).toList();
+                    var lore = handle.getImmutable().lore();
+                    if (lore == null) {
+                        lore = new ArrayList<>();
+                    }
+                    lore.addAll(newLines);
+                    handle.getMutable().lore(lore);
                 });
             });
 
-            eventNMS.registerNMS(builder -> {
-                builder.awarenessLevel(ClientView.AwarenessLevel.JAVA_DEFAULT);
-                builder.from(PluginItems.ASH_STAIRS.get());
-                builder.function(handle -> {
-                    var immutable = handle.getImmutable();
-                    handle.getMutable().set(DataComponents.ITEM_NAME, immutable.getItemName().copy().withStyle(ChatFormatting.BOLD)); // Make the item name bold
-                    handle.getMutable().set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true); // Give it an enchantment glint
+            event.register(builder -> {
+                builder.from(PluginItemTypes.ASH_STAIRS.get());
+                builder.to(handle -> {
+                    handle.getMutable().editMeta(meta -> {
+                        meta.itemName(meta.itemName().decorate(TextDecoration.BOLD));
+                        meta.setEnchantmentGlintOverride(true); // Give it an enchantment glint
+                    });
                 });
             });
 

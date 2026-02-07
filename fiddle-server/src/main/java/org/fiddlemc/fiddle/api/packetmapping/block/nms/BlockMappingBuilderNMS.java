@@ -23,53 +23,53 @@ public interface BlockMappingBuilderNMS extends AwarenessLevelMappingBuilder, Fr
      * It will be applied to every block state of that type.
      *
      * <p>
-     * This replaces any previous value set with {@link #from} or {@link #fromBlock}.
+     * This replaces any previous value set with {@link #from} or {@link #fromEveryStateOf}.
      * </p>
      */
-    default void fromBlock(Block from) {
-        this.fromBlock(List.of(from));
+    default void fromEveryStateOf(Block from) {
+        this.fromEveryStateOf(List.of(from));
     }
 
     /**
-     * @see #fromBlock(Block)
+     * @see #fromEveryStateOf(Block)
      */
-    default void fromBlock(Block[] from) {
-        this.fromBlock(Arrays.asList(from));
+    default void fromEveryStateOf(Block[] from) {
+        this.fromEveryStateOf(Arrays.asList(from));
     }
 
     /**
-     * @see #fromBlock(Block)
+     * @see #fromEveryStateOf(Block)
      */
-    default void fromBlock(Collection<Block> from) {
+    default void fromEveryStateOf(Collection<Block> from) {
         this.from(from.stream().flatMap(value -> value.getStateDefinition().getPossibleStates().stream()).toList());
     }
 
     /**
      * Adds a {@link Block} to which this mapping will be applied.
      *
-     * @see #fromBlock(Block)
+     * @see #fromEveryStateOf(Block)
      */
-    default void addFromBlock(Block from) {
+    default void addFromEveryStateOf(Block from) {
         for (BlockState value : from.getStateDefinition().getPossibleStates()) {
             this.addFrom(value);
         }
     }
 
     /**
-     * @see #addFromBlock(Block)
+     * @see #addFromEveryStateOf(Block)
      */
-    default void addFromBlock(Block[] from) {
+    default void addFromEveryStateOf(Block[] from) {
         for (Block value : from) {
-            this.addFromBlock(value);
+            this.addFromEveryStateOf(value);
         }
     }
 
     /**
-     * @see #addFromBlock(Block)
+     * @see #addFromEveryStateOf(Block)
      */
-    default void addFromBlock(Collection<Block> from) {
+    default void addFromEveryStateOf(Collection<Block> from) {
         for (Block value : from) {
-            this.addFromBlock(value);
+            this.addFromEveryStateOf(value);
         }
     }
 
@@ -84,8 +84,8 @@ public interface BlockMappingBuilderNMS extends AwarenessLevelMappingBuilder, Fr
     /**
      * @param requiresCoordinates Whether this mapping requires the coordinates
      *                            ({@link BlockMappingFunctionContext#getPhysicalBlockX()} and so on).
-     * @see FunctionBuilder#function
+     * @see FunctionBuilder#to
      */
-    void function(Consumer<BlockMappingHandleNMS> function, boolean requiresCoordinates);
+    void to(Consumer<BlockMappingHandleNMS> function, boolean requiresCoordinates);
 
 }

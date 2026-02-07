@@ -8,7 +8,7 @@ import org.fiddlemc.fiddle.api.util.mapping.WithContextMappingFunctionHandle;
 import org.fiddlemc.fiddle.api.util.mapping.WithOriginalMappingFunctionHandle;
 
 /**
- * A handle provided to code registered with {@link ComponentMappingBuilderNMS#function}.
+ * A handle provided to code registered with {@link ComponentMappingBuilderNMS#to}.
  */
 public interface ComponentMappingHandleNMS extends WithContextMappingFunctionHandle<Component, ComponentMappingFunctionContext>, WithOriginalMappingFunctionHandle<Component>, MutableMappingFunctionHandle<Component, MutableComponent> {
 }

@@ -1,10 +1,10 @@
 package org.fiddlemc.fiddle.impl.packetmapping.block;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
-import it.unimi.dsi.fastutil.Pair;
 import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.block.data.BlockData;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
@@ -47,7 +47,7 @@ public abstract class AbstractBlockMappingBuilderImpl<T, H> {
         this.to = to;
     }
 
-    public void function(Consumer<H> function, boolean requiresCoordinates) {
+    public void to(Consumer<H> function, boolean requiresCoordinates) {
         this.function = function;
         this.functionRequiresCoordinates = requiresCoordinates;
     }
@@ -59,18 +59,16 @@ public abstract class AbstractBlockMappingBuilderImpl<T, H> {
     abstract protected BlockState getSimpleTo();
 
     public void registerWith(BlockMappingsComposeEventImpl event) {
-        if (this.awarenessLevels == null) {
-            throw new IllegalStateException("No awareness level(s) were specified");
-        }
+        List<ClientView.AwarenessLevel> awarenessLevels = this.awarenessLevels != null ? this.awarenessLevels : Arrays.asList(ClientView.AwarenessLevel.getThatDoNotAlwaysUnderstandsAllServerSideBlocks());
         if (this.from == null) {
             throw new IllegalStateException("No from was specified");
         }
         if (this.function != null) {
-            event.register(this.awarenessLevels, this.getStatesToRegisterFor(), this.createFunctionStep());
+            event.register(awarenessLevels, this.getStatesToRegisterFor(), this.createFunctionStep());
             return;
         }
         if (this.to != null) {
-            event.register(this.awarenessLevels, this.getStatesToRegisterFor(), new SimpleBlockMappingsStep(this.getSimpleTo()));
+            event.register(awarenessLevels, this.getStatesToRegisterFor(), new SimpleBlockMappingsStep(this.getSimpleTo()));
             return;
         }
         throw new IllegalStateException("No to or function was specified");

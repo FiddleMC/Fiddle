@@ -1,11 +1,8 @@
 package org.fiddlemc.fiddle.impl.packetmapping.component;
 
-import it.unimi.dsi.fastutil.Pair;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.function.Consumer;
-import net.minecraft.world.level.block.state.BlockState;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
 import org.fiddlemc.fiddle.api.packetmapping.component.ComponentTarget;
 import org.jspecify.annotations.Nullable;
@@ -41,7 +38,7 @@ public abstract class AbstractComponentMappingBuilderImpl<H> {
         this.from.add(from);
     }
 
-    public void function(Consumer<H> function) {
+    public void to(Consumer<H> function) {
         this.function = function;
     }
 

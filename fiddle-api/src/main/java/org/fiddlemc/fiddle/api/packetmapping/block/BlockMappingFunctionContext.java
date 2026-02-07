@@ -21,7 +21,7 @@ public interface BlockMappingFunctionContext extends WithClientViewMappingFuncti
     /**
      * @return The x-coordinate of the physical block for which this mapping is being applied.
      * This is only available if {@link #isStateOfPhysicalBlockInWorld()} is true
-     * and if {@link BlockMappingBuilder#function} had {@code requiresCoordinates = true}.
+     * and if {@link BlockMappingBuilder#to} had {@code requiresCoordinates = true}.
      * Otherwise, the returned value is meaningless.
      */
     int getPhysicalBlockX();
@@ -29,7 +29,7 @@ public interface BlockMappingFunctionContext extends WithClientViewMappingFuncti
     /**
      * @return The y-coordinate of the physical block for which this mapping is being applied,
      * This is only available if {@link #isStateOfPhysicalBlockInWorld()} is true
-     * and if {@link BlockMappingBuilder#function} had {@code requiresCoordinates = true}.
+     * and if {@link BlockMappingBuilder#to} had {@code requiresCoordinates = true}.
      * Otherwise, the returned value is meaningless.
      */
     int getPhysicalBlockY();
@@ -37,7 +37,7 @@ public interface BlockMappingFunctionContext extends WithClientViewMappingFuncti
     /**
      * @return The z-coordinate of the physical block for which this mapping is being applied,
      * This is only available if {@link #isStateOfPhysicalBlockInWorld()} is true
-     * and if {@link BlockMappingBuilder#function} had {@code requiresCoordinates = true}.
+     * and if {@link BlockMappingBuilder#to} had {@code requiresCoordinates = true}.
      * Otherwise, the returned value is meaningless.
      */
     int getPhysicalBlockZ();
