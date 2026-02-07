@@ -1,6 +1,8 @@
 package org.fiddlemc.fiddle.impl.packetmapping.component;
 
+import java.util.Collection;
 import java.util.function.Consumer;
+import org.fiddlemc.fiddle.api.clientview.ClientView;
 import org.fiddlemc.fiddle.api.packetmapping.component.ComponentMappingBuilder;
 import org.fiddlemc.fiddle.api.packetmapping.component.ComponentMappingsComposeEvent;
 import org.fiddlemc.fiddle.api.packetmapping.component.ComponentTarget;
@@ -37,4 +39,8 @@ public final class ComponentMappingsComposeEventImpl extends AwarenessLevelPairK
         return ComponentTargetUtil.getByOrdinal(internalKey);
     }
 
+    @Override
+    public void register(Collection<ClientView.AwarenessLevel> awarenessLevels, Collection<ComponentTarget> keys, ComponentMappingsStep element) {
+        super.register(awarenessLevels, ComponentTargetUtil.expandTargets(keys), element);
+    }
 }
