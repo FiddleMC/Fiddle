@@ -67,10 +67,22 @@ public abstract class KeyedBuilderComposeEventImpl<K, E, B, IK> implements Paper
         return this.elements.entrySet().stream().map(entry -> Pair.of(this.internalKeyToKey(entry.getKey()), entry.getValue())).toList();
     }
 
+    public List<Pair<IK, List<E>>> getRegisteredWithInternalKey() {
+        return this.elements.entrySet().stream().map(entry -> Pair.of(entry.getKey(), entry.getValue())).toList();
+    }
+
     public Map<List<E>, List<K>> getRegisteredInverted() {
         Map<List<E>, List<K>> inverted = new HashMap<>(this.elements.size());
         for (Map.Entry<IK, List<E>> entry : this.elements.entrySet()) {
             inverted.computeIfAbsent(entry.getValue(), $ -> new ArrayList<>(1)).add(this.internalKeyToKey(entry.getKey()));
+        }
+        return inverted;
+    }
+
+    public Map<List<E>, List<IK>> getRegisteredInvertedWithInternalKey() {
+        Map<List<E>, List<IK>> inverted = new HashMap<>(this.elements.size());
+        for (Map.Entry<IK, List<E>> entry : this.elements.entrySet()) {
+            inverted.computeIfAbsent(entry.getValue(), $ -> new ArrayList<>(1)).add(entry.getKey());
         }
         return inverted;
     }

@@ -1,6 +1,6 @@
 package org.fiddlemc.fiddle.impl.packetmapping.block;
 
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.Pair;
 import it.unimi.dsi.fastutil.ints.IntIntPair;
 import net.minecraft.world.level.block.state.BlockState;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
@@ -74,8 +74,8 @@ public final class BlockMappingsImpl extends ComposableImpl<BlockMappingsCompose
 
     private BlockMappingsImpl() {
         this.chainMappings = new BlockMappingsStep[ClientView.AwarenessLevel.getAll().length][][];
-        this.directMappings = new BlockState[ClientView.AwarenessLevel.getAll().length][];
-        this.directMappingsAsIds = new int[this.directMappings.length][];
+        this.directMappings = new BlockState[this.chainMappings.length][];
+        this.directMappingsAsIds = new int[this.chainMappings.length][];
     }
 
     public BlockState apply(BlockState data, BlockMappingFunctionContext context) {
@@ -108,7 +108,7 @@ public final class BlockMappingsImpl extends ComposableImpl<BlockMappingsCompose
 
     /**
      * @param awarenessLevelI A {@link ClientView.AwarenessLevel#ordinal()}.
-     * @param blockStateId A {@link BlockState#indexInBlockStateRegistry}.
+     * @param blockStateId    A {@link BlockState#indexInBlockStateRegistry}.
      * @return The {@link BlockState#indexInBlockStateRegistry} for the {@link BlockState}
      * to which the {@link BlockState} with the given {@code blockStateId} is mapped,
      * or -1 if there is no direct mapping.
@@ -119,7 +119,7 @@ public final class BlockMappingsImpl extends ComposableImpl<BlockMappingsCompose
 
     /**
      * @param awarenessLevelI A {@link ClientView.AwarenessLevel#ordinal()}.
-     * @param blockStateId A {@link BlockState#indexInBlockStateRegistry}.
+     * @param blockStateId    A {@link BlockState#indexInBlockStateRegistry}.
      * @return The chain mapping for the {@link BlockState} with the given {@code blockStateId},
      * or null if there is no chain mapping.
      */
@@ -148,9 +148,9 @@ public final class BlockMappingsImpl extends ComposableImpl<BlockMappingsCompose
     @Override
     protected void copyInformationFromEvent(final BlockMappingsComposeEventImpl event) {
 
-        // Initialize the mappings
+        // Initialize the steps
+        int registrySize = BlockStateRegistry.get().size();
         for (int i = 0; i < this.chainMappings.length; i++) {
-            int registrySize = BlockStateRegistry.get().size();
             this.chainMappings[i] = new BlockMappingsStep[registrySize][];
             this.directMappings[i] = new BlockState[registrySize];
             this.directMappingsAsIds[i] = new int[registrySize];
@@ -159,37 +159,36 @@ public final class BlockMappingsImpl extends ComposableImpl<BlockMappingsCompose
 
         // Invert the mappings from id -> lists of steps to list of steps -> ids, so that we only have one reference per unique list
         Map<List<BlockMappingsStep>, List<IntIntPair>> invertedChainMappings = new HashMap<>();
-        for (int awarenessLevelI = 0; awarenessLevelI < event.mappings.length; awarenessLevelI++) {
-            for (Int2ObjectMap.Entry<List<BlockMappingsStep>> entry : event.mappings[awarenessLevelI].int2ObjectEntrySet()) {
-                List<BlockMappingsStep> mappings = entry.getValue();
-                // Do a check for if the list contains any function step
-                boolean containsFunction = false;
-                for (BlockMappingsStep mapping : mappings) {
-                    if (mapping instanceof FunctionBlockMappingsStep) {
-                        containsFunction = true;
-                        break;
-                    }
-                }
-                int fromId = entry.getIntKey();
-                if (containsFunction) {
-                    // If there is a function step, add the list of steps as a chain
-                    // But first we can simplify it a bit by keeping only the last simple step in any contiguous subsequence of simple mappings
-                    List<BlockMappingsStep> optimizedMappings = new ArrayList<>(mappings.size());
-                    for (int i = 0; i < mappings.size(); i++) {
-                        BlockMappingsStep mapping = mappings.get(i);
-                        if (i == mappings.size() - 1 || mapping instanceof FunctionBlockMappingsStep || mappings.get(i + 1) instanceof FunctionBlockMappingsStep) {
-                            optimizedMappings.add(mapping);
-                        }
-                    }
-                    invertedChainMappings.computeIfAbsent(optimizedMappings, $ -> new ArrayList<>()).add(IntIntPair.of(awarenessLevelI, entry.getIntKey()));
-                } else {
-                    // If there is no complex mapping, add this to the direct mappings
-                    BlockState to = ((SimpleBlockMappingsStep) mappings.get(mappings.size() - 1)).to();;
-                    this.directMappings[awarenessLevelI][fromId] = to;
-                    this.directMappingsAsIds[awarenessLevelI][fromId] = to.indexInBlockStateRegistry;
+        List<Pair<IntIntPair, List<BlockMappingsStep>>> registered = event.getRegisteredWithInternalKey();
+        for (Pair<IntIntPair, List<BlockMappingsStep>> entry : registered) {
+            List<BlockMappingsStep> mappings = entry.right();
+            // Do a check for if the list contains any function step
+            boolean containsFunction = false;
+            for (BlockMappingsStep mapping : mappings) {
+                if (mapping instanceof FunctionBlockMappingsStep) {
+                    containsFunction = true;
+                    break;
                 }
             }
+            if (containsFunction) {
+                // If there is a function step, add the list of steps as a chain
+                // But first we can simplify it a bit by keeping only the last simple step in any contiguous subsequence of simple mappings
+                List<BlockMappingsStep> optimizedMappings = new ArrayList<>(mappings.size());
+                for (int i = 0; i < mappings.size(); i++) {
+                    BlockMappingsStep mapping = mappings.get(i);
+                    if (i == mappings.size() - 1 || mapping instanceof FunctionBlockMappingsStep || mappings.get(i + 1) instanceof FunctionBlockMappingsStep) {
+                        optimizedMappings.add(mapping);
+                    }
+                }
+                invertedChainMappings.computeIfAbsent(optimizedMappings, $ -> new ArrayList<>()).add(entry.first());
+            } else {
+                // If there is no complex mapping, add this to the direct mappings
+                BlockState to = ((SimpleBlockMappingsStep) mappings.get(mappings.size() - 1)).to();
+                this.directMappings[entry.first().firstInt()][entry.first().secondInt()] = to;
+                this.directMappingsAsIds[entry.first().firstInt()][entry.first().secondInt()] = to.indexInBlockStateRegistry;
+            }
         }
+
         // Invert back
         for (Map.Entry<List<BlockMappingsStep>, List<IntIntPair>> entry : invertedChainMappings.entrySet()) {
             for (IntIntPair target : entry.getValue()) {

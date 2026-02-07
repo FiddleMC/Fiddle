@@ -58,17 +58,6 @@ public abstract class AbstractBlockMappingBuilderImpl<T, H> {
 
     abstract protected BlockState getSimpleTo();
 
-    private Iterable<Pair<ClientView.AwarenessLevel, BlockData>> getKeysToRegisterFor() {
-        Collection<BlockData> states = this.getStatesToRegisterFor();
-        List<Pair<ClientView.AwarenessLevel, BlockData>> keys = new ArrayList<>(this.awarenessLevels.size() * states.size());
-        for (ClientView.AwarenessLevel awarenessLevel : this.awarenessLevels) {
-            for (BlockData state : states) {
-                keys.add(Pair.of(awarenessLevel, state));
-            }
-        }
-        return keys;
-    }
-
     public void registerWith(BlockMappingsComposeEventImpl event) {
         if (this.awarenessLevels == null) {
             throw new IllegalStateException("No awareness level(s) were specified");
@@ -77,11 +66,11 @@ public abstract class AbstractBlockMappingBuilderImpl<T, H> {
             throw new IllegalStateException("No from was specified");
         }
         if (this.function != null) {
-            event.register(this.getKeysToRegisterFor(), this.createFunctionStep());
+            event.register(this.awarenessLevels, this.getStatesToRegisterFor(), this.createFunctionStep());
             return;
         }
         if (this.to != null) {
-            event.register(this.getKeysToRegisterFor(), new SimpleBlockMappingsStep(this.getSimpleTo()));
+            event.register(this.awarenessLevels, this.getStatesToRegisterFor(), new SimpleBlockMappingsStep(this.getSimpleTo()));
             return;
         }
         throw new IllegalStateException("No to or function was specified");

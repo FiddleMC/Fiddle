@@ -18,7 +18,7 @@ import org.fiddlemc.fiddle.api.packetmapping.block.BlockMappingFunctionContext;
 import org.fiddlemc.fiddle.api.packetmapping.block.BlockMappings;
 import org.fiddlemc.fiddle.impl.moredatadriven.minecraft.BlockStateRegistry;
 import org.fiddlemc.fiddle.impl.moredatadriven.minecraft.VanillaOnlyBlockStateRegistry;
-import org.fiddlemc.fiddle.impl.packetmapping.block.BlockMappingContextImpl;
+import org.fiddlemc.fiddle.impl.packetmapping.block.BlockMappingFunctionContextImpl;
 import org.fiddlemc.fiddle.impl.packetmapping.block.BlockMappingsImpl;
 import org.fiddlemc.fiddle.impl.packetmapping.block.BlockMappingsStep;
 import org.fiddlemc.fiddle.impl.packetmapping.block.FunctionBlockMappingsStep;
@@ -239,7 +239,7 @@ public final class ChunkPacketBlockMapper {
                 int z = this.chunkStartZ + zInSection;
                 for (int xInSection = 0; xInSection < 16; xInSection++) {
                     int x = this.chunkStartX + xInSection;
-                    BlockMappingFunctionContext context = new BlockMappingContextImpl(this.clientView, x, y, z);
+                    BlockMappingFunctionContext context = new BlockMappingFunctionContextImpl(this.clientView, x, y, z);
                     int mappedValue = BlockMappingsImpl.applyChain(oldBlockStateId, context, chainMapping);
                     newContents.setBlockStateId(blockInSection++, mappedValue);
                 }
@@ -299,7 +299,7 @@ public final class ChunkPacketBlockMapper {
                     int newBlockStateId = oldPaletteIndexToNewBlockStateId[oldPaletteIndex];
                     if (newBlockStateId < 0) {
                         // Apply the chain
-                        BlockMappingFunctionContext context = new BlockMappingContextImpl(this.clientView, x, y, z);
+                        BlockMappingFunctionContext context = new BlockMappingFunctionContextImpl(this.clientView, x, y, z);
                         newBlockStateId = BlockMappingsImpl.applyChain(oldContents.palette.getBlockStateId(oldPaletteIndex), context, oldPaletteIndexToChain[oldPaletteIndex]);
                     }
                     newContents.setBlockStateId(blockIndexInSection++, newBlockStateId);
@@ -345,7 +345,7 @@ public final class ChunkPacketBlockMapper {
      */
     private BlockMappingFunctionContext getGenericContext() {
         if (this.cachedGenericContext == null) {
-            this.cachedGenericContext = new BlockMappingContextImpl(this.clientView, true, 0, 0, 0);
+            this.cachedGenericContext = new BlockMappingFunctionContextImpl(this.clientView, true, 0, 0, 0);
         }
         return this.cachedGenericContext;
     }

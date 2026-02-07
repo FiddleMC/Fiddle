@@ -2,19 +2,19 @@ package org.fiddlemc.fiddle.impl.packetmapping.block;
 
 import org.fiddlemc.fiddle.api.clientview.ClientView;
 import org.fiddlemc.fiddle.api.packetmapping.block.BlockMappingFunctionContext;
-import org.fiddlemc.fiddle.impl.packetmapping.ClientViewMappingContextImpl;
+import org.fiddlemc.fiddle.impl.packetmapping.WithClientViewMappingFunctionContextImpl;
 
 /**
  * The implementation of {@link BlockMappingFunctionContext}.
  */
-public class BlockMappingContextImpl extends ClientViewMappingContextImpl implements BlockMappingFunctionContext {
+public class BlockMappingFunctionContextImpl extends WithClientViewMappingFunctionContextImpl implements BlockMappingFunctionContext {
 
     private final boolean isStateOfPhysicalBlockInWorld;
     private final int physicalBlockX;
     private final int physicalBlockY;
     private final int physicalBlockZ;
 
-    public BlockMappingContextImpl(ClientView clientView, boolean isStateOfPhysicalBlockInWorld, int physicalBlockX, int physicalBlockY, int physicalBlockZ) {
+    public BlockMappingFunctionContextImpl(ClientView clientView, boolean isStateOfPhysicalBlockInWorld, int physicalBlockX, int physicalBlockY, int physicalBlockZ) {
         super(clientView);
         this.isStateOfPhysicalBlockInWorld = isStateOfPhysicalBlockInWorld;
         this.physicalBlockX = physicalBlockX;
@@ -22,11 +22,11 @@ public class BlockMappingContextImpl extends ClientViewMappingContextImpl implem
         this.physicalBlockZ = physicalBlockZ;
     }
 
-    public BlockMappingContextImpl(ClientView clientView) {
+    public BlockMappingFunctionContextImpl(ClientView clientView) {
         this(clientView, false, 0, 0, 0);
     }
 
-    public BlockMappingContextImpl(ClientView clientView, int physicalBlockX, int physicalBlockY, int physicalBlockZ) {
+    public BlockMappingFunctionContextImpl(ClientView clientView, int physicalBlockX, int physicalBlockY, int physicalBlockZ) {
         this(clientView, true, physicalBlockX, physicalBlockY, physicalBlockZ);
     }
 

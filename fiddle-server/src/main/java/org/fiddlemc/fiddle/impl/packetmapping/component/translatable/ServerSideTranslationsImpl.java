@@ -12,18 +12,18 @@ import java.util.Map;
 /**
  * The implementation of {@link ServerSideTranslations}.
  */
-public final class ServerSideTranslationRegistrarImpl extends ComposableImpl<ServerSideTranslationsComposeEvent, ServerSideTranslationRegistrarComposeEventImpl> implements ServerSideTranslations {
+public final class ServerSideTranslationsImpl extends ComposableImpl<ServerSideTranslationsComposeEvent, ServerSideTranslationsComposeEventImpl> implements ServerSideTranslations {
 
-    public static final class ServiceProviderImpl extends NoArgsConstructorServiceProviderImpl<ServerSideTranslations, ServerSideTranslationRegistrarImpl> implements ServiceProvider {
+    public static final class ServiceProviderImpl extends NoArgsConstructorServiceProviderImpl<ServerSideTranslations, ServerSideTranslationsImpl> implements ServiceProvider {
 
         public ServiceProviderImpl() {
-            super(ServerSideTranslationRegistrarImpl.class);
+            super(ServerSideTranslationsImpl.class);
         }
 
     }
 
-    public static ServerSideTranslationRegistrarImpl get() {
-        return (ServerSideTranslationRegistrarImpl) ServerSideTranslations.get();
+    public static ServerSideTranslationsImpl get() {
+        return (ServerSideTranslationsImpl) ServerSideTranslations.get();
     }
 
     @Override
@@ -32,8 +32,8 @@ public final class ServerSideTranslationRegistrarImpl extends ComposableImpl<Ser
     }
 
     @Override
-    protected ServerSideTranslationRegistrarComposeEventImpl createComposeEvent() {
-        return new ServerSideTranslationRegistrarComposeEventImpl(this);
+    protected ServerSideTranslationsComposeEventImpl createComposeEvent() {
+        return new ServerSideTranslationsComposeEventImpl(this);
     }
 
     /**

@@ -2,48 +2,48 @@ package org.fiddlemc.fiddle.impl.packetmapping.item;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.IntIntPair;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import org.bukkit.Registry;
+import org.bukkit.inventory.ItemType;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
 import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingFunctionContext;
 import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappings;
 import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingsComposeEvent;
-import org.fiddlemc.fiddle.api.packetmapping.item.nms.ItemMappingHandleNMS;
 import org.fiddlemc.fiddle.impl.moredatadriven.minecraft.ItemRegistry;
 import org.fiddlemc.fiddle.impl.packetmapping.WithClientViewContextSingleStepMappingPipeline;
-import org.fiddlemc.fiddle.impl.packetmapping.item.builtin.BuiltInItemMapperImpl;
+import org.fiddlemc.fiddle.impl.packetmapping.item.builtin.MapDefaultItemNamesItemMappingsStep;
+import org.fiddlemc.fiddle.impl.packetmapping.item.builtin.RemoveNonVanillaDebugStickStateItemMappingsStep;
 import org.fiddlemc.fiddle.impl.util.composable.ComposableImpl;
 import org.fiddlemc.fiddle.impl.util.mappingpipeline.WithContextSingleStepMappingPipeline;
 import org.fiddlemc.fiddle.impl.util.java.serviceloader.NoArgsConstructorServiceProviderImpl;
 import org.jspecify.annotations.Nullable;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 /**
- * A pipeline of {@link NMSItemMapping}s.
+ * A pipeline of item mappings.
  */
-public final class ItemMappingPipelineImpl extends ComposableImpl<ItemMappingsComposeEvent, ItemMappingsComposeEventNMSImpl> implements WithClientViewContextSingleStepMappingPipeline<ItemStack, ItemMappingFunctionContext, ItemMappingHandleNMS>, ItemMappings {
+public final class ItemMappingsImpl extends ComposableImpl<ItemMappingsComposeEvent<ItemMappingsStep>, ItemMappingsComposeEventImpl> implements WithClientViewContextSingleStepMappingPipeline<ItemStack, ItemMappingFunctionContext, ItemMappingHandleNMSImpl>, ItemMappings<ItemMappingsStep> {
 
-    public static final class ServiceProviderImpl extends NoArgsConstructorServiceProviderImpl<ItemMappings, ItemMappingPipelineImpl> implements ServiceProvider {
+    public static final class ServiceProviderImpl extends NoArgsConstructorServiceProviderImpl<ItemMappings<?>, ItemMappingsImpl> implements ServiceProvider {
 
         public ServiceProviderImpl() {
-            super(ItemMappingPipelineImpl.class);
+            super(ItemMappingsImpl.class);
         }
 
     }
 
-    public static ItemMappingPipelineImpl get() {
-        return (ItemMappingPipelineImpl) ItemMappings.get();
+    public static ItemMappingsImpl get() {
+        return (ItemMappingsImpl) ItemMappings.get();
     }
 
     @Override
     protected String getEventTypeNamePrefix() {
-        return "fiddle_item_mapping_pipeline";
+        return "fiddle_item_mappings";
     }
 
     /**
@@ -55,25 +55,25 @@ public final class ItemMappingPipelineImpl extends ComposableImpl<ItemMappingsCo
      * The lowest-level array may be null, but will never be empty.
      * </p>
      */
-    private final NMSItemMapping[][][] mappings;
+    private final ItemMappingsStep[][][] mappings;
 
-    private ItemMappingPipelineImpl() {
-        this.mappings = new NMSItemMapping[ClientView.AwarenessLevel.getAll().length][][];
+    private ItemMappingsImpl() {
+        this.mappings = new ItemMappingsStep[ClientView.AwarenessLevel.getAll().length][][];
     }
 
     @Override
-    public NMSItemMapping @Nullable [] getStepsThatMayApplyTo(ItemMappingHandleNMS handle) {
+    public ItemMappingsStep @Nullable [] getStepsThatMayApplyTo(ItemMappingHandleNMSImpl handle) {
         return this.mappings[handle.getContext().getClientView().getAwarenessLevel().ordinal()][handle.getOriginal().getItem().indexInItemRegistry];
     }
 
     @Override
-    public ItemMappingHandleNMS createHandle(ItemStack data, ItemMappingFunctionContext context) {
-        return new ItemMappingHandleImpl(data, context, false);
+    public ItemMappingHandleNMSImpl createHandle(ItemStack data, ItemMappingFunctionContext context) {
+        return new ItemMappingHandleNMSImpl(data, context, false);
     }
 
     @Override
-    public ItemMappingContextImpl createGenericContext(ClientView clientView) {
-        return new ItemMappingContextImpl(clientView, false, false);
+    public ItemMappingFunctionContextImpl createGenericContext(ClientView clientView) {
+        return new ItemMappingFunctionContextImpl(clientView, false, false);
     }
 
     @Override
@@ -137,38 +137,36 @@ public final class ItemMappingPipelineImpl extends ComposableImpl<ItemMappingsCo
     }
 
     @Override
-    protected ItemMappingsComposeEventNMSImpl createComposeEvent() {
+    protected ItemMappingsComposeEventImpl createComposeEvent() {
         // Create the event
-        ItemMappingsComposeEventNMSImpl event = new ItemMappingsComposeEventNMSImpl();
-        // Register the built-in mappings
-        BuiltInItemMapperImpl builtInItemMapper = BuiltInItemMapperImpl.get();
-        builtInItemMapper.fireComposeEvent();
-        builtInItemMapper.registerMappings(event);
+        ItemMappingsComposeEventImpl event = new ItemMappingsComposeEventImpl();
+        // Register the built-in default item names mapping step
+        event.register(
+            Arrays.asList(ClientView.AwarenessLevel.getAll()),
+            Registry.ITEM.stream().toList(),
+            new MapDefaultItemNamesItemMappingsStep()
+        );
+        // Register the built-in non-vanilla debug stick state removal step
+        event.register(
+            Arrays.asList(ClientView.AwarenessLevel.getThatDoNotAlwaysUnderstandsAllServerSideBlocks()),
+            List.of(ItemType.DEBUG_STICK),
+            new RemoveNonVanillaDebugStickStateItemMappingsStep()
+        );
         // Return the event
         return event;
     }
 
     @Override
-    protected void copyInformationFromEvent(ItemMappingsComposeEventNMSImpl event) {
+    protected void copyInformationFromEvent(ItemMappingsComposeEventImpl event) {
 
-        // Initialize the mappings
+        // Initialize the steps
+        int registrySize = ItemRegistry.get().size();
         for (int i = 0; i < this.mappings.length; i++) {
-            this.mappings[i] = new NMSItemMapping[ItemRegistry.get().size()][];
+            this.mappings[i] = new ItemMappingsStep[registrySize][];
         }
 
-        // Invert the mapping from id -> lists of mappings to list of mappings -> ids, so that we only have one reference per unique list
-        Map<List<NMSItemMapping>, List<IntIntPair>> invertedMappings = new HashMap<>();
-        for (int awarenessLevelI = 0; awarenessLevelI < event.mappings.length; awarenessLevelI++) {
-            for (Int2ObjectMap.Entry<List<NMSItemMapping>> entry : event.mappings[awarenessLevelI].int2ObjectEntrySet()) {
-                invertedMappings.computeIfAbsent(entry.getValue(), $ -> new ArrayList<>()).add(IntIntPair.of(awarenessLevelI, entry.getIntKey()));
-            }
-        }
-        // Invert back
-        for (Map.Entry<List<NMSItemMapping>, List<IntIntPair>> entry : invertedMappings.entrySet()) {
-            for (IntIntPair target : entry.getValue()) {
-                this.mappings[target.firstInt()][target.secondInt()] = entry.getKey().toArray(NMSItemMapping[]::new);
-            }
-        }
+        // Copy steps from event
+        event.copyRegisteredInvertedAndReinvertedInto(this.mappings, ItemMappingsStep[]::new);
 
     }
 

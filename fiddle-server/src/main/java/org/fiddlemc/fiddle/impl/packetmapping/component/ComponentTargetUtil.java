@@ -19,6 +19,7 @@ import net.minecraft.network.chat.contents.objects.AtlasSprite;
 import net.minecraft.network.chat.contents.objects.ObjectInfo;
 import net.minecraft.network.chat.contents.objects.PlayerSprite;
 import org.fiddlemc.fiddle.api.packetmapping.component.ComponentTarget;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -33,100 +34,86 @@ public final class ComponentTargetUtil {
 
     private static final ComponentTarget[] VALUES = ComponentTarget.values();
 
-    private static final ComponentTarget[] GENERIC_TARGETS = {ComponentTarget.ALL};
-    private static final ComponentTarget[] TEXT_TARGETS = {ComponentTarget.ALL, ComponentTarget.TEXT};
-    private static final ComponentTarget[] TRANSLATABLE_TARGETS = {ComponentTarget.ALL, ComponentTarget.TRANSLATABLE};
-    private static final ComponentTarget[] TRANSLATABLE_WITHOUT_FALLBACK_TARGETS = {ComponentTarget.ALL, ComponentTarget.TRANSLATABLE, ComponentTarget.TRANSLATABLE_WITHOUT_FALLBACK};
-    private static final ComponentTarget[] SCORE_TARGETS = {ComponentTarget.ALL, ComponentTarget.SCORE};
-    private static final ComponentTarget[] SELECTOR_TARGETS = {ComponentTarget.ALL, ComponentTarget.SELECTOR};
-    private static final ComponentTarget[] KEYBIND_TARGETS = {ComponentTarget.ALL, ComponentTarget.KEYBIND};
-    private static final ComponentTarget[] NBT_TARGETS = {ComponentTarget.ALL, ComponentTarget.NBT};
-    private static final ComponentTarget[] NBT_BLOCK_TARGETS = {ComponentTarget.ALL, ComponentTarget.NBT, ComponentTarget.NBT_BLOCK};
-    private static final ComponentTarget[] NBT_ENTITY_TARGETS = {ComponentTarget.ALL, ComponentTarget.NBT, ComponentTarget.NBT_ENTITY};
-    private static final ComponentTarget[] NBT_STORAGE_TARGETS = {ComponentTarget.ALL, ComponentTarget.NBT, ComponentTarget.NBT_STORAGE};
-    private static final ComponentTarget[] OBJECT_TARGETS = {ComponentTarget.ALL, ComponentTarget.OBJECT};
-    private static final ComponentTarget[] OBJECT_ATLAS_TARGETS = {ComponentTarget.ALL, ComponentTarget.OBJECT, ComponentTarget.OBJECT_ATLAS};
-    private static final ComponentTarget[] OBJECT_PLAYER_TARGETS = {ComponentTarget.ALL, ComponentTarget.OBJECT, ComponentTarget.OBJECT_PLAYER};
-
-    public static ComponentTarget[] getTargetsThatApply(Component component) {
+    public static ComponentTarget getMostSpecificTarget(Component component) {
         if (component instanceof MutableComponent mutableComponent) {
             ComponentContents contents = mutableComponent.getContents();
             if (contents instanceof PlainTextContents) {
-                return TEXT_TARGETS;
+                return ComponentTarget.TEXT;
             } else if (contents instanceof TranslatableContents translatableContents) {
                 if (translatableContents.getFallback() == null) {
-                    return TRANSLATABLE_WITHOUT_FALLBACK_TARGETS;
+                    return ComponentTarget.TRANSLATABLE_WITHOUT_FALLBACK;
                 }
-                return TRANSLATABLE_TARGETS;
+                return ComponentTarget.TRANSLATABLE;
             } else if (contents instanceof ScoreContents) {
-                return SCORE_TARGETS;
+                return ComponentTarget.SCORE;
             } else if (contents instanceof SelectorContents) {
-                return SELECTOR_TARGETS;
+                return ComponentTarget.SELECTOR;
             } else if (contents instanceof KeybindContents) {
-                return KEYBIND_TARGETS;
+                return ComponentTarget.KEYBIND;
             } else if (contents instanceof NbtContents nbtContents) {
                 DataSource dataSource = nbtContents.getDataSource();
                 if (dataSource instanceof BlockDataSource) {
-                    return NBT_BLOCK_TARGETS;
+                    return ComponentTarget.NBT_BLOCK;
                 } else if (dataSource instanceof EntityDataSource) {
-                    return NBT_ENTITY_TARGETS;
+                    return ComponentTarget.NBT_ENTITY;
                 } else if (dataSource instanceof StorageDataSource) {
-                    return NBT_STORAGE_TARGETS;
+                    return ComponentTarget.NBT_STORAGE;
                 }
-                return NBT_TARGETS;
+                return ComponentTarget.NBT;
             } else if (contents instanceof ObjectContents(ObjectInfo objectInfo)) {
                 if (objectInfo instanceof AtlasSprite) {
-                    return OBJECT_ATLAS_TARGETS;
+                    return ComponentTarget.OBJECT_ATLAS;
                 } else if (objectInfo instanceof PlayerSprite) {
-                    return OBJECT_PLAYER_TARGETS;
+                    return ComponentTarget.OBJECT_PLAYER;
                 }
-                return OBJECT_TARGETS;
+                return ComponentTarget.OBJECT;
             }
         } else if (component instanceof AdventureComponent adventureComponentHolder) {
             net.kyori.adventure.text.Component adventureComponent = adventureComponentHolder.adventure$component();
             if (adventureComponent instanceof net.kyori.adventure.text.TextComponent) {
-                return TEXT_TARGETS;
+                return ComponentTarget.TEXT;
             } else if (adventureComponent instanceof net.kyori.adventure.text.TranslatableComponent translatableComponent) {
                 if (translatableComponent.fallback() == null) {
-                    return TRANSLATABLE_WITHOUT_FALLBACK_TARGETS;
+                    return ComponentTarget.TRANSLATABLE_WITHOUT_FALLBACK;
                 }
-                return TRANSLATABLE_TARGETS;
+                return ComponentTarget.TRANSLATABLE;
             } else if (adventureComponent instanceof net.kyori.adventure.text.ScoreComponent) {
-                return SCORE_TARGETS;
+                return ComponentTarget.SCORE;
             } else if (adventureComponent instanceof net.kyori.adventure.text.SelectorComponent) {
-                return SELECTOR_TARGETS;
+                return ComponentTarget.SELECTOR;
             } else if (adventureComponent instanceof net.kyori.adventure.text.KeybindComponent) {
-                return KEYBIND_TARGETS;
+                return ComponentTarget.KEYBIND;
             } else if (adventureComponent instanceof net.kyori.adventure.text.NBTComponent<?, ?>) {
                 if (adventureComponent instanceof net.kyori.adventure.text.BlockNBTComponent) {
-                    return NBT_BLOCK_TARGETS;
+                    return ComponentTarget.NBT_BLOCK;
                 } else if (adventureComponent instanceof net.kyori.adventure.text.EntityNBTComponent) {
-                    return NBT_ENTITY_TARGETS;
+                    return ComponentTarget.NBT_ENTITY;
                 } else if (adventureComponent instanceof net.kyori.adventure.text.StorageNBTComponent) {
-                    return NBT_STORAGE_TARGETS;
+                    return ComponentTarget.NBT_STORAGE;
                 }
-                return NBT_TARGETS;
+                return ComponentTarget.NBT;
             } else if (adventureComponent instanceof net.kyori.adventure.text.ObjectComponent objectComponent) {
                 net.kyori.adventure.text.object.ObjectContents objectContents = objectComponent.contents();
                 if (objectContents instanceof net.kyori.adventure.text.object.SpriteObjectContents) {
-                    return OBJECT_ATLAS_TARGETS;
+                    return ComponentTarget.OBJECT_ATLAS;
                 } else if (objectContents instanceof net.kyori.adventure.text.object.PlayerHeadObjectContents) {
-                    return OBJECT_PLAYER_TARGETS;
+                    return ComponentTarget.OBJECT_PLAYER;
                 }
-                return OBJECT_TARGETS;
+                return ComponentTarget.OBJECT;
             }
         }
-        return GENERIC_TARGETS;
+        return ComponentTarget.ALL;
     }
 
     /**
      * @param a A {@link ComponentTarget}.
-     * @param b A different {@link ComponentTarget}.
-     * @return Whether target {@code a} implies target {@code b},
-     * or a meaningless result if {@code a = b}.
+     * @param b A {@link ComponentTarget}.
+     * @return Whether target {@code a} implies target {@code b}.
      */
     public static boolean implies(ComponentTarget a, ComponentTarget b) {
-        if (a == ComponentTarget.ALL) {
+        if (a == b) {
+            return true;
+        } else if (a == ComponentTarget.ALL) {
             return true;
         } else if (a == ComponentTarget.TRANSLATABLE) {
             return b == ComponentTarget.TRANSLATABLE_WITHOUT_FALLBACK;
@@ -138,11 +125,9 @@ public final class ComponentTargetUtil {
         return false;
     }
 
-    public static List<ComponentTarget> simplifyTargets(Collection<ComponentTarget> targets) {
-        return targets.stream().filter(target -> targets.stream().noneMatch(otherTarget -> otherTarget != target && implies(otherTarget, target))).toList();
+    public static List<ComponentTarget> expandTargets(Collection<ComponentTarget> targets) {
+        return Arrays.stream(ComponentTarget.values()).filter(potentialTarget -> targets.stream().anyMatch(target -> implies(target, potentialTarget))).toList();
     }
-
-    public static ComponentTarget getMostSpecificTarget
 
     public static ComponentTarget getByOrdinal(int ordinal) {
         return VALUES[ordinal];

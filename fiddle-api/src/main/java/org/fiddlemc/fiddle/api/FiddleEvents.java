@@ -20,27 +20,25 @@ import org.fiddlemc.fiddle.api.packetmapping.component.translatable.ServerSideTr
 import org.fiddlemc.fiddle.api.packetmapping.component.translatable.ServerSideTranslationsComposeEvent;
 import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappings;
 import org.fiddlemc.fiddle.api.packetmapping.item.ItemMappingsComposeEvent;
-import org.fiddlemc.fiddle.api.packetmapping.item.builtin.BuiltInItemMapper;
-import org.fiddlemc.fiddle.api.packetmapping.item.builtin.BuiltInItemMapperComposeEvent;
 import org.fiddlemc.fiddle.api.util.composable.ComposableEventType;
 import org.jspecify.annotations.Nullable;
 
 /**
  * A convenience class providing links to the different Fiddle {@link LifecycleEventType}s.
  */
+@SuppressWarnings({"unchecked", "rawtypes"})
 public final class FiddleEvents {
 
     private FiddleEvents() {
         throw new UnsupportedOperationException();
     }
 
-    public static final LifecycleEventType.Prioritizable<BootstrapContext, RegistryComposeEvent<BlockType, BlockRegistryEntry.Builder>> BLOCK_REGISTRY_COMPOSE = RegistryEvents.BLOCK.compose();
-    public static final LifecycleEventType.Prioritizable<BootstrapContext, RegistryComposeEvent<ItemType, ItemRegistryEntry.Builder>> ITEM_REGISTRY_COMPOSE = RegistryEvents.ITEM.compose();
-    public static final ComposableEventType<BlockMappingsComposeEvent<?>> BLOCK_MAPPINGS = ((BlockMappings) BlockMappings.get()).compose();
-    public static final ComposableEventType<ItemMappingsComposeEvent<?>> ITEM_MAPPINGS = ((ItemMappings) ItemMappings.get()).compose();
-    public static final ComposableEventType<BuiltInItemMapperComposeEvent> BUILT_IN_ITEM_MAPPER_COMPOSE = BuiltInItemMapper.get().compose();
-    public static final ComposableEventType<ComponentMappingsComposeEvent> COMPONENT_MAPPINGS = ComponentMappings.get().compose();
-    public static final ComposableEventType<ServerSideTranslationsComposeEvent> SERVER_SIDE_TRANSLATIONS = ServerSideTranslations.get().compose();
-    public static final ComposableEventType<BukkitEnumNamesComposeEvent<Triple<NamespacedKey, @Nullable BlockType, @Nullable ItemType>>> MATERIAL_ENUM_NAMES = MaterialEnumNames.get().compose();
+    public static final LifecycleEventType.Prioritizable<BootstrapContext, RegistryComposeEvent<BlockType, BlockRegistryEntry.Builder>> BLOCK = RegistryEvents.BLOCK.compose();
+    public static final LifecycleEventType.Prioritizable<BootstrapContext, RegistryComposeEvent<ItemType, ItemRegistryEntry.Builder>> ITEM = RegistryEvents.ITEM.compose();
+    public static final ComposableEventType<BlockMappingsComposeEvent<?>> BLOCK_MAPPING = ((BlockMappings) BlockMappings.get()).compose();
+    public static final ComposableEventType<ItemMappingsComposeEvent<?>> ITEM_MAPPING = ((ItemMappings) ItemMappings.get()).compose();
+    public static final ComposableEventType<ComponentMappingsComposeEvent<?>> COMPONENT_MAPPING = ((ComponentMappings) ComponentMappings.get()).compose();
+    public static final ComposableEventType<ServerSideTranslationsComposeEvent> SERVER_SIDE_TRANSLATION = ServerSideTranslations.get().compose();
+    public static final ComposableEventType<BukkitEnumNamesComposeEvent<Triple<NamespacedKey, @Nullable BlockType, @Nullable ItemType>>> MATERIAL_ENUM_NAME = MaterialEnumNames.get().compose();
 
 }

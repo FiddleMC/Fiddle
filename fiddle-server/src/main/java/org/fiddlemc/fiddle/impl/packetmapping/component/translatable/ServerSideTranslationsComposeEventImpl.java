@@ -9,11 +9,11 @@ import java.util.Locale;
 /**
  * The implementation of {@link ServerSideTranslationsComposeEvent}.
  */
-public final class ServerSideTranslationRegistrarComposeEventImpl implements PaperLifecycleEvent, ServerSideTranslationsComposeEvent {
+public final class ServerSideTranslationsComposeEventImpl implements PaperLifecycleEvent, ServerSideTranslationsComposeEvent {
 
-    private final ServerSideTranslationRegistrarImpl registrar;
+    private final ServerSideTranslationsImpl registrar;
 
-    ServerSideTranslationRegistrarComposeEventImpl(ServerSideTranslationRegistrarImpl registrar) {
+    ServerSideTranslationsComposeEventImpl(ServerSideTranslationsImpl registrar) {
         this.registrar = registrar;
     }
 
@@ -39,7 +39,7 @@ public final class ServerSideTranslationRegistrarComposeEventImpl implements Pap
         }
 
         // Add the translations
-        ServerSideTranslationRegistrarImpl.RegisteredTranslationsForKey translationsForKey = this.registrar.registeredTranslations.computeIfAbsent(key, $ -> new ServerSideTranslationRegistrarImpl.RegisteredTranslationsForKey());
+        ServerSideTranslationsImpl.RegisteredTranslationsForKey translationsForKey = this.registrar.registeredTranslations.computeIfAbsent(key, $ -> new ServerSideTranslationsImpl.RegisteredTranslationsForKey());
         ServerSideTranslations.ServerSideTranslation translationToRegister = new ServerSideTranslations.ServerSideTranslation(translation, overrideClientSide);
         if (fallbackScope.equals(ServerSideTranslations.FallbackScope.ALL)) {
             // Add as generic fallback

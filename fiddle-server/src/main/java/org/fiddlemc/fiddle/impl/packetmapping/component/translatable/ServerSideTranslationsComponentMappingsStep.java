@@ -4,19 +4,19 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentContents;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
-import org.fiddlemc.fiddle.api.packetmapping.component.nms.ComponentMappingHandleNMS;
 import org.fiddlemc.fiddle.api.packetmapping.component.translatable.ServerSideTranslations;
-import org.fiddlemc.fiddle.impl.util.mappingpipeline.MappingPipelineStep;
+import org.fiddlemc.fiddle.impl.packetmapping.component.ComponentMappingHandleNMSImpl;
+import org.fiddlemc.fiddle.impl.packetmapping.component.ComponentMappingsImpl;
+import org.fiddlemc.fiddle.impl.packetmapping.component.ComponentMappingsStep;
 
 /**
- * A {@link NMSComponentMapping} that applies
- * {@linkplain ServerSideTranslations registered server-side translations}
- * to {@link Component}s.
+ * A {@link ComponentMappingsStep} to be registered with {@link ComponentMappingsImpl},
+ * that applies the {@linkplain ServerSideTranslations registered server-side translations}.
  */
-public final class ServerSideTranslationComponentMapping implements MappingPipelineStep<ComponentMappingHandleNMS> {
+public final class ServerSideTranslationsComponentMappingsStep implements ComponentMappingsStep {
 
     @Override
-    public void apply(final ComponentMappingHandleNMS handle) {
+    public void apply(ComponentMappingHandleNMSImpl handle) {
         ClientView clientView = handle.getContext().getClientView();
         if (clientView.understandsAllServerSideTranslatables()) return;
         ComponentContents contents = handle.getImmutable().getContents();

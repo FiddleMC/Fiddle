@@ -31,17 +31,17 @@ public class ComponentMappingHandleNMSImpl extends SimpleWithContextMappingFunct
 
     private static class AdventureHandle extends CrossMappedWithContextMappingFunctionHandleImpl<net.kyori.adventure.text.Component, ComponentMappingFunctionContext, Component, ComponentMappingHandleNMSImpl> implements ComponentMappingHandle {
 
-        public AdventureHandle(final ComponentMappingHandleNMSImpl internal) {
+        public AdventureHandle(ComponentMappingHandleNMSImpl internal) {
             super(internal);
         }
 
         @Override
-        protected Component mapToInternal(final net.kyori.adventure.text.Component data) {
+        protected Component mapToInternal(net.kyori.adventure.text.Component data) {
             return PaperAdventure.asVanilla(data);
         }
 
         @Override
-        protected net.kyori.adventure.text.Component mapFromInternal(final Component data) {
+        protected net.kyori.adventure.text.Component mapFromInternal(Component data) {
             return PaperAdventure.asAdventure(data);
         }
 

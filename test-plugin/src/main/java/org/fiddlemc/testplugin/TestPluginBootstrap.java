@@ -24,8 +24,7 @@ import org.fiddlemc.fiddle.api.clientview.ClientView;
 import org.fiddlemc.fiddle.api.moredatadriven.paper.nms.BlockRegistryEntryBuilderNMS;
 import org.fiddlemc.fiddle.api.moredatadriven.paper.nms.ItemRegistryEntryBuilderNMS;
 import org.fiddlemc.fiddle.api.packetmapping.component.translatable.ServerSideTranslations;
-import org.fiddlemc.fiddle.api.packetmapping.item.builtin.BuiltInItemMapper;
-import org.fiddlemc.fiddle.api.packetmapping.item.nms.NMSItemMappingPipelineComposeEvent;
+import org.fiddlemc.fiddle.api.packetmapping.item.nms.ItemMappingsComposeEventNMS;
 import org.fiddlemc.testplugin.data.PluginBlockTypes;
 import org.fiddlemc.testplugin.data.PluginBlocks;
 import org.fiddlemc.testplugin.data.PluginItemTypes;
@@ -78,7 +77,7 @@ public class TestPluginBootstrap implements PluginBootstrap {
      * </p>
      */
     private void addCustomBlocks(@NotNull BootstrapContext context) {
-        context.getLifecycleManager().registerEventHandler(FiddleEvents.BLOCK_REGISTRY_COMPOSE, event -> {
+        context.getLifecycleManager().registerEventHandler(FiddleEvents.BLOCK, event -> {
 
             event.registry().register(TypedKey.create(RegistryKey.BLOCK, Key.key("example:ash_block")), builder -> {
                 var builderNMS = (BlockRegistryEntryBuilderNMS) builder;
@@ -112,7 +111,7 @@ public class TestPluginBootstrap implements PluginBootstrap {
      * </p>
      */
     private void addCustomItems(@NotNull BootstrapContext context) {
-        context.getLifecycleManager().registerEventHandler(FiddleEvents.ITEM_REGISTRY_COMPOSE, event -> {
+        context.getLifecycleManager().registerEventHandler(FiddleEvents.ITEM, event -> {
 
             event.registry().register(TypedKey.create(RegistryKey.ITEM, Key.key("example:ash")), builder -> {
             });
@@ -146,7 +145,7 @@ public class TestPluginBootstrap implements PluginBootstrap {
      * </p>
      */
     private void setBasicBlockMappings(@NotNull BootstrapContext context) {
-        context.getLifecycleManager().registerEventHandler(FiddleEvents.BLOCK_MAPPINGS, event -> {
+        context.getLifecycleManager().registerEventHandler(FiddleEvents.BLOCK_MAPPING, event -> {
 
             event.register(builder -> {
                 builder.awarenessLevel(ClientView.AwarenessLevel.JAVA_DEFAULT);
@@ -173,7 +172,7 @@ public class TestPluginBootstrap implements PluginBootstrap {
      * </p>
      */
     private void setComplexBlockMappings(@NotNull BootstrapContext context) {
-        context.getLifecycleManager().registerEventHandler(FiddleEvents.BLOCK_MAPPINGS, event -> {
+        context.getLifecycleManager().registerEventHandler(FiddleEvents.BLOCK_MAPPING, event -> {
             event.register(builder -> {
                 builder.awarenessLevel(ClientView.AwarenessLevel.JAVA_DEFAULT);
                 builder.from(BlockType.GRASS_BLOCK.createBlockData());
@@ -192,23 +191,35 @@ public class TestPluginBootstrap implements PluginBootstrap {
      * with a simple syntax.
      *
      * <p>
-     * This works by using {@link BuiltInItemMapper}, which does the heavy lifting for us.
-     * </p>
-     *
-     * <p>
      * This maps our custom items,
      * and also maps the vanilla {@code minecraft:iron_axe} to {@code minecraft:echo_shard},
      * to show that you can also map vanilla items.
      * </p>
      */
     private void setBasicItemMappings(@NotNull BootstrapContext context) {
-        context.getLifecycleManager().registerEventHandler(FiddleEvents.BUILT_IN_ITEM_MAPPER_COMPOSE, event -> {
+        context.getLifecycleManager().registerEventHandler(FiddleEvents.ITEM_MAPPING, event -> {
 
-            event.mapItem(PluginItemTypes.ASH.get(), ItemType.GUNPOWDER);
-            event.mapItem(PluginItemTypes.ASH_BLOCK.get(), ItemType.LIGHT_GRAY_CONCRETE_POWDER);
-            event.mapItem(PluginItemTypes.ASH_STAIRS.get(), ItemType.ANDESITE_STAIRS);
+            event.register(builder -> {
+                builder.awarenessLevel(ClientView.AwarenessLevel.getThatDoNotAlwaysUnderstandsAllServerSideItems());
+                builder.from(PluginItemTypes.ASH.get());
+                builder.to(ItemType.GUNPOWDER);
+            });
+            event.register(builder -> {
+                builder.awarenessLevel(ClientView.AwarenessLevel.getThatDoNotAlwaysUnderstandsAllServerSideItems());
+                builder.from(PluginItemTypes.ASH_BLOCK.get());
+                builder.to(ItemType.LIGHT_GRAY_CONCRETE_POWDER);
+            });
+            event.register(builder -> {
+                builder.awarenessLevel(ClientView.AwarenessLevel.getThatDoNotAlwaysUnderstandsAllServerSideItems());
+                builder.from(PluginItemTypes.ASH_STAIRS.get());
+                builder.to(ItemType.ANDESITE_STAIRS);
+            });
 
-            event.mapItem(ItemType.IRON_AXE, ItemType.ECHO_SHARD);
+            event.register(builder -> {
+                builder.awarenessLevel(ClientView.AwarenessLevel.getThatDoNotAlwaysUnderstandsAllServerSideItems());
+                builder.from(ItemType.IRON_AXE);
+                builder.to(ItemType.ECHO_SHARD);
+            });
 
         });
     }
@@ -226,23 +237,30 @@ public class TestPluginBootstrap implements PluginBootstrap {
      * </p>
      */
     private void setComplexItemMappings(@NotNull BootstrapContext context) {
-        context.getLifecycleManager().registerEventHandler(FiddleEvents.ITEM_MAPPINGS, event -> {
-            var nmsEvent = (NMSItemMappingPipelineComposeEvent) event;
+        context.getLifecycleManager().registerEventHandler(FiddleEvents.ITEM_MAPPING, event -> {
+            var eventNMS = (ItemMappingsComposeEventNMS<?>) event;
 
-            nmsEvent.register(ClientView.AwarenessLevel.getAll(), Items.CRAFTING_TABLE, handle -> {
-                var newLines = Stream.of(
-                    Component.literal("This is a very important block for beginners!"),
-                    Component.literal("For example, it can be used to craft ").append(Component.translatable(PluginItems.ASH_BLOCK.get().getDescriptionId()))
-                ).map(line -> (Component) line.withStyle(Style.EMPTY.withItalic(false).withColor(5526612))).toList();
-                var existingLore = handle.getImmutable().get(DataComponents.LORE);
-                handle.getMutable().set(DataComponents.LORE, existingLore == null ? new ItemLore(newLines) : existingLore.withLineAdded(newLines.get(0)).withLineAdded(newLines.get(1)));
-
+            eventNMS.registerNMS(builder -> {
+                builder.awarenessLevel(ClientView.AwarenessLevel.getAll());
+                builder.from(Items.CRAFTING_TABLE);
+                builder.function(handle -> {
+                    var newLines = Stream.of(
+                        Component.literal("This is a very important block for beginners!"),
+                        Component.literal("For example, it can be used to craft ").append(Component.translatable(PluginItems.ASH_BLOCK.get().getDescriptionId()))
+                    ).map(line -> (Component) line.withStyle(Style.EMPTY.withItalic(false).withColor(5526612))).toList();
+                    var existingLore = handle.getImmutable().get(DataComponents.LORE);
+                    handle.getMutable().set(DataComponents.LORE, existingLore == null ? new ItemLore(newLines) : existingLore.withLineAdded(newLines.get(0)).withLineAdded(newLines.get(1)));
+                });
             });
 
-            nmsEvent.register(ClientView.AwarenessLevel.JAVA_DEFAULT, PluginItems.ASH_STAIRS.get(), handle -> {
-                var immutable = handle.getImmutable();
-                handle.getMutable().set(DataComponents.ITEM_NAME, immutable.getItemName().copy().withStyle(ChatFormatting.BOLD)); // Make the item name bold
-                handle.getMutable().set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true); // Give it an enchantment glint
+            eventNMS.registerNMS(builder -> {
+                builder.awarenessLevel(ClientView.AwarenessLevel.JAVA_DEFAULT);
+                builder.from(PluginItems.ASH_STAIRS.get());
+                builder.function(handle -> {
+                    var immutable = handle.getImmutable();
+                    handle.getMutable().set(DataComponents.ITEM_NAME, immutable.getItemName().copy().withStyle(ChatFormatting.BOLD)); // Make the item name bold
+                    handle.getMutable().set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true); // Give it an enchantment glint
+                });
             });
 
         });
@@ -263,7 +281,7 @@ public class TestPluginBootstrap implements PluginBootstrap {
      * </p>
      */
     private void setTranslations(@NotNull BootstrapContext context) {
-        context.getLifecycleManager().registerEventHandler(FiddleEvents.SERVER_SIDE_TRANSLATIONS, event -> {
+        context.getLifecycleManager().registerEventHandler(FiddleEvents.SERVER_SIDE_TRANSLATION, event -> {
 
             event.register(PluginItems.ASH.get().getDescriptionId(), "Ash");
             event.register(PluginItems.ASH_BLOCK.get().getDescriptionId(), "Ash block");
@@ -286,7 +304,7 @@ public class TestPluginBootstrap implements PluginBootstrap {
      * </p>
      */
     private void customizeEnumNameForAnItem(@NotNull BootstrapContext context) {
-        context.getLifecycleManager().registerEventHandler(FiddleEvents.MATERIAL_ENUM_NAMES, event -> {
+        context.getLifecycleManager().registerEventHandler(FiddleEvents.MATERIAL_ENUM_NAME, event -> {
             event.register(handle -> {
                 var key = handle.getSourceValue().getLeft();
                 if (key.equals(NamespacedKey.fromString("example:ash"))) {

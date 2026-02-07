@@ -4,7 +4,7 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.world.item.ItemStack;
 import org.fiddlemc.fiddle.impl.clientview.lookup.packethandling.ClientViewLookupThreadLocal;
-import org.fiddlemc.fiddle.impl.packetmapping.item.ItemMappingPipelineImpl;
+import org.fiddlemc.fiddle.impl.packetmapping.item.ItemMappingsImpl;
 
 import java.util.function.Function;
 
@@ -28,7 +28,7 @@ public final class ClientViewMappedItemStackMapCodec {
      */
     public static final MapCodec<ItemStack> CLIENT_VIEW_MAPPED_CODEC = ItemStack.MAP_CODEC.xmap(
         Function.identity(), // Used by io.papermc.paper.adventure.WrapperAwareSerializer#deserialize
-        itemStack -> ItemMappingPipelineImpl.get().applyGenerically(itemStack)
+        itemStack -> ItemMappingsImpl.get().applyGenerically(itemStack)
     );
 
 }

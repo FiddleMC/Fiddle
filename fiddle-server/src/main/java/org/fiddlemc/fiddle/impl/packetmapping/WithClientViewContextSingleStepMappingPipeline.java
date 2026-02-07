@@ -35,8 +35,8 @@ public interface WithClientViewContextSingleStepMappingPipeline<T, C extends Wit
     interface Simple<T, H extends WithContextMappingFunctionHandle<T, WithClientViewMappingFunctionContext>> extends WithClientViewContextSingleStepMappingPipeline<T, WithClientViewMappingFunctionContext, H> {
 
         @Override
-        default ClientViewMappingContextImpl createGenericContext(ClientView clientView) {
-            return new ClientViewMappingContextImpl(clientView);
+        default WithClientViewMappingFunctionContextImpl createGenericContext(ClientView clientView) {
+            return new WithClientViewMappingFunctionContextImpl(clientView);
         }
 
     }

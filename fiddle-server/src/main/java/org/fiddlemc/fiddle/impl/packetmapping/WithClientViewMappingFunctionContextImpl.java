@@ -6,11 +6,11 @@ import org.fiddlemc.fiddle.api.packetmapping.WithClientViewMappingFunctionContex
 /**
  * A base implementation of {@link WithClientViewMappingFunctionContext}.
  */
-public class ClientViewMappingContextImpl implements WithClientViewMappingFunctionContext {
+public class WithClientViewMappingFunctionContextImpl implements WithClientViewMappingFunctionContext {
 
     private final ClientView clientView;
 
-    public ClientViewMappingContextImpl(ClientView clientView) {
+    public WithClientViewMappingFunctionContextImpl(ClientView clientView) {
         this.clientView = clientView;
     }
 

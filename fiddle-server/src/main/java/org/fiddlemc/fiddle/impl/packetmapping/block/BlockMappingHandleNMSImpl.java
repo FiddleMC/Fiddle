@@ -26,24 +26,24 @@ public class BlockMappingHandleNMSImpl extends SimpleWithContextMappingFunctionH
 
     private static class BukkitHandle extends CrossMappedWithContextMappingFunctionHandleImpl<BlockData, BlockMappingFunctionContext, BlockState, BlockMappingHandleNMSImpl> implements BlockMappingHandle {
 
-        public BukkitHandle(final BlockMappingHandleNMSImpl internal) {
+        public BukkitHandle(BlockMappingHandleNMSImpl internal) {
             super(internal);
         }
 
         @Override
-        protected BlockState mapToInternal(final BlockData data) {
+        protected BlockState mapToInternal(BlockData data) {
             return ((CraftBlockData) data).getState();
         }
 
         @Override
-        protected BlockData mapFromInternal(final BlockState data) {
+        protected BlockData mapFromInternal(BlockState data) {
             return data.createCraftBlockData();
         }
 
     }
 
     /**
-     * @return A handle that can be passed to {@link MinecraftFunctionBlockMappingsStep}.
+     * @return A handle that can be passed to {@link BukkitFunctionBlockMappingsStep}.
      */
     public BlockMappingHandle bukkitHandle() {
         if (this.bukkitHandle == null) {

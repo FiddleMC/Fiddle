@@ -16,7 +16,7 @@
 +        @Override
 +        public void encode(final RegistryFriendlyByteBuf buffer, final Holder<Item> value) {
 +            Item item = value.value();
-+            Item mappedItem = org.fiddlemc.fiddle.impl.packetmapping.item.ItemMappingPipelineImpl.get().applyGenerically(item);
++            Item mappedItem = org.fiddlemc.fiddle.impl.packetmapping.item.ItemMappingsImpl.get().applyGenerically(item);
 +            UNMAPPED_STREAM_CODEC.encode(buffer, mappedItem == item ? value : Holder.direct(mappedItem));
 +        }
 +
