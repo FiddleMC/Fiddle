@@ -66,4 +66,12 @@ public interface BlockMappingsComposeEvent<M> extends BuilderComposeEvent<BlockM
         }
     }
 
+    /**
+     * Calls {@link #registerStateToState} with
+     * {@link ClientView.AwarenessLevel#getThatDoNotAlwaysUnderstandsAllServerSideBlocks()}.
+     */
+    default void registerStateToState(BlockType from, BlockType to) {
+        this.registerStateToState(ClientView.AwarenessLevel.getThatDoNotAlwaysUnderstandsAllServerSideBlocks(), from, to);
+    }
+
 }

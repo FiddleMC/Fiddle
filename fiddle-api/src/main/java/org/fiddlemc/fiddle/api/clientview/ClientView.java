@@ -94,7 +94,7 @@ public interface ClientView {
          * with additional rendering potentially being done through the use of vanilla entities.
          * </p>
          */
-        JAVA_DEFAULT(false, false, false),
+        VANILLA(false, false, false),
 
         /**
          * For Java clients that have accepted the server resource pack,
@@ -107,7 +107,7 @@ public interface ClientView {
          * Additional rendering can be done through the use of entities.
          * </p>
          */
-        JAVA_WITH_RESOURCE_PACK(true, false, false), // TODO implement
+        RESOURCE_PACK(true, false, false), // TODO implement
 
         /**
          * For Java clients that are have the client mod, i.e. they have the mod installed and are able to use
@@ -118,7 +118,7 @@ public interface ClientView {
          * the necessary information to interpret the server-side block and item keys directly from then on.
          * </p>
          */
-        JAVA_WITH_CLIENT_MOD(true, true, true); // TODO implement
+        CLIENT_MOD(true, true, true); // TODO implement
 
         private final boolean alwaysUnderstandsAllServerSideTranslatables;
         private final boolean alwaysUnderstandsAllServerSideBlocks;

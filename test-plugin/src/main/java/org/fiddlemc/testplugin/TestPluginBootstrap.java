@@ -145,14 +145,14 @@ public class TestPluginBootstrap implements PluginBootstrap {
         context.getLifecycleManager().registerEventHandler(FiddleEvents.BLOCK_MAPPING, event -> {
 
             event.register(builder -> {
-                builder.awarenessLevel(ClientView.AwarenessLevel.JAVA_DEFAULT);
+                builder.awarenessLevel(ClientView.AwarenessLevel.VANILLA);
                 builder.fromEveryStateOf(PluginBlockTypes.ASH_BLOCK.get());
                 builder.toDefaultStateOf(BlockType.LIGHT_GRAY_CONCRETE_POWDER);
             });
-            event.registerStateToState(ClientView.AwarenessLevel.JAVA_DEFAULT, PluginBlockTypes.ASH_STAIRS.get(), BlockType.ANDESITE_STAIRS);
+            event.registerStateToState(ClientView.AwarenessLevel.VANILLA, PluginBlockTypes.ASH_STAIRS.get(), BlockType.ANDESITE_STAIRS);
 
             event.register(builder -> {
-                builder.awarenessLevel(ClientView.AwarenessLevel.JAVA_DEFAULT);
+                builder.awarenessLevel(ClientView.AwarenessLevel.VANILLA);
                 builder.fromEveryStateOf(BlockType.BIRCH_LEAVES);
                 builder.toDefaultStateOf(BlockType.WAXED_COPPER_GRATE);
             });
@@ -171,7 +171,7 @@ public class TestPluginBootstrap implements PluginBootstrap {
     private void setComplexBlockMappings(@NotNull BootstrapContext context) {
         context.getLifecycleManager().registerEventHandler(FiddleEvents.BLOCK_MAPPING, event -> {
             event.register(builder -> {
-                builder.awarenessLevel(ClientView.AwarenessLevel.JAVA_DEFAULT);
+                builder.awarenessLevel(ClientView.AwarenessLevel.VANILLA);
                 builder.from(BlockType.GRASS_BLOCK.createBlockData());
                 builder.to(handle -> {
                     if (!handle.getContext().isStateOfPhysicalBlockInWorld()) return;

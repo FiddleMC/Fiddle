@@ -21,7 +21,7 @@ public final class FallbackClientViewImpl extends ClientViewImpl {
 
     @Override
     public AwarenessLevel getAwarenessLevel() {
-        return AwarenessLevel.JAVA_DEFAULT;
+        return AwarenessLevel.VANILLA;
     }
 
     @Override
