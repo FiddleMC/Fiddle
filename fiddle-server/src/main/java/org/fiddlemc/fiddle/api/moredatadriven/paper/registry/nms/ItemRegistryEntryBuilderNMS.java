@@ -1,4 +1,4 @@
-package org.fiddlemc.fiddle.api.moredatadriven.paper.nms;
+package org.fiddlemc.fiddle.api.moredatadriven.paper.registry.nms;
 
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -17,30 +17,14 @@ public interface ItemRegistryEntryBuilderNMS extends ItemRegistryEntry.Builder, 
     /**
      * Sets the factory to use, and marks this builder as using NMS.
      */
-    void factoryNMS(Function<Item.Properties, Item> factory) ;
+    ItemRegistryEntryBuilderNMS factoryNMS(Function<Item.Properties, Item> factory) ;
 
     /**
-     * Sets the factory to use for an item for a block with the {@linkplain #getKey same} {@link Identifier},
+     * Sets the factory to use for an item for a block with the {@linkplain #getKeyNMS same} {@link Identifier},
      * calls {@link Item.Properties#useBlockDescriptionPrefix()},
      * and marks this builder as using NMS.
      */
-    void factoryForBlockNMS();
-
-    /**
-     * Sets the factory to use for an item for a block with the given {@link Identifier},,
-     * calls {@link Item.Properties#useBlockDescriptionPrefix()},
-     * and marks this builder as using NMS.
-     *
-     * @param blockIdentifier The identifier of the block.
-     */
-    void factoryForBlockNMS(Identifier blockIdentifier);
-
-    /**
-     * Sets the factory to use for an item for a block with the {@linkplain #getKey same} {@link Identifier},,
-     * calls {@link Item.Properties#useBlockDescriptionPrefix()},
-     * and marks this builder as using NMS.
-     */
-    void factoryForBlockNMS(BiFunction<Block, Item.Properties, BlockItem> factory);
+    ItemRegistryEntryBuilderNMS factoryForBlockNMS();
 
     /**
      * Sets the factory to use for an item for a block with the given {@link Identifier},,
@@ -49,16 +33,32 @@ public interface ItemRegistryEntryBuilderNMS extends ItemRegistryEntry.Builder, 
      *
      * @param blockIdentifier The identifier of the block.
      */
-    void factoryForBlockNMS(Identifier blockIdentifier, BiFunction<Block, Item.Properties, BlockItem> factory);
+    ItemRegistryEntryBuilderNMS factoryForBlockNMS(Identifier blockIdentifier);
+
+    /**
+     * Sets the factory to use for an item for a block with the {@linkplain #getKeyNMS same} {@link Identifier},,
+     * calls {@link Item.Properties#useBlockDescriptionPrefix()},
+     * and marks this builder as using NMS.
+     */
+    ItemRegistryEntryBuilderNMS factoryForBlockNMS(BiFunction<Block, Item.Properties, BlockItem> factory);
+
+    /**
+     * Sets the factory to use for an item for a block with the given {@link Identifier},,
+     * calls {@link Item.Properties#useBlockDescriptionPrefix()},
+     * and marks this builder as using NMS.
+     *
+     * @param blockIdentifier The identifier of the block.
+     */
+    ItemRegistryEntryBuilderNMS factoryForBlockNMS(Identifier blockIdentifier, BiFunction<Block, Item.Properties, BlockItem> factory);
 
     /**
      * Replaces the NMS properties for the item.
      */
-    void propertiesNMS(Item.Properties properties);
+    ItemRegistryEntryBuilderNMS propertiesNMS(Item.Properties properties);
 
     /**
      * Modifies the NMS properties for the item.
      */
-    void propertiesNMS(Consumer<Item.Properties> properties);
+    ItemRegistryEntryBuilderNMS propertiesNMS(Consumer<Item.Properties> properties);
 
 }

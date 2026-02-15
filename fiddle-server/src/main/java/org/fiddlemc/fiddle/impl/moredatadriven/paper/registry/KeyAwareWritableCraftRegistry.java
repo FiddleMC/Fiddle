@@ -28,7 +28,7 @@ public class KeyAwareWritableCraftRegistry<M, T extends Keyed, B extends Settabl
 
     /**
      * A modified {@link WritableCraftRegistry.ApiWritableRegistry},
-     * that calls {@link SettableKeyAwareRegistryEntryNMS#setKey}.
+     * that calls {@link SettableKeyAwareRegistryEntryNMS#setKeyNMS}.
      */
     public class KeyAwareApiWritableRegistry extends ApiWritableRegistry {
 
@@ -44,14 +44,14 @@ public class KeyAwareWritableCraftRegistry<M, T extends Keyed, B extends Settabl
                     @Override
                     public B empty() {
                         B builder = factory.empty();
-                        builder.setKey(PaperAdventure.asVanilla(key));
+                        builder.setKeyNMS(PaperAdventure.asVanilla(key));
                         return builder;
                     }
 
                     @Override
                     public B copyFrom(final TypedKey<T> key) {
                         B builder = factory.empty();
-                        builder.setKey(PaperAdventure.asVanilla(key));
+                        builder.setKeyNMS(PaperAdventure.asVanilla(key));
                         return builder;
                     }
 

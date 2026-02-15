@@ -9,22 +9,15 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.StairBlock;
-import net.minecraft.world.level.material.MapColor;
-import net.minecraft.world.level.material.PushReaction;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.BlockType;
+import org.bukkit.block.PistonMoveReaction;
 import org.bukkit.inventory.ItemType;
 import org.fiddlemc.fiddle.api.FiddleEvents;
 import org.fiddlemc.fiddle.api.clientview.ClientView;
-import org.fiddlemc.fiddle.api.moredatadriven.paper.nms.BlockRegistryEntryBuilderNMS;
-import org.fiddlemc.fiddle.api.moredatadriven.paper.nms.ItemRegistryEntryBuilderNMS;
 import org.fiddlemc.fiddle.api.packetmapping.component.translatable.ServerSideTranslations;
 import org.fiddlemc.testplugin.data.PluginBlockTypes;
-import org.fiddlemc.testplugin.data.PluginBlocks;
 import org.fiddlemc.testplugin.data.PluginItemTypes;
-import org.fiddlemc.testplugin.data.PluginItems;
 import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -77,18 +70,13 @@ public class TestPluginBootstrap implements PluginBootstrap {
         context.getLifecycleManager().registerEventHandler(FiddleEvents.BLOCK, event -> {
 
             event.registry().register(TypedKey.create(RegistryKey.BLOCK, Key.key("example:ash_block")), builder -> {
-                var builderNMS = (BlockRegistryEntryBuilderNMS) builder;
-                builderNMS.propertiesNMS(properties -> {
-                    properties.requiresCorrectToolForDrops(); // It drops nothing unless broken with the right tool (a shovel, as defined in the included data pack)
-                    properties.mapColor(MapColor.COLOR_LIGHT_GRAY); // It shows up light gray on maps
-                    properties.pushReaction(PushReaction.DESTROY); // It breaks when pushed by a piston
-                });
+                builder.requiresCorrectToolForDrops(); // It drops nothing unless broken with the right tool (a shovel, as defined in the included data pack)
+                builder.mapColor(() -> BlockType.LIGHT_GRAY_WOOL); // It shows up light gray on maps
+                builder.pushReaction(PistonMoveReaction.BREAK); // It breaks when pushed by a piston
             });
 
             event.registry().register(TypedKey.create(RegistryKey.BLOCK, Key.key("example:ash_stairs")), builder -> {
-                var builderNMS = (BlockRegistryEntryBuilderNMS) builder;
-                builderNMS.factoryNMS(properties -> new StairBlock(PluginBlocks.ASH_BLOCK.get().defaultBlockState(), properties) {
-                }); // Use a factory that returns StairBlock to add new stairs
+                builder.inheritsFromStairBlockType(() -> PluginBlockTypes.ASH_BLOCK.get()); // It's a stair block
             });
 
         });
@@ -113,20 +101,16 @@ public class TestPluginBootstrap implements PluginBootstrap {
             event.registry().register(TypedKey.create(RegistryKey.ITEM, Key.key("example:ash")), builder -> {
             });
 
-            event.registry().register(TypedKey.create(RegistryKey.ITEM, Key.key("example:ash_block")), builder -> {
-                var builderNMS = (ItemRegistryEntryBuilderNMS) builder;
-                builderNMS.factoryForBlockNMS(); // It's a block item
-                builderNMS.propertiesNMS(properties -> {
-                    properties.stacksTo(32); // It stacks to 32
-                    properties.fireResistant(); // It is resistant to fire
-                    properties.craftRemainder(PluginItems.ASH.get()); // It leaves ash when used in a crafting recipe
-                });
-            });
+            event.registry().register(TypedKey.create(RegistryKey.ITEM, Key.key("example:ash_block")), builder ->
+                builder.inheritsFromBlockItem() // It's a block item
+                    .stacksTo(32) // It stacks to 32
+                    .fireResistant() // It is resistant to fire
+                    .craftRemainder(PluginItemTypes.ASH.get()) // It leaves ash when used in a crafting recipe
+            );
 
-            event.registry().register(TypedKey.create(RegistryKey.ITEM, Key.key("example:ash_stairs")), builder -> {
-                var builderNMS = (ItemRegistryEntryBuilderNMS) builder;
-                builderNMS.factoryForBlockNMS(); // It's a block item
-            });
+            event.registry().register(TypedKey.create(RegistryKey.ITEM, Key.key("example:ash_stairs")), builder ->
+                builder.inheritsFromBlockItem() // It's a block item
+            );
 
         });
     }
@@ -238,7 +222,7 @@ public class TestPluginBootstrap implements PluginBootstrap {
                 builder.to(handle -> {
                     var newLines = Stream.of(
                         Component.text("This is a very important block for beginners!"),
-                        Component.text("For example, it can be used to craft ").append(Component.translatable(PluginItems.ASH_BLOCK.get().getDescriptionId()))
+                        Component.text("For example, it can be used to craft ").append(Component.translatable(PluginItemTypes.ASH_BLOCK.get()))
                     ).map(line -> line.decoration(TextDecoration.ITALIC, false).color(TextColor.color(5526612))).toList();
                     var lore = handle.getImmutable().lore();
                     if (lore == null) {
@@ -279,13 +263,13 @@ public class TestPluginBootstrap implements PluginBootstrap {
     private void setTranslations(@NotNull BootstrapContext context) {
         context.getLifecycleManager().registerEventHandler(FiddleEvents.SERVER_SIDE_TRANSLATION, event -> {
 
-            event.register(PluginItems.ASH.get().getDescriptionId(), "Ash");
-            event.register(PluginItems.ASH_BLOCK.get().getDescriptionId(), "Ash block");
-            event.register(PluginItems.ASH_STAIRS.get().getDescriptionId(), "Ash stairs");
+            event.register(PluginItemTypes.ASH.get().translationKey(), "Ash");
+            event.register(PluginItemTypes.ASH_BLOCK.get().translationKey(), "Ash block");
+            event.register(PluginItemTypes.ASH_STAIRS.get().translationKey(), "Ash stairs");
 
-            event.register(PluginItems.ASH.get().getDescriptionId(), "灰", "ja_jp", ServerSideTranslations.FallbackScope.LANGUAGE_GROUP);
+            event.register(PluginItemTypes.ASH.get().translationKey(), "灰", "ja_jp", ServerSideTranslations.FallbackScope.LANGUAGE_GROUP);
 
-            event.register(Blocks.BOOKSHELF.getDescriptionId(), "Booky Bookshelf");
+            event.register(BlockType.BOOKSHELF.translationKey(), "Booky Bookshelf");
 
         });
     }

@@ -1,4 +1,4 @@
-package org.fiddlemc.fiddle.api.moredatadriven.paper.nms;
+package org.fiddlemc.fiddle.api.moredatadriven.paper.registry.nms;
 
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -15,16 +15,16 @@ public interface BlockRegistryEntryBuilderNMS extends BlockRegistryEntry.Builder
     /**
      * Sets the factory to use, and marks this builder as using NMS.
      */
-    void factoryNMS(Function<BlockBehaviour.Properties, Block> factory);
+    BlockRegistryEntryBuilderNMS factoryNMS(Function<BlockBehaviour.Properties, Block> factory);
 
     /**
      * Replaces the NMS properties for the block.
      */
-    void propertiesNMS(BlockBehaviour.Properties properties);
+    BlockRegistryEntryBuilderNMS propertiesNMS(BlockBehaviour.Properties properties);
 
     /**
      * Modifies the NMS properties for the block.
      */
-    void propertiesNMS(Consumer<BlockBehaviour.Properties> properties);
+    BlockRegistryEntryBuilderNMS propertiesNMS(Consumer<BlockBehaviour.Properties> properties);
 
 }

@@ -6,6 +6,6 @@
  * </p>
  */
 @NullMarked
-package org.fiddlemc.fiddle.api.moredatadriven.paper.nms;
+package org.fiddlemc.fiddle.api.moredatadriven.paper.registry.nms;
 
 import org.jspecify.annotations.NullMarked;
