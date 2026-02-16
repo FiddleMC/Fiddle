@@ -46,7 +46,7 @@ public interface ItemRegistryEntry {
          * This also calls {@link #useBlockDescriptionPrefix()}.
          * </p>
          */
-        ItemRegistryEntry.Builder inheritsFromBlockItem();
+        ItemRegistryEntry.Builder inheritsFromBlock();
 
         /**
          * Sets the type of item to a block item,
@@ -58,7 +58,12 @@ public interface ItemRegistryEntry {
          *
          * @param blockKey The {@link NamespacedKey} of the block.
          */
-        ItemRegistryEntry.Builder inheritsFromBlockItem(NamespacedKey blockKey);
+        ItemRegistryEntry.Builder inheritsFromBlock(NamespacedKey blockKey);
+
+        /**
+         * Sets the type f item to an egg item.
+         */
+        ItemRegistryEntry.Builder inheritsFromEgg();
 
         // Missing: a lot
 
@@ -165,7 +170,7 @@ public interface ItemRegistryEntry {
          *
          * <p>
          * This is typically only used for block items.
-         * This is called automatically when you call {@link #inheritsFromBlockItem},
+         * This is called automatically when you call {@link #inheritsFromBlock},
          * so you don't need to call it manually.
          * </p>
          */

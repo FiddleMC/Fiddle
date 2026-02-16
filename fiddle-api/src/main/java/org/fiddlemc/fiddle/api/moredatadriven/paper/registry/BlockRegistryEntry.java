@@ -3,11 +3,11 @@ package org.fiddlemc.fiddle.api.moredatadriven.paper.registry;
 import io.papermc.paper.registry.RegistryBuilder;
 import org.bukkit.FeatureFlag;
 import org.bukkit.Instrument;
+import org.bukkit.SoundGroup;
 import org.bukkit.block.BlockType;
 import org.bukkit.block.PistonMoveReaction;
 import org.bukkit.block.data.BlockData;
 import org.jetbrains.annotations.ApiStatus;
-import java.util.function.Supplier;
 import java.util.function.ToIntFunction;
 
 /**
@@ -40,89 +40,89 @@ public interface BlockRegistryEntry {
         /**
          * Sets the type of block to an anvil.
          */
-        BlockRegistryEntry.Builder inheritsFromAnvilBlock();
+        BlockRegistryEntry.Builder inheritsFromAnvil();
 
         /**
          * Sets the type of block to a barrel.
          */
-        BlockRegistryEntry.Builder inheritsFromBarrelBlock();
+        BlockRegistryEntry.Builder inheritsFromBarrel();
 
         /**
          * Sets the type of block to a cactus.
          */
-        BlockRegistryEntry.Builder inheritsFromCactusBlock();
+        BlockRegistryEntry.Builder inheritsFromCactus();
 
         /**
          * Sets the type of block to a cactus flower.
          */
-        BlockRegistryEntry.Builder inheritsFromCactusFlowerBlock();
+        BlockRegistryEntry.Builder inheritsFromCactusFlower();
 
         /**
          * Sets the type of block to a cake.
          */
-        BlockRegistryEntry.Builder inheritsFromCakeBlock();
+        BlockRegistryEntry.Builder inheritsFromCake();
 
         /**
          * Sets the type of block to a campfire.
          */
-        BlockRegistryEntry.Builder inheritsFromCampfireBlock(boolean spawnParticles, int fireDamage);
+        BlockRegistryEntry.Builder inheritsFromCampfire(boolean spawnParticles, int fireDamage);
 
         /**
          * Sets the type of block to candles.
          */
-        BlockRegistryEntry.Builder inheritsFromCandleBlock();
+        BlockRegistryEntry.Builder inheritsFromCandle();
 
         /**
          * Sets the type of block to a candle cake.
          *
-         * @param candleBlock A supplier for the candle block corresponding to this cake.
+         * @param candleBlock The candle block corresponding to this cake.
          */
-        BlockRegistryEntry.Builder inheritsFromCandleCakeBlock(Supplier<BlockType> candleBlock);
+        BlockRegistryEntry.Builder inheritsFromCandleCake(BlockType candleBlock);
 
         /**
          * Sets the type of block to a carpet.
          */
-        BlockRegistryEntry.Builder inheritsFromCarpetBlock();
+        BlockRegistryEntry.Builder inheritsFromCarpet();
 
         /**
          * Sets the type of block to a carved pumpkin.
          */
-        BlockRegistryEntry.Builder inheritsFromCarvedPumpkinBlock();
+        BlockRegistryEntry.Builder inheritsFromCarvedPumpkin();
 
         /**
          * Sets the type of block to a chain.
          */
-        BlockRegistryEntry.Builder inheritsFromChainBlock();
+        BlockRegistryEntry.Builder inheritsFromChain();
 
         /**
          * Sets the type of block to a fire.
          */
-        BlockRegistryEntry.Builder inheritsFromFireBlock();
+        BlockRegistryEntry.Builder inheritsFromFire();
 
         /**
          * Sets the type of block to a slab.
          */
-        BlockRegistryEntry.Builder inheritsFromSlabBlock();
+        BlockRegistryEntry.Builder inheritsFromSlab();
 
         /**
          * Sets the type of block to a soul fire.
          */
-        BlockRegistryEntry.Builder inheritsFromSoulFireBlock();
+        BlockRegistryEntry.Builder inheritsFromSoulFire();
 
         /**
          * Sets the type of block to stairs.
          *
-         * @param baseState A supplier for the default block state of the full block
+         * @param baseState The default block state of the full block
          *                  corresponding to these stairs.
          */
-        BlockRegistryEntry.Builder inheritsFromStairBlock(Supplier<BlockData> baseState);
+        BlockRegistryEntry.Builder inheritsFromStairs(BlockData baseState);
 
         /**
-         * Convenience function that calls {@link #inheritsFromStairBlock}
+         * Convenience function that calls {@link #inheritsFromStairs}
          * with the default state of the given {@link BlockType}.
          */
-        default BlockRegistryEntry.Builder inheritsFromStairBlockType(Supplier<BlockType> baseType) {
-            return this.inheritsFromStairBlock(() -> baseType.get().createBlockData());
+        default BlockRegistryEntry.Builder inheritsFromStairs(BlockType baseType) {
+            return this.inheritsFromStairs(baseType.createBlockData());
         }
 
         // Missing: a lot
@@ -130,7 +130,7 @@ public interface BlockRegistryEntry {
         /**
          * Sets the map color of this block to the map color of the given block.
          */
-        BlockRegistryEntry.Builder mapColor(Supplier<BlockType> referenceBlockType);
+        BlockRegistryEntry.Builder mapColor(BlockType referenceBlockType);
 
         /**
          * Disables collision and occlusion for this block.
@@ -169,7 +169,26 @@ public interface BlockRegistryEntry {
          */
         BlockRegistryEntry.Builder jumpFactor(float jumpFactor);
 
-        // Missing: sound
+        /**
+         * Sets the sounds this blocks makes.
+         */
+        BlockRegistryEntry.Builder sound(SoundGroup sound);
+
+        /**
+         * Convenience function that calls {@link #sound(SoundGroup)} with the sound group
+         * of the given {@link BlockData}.
+         */
+        default BlockRegistryEntry.Builder sound(BlockData blockData) {
+            return this.sound(blockData.getSoundGroup());
+        }
+
+        /**
+         * Convenience function that calls {@link #sound(BlockData)} with the default block state
+         * of the given {@link BlockType}.
+         */
+        default BlockRegistryEntry.Builder sound(BlockType blockType) {
+            return this.sound(blockType.createBlockData());
+        }
 
         /**
          * Sets the light level function for this block.

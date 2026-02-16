@@ -7,6 +7,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.EggItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.block.Block;
@@ -72,13 +73,18 @@ public abstract class ItemRegistryEntryImpl implements ItemRegistryEntry, Settab
         }
 
         @Override
-        public ItemRegistryEntryImpl.BuilderImpl inheritsFromBlockItem() {
+        public ItemRegistryEntryImpl.BuilderImpl inheritsFromBlock() {
             return this.factoryForBlockNMS();
         }
 
         @Override
-        public ItemRegistryEntryImpl.BuilderImpl inheritsFromBlockItem(NamespacedKey blockKey) {
+        public ItemRegistryEntryImpl.BuilderImpl inheritsFromBlock(NamespacedKey blockKey) {
             return this.factoryForBlockNMS(CraftNamespacedKey.toMinecraft(blockKey));
+        }
+
+        @Override
+        public Builder inheritsFromEgg() {
+            return this.factoryNMS(EggItem::new);
         }
 
         @Override

@@ -28,9 +28,11 @@ import net.minecraft.world.level.material.PushReaction;
 import org.bukkit.FeatureFlag;
 import org.bukkit.Instrument;
 import org.bukkit.NamespacedKey;
+import org.bukkit.SoundGroup;
 import org.bukkit.block.BlockType;
 import org.bukkit.block.PistonMoveReaction;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.craftbukkit.CraftSoundGroup;
 import org.bukkit.craftbukkit.block.CraftBlockType;
 import org.bukkit.craftbukkit.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.util.CraftNamespacedKey;
@@ -84,88 +86,88 @@ public abstract class BlockRegistryEntryImpl implements BlockRegistryEntry, Sett
         }
 
         @Override
-        public Builder inheritsFromAnvilBlock() {
+        public Builder inheritsFromAnvil() {
             return this.factoryNMS(AnvilBlock::new);
         }
 
         @Override
-        public Builder inheritsFromBarrelBlock() {
+        public Builder inheritsFromBarrel() {
             return this.factoryNMS(BarrelBlock::new);
         }
 
         @Override
-        public Builder inheritsFromCactusBlock() {
+        public Builder inheritsFromCactus() {
             return this.factoryNMS(properties -> new CactusBlock(properties) {
             });
         }
 
         @Override
-        public Builder inheritsFromCactusFlowerBlock() {
+        public Builder inheritsFromCactusFlower() {
             return this.factoryNMS(CactusFlowerBlock::new);
         }
 
         @Override
-        public Builder inheritsFromCakeBlock() {
+        public Builder inheritsFromCake() {
             return this.factoryNMS(properties -> new CakeBlock(properties) {
             });
         }
 
         @Override
-        public Builder inheritsFromCampfireBlock(boolean spawnParticles, int fireDamage) {
+        public Builder inheritsFromCampfire(boolean spawnParticles, int fireDamage) {
             return this.factoryNMS(properties -> new CampfireBlock(spawnParticles, fireDamage, properties));
         }
 
         @Override
-        public Builder inheritsFromCandleBlock() {
+        public Builder inheritsFromCandle() {
             return this.factoryNMS(CandleBlock::new);
         }
 
         @Override
-        public Builder inheritsFromCandleCakeBlock(Supplier<BlockType> candleBlock) {
-            return this.factoryNMS(properties -> new CandleCakeBlock(CraftBlockType.bukkitToMinecraftNew(candleBlock.get()), properties) {
+        public Builder inheritsFromCandleCake(BlockType candleBlock) {
+            return this.factoryNMS(properties -> new CandleCakeBlock(CraftBlockType.bukkitToMinecraftNew(candleBlock), properties) {
             });
         }
 
         @Override
-        public Builder inheritsFromCarpetBlock() {
+        public Builder inheritsFromCarpet() {
             return this.factoryNMS(CarpetBlock::new);
         }
 
         @Override
-        public Builder inheritsFromCarvedPumpkinBlock() {
+        public Builder inheritsFromCarvedPumpkin() {
             return this.factoryNMS(properties -> new CarvedPumpkinBlock(properties) {
             });
         }
 
         @Override
-        public Builder inheritsFromChainBlock() {
+        public Builder inheritsFromChain() {
             return this.factoryNMS(ChainBlock::new);
         }
 
         @Override
-        public Builder inheritsFromFireBlock() {
+        public Builder inheritsFromFire() {
             return this.factoryNMS(FireBlock::new);
         }
 
         @Override
-        public Builder inheritsFromSlabBlock() {
+        public Builder inheritsFromSlab() {
             return this.factoryNMS(SlabBlock::new);
         }
 
         @Override
-        public Builder inheritsFromSoulFireBlock() {
+        public Builder inheritsFromSoulFire() {
             return this.factoryNMS(SoulFireBlock::new);
         }
 
         @Override
-        public Builder inheritsFromStairBlock(Supplier<BlockData> baseState) {
-            return this.factoryNMS(properties -> new StairBlock(((CraftBlockData) baseState.get()).getState(), properties) {
+        public Builder inheritsFromStairs(BlockData baseState) {
+            return this.factoryNMS(properties -> new StairBlock(((CraftBlockData) baseState).getState(), properties) {
             });
         }
 
         @Override
-        public Builder mapColor(Supplier<BlockType> referenceBlockType) {
-            return this.propertiesNMS(properties -> properties.mapColor(CraftBlockType.bukkitToMinecraftNew(referenceBlockType.get()).defaultMapColor()));
+        public Builder mapColor(BlockType referenceBlockType) {
+            return this.propertiesNMS(properties -> properties.mapColor(CraftBlockType.bukkitToMinecraftNew(referenceBlockType).defaultMapColor()));
         }
 
         @Override
@@ -191,6 +193,11 @@ public abstract class BlockRegistryEntryImpl implements BlockRegistryEntry, Sett
         @Override
         public Builder jumpFactor(float jumpFactor) {
             return this.propertiesNMS(properties -> properties.jumpFactor(jumpFactor));
+        }
+
+        @Override
+        public Builder sound(SoundGroup sound) {
+            return this.propertiesNMS(properties -> properties.sound(((CraftSoundGroup) sound).getHandle()));
         }
 
         @Override

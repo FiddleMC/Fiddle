@@ -70,13 +70,14 @@ public class TestPluginBootstrap implements PluginBootstrap {
         context.getLifecycleManager().registerEventHandler(FiddleEvents.BLOCK, event -> {
 
             event.registry().register(TypedKey.create(RegistryKey.BLOCK, Key.key("example:ash_block")), builder -> {
-                builder.requiresCorrectToolForDrops(); // It drops nothing unless broken with the right tool (a shovel, as defined in the included data pack)
-                builder.mapColor(() -> BlockType.LIGHT_GRAY_WOOL); // It shows up light gray on maps
-                builder.pushReaction(PistonMoveReaction.BREAK); // It breaks when pushed by a piston
+                builder
+                    .requiresCorrectToolForDrops() // It drops nothing unless broken with the right tool (a shovel, as defined in the included data pack)
+                    .mapColor(BlockType.LIGHT_GRAY_WOOL) // It shows up light gray on maps
+                    .pushReaction(PistonMoveReaction.BREAK); // It breaks when pushed by a piston
             });
 
             event.registry().register(TypedKey.create(RegistryKey.BLOCK, Key.key("example:ash_stairs")), builder -> {
-                builder.inheritsFromStairBlockType(() -> PluginBlockTypes.ASH_BLOCK.get()); // It's a stair block
+                builder.inheritsFromStairs(PluginBlockTypes.ASH_BLOCK.get()); // It's a stair block
             });
 
         });
@@ -102,14 +103,14 @@ public class TestPluginBootstrap implements PluginBootstrap {
             });
 
             event.registry().register(TypedKey.create(RegistryKey.ITEM, Key.key("example:ash_block")), builder ->
-                builder.inheritsFromBlockItem() // It's a block item
+                builder.inheritsFromBlock() // It's a block item
                     .stacksTo(32) // It stacks to 32
                     .fireResistant() // It is resistant to fire
                     .craftRemainder(PluginItemTypes.ASH.get()) // It leaves ash when used in a crafting recipe
             );
 
             event.registry().register(TypedKey.create(RegistryKey.ITEM, Key.key("example:ash_stairs")), builder ->
-                builder.inheritsFromBlockItem() // It's a block item
+                builder.inheritsFromBlock() // It's a block item
             );
 
         });
